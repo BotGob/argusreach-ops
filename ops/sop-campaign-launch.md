@@ -1,0 +1,127 @@
+# SOP: Campaign Launch — ArgusReach
+
+**Trigger:** Client onboarding call complete, ICP approved, sequences approved.
+
+---
+
+## Step 1 — Build Prospect List (Apollo.io)
+
+1. Log into Apollo.io
+2. Navigate to **People** → **Search**
+3. Apply filters from approved ICP document:
+   - Job Titles (use exact match + broad variations)
+   - Location (city, state, radius)
+   - Company headcount
+   - Industry
+   - Any exclusion keywords
+4. Review first 20 results manually — do they look right?
+5. Export up to plan limit (Starter: 200, Growth: 500, Scale: 1,000+)
+6. Download as CSV
+7. Clean CSV in Google Sheets:
+   - Remove obvious duplicates
+   - Remove anyone with incomplete email
+   - Remove anyone on client's do-not-contact list
+   - Add "first name" column if not present (Instantly uses {{firstName}})
+
+---
+
+## Step 2 — Set Up Sending Infrastructure (Instantly.ai)
+
+### New client (first campaign):
+1. Create new workspace in Instantly for client
+2. Add sending email account:
+   - Preferred: subdomain of client's domain (e.g., `outreach.bayharborwealth.com`)
+   - Alternative: ArgusReach subdomain (e.g., `[clientname].mail.argusreach.com`)
+3. Configure DNS records:
+   - SPF: `v=spf1 include:_spf.google.com ~all` (if using Gmail/Workspace)
+   - DKIM: follow Instantly's domain authentication guide
+   - DMARC: `v=DMARC1; p=quarantine; rua=mailto:dmarc@argusreach.com`
+4. Enable **Warmup** — set to 20–30 emails/day warming, 14-day period
+5. Do not launch cold outreach until warmup score ≥ 85
+
+### Returning client (existing warmed domain):
+- Skip to Step 3
+
+---
+
+## Step 3 — Build Campaign in Instantly
+
+1. Create new campaign: `[ClientFirm] — [Month] — [Vertical]`
+2. Import cleaned CSV of prospects
+3. Configure sequence:
+   - **Step 1** (Day 0): Initial outreach
+   - **Step 2** (Day 3): Follow-up variant
+   - **Step 3** (Day 7): Value-add touch
+   - **Step 4** (Day 14): Final check-in
+   - **Step 5** (Day 21): Soft breakup ("I'll leave the door open...")
+4. Personalization variables: `{{firstName}}`, `{{company}}`, `{{customField_1}}` (trigger event)
+5. Set send window: **Tue–Thu, 7–9 AM or 12–2 PM** client's time zone
+6. Set daily send limit: 40–80/day depending on warmup score
+7. Enable **Open Tracking** and **Reply Detection**
+8. Set **Reply Action**: pause sequence on any reply (positive, negative, or OOO)
+
+---
+
+## Step 4 — Internal QA Before Launch
+
+- [ ] Send test email to Go's test inbox — does it render correctly?
+- [ ] Check sender name: should match client's name (e.g., "James K." not "james.k@")
+- [ ] Check subject line: no ALL CAPS, no spam trigger words (free, guarantee, urgent)
+- [ ] Read every touch out loud — does it sound human?
+- [ ] Verify personalization tags are populating (not showing `{{firstName}}` literally)
+- [ ] Check unsubscribe mechanism is present (Instantly auto-inserts footer)
+- [ ] Confirm reply-to routes to monitored inbox
+
+---
+
+## Step 5 — Client Final Approval
+
+- Email client: "Sequences are ready for review. [Link to Google Doc with copy]"
+- Wait for written go-ahead
+- Do NOT launch without explicit client approval
+
+---
+
+## Step 6 — Launch
+
+1. Set campaign to **Active** in Instantly
+2. Note launch date and time in Airtable (client record)
+3. Send launch confirmation to client:
+   > "Your campaign is live. First emails are going out now. I'll send you an update in 3 days with early metrics. Any positive replies will come to you directly [via method]. Let me know if you have questions."
+
+---
+
+## Step 7 — First 72 Hours Monitoring
+
+- Check deliverability score in Instantly — should stay ≥ 80
+- Watch for bounce rate > 5% → pause and clean list
+- Watch for spam complaint → pause immediately, investigate sending domain
+- Forward any positive replies to client same-day
+- Flag any interesting "not now" replies for future re-engagement
+
+---
+
+## Step 8 — Ongoing Weekly
+
+- Every Monday: pull weekly metrics (sent, opened, replied)
+- Compile into client's monthly report doc
+- If open rate drops below 25%: A/B test new subject line
+- If positive reply rate drops below 2%: review body copy, try new angle
+- Update Airtable prospect statuses: `New → Contacted → Replied → Booked → Closed (client reports)`
+
+---
+
+## Escalation / Problem Handling
+
+| Problem | Action |
+|---------|--------|
+| Bounce rate > 10% | Pause campaign, re-clean list, check email verification |
+| Spam complaint received | Pause campaign, investigate, remove domain if needed |
+| Angry reply | Respond professionally: "I'm sorry to bother you — you've been removed." Remove from all sequences. |
+| Client wants to pause | Pause in Instantly, confirm in writing, note pause date |
+| Domain blacklisted | Stop immediately, set up new sending domain, check MX Toolbox |
+
+---
+
+**Owner:** Vito R. (ArgusReach)
+**Last updated:** March 2026
