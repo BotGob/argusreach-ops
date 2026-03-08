@@ -91,8 +91,11 @@
 ---
 
 ## Meeting Booking
-- **Calendly** (free) — Vito's calendar link for discovery calls
-- Embed in website + include in email signatures
+- **Calendly** — Vito's calendar link for discovery calls: `calendly.com/vito-argusreach/30min`
+- ⚠️ **14-day free trial started ~2026-03-08** — check expiry ~2026-03-22
+- **Free plan (Basic):** 1 event type, unlimited meetings — likely sufficient for MVP (we only need the one 30-min strategy call link)
+- **Paid plan (Standard):** $10/month — adds multiple event types, email reminders, integrations
+- **Action:** Before trial ends, confirm whether Basic free plan covers our needs. If yes, downgrade to free. If reminders or multiple event types are needed, $10/month is reasonable — add to cost sheet.
 
 ---
 
@@ -111,7 +114,7 @@
 | Apollo.io (lead sourcing) | $0 (free tier) |
 | Airtable (CRM) | $0 (free tier) |
 | Netlify (website hosting) | $0 (free tier) |
-| Calendly (booking) | $0 (free tier) |
+| Calendly (booking) | $0 free / $10/mo paid — ⚠️ trial ends ~2026-03-22 |
 | n8n (automation) | $0 (self-hosted on VPS) |
 | Claude API (already paying) | ~$20–50/mo |
 | **TOTAL** | **~$57–87/month** |
