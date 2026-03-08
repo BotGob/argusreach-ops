@@ -35,10 +35,26 @@ ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 
 POLL_INTERVAL_SECONDS = 600  # 10 minutes
 LOOKBACK_HOURS = 12           # how far back to check for unread replies
+MAX_EMAILS_PER_CLIENT = 15    # hard cap per cycle — if more, something's wrong
+MAX_AI_CALLS_PER_DAY = 100   # global daily cap across all clients to control cost
 
 # ── INIT ─────────────────────────────────────────────────────────────────────
 (BASE_DIR / 'logs').mkdir(exist_ok=True)
 ai = Anthropic(api_key=ANTHROPIC_API_KEY)
+
+# Daily AI call counter — resets at midnight
+_ai_call_log = {'date': datetime.now().date(), 'count': 0}
+
+def ai_budget_ok():
+    """Check we haven't hit the daily AI call cap."""
+    today = datetime.now().date()
+    if _ai_call_log['date'] != today:
+        _ai_call_log['date'] = today
+        _ai_call_log['count'] = 0
+    return _ai_call_log['count'] < MAX_AI_CALLS_PER_DAY
+
+def ai_call_made():
+    _ai_call_log['count'] += 1
 
 # ── HELPERS ──────────────────────────────────────────────────────────────────
 def load_clients():
@@ -95,8 +111,30 @@ def get_email_body(msg):
 def is_automated_sender(from_email):
     """Filter out delivery failures, OOO auto-replies, etc."""
     automated = ['mailer-daemon', 'postmaster', 'noreply', 'no-reply',
-                 'donotreply', 'do-not-reply', 'bounce', 'notification']
+                 'donotreply', 'do-not-reply', 'bounce', 'notification',
+                 'feedback@', 'reports@', 'alert@', 'support@']
     return any(a in from_email.lower() for a in automated)
+
+def is_genuine_reply(msg):
+    """
+    Only process emails that are actual replies to something we sent.
+    Real replies have In-Reply-To or References headers.
+    Spam and cold inbound emails don't.
+    This is the primary cost control — no API call unless it's a real reply.
+    """
+    return bool(msg.get('In-Reply-To') or msg.get('References'))
+
+def looks_like_spam(msg, body):
+    """Secondary spam signals after the reply check."""
+    subject = msg.get('Subject', '').lower()
+    spam_subjects = ['unsubscribe', 'click here', 'you have won', 'congratulations',
+                     'limited time', 'act now', 'free offer', 'make money']
+    if any(s in subject for s in spam_subjects):
+        return True
+    # Very long body with no personal content is usually spam
+    if len(body) > 5000 and 'meeting' not in body.lower() and 'call' not in body.lower():
+        return True
+    return False
 
 # ── CORE LOGIC ───────────────────────────────────────────────────────────────
 def classify_and_draft(reply_body, prospect_name, prospect_email, subject, client):
@@ -216,6 +254,14 @@ def process_client(c):
 
         print(f"{label} {len(msg_ids)} new message(s) found.")
 
+        # Hard cap — if suspiciously many, alert and process only up to the limit
+        if len(msg_ids) > MAX_EMAILS_PER_CLIENT:
+            notify_vito(
+                f"⚠️ *{c['firm_name']}* — {len(msg_ids)} unread emails found. "
+                f"Processing first {MAX_EMAILS_PER_CLIENT} only. Check inbox for issues."
+            )
+            msg_ids = msg_ids[:MAX_EMAILS_PER_CLIENT]
+
         for msg_id in msg_ids:
             _, data = mail.fetch(msg_id, '(RFC822)')
             raw_email = data[0][1]
@@ -226,16 +272,41 @@ def process_client(c):
             body = get_email_body(msg)
 
             if not body.strip():
+                mail.store(msg_id, '+FLAGS', '\\Seen')
                 continue
 
+            # Filter 1: automated senders (delivery failures, noreply, etc.)
             if is_automated_sender(from_email):
                 print(f"{label} Skipping automated sender: {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 continue
 
+            # Filter 2: must be a genuine reply (has In-Reply-To / References header)
+            # This eliminates spam and cold inbound emails before any API call
+            if not is_genuine_reply(msg):
+                print(f"{label} Skipping — not a reply to our outreach: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                continue
+
+            # Filter 3: secondary spam signals
+            if looks_like_spam(msg, body):
+                print(f"{label} Skipping spam-like email from: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                continue
+
+            # Filter 4: global daily AI budget
+            if not ai_budget_ok():
+                notify_vito(
+                    f"⚠️ Daily AI call limit ({MAX_AI_CALLS_PER_DAY}) reached. "
+                    f"Replies queued until tomorrow. Consider raising limit if needed."
+                )
+                print("Daily AI cap reached. Stopping cycle.")
+                break
+
             print(f"{label} Processing reply from {from_name} <{from_email}>")
 
-            # Classify and draft
+            # Classify and draft — API call only happens here, after all filters pass
+            ai_call_made()
             result = classify_and_draft(body, from_name, from_email, subject, c)
             classification = result['classification']
             draft = result.get('draft_response', '')
