@@ -1,19 +1,35 @@
 {
+  "_readme": "Set active=true to enable a client. Set active=false to pause without deleting. Mode: automated or draft_approval.",
   "clients": [
     {
-      "_comment": "EXAMPLE — replace with real client data at onboarding",
+      "_comment": "EXAMPLE CLIENT — copy this block to add a new client, fill in all fields, set active=true",
       "id": "bay_harbor_wealth",
       "active": false,
       "mode": "draft_approval",
+
       "outreach_email": "james.k@bayharborwealth.com",
       "app_password": "xxxx xxxx xxxx xxxx",
+
       "sender_name": "James K.",
       "firm_name": "Bay Harbor Wealth Advisors",
       "vertical": "RIA",
+
       "calendly_link": "https://calendly.com/jamesk-bayharborwealth/30min",
-      "icp_summary": "Business owners post-exit, HNW individuals in Tampa Bay seeking wealth management after a major liquidity event or transition",
+
+      "icp_summary": "Business owners post-exit, HNW individuals 50-65 in Tampa Bay seeking wealth management after a liquidity event, inheritance, or business sale",
+
       "tone": "warm-professional",
-      "compliance_note": "No specific return promises or performance guarantees"
+      "compliance_note": "No specific return promises, no mention of specific securities or investment strategies, no performance guarantees of any kind",
+
+      "_field_notes": {
+        "id": "Unique snake_case identifier — used in APPROVE/REJECT commands and log files",
+        "mode": "automated = AI responds immediately; draft_approval = AI drafts, Vito gets Telegram message to APPROVE or REJECT",
+        "outreach_email": "The dedicated Gmail on the client's domain — NOT their main email",
+        "app_password": "16-char Gmail App Password (Google Account > Security > App Passwords). Never their actual password.",
+        "vertical": "RIA | Insurance | PhysicalTherapy | MentalHealth | Mortgage | Other",
+        "tone": "warm-professional | formal | conversational — affects AI response style",
+        "compliance_note": "What the AI should NEVER say or promise for this client specifically"
+      }
     }
   ]
 }

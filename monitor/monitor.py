@@ -1,68 +1,161 @@
 #!/usr/bin/env python3
 """
-ArgusReach Reply Monitor
-Monitors client outreach inboxes, classifies replies, drafts and sends responses.
-Runs continuously, checks every 10 minutes.
+ArgusReach Reply Monitor v2
+────────────────────────────
+Monitors client outreach inboxes, classifies replies with AI, auto-responds
+or queues drafts for approval, and sends Vito a nightly digest.
 
-Setup: python3 monitor.py
-Config: clients.json
-Logs: logs/replies.json
+Run:    python3 monitor.py
+Test:   python3 monitor.py --test       (connects, classifies, never sends)
+Logs:   logs/monitor.log, logs/replies.json, logs/pending_approvals.json
 """
 
+import argparse
 import imaplib
 import smtplib
 import email
 import email.utils
 import json
 import os
-import time
 import sys
-import requests
+import time
+import hashlib
+import threading
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from pathlib import Path
+
+import requests
 from anthropic import Anthropic
 
-# ── CONFIG ──────────────────────────────────────────────────────────────────
-BASE_DIR = Path(__file__).parent
-CLIENTS_FILE = BASE_DIR / 'clients.json'
-LOG_FILE = BASE_DIR / 'logs' / 'replies.json'
+# ── PATHS ─────────────────────────────────────────────────────────────────────
+BASE_DIR        = Path(__file__).parent
+CLIENTS_FILE    = BASE_DIR / 'clients.json'
+LOG_DIR         = BASE_DIR / 'logs'
+DNC_DIR         = BASE_DIR / 'dnc'
+REPLY_LOG       = LOG_DIR / 'replies.json'
+PENDING_FILE    = LOG_DIR / 'pending_approvals.json'
+PROCESSED_FILE  = LOG_DIR / 'processed_ids.json'
+MONITOR_LOG     = LOG_DIR / 'monitor.log'
 
-TELEGRAM_BOT_TOKEN = os.environ.get('ARGUSREACH_BOT_TOKEN', '8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk')
-TELEGRAM_CHAT_ID = os.environ.get('ARGUSREACH_CHAT_ID', '8135725412')
-ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+LOG_DIR.mkdir(exist_ok=True)
+DNC_DIR.mkdir(exist_ok=True)
 
-POLL_INTERVAL_SECONDS = 600  # 10 minutes
-LOOKBACK_HOURS = 12           # how far back to check for unread replies
-MAX_EMAILS_PER_CLIENT = 15    # hard cap per cycle — if more, something's wrong
-MAX_AI_CALLS_PER_DAY = 100   # global daily cap across all clients to control cost
+# ── CONFIG ────────────────────────────────────────────────────────────────────
+TELEGRAM_BOT_TOKEN  = os.environ.get('ARGUSREACH_BOT_TOKEN',
+                                      '8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk')
+TELEGRAM_CHAT_ID    = os.environ.get('ARGUSREACH_CHAT_ID', '8135725412')
+ANTHROPIC_API_KEY   = os.environ.get('ANTHROPIC_API_KEY', '')
 
-# ── INIT ─────────────────────────────────────────────────────────────────────
-(BASE_DIR / 'logs').mkdir(exist_ok=True)
-ai = Anthropic(api_key=ANTHROPIC_API_KEY)
+POLL_INTERVAL       = 600       # seconds between inbox checks (10 min)
+MAX_PER_CLIENT      = 15        # hard cap per cycle
+MAX_AI_CALLS_DAY    = 100       # daily Claude budget
+DIGEST_HOUR         = 18        # 24h local hour to send daily digest (6pm)
+AI_MODEL            = 'claude-3-5-haiku-20241022'  # verified Haiku model ID
 
-# Daily AI call counter — resets at midnight
-_ai_call_log = {'date': datetime.now().date(), 'count': 0}
+# ── ARGS ──────────────────────────────────────────────────────────────────────
+parser = argparse.ArgumentParser()
+parser.add_argument('--test', action='store_true',
+                    help='Test mode: reads and classifies, never sends emails')
+ARGS = parser.parse_args()
+TEST_MODE = ARGS.test
+
+# ── LOGGING ───────────────────────────────────────────────────────────────────
+def log(msg):
+    line = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} {msg}"
+    print(line)
+    with open(MONITOR_LOG, 'a') as f:
+        f.write(line + '\n')
+
+# ── AI CLIENT ─────────────────────────────────────────────────────────────────
+ai = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+
+_ai_day   = datetime.now().date()
+_ai_count = 0
 
 def ai_budget_ok():
-    """Check we haven't hit the daily AI call cap."""
+    global _ai_day, _ai_count
     today = datetime.now().date()
-    if _ai_call_log['date'] != today:
-        _ai_call_log['date'] = today
-        _ai_call_log['count'] = 0
-    return _ai_call_log['count'] < MAX_AI_CALLS_PER_DAY
+    if today != _ai_day:
+        _ai_day, _ai_count = today, 0
+    return _ai_count < MAX_AI_CALLS_DAY
 
-def ai_call_made():
-    _ai_call_log['count'] += 1
+def ai_tick():
+    global _ai_count
+    _ai_count += 1
 
-# ── HELPERS ──────────────────────────────────────────────────────────────────
-def load_clients():
-    with open(CLIENTS_FILE) as f:
-        data = json.load(f)
-    return [c for c in data['clients'] if c.get('active', False)]
+# ── DNC (DO NOT CONTACT) ──────────────────────────────────────────────────────
+def dnc_path(client_id):
+    return DNC_DIR / f'{client_id}.txt'
 
-def notify_vito(text):
+def is_dnc(client_id, email_addr):
+    p = dnc_path(client_id)
+    if not p.exists():
+        return False
+    return email_addr.lower().strip() in p.read_text().lower()
+
+def add_dnc(client_id, email_addr):
+    p = dnc_path(client_id)
+    with open(p, 'a') as f:
+        f.write(email_addr.lower().strip() + '\n')
+    log(f"[DNC] Added {email_addr} for client {client_id}")
+
+# ── PROCESSED ID DEDUPLICATION ────────────────────────────────────────────────
+def load_processed():
+    if PROCESSED_FILE.exists():
+        try:
+            return set(json.loads(PROCESSED_FILE.read_text()))
+        except Exception:
+            return set()
+    return set()
+
+def save_processed(ids: set):
+    # Keep only last 10k to prevent unbounded growth
+    trimmed = list(ids)[-10000:]
+    PROCESSED_FILE.write_text(json.dumps(trimmed))
+
+def msg_fingerprint(from_email, subject, date_str):
+    """Stable ID for a message to prevent double-processing."""
+    return hashlib.sha256(f"{from_email}|{subject}|{date_str}".encode()).hexdigest()[:16]
+
+# ── PENDING APPROVALS ─────────────────────────────────────────────────────────
+def load_pending():
+    if PENDING_FILE.exists():
+        try:
+            return json.loads(PENDING_FILE.read_text())
+        except Exception:
+            return []
+    return []
+
+def save_pending(pending):
+    PENDING_FILE.write_text(json.dumps(pending, indent=2))
+
+def queue_pending(client, from_email, from_name, subject, draft, classification):
+    pending = load_pending()
+    entry = {
+        'id': f"{client['id']}:{from_email}:{int(time.time())}",
+        'client_id': client['id'],
+        'firm_name': client['firm_name'],
+        'outreach_email': client['outreach_email'],
+        'app_password': client['app_password'],
+        'sender_name': client['sender_name'],
+        'from_email': from_email,
+        'from_name': from_name,
+        'subject': subject,
+        'draft': draft,
+        'classification': classification,
+        'queued_at': datetime.now().isoformat(),
+    }
+    pending.append(entry)
+    save_pending(pending)
+    return entry['id']
+
+# ── TELEGRAM ──────────────────────────────────────────────────────────────────
+def notify(text):
+    if TEST_MODE:
+        log(f"[TEST] Telegram would send: {text[:120]}")
+        return
     try:
         requests.post(
             f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage',
@@ -70,28 +163,93 @@ def notify_vito(text):
             timeout=10
         )
     except Exception as e:
-        print(f'Telegram notify failed: {e}')
+        log(f"Telegram error: {e}")
 
-def log_event(client_id, prospect_email, classification, draft, sent, notes=''):
+def check_telegram_commands():
+    """
+    Poll Telegram for incoming messages from Vito.
+    Handles: APPROVE <id> or REJECT <id>
+    Called once per main loop cycle.
+    """
     try:
-        with open(LOG_FILE) as f:
-            log = json.load(f)
-    except Exception:
-        log = []
-    log.append({
-        'timestamp': datetime.now().isoformat(),
-        'client': client_id,
-        'prospect': prospect_email,
-        'classification': classification,
-        'draft_preview': draft[:200] if draft else '',
-        'sent': sent,
-        'notes': notes
-    })
-    with open(LOG_FILE, 'w') as f:
-        json.dump(log, f, indent=2)
+        resp = requests.get(
+            f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates',
+            params={'timeout': 5, 'offset': _telegram_offset.get('offset', 0)},
+            timeout=10
+        ).json()
+        updates = resp.get('result', [])
+        if not updates:
+            return
+        _telegram_offset['offset'] = updates[-1]['update_id'] + 1
 
-def get_email_body(msg):
-    """Extract plain text body from email message."""
+        for u in updates:
+            msg = u.get('message', {})
+            text = msg.get('text', '').strip()
+            from_id = msg.get('from', {}).get('id')
+
+            # Only accept commands from Vito
+            if str(from_id) != str(TELEGRAM_CHAT_ID):
+                continue
+            if not text.upper().startswith(('APPROVE', 'REJECT', 'PENDING')):
+                continue
+
+            parts = text.split()
+            cmd = parts[0].upper()
+
+            if cmd == 'PENDING':
+                pending = load_pending()
+                if not pending:
+                    notify("No pending approvals.")
+                else:
+                    lines = ["*Pending drafts:*"]
+                    for i, p in enumerate(pending):
+                        lines.append(
+                            f"{i+1}. `{p['id']}`\n"
+                            f"   {p['firm_name']} → {p['from_name'] or p['from_email']}\n"
+                            f"   _{p['classification']}_"
+                        )
+                    notify('\n'.join(lines))
+
+            elif cmd == 'APPROVE' and len(parts) >= 2:
+                target_id = parts[1]
+                pending = load_pending()
+                match = next((p for p in pending if p['id'] == target_id or target_id in p['id']), None)
+                if not match:
+                    notify(f"❌ No pending draft found for ID: `{target_id}`")
+                    continue
+                if TEST_MODE:
+                    notify(f"[TEST] Would send draft to {match['from_email']}")
+                else:
+                    try:
+                        _send_email(match['outreach_email'], match['app_password'],
+                                    match['sender_name'], match['from_email'],
+                                    match['subject'], match['draft'])
+                        pending = [p for p in pending if p['id'] != match['id']]
+                        save_pending(pending)
+                        notify(f"✅ Sent to {match['from_name'] or match['from_email']} ({match['firm_name']})")
+                        log(f"[APPROVED] Sent draft to {match['from_email']}")
+                    except Exception as e:
+                        notify(f"❌ Send failed: `{str(e)[:200]}`")
+
+            elif cmd == 'REJECT' and len(parts) >= 2:
+                target_id = parts[1]
+                pending = load_pending()
+                match = next((p for p in pending if p['id'] == target_id or target_id in p['id']), None)
+                if not match:
+                    notify(f"❌ No pending draft found for ID: `{target_id}`")
+                    continue
+                pending = [p for p in pending if p['id'] != match['id']]
+                save_pending(pending)
+                notify(f"🗑 Rejected and discarded draft for {match['from_email']}")
+                log(f"[REJECTED] Discarded draft for {match['from_email']}")
+
+    except Exception as e:
+        log(f"Telegram command check error: {e}")
+
+_telegram_offset = {'offset': 0}
+
+# ── EMAIL UTILS ───────────────────────────────────────────────────────────────
+def get_body(msg):
     if msg.is_multipart():
         for part in msg.walk():
             ct = part.get_content_type()
@@ -108,156 +266,187 @@ def get_email_body(msg):
             pass
     return ''
 
-def is_automated_sender(from_email):
-    """Filter out delivery failures, OOO auto-replies, etc."""
-    automated = ['mailer-daemon', 'postmaster', 'noreply', 'no-reply',
-                 'donotreply', 'do-not-reply', 'bounce', 'notification',
-                 'feedback@', 'reports@', 'alert@', 'support@']
-    return any(a in from_email.lower() for a in automated)
+def is_automated(from_email):
+    skip = ['mailer-daemon', 'postmaster', 'noreply', 'no-reply',
+            'donotreply', 'do-not-reply', 'bounce@', 'notification',
+            'feedback@', 'reports@', 'alerts@', 'support@', 'daemon@']
+    return any(s in from_email.lower() for s in skip)
 
 def is_genuine_reply(msg):
-    """
-    Only process emails that are actual replies to something we sent.
-    Real replies have In-Reply-To or References headers.
-    Spam and cold inbound emails don't.
-    This is the primary cost control — no API call unless it's a real reply.
-    """
+    """Real replies have In-Reply-To or References headers. Spam doesn't."""
     return bool(msg.get('In-Reply-To') or msg.get('References'))
 
-def looks_like_spam(msg, body):
-    """Secondary spam signals after the reply check."""
+def is_spam(msg, body):
     subject = msg.get('Subject', '').lower()
-    spam_subjects = ['unsubscribe', 'click here', 'you have won', 'congratulations',
-                     'limited time', 'act now', 'free offer', 'make money']
-    if any(s in subject for s in spam_subjects):
+    spam_words = ['click here', 'you have won', 'congratulations', 'limited time offer',
+                  'act now', 'free money', 'make money fast', 'work from home']
+    if any(w in subject for w in spam_words):
         return True
-    # Very long body with no personal content is usually spam
-    if len(body) > 5000 and 'meeting' not in body.lower() and 'call' not in body.lower():
+    if len(body) > 8000 and 'meeting' not in body.lower() and 'call' not in body.lower():
         return True
     return False
 
-# ── CORE LOGIC ───────────────────────────────────────────────────────────────
-def classify_and_draft(reply_body, prospect_name, prospect_email, subject, client):
-    """Use Claude to classify the reply and draft an appropriate response."""
-    prompt = f"""You are a reply routing assistant for {client['sender_name']} at {client['firm_name']}.
-
-YOUR ONLY JOB: Classify the reply and draft a brief, safe response that routes interested prospects to a calendar booking. Nothing more.
-
-CLIENT CONTEXT:
-- Sender: {client['sender_name']}, {client['firm_name']}
-- Vertical: {client['vertical']}
-- Tone: {client.get('tone', 'warm-professional')}
-- Compliance: {client.get('compliance_note', 'none')}
-- Booking link: {client['calendly_link']}
-
-PROSPECT: {prospect_name} ({prospect_email})
-SUBJECT: {subject}
-
-THEIR REPLY:
----
-{reply_body[:1500]}
----
-
-STRICT RULES — violating any of these means set should_respond=false and escalate=true:
-1. NEVER answer domain-specific questions (investment advice, insurance coverage, medical/clinical questions, legal questions, market predictions, product recommendations). Route to a call instead.
-2. NEVER make promises, guarantees, or commitments of any kind.
-3. NEVER discuss pricing, fees, or specific service terms.
-4. NEVER speak negatively about competitors or other firms.
-5. NEVER share any information about other clients.
-6. If the email is aggressive, threatening, legal in nature, or contains complaints — do NOT respond. Escalate immediately.
-7. If you are uncertain about ANYTHING — do not respond. Escalate.
-8. Your response should do ONE thing: acknowledge warmly and invite a conversation via the booking link.
-9. Keep responses to 2-4 sentences maximum.
-10. Never mention ArgusReach. You are {client['sender_name']}.
-
-SAFE RESPONSE TEMPLATES (adapt tone, don't copy verbatim):
-- Positive: "Thanks for getting back to me, [name]. Happy to connect — feel free to grab a time here: [link]. Looking forward to it."
-- Question requiring expertise: "Good question — that's exactly what I'd want to cover on a call. [link] — pick whatever time works."
-- Not now: "Understood, [name] — I'll leave it with you. Feel free to reach out anytime."
-- Negative: "Noted — I've removed you from my list. Sorry for the interruption."
-
-Return ONLY valid JSON:
-{{
-  "classification": "positive|question|not_now|negative|ooo|other",
-  "reasoning": "one sentence",
-  "should_respond": true,
-  "escalate": false,
-  "escalate_reason": "why this needs human review, or empty string",
-  "draft_response": "safe 2-4 sentence response body only, or empty string if escalate=true",
-  "notify_vito": true,
-  "notify_reason": "brief reason",
-  "follow_up_date": "YYYY-MM-DD if not_now, else null",
-  "urgency": "high|medium|low"
-}}"""
-
-    try:
-        response = ai.messages.create(
-            model='claude-haiku-4-5',
-            max_tokens=800,
-            messages=[{'role': 'user', 'content': prompt}]
-        )
-        raw = response.content[0].text.strip()
-        # Strip markdown code blocks if present
-        if raw.startswith('```'):
-            raw = raw.split('```')[1]
-            if raw.startswith('json'):
-                raw = raw[4:]
-        return json.loads(raw.strip())
-    except Exception as e:
-        print(f'AI classification error: {e}')
-        # Fallback: flag for manual review
-        return {
-            'classification': 'other',
-            'reasoning': f'Classification failed: {str(e)[:100]}',
-            'should_respond': False,
-            'draft_response': '',
-            'notify_vito': True,
-            'notify_reason': 'Classification failed — needs manual review',
-            'follow_up_date': None,
-            'urgency': 'medium'
-        }
-
-def send_email(outreach_email, app_password, sender_name, to_email, subject, body):
-    """Send email via Gmail SMTP."""
+def _send_email(outreach_email, app_password, sender_name, to_email, subject, body, retry=1):
+    """Send via Gmail SMTP with one retry."""
     msg = MIMEMultipart('alternative')
     msg['From'] = f'{sender_name} <{outreach_email}>'
     msg['To'] = to_email
     msg['Subject'] = subject if subject.lower().startswith('re:') else f'Re: {subject}'
     msg.attach(MIMEText(body, 'plain'))
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(outreach_email, app_password)
-        smtp.send_message(msg)
 
-# ── PER-CLIENT PROCESSING ────────────────────────────────────────────────────
-def process_client(c):
-    label = f"[{c['firm_name']}]"
-    print(f"{datetime.now().strftime('%H:%M:%S')} {label} Checking inbox...")
+    for attempt in range(1 + retry):
+        try:
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as smtp:
+                smtp.login(outreach_email, app_password)
+                smtp.send_message(msg)
+            return True
+        except Exception as e:
+            if attempt < retry:
+                log(f"SMTP failed (attempt {attempt+1}), retrying in 5s: {e}")
+                time.sleep(5)
+            else:
+                raise
+
+# ── REPLY LOG ─────────────────────────────────────────────────────────────────
+def log_reply(client_id, prospect_email, classification, draft, sent, notes=''):
+    try:
+        data = json.loads(REPLY_LOG.read_text()) if REPLY_LOG.exists() else []
+    except Exception:
+        data = []
+    data.append({
+        'ts': datetime.now().isoformat(),
+        'client': client_id,
+        'prospect': prospect_email,
+        'classification': classification,
+        'draft_preview': (draft or '')[:200],
+        'sent': sent,
+        'notes': notes,
+        'test_mode': TEST_MODE,
+    })
+    REPLY_LOG.write_text(json.dumps(data, indent=2))
+
+# ── AI CLASSIFICATION ─────────────────────────────────────────────────────────
+def classify_and_draft(reply_body, from_name, from_email, subject, client):
+    if not ai:
+        return _fallback_result('No ANTHROPIC_API_KEY configured')
+
+    prompt = f"""You are a reply routing assistant for {client['sender_name']} at {client['firm_name']}.
+
+YOUR SOLE JOB: Classify this reply and draft a brief, safe response that routes interested prospects to a calendar booking. Nothing else.
+
+CLIENT CONTEXT:
+- Sender: {client['sender_name']}, {client['firm_name']}
+- Vertical: {client['vertical']}
+- Tone: {client.get('tone', 'warm-professional')}
+- Compliance notes: {client.get('compliance_note', 'none')}
+- Booking link: {client['calendly_link']}
+- ICP: {client.get('icp_summary', '')}
+
+PROSPECT: {from_name or from_email} ({from_email})
+SUBJECT: {subject}
+
+THEIR REPLY:
+---
+{reply_body[:2000]}
+---
+
+ABSOLUTE RULES — any violation → set should_respond=false, escalate=true:
+1. NEVER answer domain questions (investment, insurance, clinical, legal, compliance, market predictions, product details)
+2. NEVER make promises, guarantees, or commitments
+3. NEVER discuss pricing, fees, or contract terms
+4. NEVER speak negatively about anyone
+5. NEVER mention other clients
+6. If aggressive, threatening, legal-sounding, or contains a complaint → DO NOT respond, escalate immediately
+7. If uncertain about ANYTHING → do not respond, escalate
+8. Responses do ONE thing: acknowledge warmly and offer the booking link
+9. Keep responses to 2–4 sentences max
+10. You are {client['sender_name']} — never mention ArgusReach or any AI tool
+
+RESPONSE TONE EXAMPLES (adapt — never copy verbatim):
+- Positive: "Thanks for getting back to me, [name]. Happy to connect — grab any time here: {client['calendly_link']}"
+- Question needing expertise: "Great question — that's exactly what I'd want to cover in person. Here's my calendar: {client['calendly_link']}"
+- Not now: "No problem at all — I'll leave it with you. Reach out anytime when the timing is better."
+- Negative/remove: "Understood, removing you now — sorry for the interruption."
+
+Return ONLY valid JSON (no markdown, no commentary):
+{{
+  "classification": "positive|question|not_now|negative|ooo|other",
+  "reasoning": "one sentence max",
+  "should_respond": true,
+  "escalate": false,
+  "escalate_reason": "",
+  "draft_response": "full 2-4 sentence response or empty if escalate=true",
+  "notify_vito": true,
+  "notify_reason": "brief reason",
+  "follow_up_date": null,
+  "urgency": "high|medium|low"
+}}"""
 
     try:
-        # Connect IMAP
+        ai_tick()
+        response = ai.messages.create(
+            model=AI_MODEL,
+            max_tokens=600,
+            messages=[{'role': 'user', 'content': prompt}]
+        )
+        raw = response.content[0].text.strip()
+        if raw.startswith('```'):
+            raw = '\n'.join(raw.split('\n')[1:])
+            if raw.endswith('```'):
+                raw = raw[:-3]
+        return json.loads(raw.strip())
+    except json.JSONDecodeError as e:
+        log(f"AI JSON parse error: {e}")
+        return _fallback_result('AI returned invalid JSON')
+    except Exception as e:
+        log(f"AI call error: {e}")
+        return _fallback_result(str(e)[:120])
+
+def _fallback_result(reason):
+    return {
+        'classification': 'other',
+        'reasoning': reason,
+        'should_respond': False,
+        'escalate': True,
+        'escalate_reason': f'Classification failed: {reason}',
+        'draft_response': '',
+        'notify_vito': True,
+        'notify_reason': 'Manual review needed',
+        'follow_up_date': None,
+        'urgency': 'medium',
+    }
+
+# ── PER-CLIENT PROCESSING ─────────────────────────────────────────────────────
+def process_client(client, processed_ids):
+    cid  = client['id']
+    firm = client['firm_name']
+    label = f"[{firm}]"
+
+    log(f"{label} Checking inbox...")
+    new_processed = set()
+
+    try:
         mail = imaplib.IMAP4_SSL('imap.gmail.com')
-        mail.login(c['outreach_email'], c['app_password'])
+        mail.login(client['outreach_email'], client['app_password'])
         mail.select('inbox')
 
-        # Search for unread messages in the lookback window
-        since_date = (datetime.now() - timedelta(hours=LOOKBACK_HOURS)).strftime('%d-%b-%Y')
-        _, msg_ids_raw = mail.search(None, f'(SINCE {since_date} UNSEEN)')
-        msg_ids = msg_ids_raw[0].split() if msg_ids_raw[0] else []
+        # Fetch ALL unseen — more reliable than date-filtering (catches up after downtime)
+        _, raw = mail.search(None, 'UNSEEN')
+        msg_ids = raw[0].split() if raw[0] else []
 
         if not msg_ids:
-            print(f"{label} No new replies.")
+            log(f"{label} No unread messages.")
             mail.logout()
-            return
+            return new_processed
 
-        print(f"{label} {len(msg_ids)} new message(s) found.")
+        log(f"{label} {len(msg_ids)} unread message(s).")
 
-        # Hard cap — if suspiciously many, alert and process only up to the limit
-        if len(msg_ids) > MAX_EMAILS_PER_CLIENT:
-            notify_vito(
-                f"⚠️ *{c['firm_name']}* — {len(msg_ids)} unread emails found. "
-                f"Processing first {MAX_EMAILS_PER_CLIENT} only. Check inbox for issues."
+        if len(msg_ids) > MAX_PER_CLIENT:
+            notify(
+                f"⚠️ *{firm}* — {len(msg_ids)} unread emails found (cap: {MAX_PER_CLIENT}).\n"
+                f"Processing first {MAX_PER_CLIENT}. Check inbox directly."
             )
-            msg_ids = msg_ids[:MAX_EMAILS_PER_CLIENT]
+            msg_ids = msg_ids[:MAX_PER_CLIENT]
 
         for msg_id in msg_ids:
             _, data = mail.fetch(msg_id, '(RFC822)')
@@ -265,137 +454,238 @@ def process_client(c):
             msg = email.message_from_bytes(raw_email)
 
             from_name, from_email = email.utils.parseaddr(msg.get('From', ''))
-            subject = msg.get('Subject', '(no subject)')
-            body = get_email_body(msg)
+            subject   = msg.get('Subject', '(no subject)')
+            date_str  = msg.get('Date', '')
+            body      = get_body(msg)
 
             if not body.strip():
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 continue
 
-            # Filter 1: automated senders (delivery failures, noreply, etc.)
-            if is_automated_sender(from_email):
-                print(f"{label} Skipping automated sender: {from_email}")
+            # Deduplication — skip if we've already processed this message
+            fingerprint = msg_fingerprint(from_email, subject, date_str)
+            if fingerprint in processed_ids:
+                log(f"{label} Skipping duplicate: {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 continue
 
-            # Filter 2: must be a genuine reply (has In-Reply-To / References header)
-            # This eliminates spam and cold inbound emails before any API call
+            # Filter: automated senders
+            if is_automated(from_email):
+                log(f"{label} Skipping automated sender: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
+                continue
+
+            # Filter: must be a genuine reply to our outreach
             if not is_genuine_reply(msg):
-                print(f"{label} Skipping — not a reply to our outreach: {from_email}")
+                log(f"{label} Skipping — not a reply to our outreach: {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
                 continue
 
-            # Filter 3: secondary spam signals
-            if looks_like_spam(msg, body):
-                print(f"{label} Skipping spam-like email from: {from_email}")
+            # Filter: spam signals
+            if is_spam(msg, body):
+                log(f"{label} Skipping spam from: {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
                 continue
 
-            # Filter 4: global daily AI budget
+            # Filter: DNC list
+            if is_dnc(cid, from_email):
+                log(f"{label} Skipping DNC contact: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
+                continue
+
+            # AI budget check
             if not ai_budget_ok():
-                notify_vito(
-                    f"⚠️ Daily AI call limit ({MAX_AI_CALLS_PER_DAY}) reached. "
-                    f"Replies queued until tomorrow. Consider raising limit if needed."
+                notify(
+                    f"⚠️ Daily AI limit ({MAX_AI_CALLS_DAY} calls) reached. "
+                    f"Remaining replies will process tomorrow."
                 )
-                print("Daily AI cap reached. Stopping cycle.")
+                log("Daily AI cap reached.")
                 break
 
-            print(f"{label} Processing reply from {from_name} <{from_email}>")
-
-            # Classify and draft — API call only happens here, after all filters pass
-            ai_call_made()
-            result = classify_and_draft(body, from_name, from_email, subject, c)
+            log(f"{label} Processing: {from_name} <{from_email}>")
+            result        = classify_and_draft(body, from_name, from_email, subject, client)
             classification = result['classification']
-            draft = result.get('draft_response', '')
+            draft         = result.get('draft_response', '')
             should_respond = result.get('should_respond', False)
-            escalate = result.get('escalate', False)
-            sent = False
+            escalate      = result.get('escalate', False)
+            sent          = False
+            approval_id   = None
 
-            # Escalation: something needs a human — never auto-respond
+            # ── ESCALATION — human must review, no auto-response ever
             if escalate:
-                notify_vito(
-                    f"🚨 *{c['firm_name']}* — ESCALATION NEEDED\n"
-                    f"From: {from_name} <{from_email}>\n"
-                    f"Reason: {result.get('escalate_reason', 'Unknown')}\n\n"
-                    f"*Do not respond until you have reviewed this email.*\n"
-                    f"Subject: {subject}"
+                notify(
+                    f"🚨 *{firm}* — ESCALATION\n"
+                    f"From: {from_name or from_email}\n"
+                    f"Reason: {result.get('escalate_reason', 'Unknown')}\n"
+                    f"Subject: _{subject}_\n\n"
+                    f"*Do not reply until you have reviewed this manually.*"
                 )
-                log_event(c['id'], from_email, 'escalated', '', False,
-                          result.get('escalate_reason', ''))
+                log_reply(cid, from_email, 'escalated', '', False, result.get('escalate_reason', ''))
                 mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
                 continue
 
-            # Decide whether to send
+            # ── HANDLE RESPONSE
             if should_respond and draft:
                 if classification == 'negative':
-                    # Always auto-send removal acknowledgment
-                    send_email(c['outreach_email'], c['app_password'],
-                               c['sender_name'], from_email, subject, draft)
-                    sent = True
-                    print(f"{label} Auto-sent removal acknowledgment to {from_email}")
+                    # Unsubscribe — always auto-send removal ack and add to DNC
+                    add_dnc(cid, from_email)
+                    if not TEST_MODE:
+                        try:
+                            _send_email(client['outreach_email'], client['app_password'],
+                                        client['sender_name'], from_email, subject, draft)
+                            sent = True
+                        except Exception as e:
+                            log(f"SMTP error (removal ack): {e}")
+                            notify(f"⚠️ *{firm}* — Failed to send removal ack to {from_email}: `{str(e)[:100]}`")
+                    else:
+                        log(f"[TEST] Would send removal ack to {from_email}")
 
-                elif c['mode'] == 'automated':
-                    send_email(c['outreach_email'], c['app_password'],
-                               c['sender_name'], from_email, subject, draft)
-                    sent = True
-                    print(f"{label} Auto-sent response to {from_email}")
+                elif client['mode'] == 'automated':
+                    if not TEST_MODE:
+                        try:
+                            _send_email(client['outreach_email'], client['app_password'],
+                                        client['sender_name'], from_email, subject, draft)
+                            sent = True
+                        except Exception as e:
+                            log(f"SMTP error: {e}")
+                            notify(f"⚠️ *{firm}* — Failed to send to {from_email}: `{str(e)[:100]}`")
+                    else:
+                        log(f"[TEST] Would auto-send to {from_email}")
 
-                # draft_approval mode: draft is prepared but not sent
-                # Vito gets it via Telegram to approve
+                elif client['mode'] == 'draft_approval':
+                    approval_id = queue_pending(client, from_email, from_name,
+                                                subject, draft, classification)
 
-            # Notify Vito
-            if result.get('notify_vito') or classification in ('positive', 'question', 'other'):
-                emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
-                         'negative': '🚫', 'ooo': '🏖️', 'other': '⚠️'}.get(classification, '📬')
+            # ── TELEGRAM NOTIFICATION
+            emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
+                     'negative': '🚫', 'ooo': '🏖', 'other': '⚠️'}.get(classification, '📬')
 
-                notification = (
-                    f"{emoji} *{c['firm_name']}* — {classification.upper()}\n"
-                    f"From: {from_name or from_email}\n"
-                    f"_{result['reasoning']}_\n"
-                )
+            msg_lines = [
+                f"{emoji} *{firm}* — {classification.upper()}",
+                f"From: {from_name or from_email}",
+                f"_{result.get('reasoning', '')}_ ",
+            ]
 
-                if c['mode'] == 'draft_approval' and should_respond and draft and not sent:
-                    notification += f"\n*Draft ready for approval:*\n```\n{draft[:600]}\n```\n"
-                    notification += f"\n_Reply 'SEND {c['id']} {from_email}' to approve_"
-                elif sent:
-                    notification += f"\n✅ Auto-responded"
+            if approval_id and draft:
+                short_id = approval_id.split(':')[-1]  # just timestamp part
+                msg_lines += [
+                    f"\n*Draft ready:*",
+                    f"```\n{draft[:500]}\n```",
+                    f"Reply `APPROVE {approval_id}` to send · `REJECT {approval_id}` to discard",
+                    f"Or `PENDING` to list all queued drafts",
+                ]
+            elif sent:
+                msg_lines.append("✅ Auto-sent")
+            elif TEST_MODE:
+                msg_lines.append("🔬 Test mode — not sent")
 
-                notify_vito(notification)
+            notify('\n'.join(msg_lines))
 
-            # Mark as read
             mail.store(msg_id, '+FLAGS', '\\Seen')
-
-            # Log
-            log_event(c['id'], from_email, classification, draft, sent,
+            new_processed.add(fingerprint)
+            log_reply(cid, from_email, classification, draft, sent,
                       result.get('notify_reason', ''))
 
         mail.logout()
 
     except imaplib.IMAP4.error as e:
-        err = f"IMAP error for {c['outreach_email']}: {e}"
-        print(err)
-        notify_vito(f"⚠️ *{c['firm_name']}* inbox error: `{str(e)[:150]}`")
+        log(f"IMAP error {firm}: {e}")
+        notify(f"⚠️ *{firm}* IMAP error: `{str(e)[:150]}`")
     except Exception as e:
-        err = f"Unexpected error for {c['firm_name']}: {e}"
-        print(err)
-        notify_vito(f"⚠️ *{c['firm_name']}* monitor error: `{str(e)[:150]}`")
+        log(f"Error processing {firm}: {e}")
+        notify(f"⚠️ *{firm}* monitor error: `{str(e)[:150]}`")
 
-# ── MAIN LOOP ────────────────────────────────────────────────────────────────
+    return new_processed
+
+# ── DAILY DIGEST ──────────────────────────────────────────────────────────────
+_last_digest_day = None
+
+def maybe_send_digest():
+    global _last_digest_day
+    now = datetime.now()
+    if now.hour < DIGEST_HOUR:
+        return
+    today = now.date()
+    if _last_digest_day == today:
+        return
+    _last_digest_day = today
+
+    try:
+        data = json.loads(REPLY_LOG.read_text()) if REPLY_LOG.exists() else []
+    except Exception:
+        data = []
+
+    # Filter to today's entries
+    today_str = today.isoformat()
+    today_entries = [r for r in data if r.get('ts', '').startswith(today_str)]
+
+    if not today_entries:
+        notify(f"📊 *Daily Digest — {today_str}*\nNo replies processed today.")
+        return
+
+    counts = {}
+    for r in today_entries:
+        c = r.get('classification', 'other')
+        counts[c] = counts.get(c, 0) + 1
+
+    pending = load_pending()
+    lines = [
+        f"📊 *Daily Digest — {today_str}*",
+        f"Total replies processed: {len(today_entries)}",
+        "",
+    ]
+    for k, v in sorted(counts.items()):
+        emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
+                 'negative': '🚫', 'escalated': '🚨', 'ooo': '🏖'}.get(k, '•')
+        lines.append(f"{emoji} {k.capitalize()}: {v}")
+
+    if pending:
+        lines += ["", f"⏳ Pending approvals: {len(pending)}",
+                  "Reply `PENDING` to review drafts waiting for your approval."]
+
+    notify('\n'.join(lines))
+    log("Daily digest sent.")
+
+# ── LOAD CLIENTS ──────────────────────────────────────────────────────────────
+def load_clients():
+    data = json.loads(CLIENTS_FILE.read_text())
+    return [c for c in data['clients'] if c.get('active', False)]
+
+# ── MAIN LOOP ─────────────────────────────────────────────────────────────────
 def run():
-    print(f"ArgusReach Reply Monitor starting — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    notify_vito("✅ *ArgusReach Monitor* started — watching all active client inboxes")
+    mode_tag = " [TEST MODE]" if TEST_MODE else ""
+    log(f"ArgusReach Monitor v2 starting{mode_tag}")
+    notify(f"✅ *ArgusReach Monitor v2* started{mode_tag}\nWatching all active client inboxes · checking every {POLL_INTERVAL//60} min")
+
+    processed_ids = load_processed()
 
     while True:
         try:
             clients = load_clients()
             if not clients:
-                print("No active clients configured. Waiting...")
-            for c in clients:
-                process_client(c)
+                log("No active clients. Waiting...")
+            else:
+                for client in clients:
+                    new_ids = process_client(client, processed_ids)
+                    processed_ids.update(new_ids)
+                save_processed(processed_ids)
+
+            check_telegram_commands()
+            maybe_send_digest()
+
         except Exception as e:
-            print(f"Main loop error: {e}")
-        print(f"Cycle complete. Next check in {POLL_INTERVAL_SECONDS // 60} min.\n")
-        time.sleep(POLL_INTERVAL_SECONDS)
+            log(f"Main loop error: {e}")
+
+        log(f"Cycle complete. Next check in {POLL_INTERVAL // 60} min.\n")
+        time.sleep(POLL_INTERVAL)
 
 if __name__ == '__main__':
+    if not ANTHROPIC_API_KEY:
+        print("WARNING: ANTHROPIC_API_KEY not set. AI classification will not work.")
+        print("Set it: export ANTHROPIC_API_KEY=sk-ant-...")
     run()

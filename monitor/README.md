@@ -1,122 +1,187 @@
-# ArgusReach Reply Monitor
+# ArgusReach Reply Monitor v2
 
-Monitors all client outreach inboxes, classifies replies with AI, drafts and sends responses automatically. Runs 24/7 on the server.
+Monitors every active client's outreach inbox. Classifies replies with Claude. Auto-responds or queues drafts for Vito's approval. Sends a nightly digest. Runs 24/7.
 
 ---
 
 ## How It Works
 
-Every 10 minutes the script:
-1. Loops through every active client in `clients.json`
-2. Connects to their outreach Gmail inbox via IMAP
-3. Reads any unread replies from the last 12 hours
-4. Uses Claude to classify each reply and draft the ideal response
-5. Sends the response (automated mode) or forwards draft to Vito for approval (draft_approval mode)
-6. Notifies Vito via Telegram for hot replies
-7. Logs everything to `logs/replies.json`
+Every 10 minutes:
+1. Checks every active client's Gmail inbox for new replies
+2. Filters out: automated senders, cold inbound, spam, DNC contacts, already-processed messages
+3. Classifies each genuine reply with Claude (`claude-3-5-haiku-20241022`)
+4. **Automated mode:** sends response immediately
+5. **Draft approval mode:** queues the draft and sends Vito a Telegram message with the text — Vito replies `APPROVE [id]` or `REJECT [id]`
+6. Logs everything to `logs/replies.json`
+7. Sends a daily digest at 6pm with totals by classification + pending approval count
+
+---
+
+## Telegram Commands (Vito sends these)
+
+| Command | What it does |
+|---|---|
+| `PENDING` | Lists all drafts waiting for approval |
+| `APPROVE [id]` | Sends the queued draft to the prospect |
+| `REJECT [id]` | Discards the draft (contact stays on DNC if negative) |
+
+The `[id]` is included in the draft notification Telegram sends automatically.
 
 ---
 
 ## Adding a New Client
 
-Open `clients.json` and add an entry to the `clients` array:
+Open `clients.json` and add a new entry to the `clients` array. Copy the example block. Fill in all fields. Set `"active": true`.
 
+**Minimum fields required:**
 ```json
 {
   "id": "unique_client_id",
   "active": true,
   "mode": "draft_approval",
-  "outreach_email": "name@clientdomain.com",
+  "outreach_email": "sender@clientdomain.com",
   "app_password": "xxxx xxxx xxxx xxxx",
   "sender_name": "First Last",
   "firm_name": "Client Firm Name",
   "vertical": "RIA",
   "calendly_link": "https://calendly.com/their-link/30min",
-  "icp_summary": "Description of who they're targeting and why",
+  "icp_summary": "Who they're targeting and why (used in AI prompt)",
   "tone": "warm-professional",
-  "compliance_note": "Any compliance restrictions (e.g. no performance promises)"
+  "compliance_note": "What the AI must never say for this client"
 }
 ```
 
-Set `"active": false` to pause a client without removing them.
-
-### Mode options:
-- `"automated"` — AI drafts and sends automatically. Client gets replies directly.
-- `"draft_approval"` — AI drafts, Vito gets the draft via Telegram to approve before sending.
+**Mode options:**
+- `"draft_approval"` — AI drafts, Vito approves via Telegram before anything sends. **Use for all new clients.**
+- `"automated"` — AI responds immediately. Use only after 30 days of reviewing drafts and confirming quality.
 
 ---
 
-## Client Setup (what to tell each new client)
+## Client Gmail Setup (what to tell each new client)
 
-They need to do two things in their Google Workspace:
+Two steps. Takes 5 minutes. Walk them through this on the onboarding call.
 
-**Step 1 — Create a new Google Workspace user:**
-- Go to admin.google.com → Directory → Users → Add user
-- Create: `firstname.lastname@theirdomain.com` (or similar)
-- This is the outreach-only account. Their main email is untouched.
+**Step 1 — Create a dedicated outreach user in Google Workspace:**
+```
+admin.google.com → Directory → Users → Add new user
+Create: firstname.lastname@theirdomain.com
+(This is the outreach-only account. Their main email is never touched.)
+```
 
 **Step 2 — Generate a Gmail App Password:**
-- Log into the new account → Google Account → Security → 2-Step Verification (enable it) → App Passwords
-- Create an App Password for "Mail"
-- Copy the 16-character password (format: `xxxx xxxx xxxx xxxx`)
-- Share it with ArgusReach — this is the only credential we ever receive
+```
+Log into the new account
+→ Google Account (top right) → Security
+→ Enable 2-Step Verification (if not already on)
+→ Search "App Passwords" → Create one named "ArgusReach" → Mail
+→ Copy the 16-character password (format: xxxx xxxx xxxx xxxx)
+→ Email it to vito@argusreach.com
+```
 
-That's it. We handle everything from there.
+That's all they do. We handle everything else.
 
 ---
 
-## Starting the Monitor
+## Running the Monitor
 
+**First time — install dependencies:**
+```bash
+pip install anthropic requests --break-system-packages
+```
+
+**Set your API key:**
+```bash
+export ANTHROPIC_API_KEY=sk-ant-your-key-here
+```
+
+**Start (dev / manual):**
 ```bash
 cd /home/argus/.openclaw/workspace/argusreach/monitor
-export ANTHROPIC_API_KEY=your_key_here
 python3 monitor.py
 ```
 
-### Run as background service (recommended):
-
+**Test mode (no emails sent, no Telegram — safe for testing):**
 ```bash
-# Start in background, log to file
-nohup python3 monitor.py >> logs/monitor.log 2>&1 &
-echo $! > monitor.pid
+python3 monitor.py --test
 ```
 
-### Stop:
+**Production — background process:**
+```bash
+nohup python3 monitor.py >> logs/monitor.log 2>&1 &
+echo $! > monitor.pid
+echo "Started PID $(cat monitor.pid)"
+```
+
+**Stop background process:**
 ```bash
 kill $(cat monitor.pid)
 ```
 
-### Check logs:
+**Watch live logs:**
 ```bash
 tail -f logs/monitor.log
-cat logs/replies.json | python3 -m json.tool
 ```
 
 ---
 
-## Telegram Notifications
+## Auto-Start on Server Reboot (systemd)
 
-Vito receives Telegram messages for:
-- 🎯 Positive replies (hot leads)
-- ❓ Questions from prospects
-- ⚠️ Errors or unclear replies needing review
-- ✅ Confirmations when auto-responses are sent
+```bash
+# Copy service file to systemd
+sudo cp argusreach-monitor.service /etc/systemd/system/
 
-For `draft_approval` mode, the draft is included in the Telegram message. Reply with `SEND [client_id] [prospect_email]` to approve. *(manual approval flow — auto-approval coming later)*
+# Edit the service file to add your real ANTHROPIC_API_KEY
+sudo nano /etc/systemd/system/argusreach-monitor.service
+
+# Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable argusreach-monitor
+sudo systemctl start argusreach-monitor
+
+# Check status
+sudo systemctl status argusreach-monitor
+```
 
 ---
 
-## Scaling
+## DNC (Do Not Contact) Lists
 
-Adding the 10th client works exactly the same as adding the 1st. The script loops through all active clients in sequence. At 10+ clients, consider reducing `LOOKBACK_HOURS` to 6 to keep cycles fast.
+Each client has a DNC file at `dnc/[client_id].txt`.
+
+- Negative replies automatically add the prospect to the DNC list
+- DNC emails are skipped in all future processing cycles — they will never be processed again
+- To manually add someone: add their email address (one per line) to `dnc/client_id.txt`
+- To remove someone: delete their line from the file
+
+---
+
+## Log Files
+
+| File | Contents |
+|---|---|
+| `logs/monitor.log` | Full timestamped activity log |
+| `logs/replies.json` | Every processed reply with classification and outcome |
+| `logs/pending_approvals.json` | Drafts queued for Vito's approval (auto-cleared when approved/rejected) |
+| `logs/processed_ids.json` | Fingerprints of every processed message (prevents double-processing on restart) |
+| `dnc/[client_id].txt` | Per-client do-not-contact lists |
+
+---
+
+## Architecture Notes
+
+**Why In-Reply-To filtering matters:** The monitor only processes emails that are replies to something we sent (they have `In-Reply-To` or `References` headers). Cold inbound emails don't have these headers. This eliminates ~95% of spam before any AI call, keeping costs low.
+
+**Why deduplication matters:** If the monitor restarts mid-cycle, it could see the same UNSEEN emails again. The `processed_ids.json` fingerprinting prevents any email from being responded to twice.
+
+**Cost control:** Claude is only called after all local filters pass. With typical volumes (3–5 clients, 50–100 replies/day) the daily AI cap of 100 calls costs roughly $0.08–$0.15/day at Haiku pricing.
+
+**Draft approval flow:** Drafts are stored in `pending_approvals.json`. The monitor polls Telegram for APPROVE/REJECT commands every cycle. No separate process needed.
 
 ---
 
 ## Requirements
 
 ```
-anthropic
+anthropic>=0.84.0
 requests
 ```
-
-Install: `pip install anthropic requests --break-system-packages`
