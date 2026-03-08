@@ -139,56 +139,53 @@ def looks_like_spam(msg, body):
 # ── CORE LOGIC ───────────────────────────────────────────────────────────────
 def classify_and_draft(reply_body, prospect_name, prospect_email, subject, client):
     """Use Claude to classify the reply and draft an appropriate response."""
-    prompt = f"""You are managing outbound sales email for {client['sender_name']} at {client['firm_name']}.
+    prompt = f"""You are a reply routing assistant for {client['sender_name']} at {client['firm_name']}.
+
+YOUR ONLY JOB: Classify the reply and draft a brief, safe response that routes interested prospects to a calendar booking. Nothing more.
 
 CLIENT CONTEXT:
-- Sender name: {client['sender_name']}
-- Firm: {client['firm_name']}
-- Industry vertical: {client['vertical']}
-- Ideal client: {client['icp_summary']}
+- Sender: {client['sender_name']}, {client['firm_name']}
+- Vertical: {client['vertical']}
 - Tone: {client.get('tone', 'warm-professional')}
-- Compliance note: {client.get('compliance_note', 'none')}
-- Calendly booking link: {client['calendly_link']}
+- Compliance: {client.get('compliance_note', 'none')}
+- Booking link: {client['calendly_link']}
 
-PROSPECT WHO REPLIED:
-- Name: {prospect_name}
-- Email: {prospect_email}
-- Subject: {subject}
+PROSPECT: {prospect_name} ({prospect_email})
+SUBJECT: {subject}
 
 THEIR REPLY:
 ---
 {reply_body[:1500]}
 ---
 
-Classify this reply and draft the ideal response.
+STRICT RULES — violating any of these means set should_respond=false and escalate=true:
+1. NEVER answer domain-specific questions (investment advice, insurance coverage, medical/clinical questions, legal questions, market predictions, product recommendations). Route to a call instead.
+2. NEVER make promises, guarantees, or commitments of any kind.
+3. NEVER discuss pricing, fees, or specific service terms.
+4. NEVER speak negatively about competitors or other firms.
+5. NEVER share any information about other clients.
+6. If the email is aggressive, threatening, legal in nature, or contains complaints — do NOT respond. Escalate immediately.
+7. If you are uncertain about ANYTHING — do not respond. Escalate.
+8. Your response should do ONE thing: acknowledge warmly and invite a conversation via the booking link.
+9. Keep responses to 2-4 sentences maximum.
+10. Never mention ArgusReach. You are {client['sender_name']}.
 
-Classification options:
-- "positive": expressed interest, wants to connect, asked about scheduling
-- "question": asked a genuine question before deciding
-- "not_now": not right time but not a hard no (follow up later)
-- "negative": not interested, asked to stop, clear rejection
-- "ooo": out of office auto-reply
-- "other": unclear, spam, unrelated
+SAFE RESPONSE TEMPLATES (adapt tone, don't copy verbatim):
+- Positive: "Thanks for getting back to me, [name]. Happy to connect — feel free to grab a time here: [link]. Looking forward to it."
+- Question requiring expertise: "Good question — that's exactly what I'd want to cover on a call. [link] — pick whatever time works."
+- Not now: "Understood, [name] — I'll leave it with you. Feel free to reach out anytime."
+- Negative: "Noted — I've removed you from my list. Sorry for the interruption."
 
-Response rules:
-- Match {client['sender_name']}'s {client.get('tone', 'warm-professional')} tone exactly
-- For positive: acknowledge their interest warmly, provide the Calendly link naturally, keep it brief
-- For question: answer directly and concisely, then softly offer to connect
-- For not_now: acknowledge graciously, say you'll check back in [timeframe they mentioned or 60 days]
-- For negative: brief, gracious acknowledgment, remove them ("I've taken care of that")
-- For ooo: no response needed, note return date if mentioned
-- NEVER mention ArgusReach — you are {client['sender_name']}
-- Sign off as {client['sender_name']}
-- Keep responses short — 3-5 sentences max for positive/question
-
-Return ONLY valid JSON, no markdown:
+Return ONLY valid JSON:
 {{
   "classification": "positive|question|not_now|negative|ooo|other",
-  "reasoning": "one sentence explanation",
+  "reasoning": "one sentence",
   "should_respond": true,
-  "draft_response": "the full email body to send",
+  "escalate": false,
+  "escalate_reason": "why this needs human review, or empty string",
+  "draft_response": "safe 2-4 sentence response body only, or empty string if escalate=true",
   "notify_vito": true,
-  "notify_reason": "why vito should know, or empty string",
+  "notify_reason": "brief reason",
   "follow_up_date": "YYYY-MM-DD if not_now, else null",
   "urgency": "high|medium|low"
 }}"""
@@ -311,7 +308,22 @@ def process_client(c):
             classification = result['classification']
             draft = result.get('draft_response', '')
             should_respond = result.get('should_respond', False)
+            escalate = result.get('escalate', False)
             sent = False
+
+            # Escalation: something needs a human — never auto-respond
+            if escalate:
+                notify_vito(
+                    f"🚨 *{c['firm_name']}* — ESCALATION NEEDED\n"
+                    f"From: {from_name} <{from_email}>\n"
+                    f"Reason: {result.get('escalate_reason', 'Unknown')}\n\n"
+                    f"*Do not respond until you have reviewed this email.*\n"
+                    f"Subject: {subject}"
+                )
+                log_event(c['id'], from_email, 'escalated', '', False,
+                          result.get('escalate_reason', ''))
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                continue
 
             # Decide whether to send
             if should_respond and draft:
