@@ -258,9 +258,27 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <span class="step-tool t-green">Google Workspace</span>
       </div>
       <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">Does client have an existing contact list?</div>
+        <div class="step-detail">Warm contacts, conference leads, old prospects, referrals, LinkedIn connections</div>
+      </div>
+      <div class="arrow">↓ YES</div>
+      <div class="step">
+        <div class="step-label">Client emails CSV to Vito</div>
+        <div class="step-detail">Uses client-prospect-list-template. Fields: name, email, company, connection type, notes. Vito forwards to Go.</div>
+        <span class="step-tool t-green">CSV → vito@argusreach.com</span>
+      </div>
+      <div class="arrow">↓</div>
       <div class="auto">
-        <div class="step-label">Go builds prospect list</div>
-        <div class="step-detail">Apollo.io search using ICP criteria. Cleaned, verified. Loaded into Airtable.</div>
+        <div class="step-label">Go ingests & tags client list</div>
+        <div class="step-detail">Cleaned, validated, loaded to Airtable as source: client-provided. Grouped by connection type. These prospects are PRIORITIZED — outreached first. Warmer openers written using connection context.</div>
+        <span class="step-tool t-yellow">Airtable</span>
+        <span class="step-tool t-blue">Go (AI)</span>
+      </div>
+      <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
+      <div class="auto">
+        <div class="step-label">Go builds cold prospect list</div>
+        <div class="step-detail">Apollo.io search using ICP criteria. Fills remaining monthly volume after client-provided contacts. Cleaned, verified, loaded into Airtable.</div>
         <span class="step-tool t-orange">Apollo.io</span>
         <span class="step-tool t-yellow">Airtable</span>
       </div>
