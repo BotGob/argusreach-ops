@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ArgusReach — Master Operations Flowchart</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f0f0f; --bg2: #161616; --bg3: #1d1d1d; --bg4: #242424;
+  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.14);
+  --text: #f0f0f0; --sub: #777; --muted: #3a3a3a;
+  --green: #4ade80; --white: #fff;
+  --blue: #60a5fa; --orange: #fb923c; --purple: #c084fc; --yellow: #fbbf24; --red: #f87171;
+}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 40px 32px 80px; -webkit-font-smoothing: antialiased; }
+
+h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--white); margin-bottom: 6px; }
+.sub { font-size: 0.8rem; color: var(--sub); margin-bottom: 40px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+
+/* Phase columns */
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 48px; }
+.phase { display: flex; flex-direction: column; gap: 0; }
+.phase-hdr { padding: 10px 14px; border-radius: 6px 6px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; border: 1px solid transparent; }
+.phase-body { border: 1px solid var(--border2); border-top: none; border-radius: 0 0 6px 6px; display: flex; flex-direction: column; gap: 1px; background: var(--muted); overflow: hidden; flex: 1; }
+
+/* Phase colors */
+.p0 .phase-hdr { background: rgba(96,165,250,0.1); border-color: rgba(96,165,250,0.3); color: var(--blue); }
+.p1 .phase-hdr { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: var(--yellow); }
+.p2 .phase-hdr { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.3); color: var(--purple); }
+.p3 .phase-hdr { background: rgba(74,222,128,0.1); border-color: rgba(74,222,128,0.3); color: var(--green); }
+.p4 .phase-hdr { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: var(--orange); }
+
+/* Steps */
+.step { background: var(--bg2); padding: 11px 13px; display: flex; flex-direction: column; gap: 4px; }
+.step-label { font-size: 0.78rem; font-weight: 600; color: var(--white); line-height: 1.3; }
+.step-detail { font-size: 0.68rem; color: var(--sub); line-height: 1.4; }
+.step-tool { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 2px; }
+
+/* Tool colors */
+.t-green { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: var(--green); }
+.t-blue { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
+.t-orange { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2); color: var(--orange); }
+.t-purple { background: rgba(192,132,252,0.08); border: 1px solid rgba(192,132,252,0.2); color: var(--purple); }
+.t-yellow { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: var(--yellow); }
+.t-red { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); color: var(--red); }
+.t-white { background: rgba(255,255,255,0.04); border: 1px solid var(--border2); color: var(--sub); }
+
+.divider { height: 1px; background: var(--muted); }
+.arrow { text-align: center; padding: 4px; background: var(--bg); font-size: 0.6rem; color: var(--muted); }
+.decision { background: var(--bg3); padding: 10px 13px; border-left: 2px solid var(--yellow); }
+.decision .step-label { color: var(--yellow); }
+.escalate { background: var(--bg3); padding: 10px 13px; border-left: 2px solid var(--red); }
+.escalate .step-label { color: var(--red); }
+.auto { background: var(--bg3); padding: 10px 13px; border-left: 2px solid var(--green); }
+.auto .step-label { color: var(--green); }
+
+/* Tools reference */
+.tools-section { margin-bottom: 40px; }
+.tools-section h2 { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); margin-bottom: 16px; }
+.tools-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.tool-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; padding: 14px 14px; }
+.tool-name { font-size: 0.8rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.tool-role { font-size: 0.68rem; color: var(--sub); line-height: 1.4; }
+.tool-cost { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--green); margin-top: 6px; }
+
+/* Data flow */
+.dataflow { background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 24px; margin-bottom: 40px; }
+.dataflow h2 { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); margin-bottom: 20px; }
+.df-row { display: flex; align-items: center; gap: 0; margin-bottom: 10px; flex-wrap: wrap; }
+.df-node { padding: 6px 12px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.df-arr { padding: 0 8px; color: var(--muted); font-size: 0.7rem; }
+.df-note { font-size: 0.65rem; color: var(--sub); margin-left: 8px; }
+
+/* Roles */
+.roles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 40px; }
+.role-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 8px; padding: 20px; }
+.role-title { font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sub); margin-bottom: 12px; }
+.role-name { font-size: 1rem; font-weight: 800; color: var(--white); margin-bottom: 12px; letter-spacing: -0.02em; }
+.role-list { list-style: none; }
+.role-li { font-size: 0.775rem; color: var(--sub); padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+.role-li:last-child { border-bottom: none; }
+.role-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.dot-green { background: var(--green); }
+.dot-blue { background: var(--blue); }
+.dot-orange { background: var(--orange); }
+</style>
+</head>
+<body>
+
+<h1>ArgusReach — Master Operations Flowchart</h1>
+<div class="sub">Full system view · Updated March 2026 · Internal reference only</div>
+
+<!-- ROLES -->
+<div class="roles">
+  <div class="role-card">
+    <div class="role-title">Role</div>
+    <div class="role-name">Vito</div>
+    <ul class="role-list">
+      <li class="role-li"><span class="role-dot dot-green"></span>Sales calls & closing</li>
+      <li class="role-li"><span class="role-dot dot-green"></span>Client relationship management</li>
+      <li class="role-li"><span class="role-dot dot-green"></span>Final approval on sequences</li>
+      <li class="role-li"><span class="role-dot dot-green"></span>Approving escalated replies (draft mode)</li>
+      <li class="role-li"><span class="role-dot dot-green"></span>Business decisions & strategy</li>
+    </ul>
+  </div>
+  <div class="role-card">
+    <div class="role-title">Role</div>
+    <div class="role-name">Go (AI / COO)</div>
+    <ul class="role-list">
+      <li class="role-li"><span class="role-dot dot-blue"></span>Build client briefs from intake data</li>
+      <li class="role-li"><span class="role-dot dot-blue"></span>Write all email sequences</li>
+      <li class="role-li"><span class="role-dot dot-blue"></span>Run reply monitor 24/7</li>
+      <li class="role-li"><span class="role-dot dot-blue"></span>Classify & respond to replies</li>
+      <li class="role-li"><span class="role-dot dot-blue"></span>Build prospect lists, reports, SOPs</li>
+    </ul>
+  </div>
+  <div class="role-card">
+    <div class="role-title">Role</div>
+    <div class="role-name">Client</div>
+    <ul class="role-list">
+      <li class="role-li"><span class="role-dot dot-orange"></span>Fill intake form after signing</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Review & approve email sequences</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Create outreach email on their domain</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Share App Password with ArgusReach</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Show up to booked meetings</li>
+    </ul>
+  </div>
+</div>
+
+<!-- MAIN FLOW -->
+<div class="flow">
+
+  <!-- PHASE 0: ACQUISITION -->
+  <div class="phase p0">
+    <div class="phase-hdr">00 · Lead Acquisition</div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-label">Prospect visits argusreach.com</div>
+        <div class="step-detail">Organic, referral, or Vito's outreach to potential clients</div>
+        <span class="step-tool t-blue">GitHub Pages</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">Ready to talk?</div>
+      </div>
+      <div class="arrow">↓ YES</div>
+      <div class="step">
+        <div class="step-label">Books strategy call</div>
+        <div class="step-detail">Calendly → lands on Vito's Google Calendar</div>
+        <span class="step-tool t-purple">Calendly</span>
+        <span class="step-tool t-green">Google Cal</span>
+      </div>
+      <div class="arrow">↓ NOT YET</div>
+      <div class="step">
+        <div class="step-label">Submits email for process overview</div>
+        <div class="step-detail">Web3Forms → vito@argusreach.com alert</div>
+        <span class="step-tool t-white">Web3Forms</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Vito sends process overview email</div>
+        <div class="step-detail">Manual send from vito@argusreach.com using template</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Follow-up → books call</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 1: SALES -->
+  <div class="phase p1">
+    <div class="phase-hdr">01 · Sales & Signing</div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-label">15-min strategy call</div>
+        <div class="step-detail">Vito runs call using pitch-deck-script.md. Diagnose → present → handle objections → close</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">Interested?</div>
+      </div>
+      <div class="arrow">↓ YES</div>
+      <div class="step">
+        <div class="step-label">Proposal sent same day</div>
+        <div class="step-detail">Vito fills proposal-template.md → sends via email</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Service agreement signed</div>
+        <div class="step-detail">DocuSign or HelloSign free tier. 3-month minimum.</div>
+        <span class="step-tool t-white">DocuSign</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">$500 setup fee collected</div>
+        <div class="step-detail">Stripe invoice or PayPal. Due on signing.</div>
+        <span class="step-tool t-purple">Stripe</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Client added to Airtable</div>
+        <div class="step-detail">Status: Active. Plan, start date, MRR logged.</div>
+        <span class="step-tool t-yellow">Airtable</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Onboarding link sent to client</div>
+        <div class="step-detail">argusreach.com/onboard — client fills intake form</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: ONBOARDING -->
+  <div class="phase p2">
+    <div class="phase-hdr">02 · Onboarding</div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-label">Client fills intake form</div>
+        <div class="step-detail">argusreach.com/onboard — ICP, voice, tone, targets, compliance notes, booking link</div>
+        <span class="step-tool t-white">Web3Forms</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Form data emails to Vito</div>
+        <div class="step-detail">Vito pastes to Go in Telegram</div>
+        <span class="step-tool t-blue">Telegram</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Go builds client brief</div>
+        <div class="step-detail">Full client config doc: ICP, voice, targets, compliance, calendar link. Stored in argusreach-ops repo.</div>
+        <span class="step-tool t-blue">Go (AI)</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Go writes email sequences</div>
+        <div class="step-detail">4-5 touches in client's voice, personalized to their ICP. Tailored for their vertical.</div>
+        <span class="step-tool t-blue">Go (AI)</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Vito reviews sequences</div>
+        <div class="step-detail">Quick internal check before sending to client</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Client reviews & approves sequences</div>
+        <div class="step-detail">Google Doc shared with client. They comment, edit, approve. Nothing sends without written approval.</div>
+        <span class="step-tool t-green">Google Docs</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Client creates outreach email</div>
+        <div class="step-detail">New user on their Google Workspace: e.g. james.k@theirdomain.com. Shares App Password with Vito.</div>
+        <span class="step-tool t-green">Google Workspace</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Go builds prospect list</div>
+        <div class="step-detail">Apollo.io search using ICP criteria. Cleaned, verified. Loaded into Airtable.</div>
+        <span class="step-tool t-orange">Apollo.io</span>
+        <span class="step-tool t-yellow">Airtable</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Go adds client to monitor</div>
+        <div class="step-detail">clients.json entry created. Mode set (automated or draft_approval). Monitor activated.</div>
+        <span class="step-tool t-blue">monitor.py</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3: CAMPAIGN -->
+  <div class="phase p3">
+    <div class="phase-hdr">03 · Campaign Running</div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-label">Emails sent to prospects</div>
+        <div class="step-detail">From client's outreach email. Signed as the client. Touch 1 of 4-5 sequence. MVP: sent manually by Vito. Scale: Instantly.ai.</div>
+        <span class="step-tool t-green">Gmail (client acct)</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Monitor checks inbox every 10 min</div>
+        <div class="step-detail">monitor.py running 24/7 on server. Connects via IMAP to each client's outreach inbox.</div>
+        <span class="step-tool t-blue">monitor.py</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">New reply? Passes all filters?</div>
+        <div class="step-detail">Must be genuine reply (In-Reply-To header). Not automated sender. Not spam. Under daily AI cap.</div>
+      </div>
+      <div class="arrow">↓ YES</div>
+      <div class="auto">
+        <div class="step-label">Claude classifies reply</div>
+        <div class="step-detail">Positive / Question / Not Now / Negative / Escalate. Drafts safe 2-4 sentence response. Strict guardrails — only routes to booking, never gives advice.</div>
+        <span class="step-tool t-blue">Claude API</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">Classification result</div>
+      </div>
+      <div class="arrow">↓ POSITIVE / QUESTION</div>
+      <div class="auto">
+        <div class="step-label">Response sent with Calendly link</div>
+        <div class="step-detail">Automated: sends immediately. Draft mode: Vito approves via Telegram first.</div>
+        <span class="step-tool t-purple">Calendly link</span>
+      </div>
+      <div class="arrow">↓ NEGATIVE</div>
+      <div class="auto">
+        <div class="step-label">Polite removal auto-sent</div>
+        <div class="step-detail">Prospect added to DNC. Sequence paused. Logged in Airtable.</div>
+      </div>
+      <div class="arrow">↓ ESCALATE</div>
+      <div class="escalate">
+        <div class="step-label">🚨 Telegram alert to Vito</div>
+        <div class="step-detail">Legal, aggressive, complex, or unclear. No auto-response. Vito handles manually.</div>
+        <span class="step-tool t-blue">Telegram</span>
+      </div>
+      <div class="arrow">↓ PROSPECT BOOKS</div>
+      <div class="auto">
+        <div class="step-label">Meeting lands on client's calendar</div>
+        <div class="step-detail">Calendly sends confirmation to both prospect and client automatically. ArgusReach not involved.</div>
+        <span class="step-tool t-purple">Calendly → Client's Google Cal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: ONGOING -->
+  <div class="phase p4">
+    <div class="phase-hdr">04 · Ongoing & Growth</div>
+    <div class="phase-body">
+      <div class="step">
+        <div class="step-label">Client holds meeting</div>
+        <div class="step-detail">Client closes the deal. ArgusReach delivered the meeting — our job done for this prospect.</div>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Outcome logged</div>
+        <div class="step-detail">Vito updates Airtable: meeting held, outcome (closed/no fit/follow up needed)</div>
+        <span class="step-tool t-yellow">Airtable</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Monthly performance report</div>
+        <div class="step-detail">Go pulls Airtable data → builds report: sent, open rate, replies, meetings booked, outcomes. Emailed to client.</div>
+        <span class="step-tool t-blue">Go (AI)</span>
+        <span class="step-tool t-yellow">Airtable</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Monthly retainer collected</div>
+        <div class="step-detail">Stripe auto-charges on 1st of month.</div>
+        <span class="step-tool t-purple">Stripe</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="decision">
+        <div class="step-label">Month 3 renewal decision</div>
+      </div>
+      <div class="arrow">↓ RENEW</div>
+      <div class="auto">
+        <div class="step-label">Continue month-to-month</div>
+        <div class="step-detail">New prospect list built. Sequences refreshed. Scale plan upsell conversation.</div>
+      </div>
+      <div class="arrow">↓ UPGRADE</div>
+      <div class="step">
+        <div class="step-label">Upsell to Growth or Scale</div>
+        <div class="step-detail">More contacts, more sequences, A/B testing. New proposal sent.</div>
+      </div>
+      <div class="arrow">↓ NOT RENEWING</div>
+      <div class="step">
+        <div class="step-label">Offboarding</div>
+        <div class="step-detail">Final report. All data returned. Sending domain decommissioned. Case study offer made.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOOLS -->
+<div class="tools-section">
+  <h2>Tools & Partners</h2>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-name">GitHub Pages</div>
+      <div class="tool-role">Website hosting. argusreach.com live.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Google Workspace</div>
+      <div class="tool-role">vito@argusreach.com. Also used by clients for outreach email accounts.</div>
+      <div class="tool-cost">$6/mo</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Calendly</div>
+      <div class="tool-role">Vito's booking link. Clients also use for prospect meetings.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Web3Forms</div>
+      <div class="tool-role">Powers intake form and email capture on website. Emails results to Vito.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Apollo.io</div>
+      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Export verified contacts.</div>
+      <div class="tool-cost">Free (50/mo)</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Airtable</div>
+      <div class="tool-role">CRM. Tracks clients, prospects, campaign metrics, meeting outcomes.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Claude API</div>
+      <div class="tool-role">Powers reply monitor classification and response drafting.</div>
+      <div class="tool-cost">~$0.10/day</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">monitor.py</div>
+      <div class="tool-role">Custom script running on server. Watches all client inboxes 24/7. Routes, responds, escalates.</div>
+      <div class="tool-cost">Free (server)</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Telegram</div>
+      <div class="tool-role">Vito ↔ Go communication. Hot reply alerts. Escalations. Weekly digests.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Stripe</div>
+      <div class="tool-role">Payment collection. Setup fee + monthly retainer invoicing.</div>
+      <div class="tool-cost">2.9% + $0.30</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">DocuSign</div>
+      <div class="tool-role">Service agreement signing. Free tier for low volume.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Instantly.ai</div>
+      <div class="tool-role">Future: automated sending at scale, domain warmup, A/B testing. On hold until revenue.</div>
+      <div class="tool-cost">$37/mo (later)</div>
+    </div>
+  </div>
+</div>
+
+<!-- DATA FLOW -->
+<div class="dataflow">
+  <h2>Data Flow — Where Information Comes From and Goes</h2>
+
+  <div class="df-row">
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Website form</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">vito@argusreach.com</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Vito pastes to Telegram</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Go builds client brief</div>
+    <div class="df-note">Intake data flow</div>
+  </div>
+
+  <div class="df-row">
+    <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">Apollo.io</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">CSV export</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable (prospects)</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Client outreach Gmail</div>
+    <div class="df-note">Lead data flow</div>
+  </div>
+
+  <div class="df-row">
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Prospect replies</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Client outreach Gmail (IMAP)</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">monitor.py → Claude API</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.3);color:#c084fc;">Calendly link → Client's calendar</div>
+    <div class="df-note">Reply → booking flow</div>
+  </div>
+
+  <div class="df-row">
+    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable metrics</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Go builds monthly report</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Email to client</div>
+    <div class="df-note">Reporting flow</div>
+  </div>
+</div>
+
+<div style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:#333;text-align:center;">
+  ArgusReach Internal · Master Ops Flowchart · github.com/BotGob/argusreach-ops
+</div>
+
+</body>
+</html>
