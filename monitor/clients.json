@@ -1,0 +1,19 @@
+{
+  "clients": [
+    {
+      "_comment": "EXAMPLE — replace with real client data at onboarding",
+      "id": "bay_harbor_wealth",
+      "active": false,
+      "mode": "draft_approval",
+      "outreach_email": "james.k@bayharborwealth.com",
+      "app_password": "xxxx xxxx xxxx xxxx",
+      "sender_name": "James K.",
+      "firm_name": "Bay Harbor Wealth Advisors",
+      "vertical": "RIA",
+      "calendly_link": "https://calendly.com/jamesk-bayharborwealth/30min",
+      "icp_summary": "Business owners post-exit, HNW individuals in Tampa Bay seeking wealth management after a major liquidity event or transition",
+      "tone": "warm-professional",
+      "compliance_note": "No specific return promises or performance guarantees"
+    }
+  ]
+}
