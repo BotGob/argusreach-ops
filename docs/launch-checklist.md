@@ -7,12 +7,15 @@ Everything needed to go from zero to first paying client.
 ## Infrastructure (one-time setup)
 
 ### Domain & Email
-- [ ] Point argusreach.com DNS to GitHub Pages (GoDaddy → CNAME `www → botgob.github.io`)
-- [ ] Set up Google Workspace ($6/mo) → create vito@argusreach.com
-- [ ] Verify domain in Google Workspace (DNS TXT record via GoDaddy)
-- [ ] Set up Calendly (free) → connect to Google Calendar
-- [ ] Create Calendly link: `calendly.com/argusreach` or `calendly.com/vito-argusreach`
-- [ ] Update website with real Calendly URL (replace placeholder)
+- [x] Point argusreach.com DNS to GitHub Pages (GoDaddy → CNAME `www → botgob.github.io`)
+- [x] Set up Google Workspace → create vito@argusreach.com
+- [x] Verify domain in Google Workspace (DNS TXT record via GoDaddy)
+- [x] **DKIM configured and passing** ✅ (verified 2026-03-08)
+- [x] **SPF passing** ✅
+- [x] **DMARC passing** ✅ — emails from @argusreach.com land in inboxes, not spam
+- [x] Set up Calendly → connect to Google Calendar
+- [x] Calendly link live: `calendly.com/vito-argusreach/30min`
+- [x] Website updated with real Calendly URL
 
 ### Tools
 - [ ] Create Apollo.io free account (50 free exports/month to start)
