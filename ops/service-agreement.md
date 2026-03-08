@@ -58,6 +58,8 @@ d) Ensure the designated sending email address is active and accessible.
 
 e) Comply with all applicable laws governing commercial email outreach, including CAN-SPAM and any state-specific regulations.
 
+f) If providing a client-supplied prospect list, warrant that all contacts on that list have a legitimate business basis for outreach and that Client has not purchased, scraped, or otherwise obtained the list in violation of applicable law. Client assumes full legal responsibility for any client-supplied contact data.
+
 f) Notify Provider of any compliance constraints, regulatory requirements, or restrictions applicable to their industry before campaign launch.
 
 ---

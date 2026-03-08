@@ -32,6 +32,12 @@ Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run eac
 **Q8. Plan**
 (Multiple choice: Starter $750 / Growth $1,500 / Scale $2,500)
 
+**Q8b. Your dedicated outreach email address**
+(Short answer — the new Google Workspace account created for ArgusReach to send from, e.g. james.k@yourdomain.com. If not yet created, leave blank and complete before onboarding call.)
+
+**Q8c. Do you have an existing contact list to prioritize?**
+(Multiple choice: Yes — I'll email it separately / No — start with cold prospecting / I'll have one ready by onboarding call)
+
 **Q9. Start date**
 (Date)
 
