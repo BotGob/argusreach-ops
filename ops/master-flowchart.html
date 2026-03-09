@@ -542,6 +542,72 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
   </div>
 </div>
 
+<!-- PENDING & BACKLOG -->
+<div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Pending & Backlog</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+    <!-- VITO ACTION ITEMS -->
+    <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;">
+      <div style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#fb923c;margin-bottom:14px;">⚠ Vito — Action Required</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Stripe — switch to LIVE mode</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Recreate all 4 payment links in live mode before charging first client. Currently test mode.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Apollo.io — create free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Use vito@argusreach.com. Needed for cold prospect sourcing.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Airtable — create free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">CRM for clients, prospects, campaign metrics, outcomes.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">DocuSign or HelloSign — free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">For sending service agreements to clients.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">LLC filing — ArgusReach LLC</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">sunbiz.org · $125 · Florida. Then get EIN at irs.gov (free). Update Stripe from individual → LLC.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Anthropic API key</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">console.anthropic.com — needed for monitor.py reply classification.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Proposal + service agreement → Google Docs</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Paste from argusreach.com/docs into two Google Docs. ~5 min each.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Send first outreach messages</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">5 emails or LinkedIn DMs using vito-first-outreach.md or linkedin-outreach-script.md.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GO BACKLOG -->
+    <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;">
+      <div style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#60a5fa;margin-bottom:14px;">⏳ Go — Build Backlog</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">LOW</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">CSV ingestion & cleaning script</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Normalize any client-provided contact list into standard format. Fuzzy column matching, email validation, deduplication. Back-burner until first client onboarded.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Airtable CRM setup</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Build bases/tables per airtable-crm-schema.md once Vito creates account.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
+          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">monitor.py — wire Anthropic API key</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Once key is provided, plug into monitor config and run live test.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <div style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:#333;text-align:center;">
   ArgusReach Internal · Master Ops Flowchart · github.com/BotGob/argusreach-ops
 </div>
