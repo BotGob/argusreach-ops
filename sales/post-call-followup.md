@@ -1,5 +1,14 @@
 # Post-Call Follow-Up Emails
 
+## Payment Links (use in follow-up emails)
+- Setup Fee ($500): https://buy.stripe.com/test_4gM7sK4Qzh1J75D9qY8EM00
+- Starter ($750/mo): https://buy.stripe.com/test_00w28qer98vdblTcDa8EM03
+- Growth ($1,500/mo): https://buy.stripe.com/test_5kQbJ01En3aT3Tr1Yw8EM02
+- Scale ($2,500/mo): https://buy.stripe.com/test_8x2aEW82L7r9cpX8mU8EM01
+⚠️ TEST MODE — replace with live links before first real client.
+
+---
+
 Send these the same day as the call — within 2 hours is ideal.
 
 ---
