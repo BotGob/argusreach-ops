@@ -63,12 +63,26 @@
 - [ ] Send sequence drafts to client via email for review
 - [ ] Allow 48 hours for feedback; incorporate revisions
 
+### AI Personalization
+- [ ] Run `personalize.py` on the approved contact list:
+  ```
+  python argusreach/tools/personalize.py \
+    --input exports/[client]-prospects.csv \
+    --output exports/[client]-enriched.csv \
+    --client "[2-3 sentence description of client and what they do]" \
+    --limit 10
+  ```
+- [ ] Review the 10 test outputs — check tone, accuracy, naturalness
+- [ ] If approved, run full list (remove `--limit` flag)
+- [ ] For compliance-sensitive clients (RIAs): send sample of 10-15 custom_opening values to their compliance team for spot-check approval
+- [ ] Confirm `{{custom_opening}}` is mapped correctly in the email sequence template
+
 ### Infrastructure
 - [ ] Set up sending domain (subdomain of client's domain OR ArgusReach subdomain)
 - [ ] Warm-up domain via Instantly.ai (2-week warm-up for new domains)
 - [ ] Configure DKIM, DMARC, SPF records for deliverability
 - [ ] Set up tracking (open/click) in Instantly
-- [ ] Load approved contacts into Instantly campaign
+- [ ] Load enriched CSV (with custom_opening) into Instantly campaign
 
 ### Launch
 - [ ] Client approval received in writing (email is fine)
