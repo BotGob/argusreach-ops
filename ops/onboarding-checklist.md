@@ -33,7 +33,12 @@
 
 ### 4. Logistics (10 min)
 - Sending identity: Name, email, firm name that will appear on outreach
-- Calendar link for meeting booking (Calendly, Cal.com, or other)
+- **Calendly setup (required before launch):**
+  - Client creates free Calendly account at calendly.com
+  - Connects their Google Calendar (or Outlook)
+  - Sets up a meeting type (30-min discovery call recommended)
+  - Shares their booking link with Vito — e.g. `calendly.com/their-name/discovery`
+  - When prospects book, meeting lands directly on client's calendar. ArgusReach sends the link; Calendly handles the rest.
 - Communication preference: how do they want to receive hot replies?
   - [ ] Email forward
   - [ ] Telegram/text notification

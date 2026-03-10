@@ -414,7 +414,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Calendly</div>
-      <div class="tool-role">Vito's booking link. Clients also use for prospect meetings.</div>
+      <div class="tool-role">Vito's booking link. Clients must also create their own free Calendly account, connect their Google Calendar, and share their booking link with Vito before launch. When prospects book, meetings land directly on the client's calendar — ArgusReach just provides the link.</div>
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
@@ -424,8 +424,13 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Apollo.io</div>
-      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Export verified contacts.</div>
+      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Export verified contacts. For government entity clients, supplemented with CAFR + EMMA public records for AUM sizing.</div>
       <div class="tool-cost">Free (50/mo)</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">CAFR + EMMA (Public Records)</div>
+      <div class="tool-role">Government entity AUM sizing. CAFR = Comprehensive Annual Financial Reports (investment balances by city/county). EMMA = MSRB bond database (bond proceeds by entity). Free, public, legal. Used for RIA/investment vertical to filter prospects by AUM range.</div>
+      <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Airtable</div>
@@ -460,6 +465,16 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="tool-card">
       <div class="tool-name">argusreach.com/overview</div>
       <div class="tool-role">Client-facing one-pager. Human empowerment angle. Shareable link + prints clean as PDF. Send after strategy calls.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">argusreach.com/pt</div>
+      <div class="tool-role">Vertical one-pager: Physical Therapy. Covers lapsed patient re-engagement + physician referral outreach. Share with PT/healthcare prospects.</div>
+      <div class="tool-cost">Free</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">argusreach.com/ria</div>
+      <div class="tool-role">Vertical one-pager: RIAs / Investment Advisors. Covers government entity pipeline building (cities, counties, fire/police depts), CAFR+EMMA data sourcing, compliance-approved outreach, AUM diversification play. Share with RIA or investment firm prospects.</div>
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
@@ -518,7 +533,18 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable (prospects)</div>
     <div class="df-arr">→</div>
     <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Client outreach Gmail</div>
-    <div class="df-note">Lead data flow</div>
+    <div class="df-note">Lead data flow (B2B)</div>
+  </div>
+
+  <div class="df-row">
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">CAFR + EMMA (public records)</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">AUM-filtered entity list</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">Apollo contact lookup</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable (prospects)</div>
+    <div class="df-note">Lead data flow (RIA/gov entity)</div>
   </div>
 
   <div class="df-row">
