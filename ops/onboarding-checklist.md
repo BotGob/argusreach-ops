@@ -50,6 +50,12 @@
 
 ## Post-Call (internal, within 24 hours)
 
+### Relationships & DNC Collection
+- [ ] Ask client: "Who do you already have a relationship with in your target market?" (existing referral partners, colleagues, current patients/clients, anyone they know personally in the space)
+- [ ] Client sends relationships list — can be a CSV or even a plain list of emails/names. Save to `clients/[client_id]/relationships.csv`
+- [ ] Ask client for any explicit do-not-contact names (competitors, past bad experiences, etc.). Save to `dnc/[client_id].txt`
+- [ ] Confirm: any warm contacts they want us to REACH OUT TO (not exclude) go in the warm contacts list — these are separate from relationships
+
 ### ICP Document
 - [ ] Finalize ICP in writing and send to client for approval
 - [ ] Confirm geographic radius and any sub-markets
@@ -63,8 +69,20 @@
 - [ ] Send sequence drafts to client via email for review
 - [ ] Allow 48 hours for feedback; incorporate revisions
 
+### Deduplication (run before personalization)
+- [ ] Run `dedupe.py` against the raw prospect list:
+  ```
+  python3 argusreach/tools/dedupe.py \
+    --prospects exports/[client]-prospects.csv \
+    --output exports/[client]-deduped.csv \
+    --relationships clients/[client_id]/relationships.csv \
+    --dnc dnc/[client_id].txt
+  ```
+- [ ] Review the removal log (`-removed-log.csv`) — send to client so they can see what was protected
+- [ ] Confirm clean count is still sufficient for the plan volume. If too many removed, discuss with client.
+
 ### AI Personalization
-- [ ] Run `personalize.py` on the approved contact list:
+- [ ] Run `personalize.py` on the **deduped** list (not the raw Apollo export):
   ```
   python argusreach/tools/personalize.py \
     --input exports/[client]-prospects.csv \
