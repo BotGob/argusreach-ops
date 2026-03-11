@@ -7,14 +7,12 @@ Wants=network-online.target
 Type=simple
 User=argus
 WorkingDirectory=/home/argus/.openclaw/workspace/argusreach/monitor
+EnvironmentFile=/home/argus/.openclaw/workspace/argusreach/monitor/.env
 ExecStart=/usr/bin/python3 /home/argus/.openclaw/workspace/argusreach/monitor/monitor.py
 Restart=on-failure
 RestartSec=30
 StandardOutput=append:/home/argus/.openclaw/workspace/argusreach/monitor/logs/monitor.log
 StandardError=append:/home/argus/.openclaw/workspace/argusreach/monitor/logs/monitor.log
-Environment=ANTHROPIC_API_KEY=YOUR_KEY_HERE
-Environment=ARGUSREACH_BOT_TOKEN=8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk
-Environment=ARGUSREACH_CHAT_ID=8135725412
 
 [Install]
 WantedBy=multi-user.target
