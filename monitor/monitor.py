@@ -52,7 +52,12 @@ POLL_INTERVAL       = 600       # seconds between inbox checks (10 min)
 MAX_PER_CLIENT      = 15        # hard cap per cycle
 MAX_AI_CALLS_DAY    = 100       # daily Claude budget
 DIGEST_HOUR         = 18        # 24h local hour to send daily digest (6pm)
-AI_MODEL            = 'claude-3-5-haiku-20241022'  # verified Haiku model ID
+AI_MODEL            = 'claude-haiku-4-5-20251001'  # updated 2026-03-11
+
+# ── INTEGRATION KEYS (loaded from .env) ──────────────────────────────────────
+INSTANTLY_API_KEY   = os.environ.get('INSTANTLY_API_KEY', '')
+AIRTABLE_TOKEN      = os.environ.get('AIRTABLE_TOKEN', '')
+AIRTABLE_BASE_ID    = os.environ.get('AIRTABLE_BASE_ID', '')
 
 # ── ARGS ──────────────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser()
@@ -100,6 +105,178 @@ def add_dnc(client_id, email_addr):
     with open(p, 'a') as f:
         f.write(email_addr.lower().strip() + '\n')
     log(f"[DNC] Added {email_addr} for client {client_id}")
+
+# ── INSTANTLY INTEGRATION ─────────────────────────────────────────────────────
+def instantly_pause_contact(prospect_email: str, campaign_id: str = None) -> bool:
+    """
+    Pause a prospect in Instantly so no further touches go out after a reply.
+    Set client['instantly_campaign_id'] in clients.json to enable per-client targeting.
+    Falls back gracefully if key not set — logs warning, never crashes monitor.
+    """
+    if not INSTANTLY_API_KEY:
+        log("[Instantly] No API key configured — skipping auto-pause")
+        return False
+    try:
+        payload = {"api_key": INSTANTLY_API_KEY, "email": prospect_email}
+        if campaign_id:
+            payload["campaign_id"] = campaign_id
+        resp = requests.post(
+            "https://api.instantly.ai/api/v1/lead/pause",
+            json=payload,
+            timeout=10
+        )
+        if resp.status_code == 200:
+            log(f"[Instantly] Paused contact: {prospect_email}")
+            return True
+        else:
+            log(f"[Instantly] Pause failed for {prospect_email}: {resp.status_code} {resp.text[:120]}")
+            return False
+    except Exception as e:
+        log(f"[Instantly] Error pausing {prospect_email}: {e}")
+        return False
+
+
+def instantly_unsubscribe_contact(prospect_email: str) -> bool:
+    """
+    Permanently unsubscribe a prospect in Instantly (DNC at platform level).
+    Called in addition to our local DNC list for negative/unsubscribe replies.
+    """
+    if not INSTANTLY_API_KEY:
+        return False
+    try:
+        resp = requests.post(
+            "https://api.instantly.ai/api/v1/lead/unsubscribe",
+            json={"api_key": INSTANTLY_API_KEY, "email": prospect_email},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            log(f"[Instantly] Unsubscribed: {prospect_email}")
+            return True
+        else:
+            log(f"[Instantly] Unsubscribe failed for {prospect_email}: {resp.status_code} {resp.text[:120]}")
+            return False
+    except Exception as e:
+        log(f"[Instantly] Error unsubscribing {prospect_email}: {e}")
+        return False
+
+
+# ── AIRTABLE INTEGRATION ───────────────────────────────────────────────────────
+# Status map: monitor classification → Airtable Prospect Status field value
+_AIRTABLE_STATUS_MAP = {
+    'positive':  'Replied — Interested',
+    'question':  'Replied — Interested',
+    'not_now':   'Replied — Not Now',
+    'negative':  'DNC',
+    'ooo':       'In Sequence',   # keep in sequence, follow up after return date
+    'other':     'In Sequence',
+    'escalated': 'In Sequence',   # human will handle — don't change status
+}
+
+def _airtable_find_prospect(prospect_email: str) -> str | None:
+    """Return Airtable record ID for a prospect by email, or None if not found."""
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        return None
+    try:
+        formula = f"LOWER({{Email}})=LOWER('{prospect_email}')"
+        url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/Prospects"
+        resp = requests.get(
+            url,
+            headers={"Authorization": f"Bearer {AIRTABLE_TOKEN}"},
+            params={"filterByFormula": formula, "maxRecords": 1},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            records = resp.json().get("records", [])
+            return records[0]["id"] if records else None
+        return None
+    except Exception as e:
+        log(f"[Airtable] Find error for {prospect_email}: {e}")
+        return None
+
+
+def airtable_sync_reply(client_id: str, prospect_email: str,
+                         classification: str, reply_text: str,
+                         follow_up_date: str = None) -> bool:
+    """
+    Update the Prospect record in Airtable after a reply is classified.
+    Creates a Touch Log entry as well.
+    Falls back gracefully — never crashes monitor.
+    """
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        log("[Airtable] No token/base configured — skipping sync")
+        return False
+
+    record_id = _airtable_find_prospect(prospect_email)
+    if not record_id:
+        log(f"[Airtable] Prospect not found: {prospect_email} — skipping sync")
+        return False
+
+    status = _AIRTABLE_STATUS_MAP.get(classification, 'In Sequence')
+    today  = datetime.now().strftime('%Y-%m-%d')
+
+    fields = {
+        "Status":         status,
+        "Last Reply":     reply_text[:500] if reply_text else "",
+        "Last Contacted": today,
+    }
+    if follow_up_date:
+        fields["Follow Up Date"] = follow_up_date
+    if classification in ('negative',):
+        fields["Status"] = "DNC"
+
+    try:
+        url  = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/Prospects/{record_id}"
+        resp = requests.patch(
+            url,
+            headers={"Authorization": f"Bearer {AIRTABLE_TOKEN}",
+                     "Content-Type": "application/json"},
+            json={"fields": fields},
+            timeout=10
+        )
+        if resp.status_code == 200:
+            log(f"[Airtable] Updated prospect {prospect_email} → {status}")
+            # Also log to Touch Log table
+            _airtable_log_touch(client_id, prospect_email, classification, reply_text)
+            return True
+        else:
+            log(f"[Airtable] Update failed {prospect_email}: {resp.status_code} {resp.text[:120]}")
+            return False
+    except Exception as e:
+        log(f"[Airtable] Sync error for {prospect_email}: {e}")
+        return False
+
+
+def _airtable_log_touch(client_id: str, prospect_email: str,
+                         classification: str, reply_text: str):
+    """Append a row to Touch Log table for audit trail."""
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        return
+    outcome_map = {
+        'positive':  'Replied — Positive',
+        'question':  'Replied — Positive',
+        'not_now':   'Replied — Negative',
+        'negative':  'Replied — Negative',
+        'ooo':       'Sent',
+        'other':     'Sent',
+        'escalated': 'Sent',
+    }
+    try:
+        requests.post(
+            f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/Touch Log",
+            headers={"Authorization": f"Bearer {AIRTABLE_TOKEN}",
+                     "Content-Type": "application/json"},
+            json={"fields": {
+                "Prospect Email": prospect_email,
+                "Client":         client_id,
+                "Date Sent":      datetime.now().strftime('%Y-%m-%d'),
+                "Outcome":        outcome_map.get(classification, 'Sent'),
+                "Reply Text":     (reply_text or '')[:500],
+            }},
+            timeout=10
+        )
+    except Exception as e:
+        log(f"[Airtable] Touch log error: {e}")
+
 
 # ── PROCESSED ID DEDUPLICATION ────────────────────────────────────────────────
 def load_processed():
@@ -529,11 +706,25 @@ def process_client(client, processed_ids):
                 new_processed.add(fingerprint)
                 continue
 
+            # ── INSTANTLY: pause sequence on any real reply
+            if classification not in ('ooo',) and not escalate:
+                instantly_pause_contact(
+                    from_email,
+                    campaign_id=client.get('instantly_campaign_id')
+                )
+
+            # ── AIRTABLE: sync reply classification
+            airtable_sync_reply(
+                cid, from_email, classification, body[:500],
+                follow_up_date=result.get('follow_up_date')
+            )
+
             # ── HANDLE RESPONSE
             if should_respond and draft:
                 if classification == 'negative':
                     # Unsubscribe — always auto-send removal ack and add to DNC
                     add_dnc(cid, from_email)
+                    instantly_unsubscribe_contact(from_email)   # platform-level unsubscribe
                     if not TEST_MODE:
                         try:
                             _send_email(client['outreach_email'], client['app_password'],

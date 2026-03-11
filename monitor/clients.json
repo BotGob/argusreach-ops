@@ -15,6 +15,7 @@
       "vertical": "RIA",
 
       "calendly_link": "https://calendly.com/jamesk-bayharborwealth/30min",
+      "instantly_campaign_id": "",
 
       "icp_summary": "Business owners post-exit, HNW individuals 50-65 in Tampa Bay seeking wealth management after a liquidity event, inheritance, or business sale",
 
@@ -28,7 +29,8 @@
         "app_password": "16-char Gmail App Password (Google Account > Security > App Passwords). Never their actual password.",
         "vertical": "RIA | Insurance | PhysicalTherapy | MentalHealth | Mortgage | Other",
         "tone": "warm-professional | formal | conversational — affects AI response style",
-        "compliance_note": "What the AI should NEVER say or promise for this client specifically"
+        "compliance_note": "What the AI should NEVER say or promise for this client specifically",
+        "instantly_campaign_id": "Campaign ID from Instantly dashboard (optional — enables auto-pause on reply). Leave blank to pause all campaigns for this email."
       }
     }
   ]
