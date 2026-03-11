@@ -20,7 +20,7 @@ Usage:
 Optional flags:
   --limit 5       Only process first 5 rows (for testing)
   --delay 0.3     Seconds between API calls (default 0.3)
-  --model         Override the Claude model (default: claude-3-5-haiku-20241022)
+  --model         Override the Claude model (default: claude-haiku-4-5)
 
 The generated opening is 1-2 sentences. It references the prospect's
 role, company type, industry, or location — something specific enough
@@ -131,8 +131,8 @@ def main():
                         help="Seconds between API calls (default: 0.3)")
     parser.add_argument("--limit",  type=int, default=None,
                         help="Only process first N rows — useful for testing")
-    parser.add_argument("--model",  default="claude-3-5-haiku-20241022",
-                        help="Claude model to use (default: claude-3-5-haiku-20241022)")
+    parser.add_argument("--model",  default="claude-haiku-4-5",
+                        help="Claude model to use (default: claude-haiku-4-5)")
     args = parser.parse_args()
 
     # Load env + validate API key
