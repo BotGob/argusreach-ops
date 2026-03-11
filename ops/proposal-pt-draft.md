@@ -30,22 +30,24 @@ Your team's involvement: one onboarding call and a quick review of the email seq
 
 ---
 
-**Pilot Pricing — Founding Client Rate:**
+**Founding Client Pricing:**
 
 | | |
 |---|---|
-| Setup fee (one-time) | $250 *(normally $500)* |
-| Monthly | $500/mo *(normally $750/mo)* |
+| Setup fee (one-time) | ~~$500~~ **Waived** |
+| Monthly | $750/mo |
 | Minimum term | 3 months |
-| Total 3-month investment | $1,750 |
+| Total 3-month investment | $2,250 |
 
-As one of our first clients, you get a reduced rate in exchange for honest feedback and — if it works the way I believe it will — the ability to use your results as a case study (anonymized or named, your call).
+As a founding client, I'm waiving the setup fee entirely. In exchange I'd ask for honest feedback throughout — and if it performs the way I expect, the ability to use your results as a case study (anonymized or with your practice named, completely your call).
 
 After the initial 3 months, it's month-to-month. Cancel anytime with 30 days notice.
 
 ---
 
 **What the next 90 days looks like:**
+
+**Before week 1:** Sign the service agreement, set up a dedicated outreach email on your domain (we handle the technical config), and create a free Calendly account connected to your calendar. Total time: about 20 minutes.
 
 **Week 1:** Onboarding call → we build your physician list and write the sequences → you review and approve
 
