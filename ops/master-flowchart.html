@@ -613,6 +613,14 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
           <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Proposal + service agreement → Google Docs</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Paste from argusreach.com/docs into two Google Docs. ~5 min each.</div></div>
         </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">⚠ Install monitor as systemd service (needs sudo)</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">3 commands — Go will walk through. Do after adding first client to clients.json. Estimated 5 min.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">⚠ Calendly — decide free vs. paid before Mar 22</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Trial expires ~2026-03-22. Free Basic ($0, 1 event type) is likely enough for MVP. Paid is $10/mo. Needed for webhooks (meeting → Airtable automation).</div></div>
+        </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
           <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Send first outreach messages</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">5 emails or LinkedIn DMs using vito-first-outreach.md or linkedin-outreach-script.md.</div></div>
@@ -634,15 +642,23 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">✅ monitor.py — Anthropic API key wired</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Key saved to monitor/.env and tested. Ready to run live test once Instantly.ai is paid and sending domain + warmup is configured.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">✅ monitor.py v2.1 — fully pre-wired + all tests passing</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">AI model updated (claude-haiku-4-5-20251001). Instantly pause/unsubscribe + Airtable sync pre-built and wired in. All 5 reply scenarios tested: hot, returns question, unsubscribe, legal threat, not-now. Service file fixed (EnvironmentFile). Awaiting: sudo systemd install + first client in clients.json. Done 2026-03-11.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">⚠ NOW</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">Monitor systemd install — needs Vito's sudo</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">3 commands: sudo cp monitor/argusreach-monitor.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now argusreach-monitor. Activate after first client added to clients.json.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">LOW</span>
           <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Instantly.ai upload script</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Takes enriched CSV and loads contacts directly into an Instantly campaign via API. Removes manual upload step. Build once Instantly is paid and active.</div></div>
         </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Calendly webhook → Airtable + Telegram</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">n8n workflow: when meeting booked → auto-update Prospect record (Meeting Booked=true, date) + Telegram alert to Vito. Requires Calendly paid plan for webhooks. Design ready, build on first client.</div></div>
+        </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">FUTURE</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Client Portal</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Post-MVP. Web-based login for clients to view their own dashboard: emails sent, open rates, response rate, full prospect list (name, email, phone, practice, address), plan management (upgrade/downgrade subscription), and historical reporting. Currently handled manually via monthly email report. Build once revenue justifies the investment.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Client Portal</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Post-MVP. Web-based login for clients to view their own dashboard: emails sent, open rates, response rate, full prospect list, plan management, historical reporting. Currently handled via monthly email report. Build once revenue justifies.</div></div>
         </div>
       </div>
     </div>
