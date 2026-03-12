@@ -86,7 +86,7 @@ Provider commits to: accurate contact sourcing, professional-quality email copy,
 
 Each party agrees to keep confidential all non-public information received from the other party in connection with this Agreement, including but not limited to Client's prospect lists, ICP details, business strategy, and client data. This obligation survives termination of this Agreement.
 
-Provider will not share, sell, or use Client's prospect or client data for any purpose other than performing the Services described herein.
+Provider will not sell Client's prospect or client data, share it with other clients, or use it for any purpose outside of performing the Services described herein. Client acknowledges that Provider uses vetted third-party platforms (including but not limited to CRM and email delivery tools) as subprocessors in the ordinary course of delivering the Services. Such platforms are bound by their own privacy and data protection policies. Provider will not authorize any subprocessor to use Client data for purposes beyond service delivery.
 
 ---
 
