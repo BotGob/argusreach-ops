@@ -94,9 +94,16 @@
 | DocuSign/HelloSign | Free (limited) | High signing volume | $15-25/mo |
 
 > **Current monthly burn:** ~$129/mo (Claude Pro $100 + Hostinger $19.99 + Google Workspace $6 + Claude API ~$3)
-> **At first client launch:** ~$176/mo (+ Instantly $47)
-> **At scale (5+ clients):** ~$246/mo (+ Calendly $10 + Apollo $49 + Airtable $20 - approximate)
+> **At first client launch:** ~$275/mo (+ Instantly $47 + Apollo $99)
+> **At scale (5+ clients):** ~$295/mo (+ Calendly $10 + Airtable $20 when needed)
 > ⚠️ Hostinger renews Mar 19 at $19.99/mo — staying monthly for now, revisit annual plan when first client signs
+
+### Pending Costs — Upgrade When First Client Signs
+| Tool | Plan | Cost | Trigger |
+|------|------|------|---------|
+| Instantly.ai | Growth | $47/mo | First client ready to launch |
+| Apollo.io | Professional | $99/mo | First client ready to launch |
+| Calendly | Standard | $10/mo | When webhook → Airtable automation needed (not urgent) |
 
 ---
 
