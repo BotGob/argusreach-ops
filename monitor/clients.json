@@ -2,6 +2,27 @@
   "_readme": "Set active=true to enable a client. Set active=false to pause without deleting. Mode: automated or draft_approval.",
   "clients": [
     {
+      "_comment": "DRY RUN TEST CLIENT — fake PT practice, gobbot95@gmail.com inbox, draft_approval mode",
+      "id": "test_pt_dryryn",
+      "active": true,
+      "mode": "draft_approval",
+
+      "outreach_email": "gobbot95@gmail.com",
+      "app_password": "hpck wpdv baad nmbx",
+
+      "sender_name": "Mike T.",
+      "firm_name": "Gulf Coast Physical Therapy",
+      "vertical": "PhysicalTherapy",
+
+      "calendly_link": "https://calendly.com/vito-argusreach/30min",
+      "instantly_campaign_id": "",
+
+      "icp_summary": "Orthopedic surgeons, sports medicine doctors, PCPs, and chiropractors in Tampa Bay area who can refer PT patients",
+
+      "tone": "warm-professional",
+      "compliance_note": "Do not make any clinical claims, do not promise outcomes or recovery times, do not discuss insurance reimbursement rates"
+    },
+    {
       "_comment": "EXAMPLE CLIENT — copy this block to add a new client, fill in all fields, set active=true",
       "id": "bay_harbor_wealth",
       "active": false,
@@ -30,7 +51,7 @@
         "vertical": "RIA | Insurance | PhysicalTherapy | MentalHealth | Mortgage | Other",
         "tone": "warm-professional | formal | conversational — affects AI response style",
         "compliance_note": "What the AI should NEVER say or promise for this client specifically",
-        "instantly_campaign_id": "Campaign ID from Instantly dashboard (optional — enables auto-pause on reply). Leave blank to pause all campaigns for this email."
+        "instantly_campaign_id": "Campaign ID from Instantly dashboard. IMPORTANT: all campaigns must be created with stop_on_reply=true in Instantly UI — this handles sequence pausing automatically when a prospect replies."
       }
     }
   ]

@@ -109,54 +109,45 @@ def add_dnc(client_id, email_addr):
 # ── INSTANTLY INTEGRATION ─────────────────────────────────────────────────────
 def instantly_pause_contact(prospect_email: str, campaign_id: str = None) -> bool:
     """
-    Pause a prospect in Instantly so no further touches go out after a reply.
-    Set client['instantly_campaign_id'] in clients.json to enable per-client targeting.
-    Falls back gracefully if key not set — logs warning, never crashes monitor.
+    NOTE: Pause is handled automatically by Instantly's built-in 'stop_on_reply' campaign setting.
+    All campaigns MUST be created with stop_on_reply=true in the Instantly dashboard.
+    This function is a no-op — kept as a hook for future API integration if needed.
     """
-    if not INSTANTLY_API_KEY:
-        log("[Instantly] No API key configured — skipping auto-pause")
-        return False
-    try:
-        payload = {"api_key": INSTANTLY_API_KEY, "email": prospect_email}
-        if campaign_id:
-            payload["campaign_id"] = campaign_id
-        resp = requests.post(
-            "https://api.instantly.ai/api/v1/lead/pause",
-            json=payload,
-            timeout=10
-        )
-        if resp.status_code == 200:
-            log(f"[Instantly] Paused contact: {prospect_email}")
-            return True
-        else:
-            log(f"[Instantly] Pause failed for {prospect_email}: {resp.status_code} {resp.text[:120]}")
-            return False
-    except Exception as e:
-        log(f"[Instantly] Error pausing {prospect_email}: {e}")
-        return False
+    log(f"[Instantly] Pause handled by stop_on_reply campaign setting for {prospect_email}")
+    return True
 
 
 def instantly_unsubscribe_contact(prospect_email: str) -> bool:
     """
-    Permanently unsubscribe a prospect in Instantly (DNC at platform level).
-    Called in addition to our local DNC list for negative/unsubscribe replies.
+    Add a prospect to Instantly's global blocklist via v2 API.
+    Unsubscribe is also handled locally via our DNC list (dnc/<client_id>.txt).
+    Falls back gracefully — never crashes monitor.
     """
     if not INSTANTLY_API_KEY:
+        log("[Instantly] No API key — unsubscribe handled via local DNC list only")
         return False
     try:
+        # v2 API: look up lead by email to get UUID, then blocklist
+        headers = {
+            "Authorization": f"Bearer {INSTANTLY_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        # Add to global blocklist — prevents emailing across ALL campaigns
         resp = requests.post(
-            "https://api.instantly.ai/api/v1/lead/unsubscribe",
-            json={"api_key": INSTANTLY_API_KEY, "email": prospect_email},
+            "https://api.instantly.ai/api/v2/blocklists/entries",
+            headers=headers,
+            json={"email": prospect_email, "reason": "unsubscribed"},
             timeout=10
         )
-        if resp.status_code == 200:
-            log(f"[Instantly] Unsubscribed: {prospect_email}")
+        if resp.status_code in (200, 201):
+            log(f"[Instantly] Blocklisted: {prospect_email}")
             return True
         else:
-            log(f"[Instantly] Unsubscribe failed for {prospect_email}: {resp.status_code} {resp.text[:120]}")
+            # Non-critical — local DNC list already handles this
+            log(f"[Instantly] Blocklist note for {prospect_email}: {resp.status_code} (local DNC active)")
             return False
     except Exception as e:
-        log(f"[Instantly] Error unsubscribing {prospect_email}: {e}")
+        log(f"[Instantly] Blocklist error for {prospect_email}: {e}")
         return False
 
 
