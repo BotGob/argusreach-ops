@@ -93,8 +93,10 @@
 | Airtable | Free (1,000 records/base) | 5+ clients with large prospect lists | $20/mo |
 | DocuSign/HelloSign | Free (limited) | High signing volume | $15-25/mo |
 
-> Running cost at first client: **$47/mo** (Instantly only)
-> Running cost at scale (5+ clients): **~$143/mo** (Instantly + Calendly + Apollo)
+> **Current monthly burn:** ~$26/mo (Hostinger $19.99 + Google Workspace $6)
+> **At first client launch:** ~$73/mo (+ Instantly $47)
+> **At scale (5+ clients):** ~$143/mo (+ Calendly $10 + Apollo $49 + Airtable $20 - approximate)
+> ⚠️ Hostinger renews Mar 19 at $19.99/mo — check if annual plan is cheaper
 
 ---
 
