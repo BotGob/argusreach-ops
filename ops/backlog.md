@@ -7,7 +7,13 @@
 
 ## 🔴 Vito — Action Required
 
-### 1. Reach out to Creekside Recovery Residences (Carter Pope)
+### 1. Upgrade Instantly.ai to Growth plan before March 23
+- Free trial expires Mar 23, 2026 — 11 days away
+- Growth = $47/mo — 5,000 emails/month, 1,000 contacts, warm-up, sequences
+- **Do this before Hyper Growth ($97) — Growth is enough for first 1-2 clients**
+- upgrade at: app.instantly.ai → Billing → Email Outreach → Update Plan
+
+### 2. Reach out to Creekside Recovery Residences (Carter Pope)
 - Warm intro, friend relationship — highest probability first client
 - Vertical: sober living referral pipeline (therapists, treatment centers, discharge planners)
 - Markets: Atlanta (down 25% YoY — pain point) + Tampa Bay
