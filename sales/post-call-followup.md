@@ -1,10 +1,16 @@
 # Post-Call Follow-Up Emails
 
-## Payment Links (use in follow-up emails)
+## Payment Links
+
+**Step 1 — Send at signing (setup fee only):**
 - Setup Fee ($500): https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01
+
+**Step 2 — Send at campaign launch (~2 weeks later, when first emails go out):**
 - Starter ($750/mo): https://buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02
 - Growth ($1,500/mo): https://buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00
 - Scale ($2,500/mo): https://buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03
+
+⚠️ Do NOT send the monthly subscription link at signing — Stripe starts billing immediately when clicked. Only send it when the campaign is live.
 
 
 ---
@@ -36,15 +42,38 @@ INVESTMENT:
 
 YOUR NEXT STEPS:
 1. Sign the agreement (link below)
-2. Pay the setup fee
-3. We schedule your onboarding call
+2. Pay the $500 setup fee (link below)
+3. We schedule your onboarding call — campaign builds from there
 
 Agreement: [DocuSign link]
-Setup fee: [Stripe link]
+Setup fee: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01
 
-Once both are done, I'll send over the onboarding form and we'll schedule the kickoff call.
+Once both are done, I'll send the onboarding form and we'll get your kickoff call scheduled. Your monthly billing doesn't start until your campaign goes live — usually about 2 weeks after the onboarding call.
 
 Any questions before you sign — just reply here.
+
+Vito R.
+ArgusReach
+vito@argusreach.com
+```
+
+---
+
+## CAMPAIGN LAUNCH EMAIL — Send when first emails go out
+
+```
+Subject: Your ArgusReach campaign is live 🟢
+
+Hi [First Name],
+
+Your campaign launched today — first emails are going out now.
+
+To start your monthly subscription, use the link below:
+[Stripe subscription link — Starter/Growth/Scale]
+
+Your 3-month term begins today. Monthly billing will recur on this date each month. After 3 months, it's month-to-month with 30 days notice to cancel.
+
+I'll be in touch if any positive replies come in. You can expect to start seeing activity within the first 1–2 weeks.
 
 Vito R.
 ArgusReach
