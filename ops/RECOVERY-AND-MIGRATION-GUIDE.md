@@ -10,9 +10,9 @@ Everything important lives in GitHub. Even if the server burns down tonight, not
 
 | What | Where on GitHub | How often |
 |------|----------------|-----------|
-| Go's memory, identity, personality files | BotGob/argusreach-memory | Nightly at 3am + on demand |
-| ArgusReach code, monitor, tools, SOPs | BotGob/argusreach-ops | Every time Go makes a change |
-| Website | BotGob/argusreach-website | Every time Go makes a change |
+| Gob's memory, identity, personality files | BotGob/argusreach-memory | Nightly at 3am + on demand |
+| ArgusReach code, monitor, tools, SOPs | BotGob/argusreach-ops | Every time Gob makes a change |
+| Website | BotGob/argusreach-website | Every time Gob makes a change |
 | API keys (.env) | **NOT on GitHub** (intentional — security) | Stored only on server |
 
 **The only things NOT backed up automatically:**
@@ -22,9 +22,9 @@ Everything important lives in GitHub. Even if the server burns down tonight, not
 
 ---
 
-## Part 1 — What to Do If Go Crashes or Goes Silent
+## Part 1 — What to Do If Gob Crashes or Goes Silent
 
-### If Go stops responding in Telegram:
+### If Gob stops responding in Telegram:
 
 **Step 1 — Restart the OpenClaw gateway**
 ```
@@ -33,7 +33,7 @@ openclaw gateway restart
 ```
 
 **Step 2 — Check if it came back**
-Send any message in Telegram. If Go responds, you're done.
+Send any message in Telegram. If Gob responds, you're done.
 
 **Step 3 — If still not responding, restart the server process**
 ```
@@ -49,7 +49,7 @@ If it says "inactive" or "failed":
 sudo systemctl restart argusreach-monitor
 ```
 
-That's it. Go's memory and personality are loaded from files on startup — nothing is lost when it crashes.
+That's it. Gob's memory and personality are loaded from files on startup — nothing is lost when it crashes.
 
 ---
 
@@ -65,7 +65,7 @@ If the entire server is gone and you need to start fresh on a new machine:
 ### Step 2 — Install OpenClaw
 Follow the OpenClaw setup guide at docs.openclaw.ai. Connect your Telegram bot token during setup.
 
-### Step 3 — Restore Go's memory and workspace
+### Step 3 — Restore Gob's memory and workspace
 ```bash
 cd ~
 mkdir -p .openclaw/workspace
@@ -136,21 +136,21 @@ Nothing changes in Telegram — the bot token stays the same. OpenClaw just need
 
 ---
 
-## Part 4 — What Go Keeps in Memory
+## Part 4 — What Gob Keeps in Memory
 
-Go's "brain" is these files on the server (all backed up to GitHub nightly):
+Gob's "brain" is these files on the server (all backed up to GitHub nightly):
 
 | File | What it contains |
 |------|-----------------|
 | `MEMORY.md` | Long-term memory — key decisions, context, lessons |
-| `SOUL.md` | Personality, values, how Go thinks |
+| `SOUL.md` | Personality, values, how Gob thinks |
 | `USER.md` | Everything about you — your goals, working style, preferences |
-| `AGENTS.md` | Operating rules — how Go handles memory, group chats, tools |
-| `HEARTBEAT.md` | What Go checks proactively between conversations |
-| `IDENTITY.md` | Go's name, emoji, avatar |
+| `AGENTS.md` | Operating rules — how Gob handles memory, group chats, tools |
+| `HEARTBEAT.md` | What Gob checks proactively between conversations |
+| `IDENTITY.md` | Gob's name, emoji, avatar |
 | `memory/YYYY-MM-DD.md` | Daily session notes — raw log of what happened each day |
 
-When Go restarts (crash, reboot, new session), it reads these files and picks up exactly where it left off. **Nothing is lost between sessions as long as these files are on GitHub.**
+When Gob restarts (crash, reboot, new session), it reads these files and picks up exactly where it left off. **Nothing is lost between sessions as long as these files are on GitHub.**
 
 ---
 
@@ -165,13 +165,13 @@ Save these in a secure Google Drive folder called "ArgusReach — Private":
 
 ---
 
-## Part 6 — Recommended Backup Schedule (What Go Will Do)
+## Part 6 — Recommended Backup Schedule (What Gob Will Do)
 
 Currently running:
 - ✅ Nightly memory backup at 3am UTC (SOUL, USER, MEMORY, daily notes → GitHub)
 - ✅ Code changes pushed to GitHub on every update
 
-**To add (Go will set this up):**
+**To add (Gob will set this up):**
 - [ ] Weekly DNC list backup — copy client DNC files to a dated archive
 - [ ] Monthly `.env` reminder — alert Vito to verify API keys are still saved in Drive
 
@@ -181,7 +181,7 @@ Currently running:
 
 | Situation | What to do |
 |-----------|-----------|
-| Go not responding | `openclaw gateway restart` on the server |
+| Gob not responding | `openclaw gateway restart` on the server |
 | Monitor stopped | `sudo systemctl restart argusreach-monitor` |
 | Entire server gone | Follow Part 2 (2 hours to full recovery) |
 | Moving to bigger server | Follow Part 3 (~5 min downtime) |
@@ -190,4 +190,4 @@ Currently running:
 
 ---
 
-*Save this document to Google Drive. It has everything you need to get back up and running without Go's help.*
+*Save this document to Google Drive. It has everything you need to get back up and running without Gob's help.*

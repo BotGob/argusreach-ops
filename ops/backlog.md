@@ -1,7 +1,7 @@
 # ArgusReach — Product & Ops Backlog
 
 > COO-maintained. Items are ordered roughly by value/effort.
-> Last updated: 2026-03-12 by Go
+> Last updated: 2026-03-12 by Gob
 
 ---
 
@@ -13,8 +13,8 @@
 - ✅ Instantly unsubscribe — v2 blocklist endpoint wired, falls back to local DNC
 - ✅ Airtable sync — pre-built in monitor, fires on every classified reply
 - ✅ Subject line double "Re:" bug — fixed
-- ✅ Telegram approval routing — alerts come to this chat, Vito approves/rejects via Go directly
-- ✅ Heartbeat pending check — Go checks pending_approvals.json every 30 min, alerts if drafts are waiting
+- ✅ Telegram approval routing — alerts come to this chat, Vito approves/rejects via Gob directly
+- ✅ Heartbeat pending check — Gob checks pending_approvals.json every 30 min, alerts if drafts are waiting
 - ✅ Prospect CSV import script — `tools/import_prospects.py`, fuzzy column matching, dedup, rate limited
 - ✅ Full dry run completed — 3/3 replies handled correctly (positive, not_now, negative/DNC)
 - ✅ Service file fixed — loads keys from .env, no hardcoded values
@@ -29,14 +29,14 @@
 - Warm intro, friend relationship — highest probability first client
 - Vertical: sober living referral pipeline (therapists, treatment centers, discharge planners)
 - Markets: Atlanta (down 25% YoY — pain point) + Tampa Bay
-- Go has assessed the fit: ✅ strong match
-- **Action:** Send the message Go drafted. Do it tomorrow morning.
+- Gob has assessed the fit: ✅ strong match
+- **Action:** Send the message Gob drafted. Do it tomorrow morning.
 
 ### 2. Calendly — decide free vs. paid before March 22
 - Trial expires ~2026-03-22 (10 days)
 - Free Basic ($0, 1 event type) works for MVP
 - Paid ($10/mo) needed for Calendly webhooks (meeting → Airtable auto-log)
-- **Recommendation:** Go paid. $10/mo is worth the automation.
+- **Recommendation:** Gob paid. $10/mo is worth the automation.
 
 ### 3. Send first 5 outreach messages for ArgusReach itself
 - Use `outreach/vito-first-outreach.md` or `sales/linkedin-outreach-script.md`
@@ -45,7 +45,7 @@
 
 ---
 
-## 🔴 Go — Action Required Next Client
+## 🔴 Gob — Action Required Next Client
 
 ### 4. Wire up first real client in clients.json
 - Copy example block, fill in outreach email + app password + Calendly + ICP
@@ -72,7 +72,7 @@
 
 ### 8. Instantly Campaign Creation Script
 - Script to create a new campaign in Instantly via API, pre-configured with correct settings
-- Eliminates manual dashboard setup — Go does it all from terminal
+- Eliminates manual dashboard setup — Gob does it all from terminal
 - Build once we have first active Instantly account
 
 ### 9. Monthly Report Auto-Generation
