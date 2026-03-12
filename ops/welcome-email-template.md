@@ -45,9 +45,9 @@ Reply to this email with the list attached, or we can collect it on the onboardi
 
 Once we have your onboarding form and email access:
 
-- **Within 24 hours:** We build your prospect list and write your email sequences
-- **Within 48 hours:** We send you the sequences for review — you can edit anything
-- **Once you approve:** We launch. First emails go out within 24 hours of your sign-off
+- **Days 1–2:** We build your prospect list and write your email sequences
+- **Days 2–3:** We send you the sequences for review — you can edit anything
+- **Once you approve:** Domain warm-up completes in parallel (1–2 weeks from account creation). Campaign launches when warm-up is done — first emails go out, and your monthly billing begins on that date.
 - **Ongoing:** We monitor replies, handle responses, and route interested prospects to your calendar automatically
 
 Your only job after launch: show up to the meetings.
