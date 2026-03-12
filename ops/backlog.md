@@ -96,7 +96,7 @@
 > **Current monthly burn:** ~$26/mo (Hostinger $19.99 + Google Workspace $6)
 > **At first client launch:** ~$73/mo (+ Instantly $47)
 > **At scale (5+ clients):** ~$143/mo (+ Calendly $10 + Apollo $49 + Airtable $20 - approximate)
-> ⚠️ Hostinger renews Mar 19 at $19.99/mo — check if annual plan is cheaper
+> ⚠️ Hostinger renews Mar 19 at $19.99/mo — staying monthly for now, revisit annual plan when first client signs
 
 ---
 
