@@ -93,9 +93,9 @@
 | Airtable | Free (1,000 records/base) | 5+ clients with large prospect lists | $20/mo |
 | DocuSign/HelloSign | Free (limited) | High signing volume | $15-25/mo |
 
-> **Current monthly burn:** ~$26/mo (Hostinger $19.99 + Google Workspace $6)
-> **At first client launch:** ~$73/mo (+ Instantly $47)
-> **At scale (5+ clients):** ~$143/mo (+ Calendly $10 + Apollo $49 + Airtable $20 - approximate)
+> **Current monthly burn:** ~$129/mo (Claude Pro $100 + Hostinger $19.99 + Google Workspace $6 + Claude API ~$3)
+> **At first client launch:** ~$176/mo (+ Instantly $47)
+> **At scale (5+ clients):** ~$246/mo (+ Calendly $10 + Apollo $49 + Airtable $20 - approximate)
 > ⚠️ Hostinger renews Mar 19 at $19.99/mo — staying monthly for now, revisit annual plan when first client signs
 
 ---
