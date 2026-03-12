@@ -110,6 +110,20 @@
 
 ---
 
+## 🚀 Post-MVP Product Expansion
+
+### Voice Calling — Argus Books Meetings by Phone
+- Argus calls prospects who replied positively and confirms/books the meeting by voice
+- Human-sounding AI voice (ElevenLabs + GPT-4o Realtime or Bland.ai)
+- Handles: "Yes I'm interested" follow-ups, scheduling conflicts, reminder calls day-before
+- Prospect hears: a warm, professional voice calling from the client's number
+- Outcome: meeting confirmed on calendar, no human involvement
+- **Why it matters:** Response time is everything. A positive reply at 2pm on a Tuesday that gets a call back within 10 minutes closes 3x more meetings than an email reply the next morning
+- **Tools to evaluate:** Bland.ai, Vapi.ai, Retell.ai — all have outbound calling APIs
+- **Build when:** 3+ active clients, proven email ROI, client appetite for premium tier
+
+---
+
 ## 💡 Longer-Term Ideas
 
 - **Referral Partner Program** — accountants, attorneys who refer clients get a cut
