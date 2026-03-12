@@ -1,100 +1,111 @@
 # ArgusReach — Product & Ops Backlog
 
-> COO-maintained. Items are ordered roughly by value/effort. Move to `launch-checklist.md` when prioritized for a sprint.
+> COO-maintained. Items are ordered roughly by value/effort.
+> Last updated: 2026-03-12 by Go
 
 ---
 
-## 🔴 Next Up (do these when first client signs)
+## ✅ Completed (2026-03-11 / 03-12)
 
-### 1. Deploy Monitor as System Service
-- Run: `sudo cp monitor/argusreach-monitor.service /etc/systemd/system/`
-- Then: `sudo systemctl daemon-reload && sudo systemctl enable argusreach-monitor && sudo systemctl start argusreach-monitor`
-- Prereq: active client entry in `monitor/clients.json`
-- **Note:** Service file is fixed — loads keys from `.env` automatically
-
-### 2. Wire Up First Real Client in clients.json
-- Copy the example block in `monitor/clients.json`
-- Fill in: outreach email, Gmail app password, Calendly link, ICP summary
-- Set `active: true`, `mode: "draft_approval"` (always start here — switch to automated after 2 weeks of clean drafts)
-
-### 3. Instantly.ai — Client Sending Domain Warm-Up
-- Create client's sending subdomain (e.g., `outreach.clientdomain.com`)
-- Add to Instantly, connect Gmail, start warm-up sequence
-- Do NOT send real volume until 3+ weeks of warm-up
-- Warm-up runs in parallel — start on Day 1 of onboarding
+- ✅ Monitor deployed as systemd service — running 24/7, auto-restarts on reboot
+- ✅ Monitor v2.1 — AI model fixed (claude-haiku-4-5-20251001), all 5 reply scenarios tested and passing
+- ✅ Instantly sequence pause — handled by `stop_on_reply` campaign setting (no API call needed)
+- ✅ Instantly unsubscribe — v2 blocklist endpoint wired, falls back to local DNC
+- ✅ Airtable sync — pre-built in monitor, fires on every classified reply
+- ✅ Subject line double "Re:" bug — fixed
+- ✅ Telegram approval routing — alerts come to this chat, Vito approves/rejects via Go directly
+- ✅ Heartbeat pending check — Go checks pending_approvals.json every 30 min, alerts if drafts are waiting
+- ✅ Prospect CSV import script — `tools/import_prospects.py`, fuzzy column matching, dedup, rate limited
+- ✅ Full dry run completed — 3/3 replies handled correctly (positive, not_now, negative/DNC)
+- ✅ Service file fixed — loads keys from .env, no hardcoded values
+- ✅ Backlog doc created — this file
+- ✅ Master flowchart updated
 
 ---
 
-## 🟡 High Value — Build When We Have 2+ Clients
+## 🔴 Vito — Action Required Now
 
-### 4. Monitor → Airtable Auto-Sync
-When monitor classifies a reply, auto-update the Prospect record in Airtable:
-- Set `Status` to match reply type (Replied — Interested, DNC, etc.)
-- Log `Last Reply` text
-- Set `Last Contacted` date
-- Currently: monitor logs to local JSON only — manual Airtable updates required
-- **Implementation:** Add Airtable API calls to `monitor.py` after `log_reply()`
+### 1. Reach out to Creekside Recovery Residences (Carter Pope)
+- Warm intro, friend relationship — highest probability first client
+- Vertical: sober living referral pipeline (therapists, treatment centers, discharge planners)
+- Markets: Atlanta (down 25% YoY — pain point) + Tampa Bay
+- Go has assessed the fit: ✅ strong match
+- **Action:** Send the message Go drafted. Do it tomorrow morning.
 
-### 5. Instantly.ai → Monitor Sequence Auto-Pause
-When monitor detects a positive/negative reply, auto-pause that prospect's sequence in Instantly via API:
-- Prevents Touch 2 going out after a positive reply
-- Currently: manual step in reply-handling-sop.md
-- **Implementation:** Add `pause_instantly_contact()` call using `INSTANTLY_API_KEY` from `.env`
-- API endpoint: `POST /api/v1/lead/pause` (check Instantly docs)
+### 2. Calendly — decide free vs. paid before March 22
+- Trial expires ~2026-03-22 (10 days)
+- Free Basic ($0, 1 event type) works for MVP
+- Paid ($10/mo) needed for Calendly webhooks (meeting → Airtable auto-log)
+- **Recommendation:** Go paid. $10/mo is worth the automation.
 
-### 6. Calendly Webhook → Airtable Meeting Log
-When a meeting is booked via Calendly:
-- Auto-set `Meeting Booked = true` and `Meeting Date` in Airtable Prospect record
-- Auto-notify Vito via Telegram: "📅 Meeting booked — [name] at [company] for [date]"
-- **Implementation:** Calendly webhook → n8n → Airtable + Telegram
-- Calendly webhooks available on paid plan (another reason to keep paid vs. free Basic)
+### 3. Send first 5 outreach messages for ArgusReach itself
+- Use `outreach/vito-first-outreach.md` or `sales/linkedin-outreach-script.md`
+- Target: your network first — warm intros close faster
+- Creekside is #1. Who else do you know that runs a professional services firm?
 
-### 7. ArgusReach Self-Prospecting Domain Warm-Up
+---
+
+## 🔴 Go — Action Required Next Client
+
+### 4. Wire up first real client in clients.json
+- Copy example block, fill in outreach email + app password + Calendly + ICP
+- Set `active: true`, `mode: "draft_approval"`
+- Test IMAP connection before going live
+
+### 5. Import client prospect list into Airtable
+- Run `tools/import_prospects.py --csv <file> --client <id>` before first email fires
+- This MUST happen before Instantly sends Touch 1 — non-negotiable
+
+### 6. Set up client sending domain in Instantly
+- Create subdomain (e.g. `outreach.clientdomain.com`)
+- Connect Gmail, start warm-up immediately on Day 1 of onboarding
+- Enable `stop_on_reply=true` on every campaign created
+
+---
+
+## 🟡 High Value — Build When First Client is Live
+
+### 7. Calendly Webhook → Airtable + Telegram
+- When meeting booked → auto-update Prospect record + alert Vito
+- Requires Calendly paid plan
+- Implementation: Calendly webhook → n8n → Airtable PATCH + Telegram notify
+
+### 8. Instantly Campaign Creation Script
+- Script to create a new campaign in Instantly via API, pre-configured with correct settings
+- Eliminates manual dashboard setup — Go does it all from terminal
+- Build once we have first active Instantly account
+
+### 9. Monthly Report Auto-Generation
+- Pull stats from Airtable → populate report template → email to client on 1st of month
+- Tools: Python script + Airtable API
+
+### 10. ArgusReach Self-Prospecting Domain Warm-Up
 - Set up `outreach@mail.argusreach.com` in Google Workspace
-- Add to Instantly.ai and start warm-up for Vito's own pipeline
-- Use this to prospect for ArgusReach clients via cold email
-- Separate from client campaigns — ArgusReach sells itself this way
+- Add to Instantly, start warm-up — use for finding ArgusReach clients via cold email
+- Start this when Creekside or first client is signed (parallel track)
 
 ---
 
 ## 🟢 Nice to Have — Scale Features
 
-### 8. Client-Facing Dashboard
-Simple read-only Airtable share link per client showing:
-- Their campaign status, emails sent, meetings booked this month
-- Cuts down on reporting overhead / client check-in calls
-- Zero build cost — just a filtered Airtable view + share link
-
-### 9. Monthly Report Auto-Generation
-- Pull stats from Airtable (emails sent, reply rate, meetings booked)
-- Populate a Google Slides template automatically
-- Send to client on the 1st of each month via email
-- **Tools:** n8n + Google Slides API or a simple Python script
-
-### 10. Reply Volume Dashboard (internal)
-Telegram daily digest exists — add a weekly summary:
-- Total replies across all clients this week
-- Meetings booked vs. prior week
-- Any DNC spikes (signals bad list quality)
-
-### 11. List-Unsubscribe Header Support
-Some ESPs send unsubscribes via `List-Unsubscribe` headers rather than reply text.
-Monitor should parse and honor these even if the reply body is neutral.
-Low priority until we see volume.
+### 11. Client-Facing Dashboard
+- Read-only Airtable share link per client: campaign status, emails sent, meetings booked
+- Zero build cost — filtered Airtable view + share link
 
 ### 12. Daily Send Cap Per Client (Circuit Breaker)
-Add a configurable `max_auto_responses_per_day` field to each client in `clients.json`.
-Default: 10. Prevents runaway auto-responses if something goes wrong.
+- Add `max_auto_responses_per_day` to clients.json
+- Default: 10. Prevents runaway scenarios.
 
-### 13. HubSpot CRM Migration
-- Move from Airtable to HubSpot Free when we hit 5+ clients
-- Better pipeline visibility, email tracking, deal stages
+### 13. List-Unsubscribe Header Support
+- Some ESPs send unsubscribes via header, not reply text
+- Low priority until volume demands it
+
+### 14. HubSpot CRM Migration
+- Move from Airtable when 5+ clients
 - Free forever for core CRM features
 
-### 14. Lead Sourcing Automation (Clay.com)
-At scale (3+ active campaigns running):
-- Clay.com automates Apollo exports + personalization at scale
-- $149/month — worth it when volume demands it
+### 15. Lead Sourcing Automation (Clay.com)
+- $149/mo — add when running 3+ simultaneous campaigns
 - Replaces manual Apollo exports
 
 ---
@@ -102,11 +113,8 @@ At scale (3+ active campaigns running):
 ## 💡 Longer-Term Ideas
 
 - **Referral Partner Program** — accountants, attorneys who refer clients get a cut
-- **White-label** — sell ArgusReach under a client's brand to their clients
-- **Vertical-specific landing pages** — PT, RIA, Insurance each get a dedicated page with vertical-specific proof points
-- **Case study machine** — after first client result, auto-generate case study from Airtable data
-- **AI-personalized opening lines** — use Clay + Claude to write 1-line personalized openers at scale before loading into Instantly
-
----
-
-*Last updated: 2026-03-11 by Go*
+- **White-label** — sell ArgusReach under client's brand to their clients
+- **Vertical-specific landing pages** — deeper pages for PT, RIA, Insurance, Sober Living
+- **Case study machine** — auto-generate case study from Airtable data after first client result
+- **AI-personalized opening lines** — Clay + Claude writes 1-line custom openers at scale
+- **Sober Living vertical page** — Creekside conversation revealed this is a real market
