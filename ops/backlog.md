@@ -18,13 +18,7 @@
 - Creekside is #1. Who else runs a professional services firm you could intro to?
 - Use `sales/pitch-deck-script.md` and `outreach/vito-first-outreach.md` for guidance
 
-### 3. Calendly — free vs. paid decision before March 22
-- Trial expires ~2026-03-22
-- Free Basic ($0) works for MVP — 1 event type
-- Paid ($10/mo) unlocks webhooks → meeting auto-logs to Airtable + Telegram alert
-- **Recommendation:** Go paid. $10/mo is worth the automation.
-
-### 4. DocuSign or HelloSign account setup
+### 3. DocuSign or HelloSign account setup
 - Need for service agreement signing when first client is ready
 - Both have free tiers for low volume
 
