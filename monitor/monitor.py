@@ -344,86 +344,11 @@ def notify(text):
 
 def check_telegram_commands():
     """
-    Poll Telegram for incoming messages from Vito.
-    Handles: APPROVE <id> or REJECT <id>
-    Called once per main loop cycle.
+    Approval/rejection is handled by Go (OpenClaw) directly via the pending_approvals.json file.
+    Vito tells Go "approve" or "reject" in plain English in the main chat.
+    This function is intentionally a no-op — bot polling removed to avoid conflicts with OpenClaw.
     """
-    try:
-        resp = requests.get(
-            f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates',
-            params={'timeout': 5, 'offset': _telegram_offset.get('offset', 0)},
-            timeout=10
-        ).json()
-        updates = resp.get('result', [])
-        if not updates:
-            return
-        _telegram_offset['offset'] = updates[-1]['update_id'] + 1
-
-        for u in updates:
-            msg = u.get('message', {})
-            text = msg.get('text', '').strip()
-            from_id = msg.get('from', {}).get('id')
-
-            # Only accept commands from Vito
-            if str(from_id) != str(TELEGRAM_CHAT_ID):
-                continue
-            if not text.upper().startswith(('APPROVE', 'REJECT', 'PENDING')):
-                continue
-
-            parts = text.split()
-            cmd = parts[0].upper()
-
-            if cmd == 'PENDING':
-                pending = load_pending()
-                if not pending:
-                    notify("No pending approvals.")
-                else:
-                    lines = ["*Pending drafts:*"]
-                    for i, p in enumerate(pending):
-                        lines.append(
-                            f"{i+1}. `{p['id']}`\n"
-                            f"   {p['firm_name']} → {p['from_name'] or p['from_email']}\n"
-                            f"   _{p['classification']}_"
-                        )
-                    notify('\n'.join(lines))
-
-            elif cmd == 'APPROVE' and len(parts) >= 2:
-                target_id = parts[1]
-                pending = load_pending()
-                match = next((p for p in pending if p['id'] == target_id or target_id in p['id']), None)
-                if not match:
-                    notify(f"❌ No pending draft found for ID: `{target_id}`")
-                    continue
-                if TEST_MODE:
-                    notify(f"[TEST] Would send draft to {match['from_email']}")
-                else:
-                    try:
-                        _send_email(match['outreach_email'], match['app_password'],
-                                    match['sender_name'], match['from_email'],
-                                    match['subject'], match['draft'])
-                        pending = [p for p in pending if p['id'] != match['id']]
-                        save_pending(pending)
-                        notify(f"✅ Sent to {match['from_name'] or match['from_email']} ({match['firm_name']})")
-                        log(f"[APPROVED] Sent draft to {match['from_email']}")
-                    except Exception as e:
-                        notify(f"❌ Send failed: `{str(e)[:200]}`")
-
-            elif cmd == 'REJECT' and len(parts) >= 2:
-                target_id = parts[1]
-                pending = load_pending()
-                match = next((p for p in pending if p['id'] == target_id or target_id in p['id']), None)
-                if not match:
-                    notify(f"❌ No pending draft found for ID: `{target_id}`")
-                    continue
-                pending = [p for p in pending if p['id'] != match['id']]
-                save_pending(pending)
-                notify(f"🗑 Rejected and discarded draft for {match['from_email']}")
-                log(f"[REJECTED] Discarded draft for {match['from_email']}")
-
-    except Exception as e:
-        log(f"Telegram command check error: {e}")
-
-_telegram_offset = {'offset': 0}
+    pass
 
 # ── EMAIL UTILS ───────────────────────────────────────────────────────────────
 def get_body(msg):
@@ -763,12 +688,10 @@ def process_client(client, processed_ids):
             ]
 
             if approval_id and draft:
-                short_id = approval_id.split(':')[-1]  # just timestamp part
                 msg_lines += [
                     f"\n*Draft ready:*",
                     f"```\n{draft[:500]}\n```",
-                    f"Reply `APPROVE {approval_id}` to send · `REJECT {approval_id}` to discard",
-                    f"Or `PENDING` to list all queued drafts",
+                    f"→ Tell Go: *approve* or *reject* this reply",
                 ]
             elif sent:
                 msg_lines.append("✅ Auto-sent")
