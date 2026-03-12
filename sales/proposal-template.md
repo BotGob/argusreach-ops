@@ -94,7 +94,7 @@ Payment: Setup fee due upon signing. Monthly retainer due on the 1st of each act
 2. **Onboarding Call** (45 min) — ICP deep-dive, sequence brief, calendar access
 3. **We Build** — list, sequences, deliverability infra (3–5 business days)
 4. **You Approve** — review emails before launch, request any changes
-5. **Launch** — first outreach deployed; you receive notifications on positive replies
+5. **Launch** — first outreach deployed (typically 1–2 weeks after onboarding); monthly billing begins; you receive notifications on positive replies
 6. **Meetings** — qualified prospects book directly on your calendar
 
 ---

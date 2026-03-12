@@ -68,7 +68,7 @@
 
 "Based on what you've told me, it sounds like this could be a fit. Here's what I'd suggest:"
 
-"We do a proper 45-minute onboarding call where we build out your ICP, define your ideal prospect profile, and I show you exactly what the outreach will look like before a single email goes out. There's a $500 one-time setup fee to cover that work, and then we're on a 3-month engagement from there."
+"We do a proper 45-minute onboarding call where we build out your ICP, define your ideal prospect profile, and I show you exactly what the outreach will look like before a single email goes out. There's a $500 one-time setup fee that covers all of that work. Your monthly subscription doesn't start until your campaign goes live — usually 1–2 weeks after the onboarding call. Then we're on a 3-month engagement from launch."
 
 "The question is — do you want to keep relying entirely on referrals, or do you want a second engine running in the background that's filling your pipeline every single month?"
 

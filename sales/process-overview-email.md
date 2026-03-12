@@ -61,7 +61,7 @@ These are projections, not guarantees. Performance depends on your offer, your v
 | Growth | $1,500/mo | 500 contacts |
 | Scale | $2,500/mo | 1,000+ contacts |
 
-All plans include a $500 one-time setup fee and a 3-month minimum. No contracts after that.
+All plans include a $500 one-time setup fee due at signing. Monthly billing begins when your campaign launches — not before. 3-month minimum from launch date. No contracts after that.
 
 One new client typically pays for 6–12 months of ArgusReach. That's the math.
 

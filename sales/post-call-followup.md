@@ -30,9 +30,9 @@ WHAT YOU'RE GETTING:
 - Monthly performance reporting
 
 INVESTMENT:
-- $500 setup fee (one-time)
-- $[750/1,500/2,500]/month — [Starter/Growth/Scale]
-- 3-month minimum, then month-to-month
+- $500 setup fee (one-time, due at signing — covers everything through campaign launch)
+- $[750/1,500/2,500]/month — [Starter/Growth/Scale] — billing starts at campaign launch, not at signing
+- 3-month minimum from launch date, then month-to-month
 
 YOUR NEXT STEPS:
 1. Sign the agreement (link below)
@@ -71,7 +71,7 @@ WHAT WE DISCUSSED:
 THE MATH FOR [FIRM NAME]:
 - Average client value: ~$[X]/year
 - One new client from ArgusReach: covers [X] months of service
-- Starter plan: $750/mo + $500 setup = $2,750 for 3 months
+- Starter plan: $750/mo + $500 setup = $2,750 total for first 3 months (monthly billing starts at launch)
 
 FULL OVERVIEW: argusreach.com/overview
 ROI CALCULATOR: argusreach.com/roi
