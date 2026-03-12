@@ -35,10 +35,10 @@ All outreach is conducted in Client's name. Provider will not identify itself as
 
 **Selected Plan:** [Starter / Growth / Scale]
 **Monthly Retainer:** $[750 / 1,500 / 2,500] per month
-**One-Time Setup Fee:** $500 (due upon signing)
+**One-Time Setup Fee:** $500 (due upon signing — covers onboarding, ICP research, list build, sequence writing, and all systems setup)
 **Minimum Engagement:** 3 months from the date of first campaign launch
 
-Monthly retainer is due on the 1st of each active month. Invoices unpaid after 10 days may result in campaign pause.
+Monthly retainer billing begins on the date of first campaign launch (when first outreach emails go out), not the date of signing. The setup fee covers all work performed prior to launch. Monthly retainer is due on the 1st of each active month following campaign launch. Invoices unpaid after 10 days may result in campaign pause.
 
 After the initial 3-month period, this Agreement continues month-to-month until terminated by either party with 30 days written notice.
 
