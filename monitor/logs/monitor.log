@@ -1,0 +1,90 @@
+2026-03-11 20:59:12 ArgusReach Monitor v2 starting [TEST MODE]
+2026-03-11 20:59:12 [TEST] Telegram would send: ✅ *ArgusReach Monitor v2* started [TEST MODE]
+Watching all active client inboxes · checking every 10 min
+2026-03-11 20:59:12 No active clients. Waiting...
+2026-03-11 20:59:19 [TEST] Telegram would send: 📊 *Daily Digest — 2026-03-11*
+No replies processed today.
+2026-03-11 20:59:19 Cycle complete. Next check in 10 min.
+
+2026-03-11 21:00:04 AI call error: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-5-haiku-20241022'}, 'request_id': 'req_011CYwxxRUP7io8zXqQVHnKx'}
+2026-03-11 21:00:04 AI call error: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-5-haiku-20241022'}, 'request_id': 'req_011CYwxxSDHFZ7iGUdrboeZk'}
+2026-03-11 21:00:04 AI call error: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-5-haiku-20241022'}, 'request_id': 'req_011CYwxxSvwcjh798BzBSe2n'}
+2026-03-11 21:00:04 AI call error: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-5-haiku-20241022'}, 'request_id': 'req_011CYwxxTUgJwVoVEzUppjZj'}
+2026-03-12 00:54:26 ArgusReach Monitor v2 starting
+2026-03-12 00:54:26 No active clients. Waiting...
+2026-03-12 00:54:31 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:04:31 No active clients. Waiting...
+2026-03-12 01:04:37 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:09:21 ArgusReach Monitor v2 starting
+2026-03-12 01:09:22 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 01:09:23 [Gulf Coast Physical Therapy] 2 unread message(s).
+2026-03-12 01:09:23 [Gulf Coast Physical Therapy] Skipping automated sender: no-reply@accounts.google.com
+2026-03-12 01:09:23 [Gulf Coast Physical Therapy] Skipping automated sender: no-reply@accounts.google.com
+2026-03-12 01:09:29 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:19:29 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 01:19:30 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 01:19:35 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:29:35 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 01:29:36 [Gulf Coast Physical Therapy] 3 unread message(s).
+2026-03-12 01:29:37 [Gulf Coast Physical Therapy] Processing: Vito Resciniti <vito@argusreach.com>
+2026-03-12 01:29:39 [Instantly] Pause failed for vito@argusreach.com: 404 {"message":"Route POST:/api/v1/lead/pause not found","error":"Not Found","statusCode":404}
+2026-03-12 01:29:40 [Airtable] Prospect not found: vito@argusreach.com — skipping sync
+2026-03-12 01:29:40 [DNC] Added vito@argusreach.com for client test_pt_dryryn
+2026-03-12 01:29:40 [Instantly] Unsubscribe failed for vito@argusreach.com: 404 {"message":"Route POST:/api/v1/lead/unsubscribe not found","error":"Not Found","statusCode":404}
+2026-03-12 01:29:43 [Gulf Coast Physical Therapy] Processing: vito resciniti <vitoresciniti27@yahoo.com>
+2026-03-12 01:29:45 [Instantly] Pause failed for vitoresciniti27@yahoo.com: 404 {"message":"Route POST:/api/v1/lead/pause not found","error":"Not Found","statusCode":404}
+2026-03-12 01:29:46 [Airtable] Prospect not found: vitoresciniti27@yahoo.com — skipping sync
+2026-03-12 01:29:47 [Gulf Coast Physical Therapy] Processing: David Holleran <djholleran@gmail.com>
+2026-03-12 01:29:48 [Instantly] Pause failed for djholleran@gmail.com: 404 {"message":"Route POST:/api/v1/lead/pause not found","error":"Not Found","statusCode":404}
+2026-03-12 01:29:49 [Airtable] Prospect not found: djholleran@gmail.com — skipping sync
+2026-03-12 01:29:55 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:39:55 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 01:39:56 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 01:40:01 Cycle complete. Next check in 10 min.
+
+2026-03-12 01:50:01 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 01:50:02 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 01:50:08 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:00:08 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:00:08 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:00:14 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:01:51 ArgusReach Monitor v2 starting
+2026-03-12 02:01:52 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:01:53 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:01:53 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:11:53 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:11:54 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:11:54 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:21:54 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:21:54 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:21:55 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:31:55 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:31:56 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:31:56 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:41:56 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:41:57 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:41:57 Cycle complete. Next check in 10 min.
+
+2026-03-12 02:51:57 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 02:51:58 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 02:51:58 Cycle complete. Next check in 10 min.
+
+2026-03-12 03:01:58 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 03:01:59 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 03:01:59 Cycle complete. Next check in 10 min.
+
+2026-03-12 03:11:59 [Gulf Coast Physical Therapy] Checking inbox...
+2026-03-12 03:12:00 [Gulf Coast Physical Therapy] No unread messages.
+2026-03-12 03:12:00 Cycle complete. Next check in 10 min.
+

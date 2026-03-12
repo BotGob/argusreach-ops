@@ -1,0 +1,32 @@
+[
+  {
+    "ts": "2026-03-12T01:29:43.508921",
+    "client": "test_pt_dryryn",
+    "prospect": "vito@argusreach.com",
+    "classification": "negative",
+    "draft_preview": "Understood, removing you now \u2014 sorry for the interruption. You won't hear from me again.",
+    "sent": true,
+    "notes": "Vito Resciniti has requested removal from mailing list; ensure he is added to do-not-contact registry.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-12T01:29:46.765294",
+    "client": "test_pt_dryryn",
+    "prospect": "vitoresciniti27@yahoo.com",
+    "classification": "not_now",
+    "draft_preview": "No problem at all, Vito \u2014 I completely understand. Feel free to reach out anytime next month when things settle down. Looking forward to connecting then!",
+    "sent": false,
+    "notes": "Soft decline with future intent; candidate for light re-engagement in ~4 weeks",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-12T01:29:49.994821",
+    "client": "test_pt_dryryn",
+    "prospect": "djholleran@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Perfect, Dave\u2014thanks for getting back to me. I appreciate it. Grab a time that works best for you here: https://calendly.com/vito-argusreach/30min",
+    "sent": false,
+    "notes": "Qualified prospect (likely physician/specialist) has accepted meeting request.",
+    "test_mode": false
+  }
+]
