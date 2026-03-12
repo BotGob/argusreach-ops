@@ -393,7 +393,11 @@ def _send_email(outreach_email, app_password, sender_name, to_email, subject, bo
     msg = MIMEMultipart('alternative')
     msg['From'] = f'{sender_name} <{outreach_email}>'
     msg['To'] = to_email
-    msg['Subject'] = subject if subject.lower().startswith('re:') else f'Re: {subject}'
+    # Decode encoded subject before checking for Re: prefix
+    decoded_subject = email.header.decode_header(subject)[0][0]
+    if isinstance(decoded_subject, bytes):
+        decoded_subject = decoded_subject.decode('utf-8', errors='ignore')
+    msg['Subject'] = decoded_subject if decoded_subject.lower().startswith('re:') else f'Re: {decoded_subject}'
     msg.attach(MIMEText(body, 'plain'))
 
     for attempt in range(1 + retry):
