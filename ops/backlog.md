@@ -7,13 +7,7 @@
 
 ## 🔴 Vito — Action Required
 
-### 1. Upgrade Instantly.ai to Growth plan before March 23
-- Free trial expires Mar 23, 2026 — 11 days away
-- Growth = $47/mo — 5,000 emails/month, 1,000 contacts, warm-up, sequences
-- **Do this before Hyper Growth ($97) — Growth is enough for first 1-2 clients**
-- upgrade at: app.instantly.ai → Billing → Email Outreach → Update Plan
-
-### 2. Reach out to Creekside Recovery Residences (Carter Pope)
+### 1. Reach out to Creekside Recovery Residences (Carter Pope)
 - Warm intro, friend relationship — highest probability first client
 - Vertical: sober living referral pipeline (therapists, treatment centers, discharge planners)
 - Markets: Atlanta (down 25% YoY — pain point) + Tampa Bay
@@ -86,6 +80,21 @@
 
 ### 16. Lead Sourcing Automation (Clay.com)
 - $149/mo — replace manual Apollo exports at 3+ simultaneous campaigns
+
+---
+
+## 💰 Pending Costs — Upgrade When First Client Signs
+
+| Tool | Current | Upgrade Trigger | Cost |
+|------|---------|-----------------|------|
+| Instantly.ai | Free trial (expires Mar 23 — goes inactive) | First client campaign ready to launch | $47/mo (Growth) |
+| Calendly | Free Basic (1 event type) | Ready to auto-log meetings to Airtable | $10/mo |
+| Apollo.io | Free (50 exports/mo) | Need more than 50 contacts/mo | $49/mo (Basic) |
+| Airtable | Free (1,000 records/base) | 5+ clients with large prospect lists | $20/mo |
+| DocuSign/HelloSign | Free (limited) | High signing volume | $15-25/mo |
+
+> Running cost at first client: **$47/mo** (Instantly only)
+> Running cost at scale (5+ clients): **~$143/mo** (Instantly + Calendly + Apollo)
 
 ---
 
