@@ -49,6 +49,13 @@
 - Enable `stop_on_reply=true` on every campaign
 - Decide delivery model per client: admin access (preferred) vs guided screen share
 
+### 8b. Prospect list sourcing & email verification (pre-campaign gate)
+- **Apollo paid ($49-99/mo)** — required before first client campaign. Free tier (50 exports/mo) only gives generic info@ emails from web scraping. Paid gives verified personal emails by title/location/company size.
+- **Email verification (NeverBounce or ZeroBounce)** — run every list through verifier before loading into Instantly. Target <2% bounce rate. Cost: ~$3 per 1,000 emails.
+- Process: Apollo search → export CSV → NeverBounce verify → remove invalid/risky → load into Instantly
+- This is non-negotiable for client campaigns. Generic info@ emails = high bounces = damaged sender reputation.
+- Upgrade Apollo to Basic ($49/mo) when first client is signed — add to pending costs table.
+
 ---
 
 ## 🟡 High Value — Build When First Client is Live

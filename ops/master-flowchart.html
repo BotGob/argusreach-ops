@@ -298,9 +298,16 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
       <div class="auto">
         <div class="step-label">Gob builds cold prospect list</div>
-        <div class="step-detail">Apollo.io search using ICP criteria. Fills remaining monthly volume after client-provided contacts. Cleaned, verified, loaded into Airtable.</div>
-        <span class="step-tool t-orange">Apollo.io</span>
+        <div class="step-detail">Apollo.io paid search by title (Owner, Director, Practice Manager), location, company size. Returns verified personal emails — not generic info@ addresses. Free tier (50 exports/mo) insufficient for client campaigns; paid plan ($49-99/mo) required.</div>
+        <span class="step-tool t-orange">Apollo.io (paid)</span>
         <span class="step-tool t-yellow">Airtable</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Email list verified before sending</div>
+        <div class="step-detail">Every prospect list run through NeverBounce or ZeroBounce before loading into Instantly. Target: &lt;2% bounce rate. Invalid/risky emails removed. Cost: ~$3 per 1,000. Protects sender domain reputation. Non-negotiable gate before campaign launch.</div>
+        <span class="step-tool t-red">NeverBounce</span>
+        <span class="step-tool t-orange">Instantly.ai</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
@@ -443,9 +450,14 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Apollo.io — Free Trial</div>
-      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Export verified contacts. For government entity clients, supplemented with CAFR + EMMA public records for assets under management sizing. Free plan: 50 credits/mo — not sufficient for client campaigns. Upgrade to Professional ($99/mo, 12,000 credits/year) when first client signs. Covers all plan tiers: Starter (200/mo), Growth (500/mo), Scale (1,000/mo).</div>
-      <div class="tool-cost">Free now → $99/mo at first client launch</div>
+      <div class="tool-name">Apollo.io — Paid Required</div>
+      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Returns verified personal emails (firstname@domain.com) — not generic info@ addresses. Free plan (50 credits/mo) insufficient for client campaigns — only web-scraped generic emails available. Paid Basic ($49/mo) required before first client launch. Upgrade to Professional ($99/mo) at 3+ simultaneous clients. Supplemented with CAFR + EMMA public records for government/RIA verticals.</div>
+      <div class="tool-cost">Free now → $49/mo at first client launch</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">NeverBounce / ZeroBounce</div>
+      <div class="tool-role">Email verification. Every prospect list verified before loading into Instantly. Removes invalid, risky, and catch-all addresses. Target: &lt;2% bounce rate. Protects client's sending domain reputation. Non-negotiable gate before every campaign launch. ~$3 per 1,000 verifications.</div>
+      <div class="tool-cost">~$3–5/campaign</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">CAFR + EMMA (Public Records)</div>
