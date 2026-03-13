@@ -28,5 +28,15 @@
     "sent": false,
     "notes": "Qualified prospect (likely physician/specialist) has accepted meeting request.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-13T22:21:05.059504",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Pricing questions must be handled by Vito directly; violates Rule 1 (domain questions) and Rule 3 (pricing discussion).",
+    "test_mode": false
   }
 ]

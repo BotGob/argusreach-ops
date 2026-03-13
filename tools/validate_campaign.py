@@ -83,6 +83,15 @@ def main():
         steps = seq.get("steps", [])
         check(len(steps) > 0, f"Sequence {seq_idx+1}: {len(steps)} steps found")
         for step_idx, step in enumerate(steps):
+            # Check delay_unit is explicitly set to "days" — without this, Instantly
+            # treats delay as hours/minutes and fires follow-ups immediately
+            delay_unit = step.get("delay_unit")
+            delay = step.get("delay", 0)
+            if delay > 0 and delay_unit != "days":
+                print(f"  ✗ Step {step_idx+1}: delay={delay} but delay_unit='{delay_unit}' — MUST be 'days' or follow-ups fire immediately!")
+                errors += 1
+            elif delay > 0:
+                print(f"  ✓ Step {step_idx+1}: delay={delay} days (delay_unit=days confirmed)")
             for var_idx, variant in enumerate(step.get("variants", [])):
                 subject = variant.get("subject", "")
                 body = variant.get("body", "")

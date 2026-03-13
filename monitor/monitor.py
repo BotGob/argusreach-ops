@@ -614,12 +614,25 @@ def process_client(client, processed_ids):
 
             # ── ESCALATION — human must review, no auto-response ever
             if escalate:
+                # Save to pending_approvals so Gob can read body and draft a response
+                esc_id = queue_pending(client, from_email, from_name, subject,
+                                       draft='', classification='escalated')
+                # Overwrite draft field with the raw email body so it's readable
+                pending = load_pending()
+                for entry in pending:
+                    if entry.get('id') == esc_id:
+                        entry['prospect_message'] = body[:1000]
+                        entry['escalate_reason'] = result.get('escalate_reason', 'Unknown')
+                        break
+                save_pending(pending)
+
                 notify(
                     f"🚨 *{firm}* — ESCALATION\n"
                     f"From: {from_name or from_email}\n"
                     f"Reason: {result.get('escalate_reason', 'Unknown')}\n"
                     f"Subject: _{subject}_\n\n"
-                    f"*Do not reply until you have reviewed this manually.*"
+                    f"*Their message:*\n```\n{body[:600]}\n```\n\n"
+                    f"→ Tell Gob to draft a response, then approve/send manually."
                 )
                 log_reply(cid, from_email, 'escalated', '', False, result.get('escalate_reason', ''))
                 mail.store(msg_id, '+FLAGS', '\\Seen')
