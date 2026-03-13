@@ -389,7 +389,14 @@ def _send_email(outreach_email, app_password, sender_name, to_email, subject, bo
     if isinstance(decoded_subject, bytes):
         decoded_subject = decoded_subject.decode('utf-8', errors='ignore')
     msg['Subject'] = decoded_subject if decoded_subject.lower().startswith('re:') else f'Re: {decoded_subject}'
-    msg.attach(MIMEText(body, 'plain'))
+    # Convert plain text body to clean HTML with proper spacing
+    paragraphs = [p.strip() for p in body.strip().split('\n\n') if p.strip()]
+    html_body = '\n'.join(f'<p>{p.replace(chr(10), "<br>")}</p>' for p in paragraphs)
+    html_body = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
+{html_body}
+</body></html>"""
+    msg.attach(MIMEText(body, 'plain'))       # plain fallback
+    msg.attach(MIMEText(html_body, 'html'))   # HTML preferred
 
     for attempt in range(1 + retry):
         try:
@@ -459,11 +466,18 @@ ABSOLUTE RULES — any violation → set should_respond=false, escalate=true:
 9. Keep responses to 2–4 sentences max
 10. You are {client['sender_name']} — never mention ArgusReach or any AI tool
 
+FORMATTING RULES (mandatory):
+- Write in plain text with double line breaks between paragraphs (they will be rendered as HTML)
+- Signature must ALWAYS be on its own line at the end, separated by a blank line: "{client['sender_name']}\nCEO, {client['firm_name']}"
+- Calendly link always on its own line, never embedded mid-sentence
+- No em dashes (use hyphens or rephrase)
+- 2-4 sentences max before signature
+
 RESPONSE TONE EXAMPLES (adapt — never copy verbatim):
-- Positive: "Thanks for getting back to me, [name]. Happy to connect — grab any time here: {client['calendly_link']}"
-- Question needing expertise: "Great question — that's exactly what I'd want to cover in person. Here's my calendar: {client['calendly_link']}"
-- Not now: "No problem at all — I'll leave it with you. Reach out anytime when the timing is better."
-- Negative/remove: "Understood, removing you now — sorry for the interruption."
+- Positive: "[name],\n\nThanks for getting back to me. Happy to connect - grab any time here:\n\n{client['calendly_link']}\n\n{client['sender_name']}\nCEO, {client['firm_name']}"
+- Question: "[name],\n\nGreat question - that is exactly what I would want to cover on a quick call. Here is my calendar:\n\n{client['calendly_link']}\n\n{client['sender_name']}\nCEO, {client['firm_name']}"
+- Not now: "[name],\n\nNo problem at all - I will leave it with you. Reach out anytime when the timing is better.\n\n{client['sender_name']}\nCEO, {client['firm_name']}"
+- Negative/remove: "[name],\n\nUnderstood, removing you now - sorry for the interruption.\n\n{client['sender_name']}\nCEO, {client['firm_name']}"
 
 Return ONLY valid JSON (no markdown, no commentary):
 {{

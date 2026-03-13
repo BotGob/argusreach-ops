@@ -38,5 +38,15 @@
     "sent": false,
     "notes": "Pricing questions must be handled by Vito directly; violates Rule 1 (domain questions) and Rule 3 (pricing discussion).",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-13T23:06:24.872067",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Perfect, Silvana\u2014really glad this resonates. I've got some openings next week on my calendar here: https://calendly.com/vito-argusreach/30min. Grab whichever slot works best for you, and we'll dive in",
+    "sent": false,
+    "notes": "Qualified prospect interested in booking\u2014ready to move to discovery call.",
+    "test_mode": false
   }
 ]
