@@ -122,8 +122,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <ul class="role-list">
       <li class="role-li"><span class="role-dot dot-orange"></span>Fill intake form after signing</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Review & approve email sequences</li>
-      <li class="role-li"><span class="role-dot dot-orange"></span>Create outreach email on their domain</li>
-      <li class="role-li"><span class="role-dot dot-orange"></span>Share App Password with ArgusReach</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Purchase Google Workspace seat for outreach (~$7–12/mo)</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Grant ArgusReach admin access (or join 30-min screen share)</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Show up to booked meetings</li>
     </ul>
   </div>
@@ -253,9 +253,29 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       </div>
       <div class="arrow">↓</div>
       <div class="step">
-        <div class="step-label">Client creates outreach email</div>
-        <div class="step-detail">New user on their Google Workspace: e.g. james.k@theirdomain.com. Shares App Password with Vito.</div>
+        <div class="step-label">Client adds Google Workspace seat</div>
+        <div class="step-detail">~$7–12/mo billed to client. Required for standalone outreach mailbox. Must be Secondary Domain (not User Alias). Grant ArgusReach admin access or schedule 30-min screen share.</div>
         <span class="step-tool t-green">Google Workspace</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Gob sets up outreach subdomain</div>
+        <div class="step-detail">Add outreach.[clientdomain].com as Secondary Domain. DNS records: MX (SMTP.GOOGLE.COM), SPF (include:_spf.google.com), DKIM (2048-bit, generated in Workspace), DMARC (p=none, rua to vito@argusreach.com). Full SOP: ops/client-email-setup-sop.md</div>
+        <span class="step-tool t-green">GoDaddy / Cloudflare</span>
+        <span class="step-tool t-blue">Gob (COO)</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Outreach mailbox created &amp; connected to Instantly</div>
+        <div class="step-detail">Create [name]@outreach.[clientdomain].com as real Workspace user. Approve Instantly as trusted app in Workspace Admin. Connect via Google OAuth. Set reply-to = client's main email. Enable warmup: 20/day, 30% reply rate.</div>
+        <span class="step-tool t-orange">Instantly.ai</span>
+        <span class="step-tool t-green">Google Workspace</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">⏳ 2–3 week warmup period</div>
+        <div class="step-detail">No campaign sends during warmup. Instantly auto-sends warmup emails with other accounts. Monitor health score — must reach 85%+ before going live. Alert client: "Infrastructure live, launching in ~3 weeks."</div>
+        <span class="step-tool t-orange">Instantly.ai</span>
       </div>
       <div class="arrow">↓</div>
       <div class="decision">

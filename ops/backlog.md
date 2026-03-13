@@ -40,9 +40,14 @@
 - Non-negotiable gate — prospects must be in Airtable before Touch 1
 
 ### 8. Set up client sending domain in Instantly
-- Create subdomain (e.g. `outreach.clientdomain.com`)
-- Connect Gmail, start warm-up Day 1 of onboarding
+- Full SOP documented: `ops/client-email-setup-sop.md`
+- Secondary domain (NOT user alias) required for standalone mailbox
+- DNS: MX, SPF, DKIM, DMARC — all required before launch
+- Approve Instantly as trusted app in Google Workspace Admin first
+- Connect via Google OAuth in Instantly, enable warmup Day 1
+- Warmup minimum 2–3 weeks before any campaign sends
 - Enable `stop_on_reply=true` on every campaign
+- Decide delivery model per client: admin access (preferred) vs guided screen share
 
 ---
 
