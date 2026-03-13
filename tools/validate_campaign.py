@@ -216,7 +216,24 @@ def main():
     else:
         print(f"  ✓ All {len(leads)} emails are properly formatted")
 
-    # --- 5. Sending account ---
+    # --- 5. Stop on reply ---
+    print("\n[ SAFETY SETTINGS ]")
+    stop_on_reply = campaign.get("stop_on_reply")
+    if not stop_on_reply:
+        print(f"  ✗ stop_on_reply is NOT enabled — prospects will keep receiving follow-ups after replying!")
+        errors += 1
+    else:
+        print(f"  ✓ stop_on_reply: enabled (sequence halts on any reply)")
+
+    # Check HTML body format
+    for i, body in enumerate(all_bodies):
+        if body and '<p>' not in body.lower() and '<br' not in body.lower():
+            print(f"  ✗ Step {i+1}: Body appears to be plain text (no <p> tags). Use HTML or follow-ups will render as wall of text.")
+            errors += 1
+        elif body:
+            print(f"  ✓ Step {i+1}: HTML formatting detected")
+
+    # --- 6. Sending account ---
     print("\n[ SENDING ACCOUNT ]")
     email_list = campaign.get("email_list", [])
     check(len(email_list) > 0, f"Sending account configured: {email_list}")
