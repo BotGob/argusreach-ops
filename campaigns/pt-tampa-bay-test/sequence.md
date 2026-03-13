@@ -19,72 +19,75 @@
 ---
 
 ## Touch 1 — Cold Intro
-**Send:** Day 1  
+**Send:** Day 0
 **Subject:** referral pipeline, {{first_name}}
 
 ---
 
 Hey {{first_name}},
 
-Quick question — how are you currently getting new referrals from physicians in the area?
+I came across {{company}} while researching local PT practices in the Tampa Bay area - looks like a great practice.
 
-Most PT clinic owners I talk to say the same thing: the referrals come in, but it's inconsistent. The orthopedic you built a relationship with three years ago keeps sending patients. The other 40 in a 10-mile radius? No real system for reaching them.
+I started ArgusReach to help clinics like yours build consistent referral pipelines from the physicians in the area. Most PT owners I talk to have the same situation: a few strong referral relationships, and no real system for reaching the rest. The ortho who has known you for years keeps sending patients. The other 40 in your area don't know you exist.
 
-I run ArgusReach — we handle physician outreach for PT clinics. We build a targeted list of PCPs, orthos, sports med, and neurologists in your area, write personalized outreach in your voice, and manage every reply automatically. When a physician is interested, they book directly on your calendar.
+We handle the physician outreach for you - identifying PCPs, orthos, and sports med docs in your market, reaching out in your voice, and managing every reply. When a physician is interested, they book directly on your calendar. We also track every contact made, every follow-up, and report back monthly on exactly who was reached, when, and how they responded.
 
-You don't have to cold call anyone or remember who to follow up with.
+Worth a 15-minute call to see if it makes sense for {{company}}?
 
-Would a 15-minute call make sense to see if it's a fit for {{company}}?
+www.argusreach.com/pt.html
 
-{{calendly_link}}
+Vito Resciniti
+CEO, ArgusReach
 
-Vito  
-ArgusReach  
-vito@argusreach.com
+---
+If you are not the right person for this, I would really appreciate you passing it along to whoever handles business development at {{company}}.
 
 ---
 
-## Touch 2 — Follow Up
-**Send:** Day 4  
+## Touch 2 — Origin Story Follow Up
+**Send:** Day 3
 **Subject:** re: referral pipeline, {{first_name}}
 
 ---
 
 Hey {{first_name}},
 
-Wanted to follow up on my note from earlier this week.
+Quick follow-up - and a bit more context on who we are.
 
-The clinics we work with typically have the clinical quality and patient outcomes to earn more referrals — the problem is just volume and consistency. Most physicians won't refer unless they've been reached, reminded, and given an easy way to act. That takes a system.
+I spent years in investment management, where I watched professionals constantly struggle to grow their client and referral base without a scalable system. Cold calling felt beneath everyone. Conferences were hit or miss. Nothing really scaled.
 
-We build and run that system for you. No cold calling, no chasing, no hiring a marketing coordinator.
+Same problem exists in healthcare. PT clinics with great outcomes and no real pipeline to the physicians who should be sending them patients.
 
-Happy to walk you through exactly how it works in 15 minutes if you want to see whether it makes sense for your practice:
+ArgusReach is the system I built to fix it. We identify every relevant physician in your market, write personalized outreach in your voice, and manage every reply. When a physician wants to connect, they book directly on your calendar.
 
-{{calendly_link}}
+Here's exactly how it works: www.argusreach.com/workflow-pt.html
 
-Vito  
-ArgusReach
+Happy to walk you through it in 15 minutes:
+calendly.com/vito-argusreach/30min
+
+Vito Resciniti
+CEO, ArgusReach
 
 ---
 
 ## Touch 3 — Final Bump
-**Send:** Day 9  
-**Subject:** last note — {{company}}
+**Send:** Day 8
+**Subject:** last note - {{company}}
 
 ---
 
 Hey {{first_name}},
 
-Last one from me — I know your inbox is full.
+Last one from me - I know your inbox is full.
 
-If building a more consistent referral pipeline from physicians in the Tampa Bay area is on your radar this year, I'd love to show you what we're doing for other practices here. Takes 15 minutes.
+If building a more consistent referral pipeline from physicians in the Tampa Bay area is something on your radar this year, I would love to show you what we are doing for other practices here. Takes 15 minutes.
 
-If the timing isn't right, no worries at all — just reply and I'll leave you alone.
+If the timing is not right, no worries at all - just reply and I will leave you alone.
 
-{{calendly_link}}
+calendly.com/vito-argusreach/30min
 
-Vito  
-ArgusReach
+Vito Resciniti
+CEO, ArgusReach
 
 ---
 
