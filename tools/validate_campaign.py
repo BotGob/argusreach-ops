@@ -24,7 +24,11 @@ API_KEY = os.environ.get("INSTANTLY_API_KEY", "MWYzYWRkZjYtNDhmZC00OTRiLWFjZDMtN
 BASE_URL = "https://api.instantly.ai/api/v2"
 HEADERS = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0"}
 
-TEMPLATE_VARS = ["{{first_name}}", "{{last_name}}", "{{company}}", "{{company_name}}"]
+# Instantly uses camelCase payload keys for substitution
+# CORRECT: {{firstName}}, {{lastName}}, {{companyName}}
+# WRONG (will NOT substitute): {{first_name}}, {{last_name}}, {{company}}, {{company_name}}
+VALID_VARS = ["{{firstName}}", "{{lastName}}", "{{companyName}}", "{{email}}", "{{website}}", "{{personalization}}"]
+INVALID_VARS = ["{{first_name}}", "{{last_name}}", "{{company_name}}", "{{company}}"]  # these will NOT substitute!
 
 def api_get(path):
     req = urllib.request.Request(f"{BASE_URL}{path}", headers=HEADERS)
