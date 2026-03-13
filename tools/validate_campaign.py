@@ -84,15 +84,23 @@ def main():
                 body = variant.get("body", "")
                 all_bodies.append(body)
 
-                # Check for unreplaced template variables IN THE TEMPLATE ITSELF
-                # (these should be placeholders, not actual unreplaced content)
-                # We flag if non-variable {{ }} patterns exist
-                leftover = re.findall(r'\{\{(?!first_name|last_name|company|company_name)[^}]+\}\}', body + subject)
+                # Check for wrong variable syntax (snake_case instead of camelCase)
+                # Instantly uses {{firstName}}, {{companyName}}, {{lastName}}
+                # NOT {{first_name}}, {{company}}, {{last_name}}
+                wrong_vars = re.findall(r'\{\{(first_name|last_name|company(?!Name)|company_name)\}\}', body + subject)
+                if wrong_vars:
+                    print(f"  ✗ Step {step_idx+1}: WRONG variable syntax detected: {wrong_vars}")
+                    print(f"       Use {{{{firstName}}}}, {{{{companyName}}}} (camelCase) NOT snake_case")
+                    errors += 1
+                
+                # Check for unknown variables
+                leftover = re.findall(r'\{\{(?!firstName|lastName|companyName|email|phone|website|location|personalization|linkedin)[^}]+\}\}', body + subject)
                 if leftover:
                     print(f"  ✗ Step {step_idx+1}: Unknown variables found: {leftover}")
                     errors += 1
-                else:
-                    print(f"  ✓ Step {step_idx+1}: Variables look correct ({{{{first_name}}}}, {{{{company}}}} present)")
+                
+                if not wrong_vars and not leftover:
+                    print(f"  ✓ Step {step_idx+1}: Variables correct (camelCase Instantly format)")
 
                 check(len(body) > 50, f"  Step {step_idx+1}: Body has content ({len(body)} chars)")
                 check(bool(subject), f"  Step {step_idx+1}: Subject set: '{subject[:60]}'")
