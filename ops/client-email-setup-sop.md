@@ -1,8 +1,34 @@
 # ArgusReach — Client Email Infrastructure SOP
 
-> **Owner:** Gob (COO)  
-> **Last updated:** 2026-03-13  
+> **Owner:** Gob (COO)
+> **Last updated:** 2026-03-14
 > **Purpose:** Step-by-step process to set up a client's outreach email infrastructure before any campaign goes live. This happens during onboarding, after contract is signed and setup fee is paid.
+
+---
+
+## Quick-Start Reference Card
+
+**Total time:** ~45-60 minutes (you + client on screen share)
+**What you need before starting:**
+- Access to client's **Google Workspace Admin** (admin.google.com) — ask client to either grant admin access or be on screen share
+- Access to client's **domain registrar** (GoDaddy, Namecheap, etc.) — same as above
+- Their primary business email (for Reply-To and DMARC reports)
+- Instantly account open in another tab
+
+**The 5 things you're doing:**
+1. Add `outreach.[clientdomain].com` as a **Secondary Domain** in Google Workspace
+2. Add 4 DNS records in GoDaddy: Verification TXT, MX, DKIM, SPF, DMARC
+3. Create the outreach email user in Google Workspace
+4. Connect it to Instantly and turn on warmup
+5. Add the client to `monitor/clients.json` and restart the monitor
+
+**Biggest mistakes to avoid:**
+- ❌ "User alias domain" instead of "Secondary domain" — won't work, can't create a mailbox
+- ❌ Skipping warmup — cold domain = spam folder guaranteed
+- ❌ Launching campaign before warmup hits 85%+ health score in Instantly
+- ❌ Forgetting to approve Instantly as trusted app in Google Workspace before connecting
+
+**Full step-by-step below.**
 
 ---
 
