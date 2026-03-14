@@ -11,6 +11,7 @@
       "app_password": "hpck wpdv baad nmbx",
 
       "sender_name": "Mike T.",
+      "title": "Owner",
       "firm_name": "Gulf Coast Physical Therapy",
       "vertical": "PhysicalTherapy",
 
@@ -25,12 +26,13 @@
     {
       "_comment": "PT Tampa Bay Test Campaign — vito@argusreach.com inbox, draft_approval mode",
       "id": "pt_tampa_bay_test",
-      "active": false,
+      "active": true,
       "mode": "draft_approval",
 
       "prospects_csv": "campaigns/pt-tampa-bay-test/prospects.csv",
 
       "outreach_email": "vito@argusreach.com",
+      "title": "Founder",
       "app_password": "dsvu rotk mehv qrww",
 
       "sender_name": "Vito Resciniti",
