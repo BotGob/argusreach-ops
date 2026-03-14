@@ -71,6 +71,18 @@
 - [ ] Verify personalization tags are populating (not showing `{{firstName}}` literally)
 - [ ] Check unsubscribe mechanism is present (Instantly auto-inserts footer)
 - [ ] Confirm reply-to routes to monitored inbox
+- [ ] Confirm all email bodies use HTML `<p>` tags — NOT plain text with `\n\n` line breaks
+
+---
+
+## Step 4b — Run Campaign Validator (MANDATORY — NO EXCEPTIONS)
+
+```bash
+cd /home/argus/.openclaw/workspace/argusreach
+python3 tools/validate_campaign.py [client_id]
+```
+
+This checks: prospect list format, required CSV columns, clients.json config, DNC conflicts, and prospects_csv path. **Do not proceed to Step 5 until this passes with zero errors.**
 
 ---
 

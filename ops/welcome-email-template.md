@@ -61,7 +61,7 @@ We'll schedule this once you've submitted the intake form. It's 45 minutes and c
 - Reviewing sequence drafts together
 - Setting up notifications and reporting preferences
 
-Book it here when you're ready: [VITO'S CALENDLY LINK]
+Book it here when you're ready: https://calendly.com/vito-argusreach/30min
 
 ---
 

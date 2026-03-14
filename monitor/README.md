@@ -9,7 +9,7 @@ Monitors every active client's outreach inbox. Classifies replies with Claude. A
 Every 10 minutes:
 1. Checks every active client's Gmail inbox for new replies
 2. Filters out: automated senders, cold inbound, spam, DNC contacts, already-processed messages
-3. Classifies each genuine reply with Claude (`claude-3-5-haiku-20241022`)
+3. Classifies each genuine reply with Claude (`claude-haiku-4-5-20251001`)
 4. **Automated mode:** sends response immediately
 5. **Draft approval mode:** queues the draft and sends Vito a Telegram message with the text — Vito replies `APPROVE [id]` or `REJECT [id]`
 6. Logs everything to `logs/replies.json`
@@ -148,7 +148,9 @@ sudo systemctl status argusreach-monitor
 
 Each client has a DNC file at `dnc/[client_id].txt`.
 
-- Negative replies automatically add the prospect to the DNC list
+- Negative replies add the prospect to the DNC list and unsubscribe them from Instantly
+- In **draft_approval mode**, negative replies are also queued for Vito's review via Telegram before any acknowledgment is sent (APPROVE [id] to send removal ack, REJECT [id] to discard)
+- In **automated mode**, a removal acknowledgment is sent immediately
 - DNC emails are skipped in all future processing cycles — they will never be processed again
 - To manually add someone: add their email address (one per line) to `dnc/client_id.txt`
 - To remove someone: delete their line from the file
@@ -171,6 +173,8 @@ Each client has a DNC file at `dnc/[client_id].txt`.
 
 **Why In-Reply-To filtering matters:** The monitor only processes emails that are replies to something we sent (they have `In-Reply-To` or `References` headers). Cold inbound emails don't have these headers. This eliminates ~95% of spam before any AI call, keeping costs low.
 
+**Prospect list filtering:** In addition to reply-header filtering, the monitor validates that the sender's email exists in the client's `prospects_csv` file (configured per client in `clients.json`). This ensures we only respond to people we actually reached out to — warmup emails, inbound cold pitches, and other noise are ignored even if they have reply headers. Every new client requires a `campaigns/[client_id]/prospects.csv` before the monitor is activated.
+
 **Why deduplication matters:** If the monitor restarts mid-cycle, it could see the same UNSEEN emails again. The `processed_ids.json` fingerprinting prevents any email from being responded to twice.
 
 **Cost control:** Claude is only called after all local filters pass. With typical volumes (3–5 clients, 50–100 replies/day) the daily AI cap of 100 calls costs roughly $0.08–$0.15/day at Haiku pricing.
@@ -185,3 +189,9 @@ Each client has a DNC file at `dnc/[client_id].txt`.
 anthropic>=0.84.0
 requests
 ```
+
+**Integrations:**
+- **Anthropic Claude** — AI classification and draft generation (`claude-haiku-4-5-20251001`)
+- **Instantly.ai** — prospect sequence pause and blocklist via API
+- **Airtable** — CRM sync: reply classification and follow-up dates are written back to the prospect record automatically
+- **Telegram** — Vito receives draft notifications and sends APPROVE/REJECT commands

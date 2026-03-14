@@ -19,7 +19,7 @@
 - Cost: $37/month (Instantly Growth plan)
 
 ### Email Sending
-- Tool: **Instantly.ai** — $37/month
+- Tool: **Instantly.ai** — $47/month (Growth plan)
   - Handles warm-up, sequences, deliverability, tracking
   - Simple UI, no coding required
   - Connects to any email account
@@ -63,11 +63,10 @@
 
 ## Workflow Automation
 
-### n8n (Self-hosted on VPS — already have it)
-- Free since we host it ourselves
-- Connects everything: Apollo → Airtable → Instantly → Telegram alerts
-- Automates: new lead added → enriched → loaded into sequence → Vito notified of replies
-- Go builds and maintains all workflows
+### monitor.py (Custom — ArgusReach Reply Monitor)
+- Handles all current automation: inbox monitoring → AI classification → Telegram draft approval → Airtable sync → DNC management
+- Runs as a systemd service on the VPS, checks every 10 minutes
+- **n8n:** Self-hosted and available on the VPS but not currently used for active workflows. Planned for future use (e.g., Apollo → Airtable lead import automation). monitor.py handles everything for now.
 
 ### Make.com (backup)
 - $9/month if n8n proves too complex for certain tasks
@@ -78,8 +77,8 @@
 
 ### Phase 1 (Now): Static landing page
 - Built by Go — clean, professional, 11x.ai-inspired dark design
-- Hosted on Netlify (free)
-- argusreach.com pointed here via GoDaddy DNS
+- Hosted on GitHub Pages (BotGob/argusreach-website)
+- argusreach.com pointed here via GoDaddy DNS (CNAME)
 - Content: headline, problem/solution, how it works, pricing, CTA (book a call)
 - Calendar: Calendly (free) embedded for meeting booking
 
@@ -92,10 +91,7 @@
 
 ## Meeting Booking
 - **Calendly** — Vito's calendar link for discovery calls: `calendly.com/vito-argusreach/30min`
-- ⚠️ **14-day free trial started ~2026-03-08** — check expiry ~2026-03-22
-- **Free plan (Basic):** 1 event type, unlimited meetings — likely sufficient for MVP (we only need the one 30-min strategy call link)
-- **Paid plan (Standard):** $10/month — adds multiple event types, email reminders, integrations
-- **Action:** Before trial ends, confirm whether Basic free plan covers our needs. If yes, downgrade to free. If reminders or multiple event types are needed, $10/month is reasonable — add to cost sheet.
+- ⚠️ **Action needed ~2026-03-22:** Free trial ends. Confirm whether Basic (free) plan is sufficient. If yes, downgrade; if reminders or multiple event types are needed, Standard is $10/month.
 
 ---
 
@@ -110,7 +106,7 @@
 
 | Tool | Cost |
 |------|------|
-| Instantly.ai (email sending + warm-up) | $37/mo |
+| Instantly.ai (email sending + warm-up) | $47/mo (Growth) |
 | Apollo.io (lead sourcing) | $0 (free tier) |
 | Airtable (CRM) | $0 (free tier) |
 | Netlify (website hosting) | $0 (free tier) |
@@ -127,11 +123,11 @@ Revenue from 1 client at Starter ($750) = **$663–693 profit/month immediately*
 
 1. ✅ Offer defined
 2. ✅ Email sequences written
-3. ⬜ GoDaddy DNS → point argusreach.com to Netlify
-4. ⬜ Google Workspace setup (vito@argusreach.com)
-5. ⬜ Instantly.ai account + domain warm-up start
-6. ⬜ Apollo.io free account + first prospect list
-7. ⬜ Airtable CRM template built
-8. ⬜ Landing page built + deployed
-9. ⬜ Calendly setup + embedded
-10. ⬜ First outreach sent
+3. ✅ GoDaddy DNS → argusreach.com pointed to GitHub Pages (BotGob/argusreach-website)
+4. ✅ Google Workspace setup (vito@argusreach.com)
+5. ✅ Instantly.ai account + domain warm-up active (vito@argusreach.com warming now)
+6. ✅ Apollo.io free account + first prospect list (20 PT clinics loaded)
+7. ✅ Airtable CRM template built and integrated with monitor
+8. ✅ Landing page built + deployed (argusreach.com live)
+9. ✅ Calendly setup (https://calendly.com/vito-argusreach/30min)
+10. ⬜ First real outreach sent (PT Tampa Bay campaign awaiting Vito launch approval)

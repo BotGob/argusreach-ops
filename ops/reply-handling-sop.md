@@ -81,13 +81,35 @@ If client hasn't replied to the hot lead notification within 4 hours during busi
 
 ---
 
+## The APPROVE/REJECT Flow (How Draft Approval Actually Works)
+
+All clients are in **draft_approval mode** — nothing sends without Vito's explicit approval.
+
+When the monitor classifies a reply, Vito receives a Telegram message like:
+
+> 📬 *ArgusReach* — Reply from Lisa M. at Tampa Bay PT  
+> Classification: Positive  
+> Draft: "Lisa, great to hear from you! Grab a time here: [calendly link]"  
+> ID: `abc123`  
+> → Reply `APPROVE abc123` to send · `REJECT abc123` to discard
+
+Vito replies:
+- `APPROVE [id]` — sends the draft immediately
+- `REJECT [id]` — discards the draft, no email sent
+
+To see all pending drafts at any time, send `PENDING` in Telegram.
+
+**There is no auto-send fallback.** If Vito doesn't respond, nothing sends.
+
+---
+
 ## Step 3 — Warm Reply Flow (prospect asked a question)
 
-Draft a response on behalf of the client that:
+The monitor drafts a response that:
 1. Answers their question directly
 2. Ends with a soft CTA to book a call
 
-Send the draft to the client for approval before sending. If client doesn't respond within 2 hours, send the draft directly (if client has pre-authorized this).
+Vito receives the draft via Telegram (see APPROVE/REJECT flow above) and approves before anything sends.
 
 ---
 

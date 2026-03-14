@@ -183,6 +183,7 @@ Run this checklist before any cold email fires:
 - [ ] Prospect list loaded in Airtable ✅
 - [ ] Email sequences approved by client ✅
 - [ ] clients.json entry created in monitor ✅
+- [ ] `campaigns/[client_id]/prospects.csv` created with all prospect emails ✅ (required for prospect filter — monitor ignores all replies until this exists)
 
 ---
 

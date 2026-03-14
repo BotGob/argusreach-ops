@@ -56,8 +56,8 @@
 - [x] Sequence written and loaded
 - [x] stop_on_reply = true
 - [x] Daily limit = 20
-- [ ] **VITO APPROVAL** — reply "launch" to activate
-- [ ] Campaign activated
+- [ ] **VITO APPROVAL** — tell Gob "launch the PT Tampa Bay campaign" via Telegram
+- [ ] Campaign activated in Instantly (set to Active)
 
 ---
 

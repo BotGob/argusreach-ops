@@ -27,8 +27,8 @@ We research and source verified contacts that match your exact ideal client prof
 **2. We write every email**
 Every message is written specifically for the individual prospect — referencing their company, their role, their market context. Not a template. Not a mail merge. Something that reads like you wrote it yourself, because we wrote it to sound exactly like you.
 
-**3. You approve before anything sends** *(optional)*
-If you want full visibility, we send you every email for approval before it goes out. Nothing sends without your sign-off. Most clients start here, then switch to fully automated once they've seen the quality.
+**3. You approve before anything sends**
+We send you every AI-drafted reply for your approval before it goes out. Nothing sends without your sign-off — this is the standard for all clients. Once you've reviewed drafts for 30+ days and are confident in the quality, we can discuss switching to fully automated mode if you prefer.
 
 **4. We run the follow-up**
 4–5 touches over three weeks. Most positive replies come after touch 3 or 4. We never stop too early.

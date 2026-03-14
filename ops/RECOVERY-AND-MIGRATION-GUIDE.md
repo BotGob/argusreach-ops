@@ -80,11 +80,13 @@ You need to recreate `argusreach/monitor/.env` manually. Keep this list somewher
 ```
 INSTANTLY_API_KEY=     ← from Instantly dashboard → Settings → API
 AIRTABLE_TOKEN=        ← from Airtable → Account → API
-AIRTABLE_BASE_ID=      ← appquzx2A8BByrarX (your CRM base)
-ANTHROPIC_API_KEY=     ← from console.anthropic.com
-ARGUSREACH_BOT_TOKEN=  ← 8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk
-ARGUSREACH_CHAT_ID=    ← 8135725412
+AIRTABLE_BASE_ID=      ← from Airtable → your CRM base → Help → API docs (starts with "app...")
+ANTHROPIC_API_KEY=     ← from console.anthropic.com → API Keys
+ARGUSREACH_BOT_TOKEN=  ← from BotFather in Telegram → your bot → API Token
+ARGUSREACH_CHAT_ID=    ← your Telegram user ID (check via @userinfobot in Telegram)
 ```
+
+> ⚠️ Keep all real values in a **secure Google Drive note** — never store live credentials in this document.
 
 ### Step 5 — Reinstall monitor service
 ```bash
@@ -95,6 +97,9 @@ sudo systemctl enable --now argusreach-monitor
 
 ### Step 6 — Restore DNC lists
 If you have any active clients, the DNC lists (do-not-contact) live in `monitor/dnc/`. These are small text files. If you backed them up (see below), restore them here. If not, they can be rebuilt from reply logs.
+
+### Step 7 — Restore prospect lists
+Each active campaign has a prospects CSV at `campaigns/[client_id]/prospects.csv`. The monitor's prospect filter requires this file to exist before activating a client — without it, all replies will be ignored. Restore from backup or re-export from Apollo/Airtable.
 
 **Time to full recovery: approximately 2 hours** (mostly waiting for installs)
 

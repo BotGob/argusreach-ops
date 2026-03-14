@@ -34,10 +34,10 @@ We handle the physician outreach for you - identifying PCPs, orthos, and sports 
 
 Worth a 15-minute call to see if it makes sense for {{company}}?
 
-www.argusreach.com/pt.html
+www.argusreach.com
 
 Vito Resciniti
-CEO, ArgusReach
+Founder, ArgusReach
 
 ---
 If you are not the right person for this, I would really appreciate you passing it along to whoever handles business development at {{company}}.
@@ -60,13 +60,13 @@ Same problem exists in healthcare. PT clinics with great outcomes and no real pi
 
 ArgusReach is the system I built to fix it. We identify every relevant physician in your market, write personalized outreach in your voice, and manage every reply. When a physician wants to connect, they book directly on your calendar.
 
-Here's exactly how it works: www.argusreach.com/workflow-pt.html
+Here's exactly how it works: www.argusreach.com
 
 Happy to walk you through it in 15 minutes:
 calendly.com/vito-argusreach/30min
 
 Vito Resciniti
-CEO, ArgusReach
+Founder, ArgusReach
 
 ---
 
@@ -87,7 +87,7 @@ If the timing is not right, no worries at all - just reply and I will leave you 
 calendly.com/vito-argusreach/30min
 
 Vito Resciniti
-CEO, ArgusReach
+Founder, ArgusReach
 
 ---
 

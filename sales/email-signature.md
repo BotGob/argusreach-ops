@@ -23,8 +23,6 @@ ArgusReach builds done-for-you outbound systems for RIAs, insurance agencies,
 and professional practices. We find your ideal clients, send personalized outreach
 as you, and book meetings on your calendar.
 
-→ See how it works: argusreach.com/overview
-→ Run the ROI math: argusreach.com/roi
 → Book a free strategy call: calendly.com/vito-argusreach/30min
 ```
 

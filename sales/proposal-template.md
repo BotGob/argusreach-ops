@@ -94,14 +94,14 @@ Payment: Setup fee due upon signing. Monthly retainer due on the 1st of each act
 2. **Onboarding Call** (45 min) — ICP deep-dive, sequence brief, calendar access
 3. **We Build** — list, sequences, deliverability infra (3–5 business days)
 4. **You Approve** — review emails before launch, request any changes
-5. **Launch** — first outreach deployed (typically 1–2 weeks after onboarding); monthly billing begins; you receive notifications on positive replies
+5. **Launch** — first outreach deployed (typically 1–2 weeks after onboarding); monthly billing begins; you receive Telegram notifications with AI-drafted replies for your approval before anything sends
 6. **Meetings** — qualified prospects book directly on your calendar
 
 ---
 
 ## Our Commitment
 
-- Every email approved by you before launch
+- Every AI-drafted reply approved by you before it sends (standard for all clients — nothing sends without your sign-off)
 - No promises of specific results — we commit to volume, quality, and iteration
 - You are never associated with ArgusReach publicly — we are invisible to your prospects
 - Transparent monthly reporting: sent, opened, replied, meetings booked

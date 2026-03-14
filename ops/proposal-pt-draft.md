@@ -67,11 +67,7 @@ That's why the pilot matters. I'd rather prove it to you over 90 days than ask y
 
 ---
 
-Here's the full step-by-step workflow so you can share it with whoever else needs to see it:
-**argusreach.com/workflow**
-
-And the PT-specific overview:
-**argusreach.com/pt**
+I'd be happy to walk you through the full workflow on a quick call — just grab a time that works:
 
 Let me know if you want to get on a call to walk through any of this — happy to answer questions from your team or your boss directly.
 

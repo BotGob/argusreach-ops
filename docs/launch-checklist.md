@@ -18,9 +18,9 @@ Everything needed to go from zero to first paying client.
 - [x] Website updated with real Calendly URL
 
 ### Tools
-- [ ] Create Apollo.io free account (50 free exports/month to start)
-- [ ] Create Instantly.ai account ($37/mo) — start domain warm-up immediately
-- [ ] Create Airtable account (free) — build CRM per schema in `airtable-crm-schema.md`
+- [x] Create Apollo.io free account (50 free exports/month to start)
+- [x] Create Instantly.ai account ($37/mo) — warmup active on vito@argusreach.com
+- [x] Create Airtable account (free) — CRM built and integrated with monitor
 - [ ] Set up main sending domain: `outreach.argusreach.com` (warm-up for Vito's own prospecting)
 
 ### Legal (optional but recommended)
@@ -31,7 +31,7 @@ Everything needed to go from zero to first paying client.
 ---
 
 ## Sales Materials (done)
-- [x] Landing page (live at botgob.github.io/argusreach-website)
+- [x] Landing page (live at argusreach.com)
 - [x] Email sequences — RIA, Insurance, Mortgage (`email-sequences-v1.md`)
 - [x] Offer document (`offer.md`)
 - [x] Pitch deck / sales call script (`pitch-deck-script.md`)

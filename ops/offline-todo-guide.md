@@ -1,5 +1,6 @@
 # Offline To-Do Guide
-*Step-by-step for Vito while Go is offline*
+*Historical reference — initial setup guide written before ArgusReach infrastructure was live.*
+*As of 2026-03-14: Apollo ✅, Airtable ✅, Anthropic API ✅, Instantly ✅ are all done. DocuSign and LLC filing still pending.*
 
 ---
 
@@ -99,4 +100,4 @@
 
 ---
 
-*Everything above can be done at argusreach.com/docs when Go is back online.*
+*For current status and active tasks, see ops/backlog.md.*

@@ -155,6 +155,6 @@ Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run eac
 3. Add all questions above in order
 4. In Settings → Responses → check "Collect email addresses"
 5. Click the Google Sheets icon (top right of Responses tab) → "Create a new spreadsheet" → name it "ArgusReach Client Intake Responses"
-6. Share that spreadsheet with go@argusreach.com (or Vito shares the link with me when a new client submits)
+6. Share that spreadsheet with vito@argusreach.com (Vito then pastes the link to Gob when a new client submits)
 
 That's it. Every new client gets a row. I read the row and build their campaign.

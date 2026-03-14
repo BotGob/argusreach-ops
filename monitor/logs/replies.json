@@ -48,5 +48,25 @@
     "sent": false,
     "notes": "Qualified prospect interested in booking\u2014ready to move to discovery call.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-14T05:02:43.647847",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "positive",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Prospect accepted meeting invitation and calendar booking is in progress.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-14T12:34:19.693689",
+    "client": "pt_tampa_bay_test",
+    "prospect": "clifford.lucas@greatoutdoorguides.com",
+    "classification": "negative",
+    "draft_preview": "Clifford,\n\nUnderstood - removing you from our list now. Sorry for the mix-up.\n\nVito Resciniti\nCEO, ArgusReach",
+    "sent": true,
+    "notes": "Wrong prospect in database - email domain and company name indicate non-PT vertical.",
+    "test_mode": false
   }
 ]
