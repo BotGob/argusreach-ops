@@ -103,6 +103,19 @@ This checks: prospect list format, required CSV columns, clients.json config, DN
 
 ---
 
+## Step 6b — Verify Sequence Timing After Activation (MANDATORY)
+
+⚠️ Known Instantly issue: Touch 2 and Touch 3 have misfired prematurely in testing (firing within minutes instead of days). Root cause not fully confirmed — may be related to re-activation after pause, or prospect import timing.
+
+Before considering the campaign live:
+- [ ] Send a test contact through the sequence and confirm Touch 2 does NOT fire within the first hour
+- [ ] Check Instantly → Campaign → Sequence steps — confirm delays show as "3 days" and "8 days" (not minutes or hours)
+- [ ] If anything fires out of order → pause campaign immediately, delete test contact, investigate before re-activating with real prospects
+
+**Until the Instantly campaign creation script is built, manual verification is required for every new campaign activation.**
+
+---
+
 ## Step 7 — First 72 Hours Monitoring
 
 - Check deliverability score in Instantly — should stay ≥ 80
