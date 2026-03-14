@@ -81,6 +81,19 @@
 
 ## 🟡 High Value — Build When First Client is Live
 
+### 16b. Prospect List Ingestion & Hygiene Test (end-to-end)
+- **What:** Simulate real client onboarding — Vito provides a fake "existing contact list" (25 emails), Gob cross-references against Apollo-sourced prospect list, removes duplicates + DNC matches, outputs clean final list ready for Instantly
+- **Test steps:**
+  1. Vito sends 25 fake client contacts (CSV or paste)
+  2. Gob has 25 fake Apollo-pulled prospects
+  3. Cross-reference: flag anyone appearing on both lists
+  4. Check against DNC list — remove any matches
+  5. Output: clean deduplicated list with notes on what was removed and why
+- **Why it matters:** First client will have existing relationships we must not contact — missing this is a serious trust/reputation risk
+- **When:** Test before first real client onboards
+
+---
+
 ### 9. Calendly Webhook → Airtable + Telegram
 - Meeting booked → auto-update Prospect record + alert Vito
 - Requires Calendly paid plan
