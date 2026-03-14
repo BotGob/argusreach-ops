@@ -369,6 +369,31 @@ def is_genuine_reply(msg):
     """Real replies have In-Reply-To or References headers. Spam doesn't."""
     return bool(msg.get('In-Reply-To') or msg.get('References'))
 
+def load_prospect_emails(client):
+    """
+    Return a set of lowercase email addresses from the client's prospects CSV.
+    Returns None if no prospects_csv is configured (disables the check).
+    """
+    csv_path = client.get('prospects_csv')
+    if not csv_path:
+        return None
+    p = Path(csv_path)
+    if not p.is_absolute():
+        p = BASE_DIR.parent / csv_path  # relative to argusreach/ root
+    if not p.exists():
+        log(f"[ProspectFilter] prospects_csv not found: {p}")
+        return None
+    import csv as _csv
+    emails = set()
+    with open(p, newline='', encoding='utf-8') as f:
+        reader = _csv.DictReader(f)
+        for row in reader:
+            # Accept columns named 'email', 'Email', 'EMAIL', or 'e-mail'
+            for col in row:
+                if col.strip().lower() in ('email', 'e-mail'):
+                    emails.add(row[col].strip().lower())
+    return emails
+
 def is_spam(msg, body):
     subject = msg.get('Subject', '').lower()
     spam_words = ['click here', 'you have won', 'congratulations', 'limited time offer',
@@ -601,6 +626,14 @@ def process_client(client, processed_ids):
                 new_processed.add(fingerprint)
                 continue
 
+            # Filter: prospect list — only respond to people we actually emailed
+            prospect_emails = load_prospect_emails(client)
+            if prospect_emails is not None and from_email.lower() not in prospect_emails:
+                log(f"{label} Skipping — not in prospect list: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
+                continue
+
             # Filter: DNC list
             if is_dnc(cid, from_email):
                 log(f"{label} Skipping DNC contact: {from_email}")
@@ -669,19 +702,26 @@ def process_client(client, processed_ids):
             # ── HANDLE RESPONSE
             if should_respond and draft:
                 if classification == 'negative':
-                    # Unsubscribe — always auto-send removal ack and add to DNC
+                    # Always add to DNC and unsubscribe from Instantly
                     add_dnc(cid, from_email)
                     instantly_unsubscribe_contact(from_email)   # platform-level unsubscribe
-                    if not TEST_MODE:
-                        try:
-                            _send_email(client['outreach_email'], client['app_password'],
-                                        client['sender_name'], from_email, subject, draft)
-                            sent = True
-                        except Exception as e:
-                            log(f"SMTP error (removal ack): {e}")
-                            notify(f"⚠️ *{firm}* — Failed to send removal ack to {from_email}: `{str(e)[:100]}`")
-                    else:
-                        log(f"[TEST] Would send removal ack to {from_email}")
+                    # Auto-send removal ack ONLY in automated mode
+                    # In draft_approval mode, queue for human review like everything else
+                    if client['mode'] == 'automated':
+                        if not TEST_MODE:
+                            try:
+                                _send_email(client['outreach_email'], client['app_password'],
+                                            client['sender_name'], from_email, subject, draft)
+                                sent = True
+                            except Exception as e:
+                                log(f"SMTP error (removal ack): {e}")
+                                notify(f"⚠️ *{firm}* — Failed to send removal ack to {from_email}: `{str(e)[:100]}`")
+                        else:
+                            log(f"[TEST] Would send removal ack to {from_email}")
+                    elif client['mode'] == 'draft_approval':
+                        approval_id = queue_pending(client, from_email, from_name,
+                                                    subject, draft, classification)
+                        log(f"{label} Negative queued for approval (draft_approval mode): {from_email}")
 
                 elif client['mode'] == 'automated':
                     if not TEST_MODE:

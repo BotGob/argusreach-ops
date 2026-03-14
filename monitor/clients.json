@@ -4,7 +4,7 @@
     {
       "_comment": "DRY RUN TEST CLIENT — fake PT practice, gobbot95@gmail.com inbox, draft_approval mode",
       "id": "test_pt_dryryn",
-      "active": true,
+      "active": false,
       "mode": "draft_approval",
 
       "outreach_email": "gobbot95@gmail.com",
@@ -25,8 +25,10 @@
     {
       "_comment": "PT Tampa Bay Test Campaign — vito@argusreach.com inbox, draft_approval mode",
       "id": "pt_tampa_bay_test",
-      "active": true,
+      "active": false,
       "mode": "draft_approval",
+
+      "prospects_csv": "campaigns/pt-tampa-bay-test/prospects.csv",
 
       "outreach_email": "vito@argusreach.com",
       "app_password": "dsvu rotk mehv qrww",
