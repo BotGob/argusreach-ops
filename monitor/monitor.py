@@ -28,9 +28,11 @@ from pathlib import Path
 
 import requests
 from anthropic import Anthropic
+from dotenv import load_dotenv
 
 # ── PATHS ─────────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
+load_dotenv(BASE_DIR / '.env')   # load .env before reading os.environ below
 CLIENTS_FILE    = BASE_DIR / 'clients.json'
 LOG_DIR         = BASE_DIR / 'logs'
 DNC_DIR         = BASE_DIR / 'dnc'
