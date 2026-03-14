@@ -68,6 +68,17 @@
 
 ---
 
+## 🟡 High Value — Build Before Launch
+
+### 10a. Instantly Campaign Creation Script (PINNED — build before PT Tampa Bay goes live)
+- Script reads `campaigns/[client_id]/sequence.md`, parses each touch, creates the campaign in Instantly via API with proper HTML formatting
+- Eliminates manual copy-paste into Instantly dashboard — zero formatting errors, no wall-of-text risk
+- Also handles: prospect import, send settings (daily limit, window, stop_on_reply), all config
+- Root cause: Instantly's editor doesn't auto-format paragraphs — only way to guarantee clean emails for every client is to push via API
+- **Decision (2026-03-14):** Build before PT Tampa Bay launch so first real prospect emails are clean
+
+---
+
 ## 🟡 High Value — Build When First Client is Live
 
 ### 9. Calendly Webhook → Airtable + Telegram
