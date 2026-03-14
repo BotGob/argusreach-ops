@@ -58,6 +58,16 @@
 
 ---
 
+## 🟡 High Value — Build Soon
+
+### 15b. Fix message deduplication fingerprint (minor edge case)
+- Current: fingerprint = sender + subject + date → two different emails from same sender on same day can collide
+- Fix: include Gmail Message-ID header in fingerprint so each unique email has a unique fingerprint
+- Risk: low (rare edge case), not a security issue — just could skip a second email from same person same day
+- Tracked from: 2026-03-14 testing session
+
+---
+
 ## 🟡 High Value — Build When First Client is Live
 
 ### 9. Calendly Webhook → Airtable + Telegram

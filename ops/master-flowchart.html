@@ -689,6 +689,27 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 <!-- RECENT CHANGES LOG -->
 <div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-14</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Monitor / Security</div>
+    <div style="font-size:0.75rem;color:#888;">• Bug fix: negative replies in draft_approval mode now queue for Vito approval instead of auto-sending removal ack</div>
+    <div style="font-size:0.75rem;color:#888;">• Bug fix: warmup emails from Instantly were triggering monitor responses — fixed by prospect list filter</div>
+    <div style="font-size:0.75rem;color:#888;">• Prospect list filter added — monitor only processes replies from contacts in campaigns/[client_id]/prospects.csv</div>
+    <div style="font-size:0.75rem;color:#888;">• 10 new AI escalation rules added: inbound cold pitches, media/press, legal/regulatory, forwarded chains, intermediary replies, non-English, context mismatch, competitor mentions, sensitive PII, group addresses</div>
+    <div style="font-size:0.75rem;color:#888;">• Hardcoded "CEO" title in AI prompt replaced with client.title field (Vito = Founder, configurable per client)</div>
+    <div style="font-size:0.75rem;color:#888;">• OpenClaw updated: 2026.3.8 → 2026.3.13</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Docs</div>
+    <div style="font-size:0.75rem;color:#888;">• Full documentation audit — 21 files updated for consistency, accuracy, and current system state</div>
+    <div style="font-size:0.75rem;color:#888;">• Live Telegram credentials removed from RECOVERY-AND-MIGRATION-GUIDE.md (security)</div>
+    <div style="font-size:0.75rem;color:#888;">• reply-handling-sop.md — APPROVE/REJECT Telegram flow documented; "send directly if no response" removed</div>
+    <div style="font-size:0.75rem;color:#888;">• sop-campaign-launch.md — validate_campaign.py added as mandatory step; HTML format requirement added</div>
+    <div style="font-size:0.75rem;color:#888;">• tech-stack.md — all setup items marked complete; hosting corrected (GitHub Pages, not Netlify); n8n role clarified</div>
+    <div style="font-size:0.75rem;color:#888;">• Instantly pricing corrected to $47/mo (Growth) across all docs</div>
+    <div style="font-size:0.75rem;color:#888;">• campaign-status.md launch instruction updated to Telegram flow</div>
+    <div style="font-size:0.75rem;color:#888;">• sequence.md — CEO → Founder in all email signatures; dead /pt.html and /workflow-pt.html URLs removed</div>
+  </div>
+</div>
+<div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-12</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Website (argusreach.com)</div>
