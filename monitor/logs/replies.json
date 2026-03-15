@@ -188,5 +188,45 @@
     "sent": false,
     "notes": "CONTEXT MISMATCH + IDENTITY VERIFICATION NEEDED: Outbound email referenced mental health practices and OB-GYNs/neurologists (wrong vertical for PT), but prospect name matches sender (Vito Resciniti). Verify this is a legitimate prospect and not an internal email, misdirected campaign, or system error before responding.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:18:09.196248",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "question",
+    "draft_preview": "Hey Vito,\n\nGreat question. We help PT clinic owners like you build a consistent pipeline of physician referrals by identifying the right doctors in your market and managing outreach on your behalf - s",
+    "sent": false,
+    "notes": "Legitimate prospect inquiry from clinic owner with name match; engaged enough to ask clarifying questions before committing.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:18:12.837568",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "question",
+    "draft_preview": "Happy to - I'd rather show you than tell you, and a quick call is the best way to see if we're a fit. We help clinic owners like you build physician referral pipelines so you can stay focused on patie",
+    "sent": false,
+    "notes": "Prospect showed initial interest, asked clarifying question before booking - warm lead moving through funnel.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:18:16.417340",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "ooo",
+    "draft_preview": "Joe,\n\nNo problem at all - enjoy your time away. When you're back and have a free 15 minutes, just let me know and we can connect.\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, A",
+    "sent": false,
+    "notes": "Warm prospect with genuine interest - schedule light follow-up after his return week.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:18:21.272258",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "not_now",
+    "draft_preview": "Silvana,\n\nCompletely understand - team buy-in matters. Just to clarify though: we handle the outreach legwork so your team can focus on what they do best (patient care and relationships). Nothing repl",
+    "sent": false,
+    "notes": "Internal team resistance to AI is a common objection; prospect is not rejecting outright but has legitimate org concern. Warm re-engagement when timing improves could convert.",
+    "test_mode": false
   }
 ]

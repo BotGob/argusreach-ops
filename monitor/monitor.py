@@ -306,6 +306,13 @@ def save_pending(pending):
 def queue_pending(client, from_email, from_name, subject, draft, classification,
                   in_reply_to=None, references=None):
     pending = load_pending()
+    # Dedup: if a pending entry already exists for this prospect, replace it (don't double-notify)
+    is_new = True
+    existing_idx = next((i for i, e in enumerate(pending) if e.get('from_email') == from_email and e.get('client_id') == client['id']), None)
+    if existing_idx is not None:
+        log(f"[{client['firm_name']}] Replacing existing pending entry for {from_email} (suppressing duplicate notification)")
+        pending.pop(existing_idx)
+        is_new = False
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
         'client_id': client['id'],
@@ -324,7 +331,7 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
     }
     pending.append(entry)
     save_pending(pending)
-    return entry['id']
+    return entry['id'], is_new
 
 # ── TELEGRAM ──────────────────────────────────────────────────────────────────
 def notify(text):
@@ -685,14 +692,15 @@ def process_client(client, processed_ids):
             classification = result['classification']
             draft         = result.get('draft_response', '')
             should_respond = result.get('should_respond', False)
-            escalate      = result.get('escalate', False)
-            sent          = False
-            approval_id   = None
+            escalate           = result.get('escalate', False)
+            sent               = False
+            approval_id        = None
+            is_new_notification = True
 
             # ── ESCALATION — human must review, no auto-response ever
             if escalate:
                 # Save to pending_approvals so Gob can read body and draft a response
-                esc_id = queue_pending(client, from_email, from_name, subject,
+                esc_id, esc_is_new = queue_pending(client, from_email, from_name, subject,
                                        draft='', classification='escalated',
                                        in_reply_to=message_id, references=references)
                 # Overwrite draft field with the raw email body so it's readable
@@ -704,14 +712,15 @@ def process_client(client, processed_ids):
                         break
                 save_pending(pending)
 
-                notify(
-                    f"🚨 *{firm}* — ESCALATION\n"
-                    f"From: {from_name or from_email}\n"
-                    f"Reason: {result.get('escalate_reason', 'Unknown')}\n"
-                    f"Subject: _{subject}_\n\n"
-                    f"*Their message:*\n```\n{body[:600]}\n```\n\n"
-                    f"→ Tell Gob to draft a response, then approve/send manually."
-                )
+                if esc_is_new:
+                    notify(
+                        f"🚨 *{firm}* — ESCALATION\n"
+                        f"From: {from_name or from_email}\n"
+                        f"Reason: {result.get('escalate_reason', 'Unknown')}\n"
+                        f"Subject: _{subject}_\n\n"
+                        f"*Their message:*\n```\n{body[:600]}\n```\n\n"
+                        f"→ Tell Gob to draft a response, then approve/send manually."
+                    )
                 log_reply(cid, from_email, 'escalated', '', False, result.get('escalate_reason', ''))
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 new_processed.add(fingerprint)
@@ -751,12 +760,13 @@ def process_client(client, processed_ids):
                         else:
                             log(f"[TEST] Would send removal ack to {from_email}")
                     elif client['mode'] == 'draft_approval':
-                        approval_id = queue_pending(client, from_email, from_name,
+                        approval_id, is_new_notification = queue_pending(client, from_email, from_name,
                                                     subject, draft, classification,
                                                     in_reply_to=message_id, references=references)
                         log(f"{label} Negative queued for approval (draft_approval mode): {from_email}")
 
                 elif client['mode'] == 'automated':
+                    is_new_notification = True
                     if not TEST_MODE:
                         try:
                             _send_email(client['outreach_email'], client['app_password'],
@@ -770,7 +780,7 @@ def process_client(client, processed_ids):
                         log(f"[TEST] Would auto-send to {from_email}")
 
                 elif client['mode'] == 'draft_approval':
-                    approval_id = queue_pending(client, from_email, from_name,
+                    approval_id, is_new_notification = queue_pending(client, from_email, from_name,
                                                 subject, draft, classification,
                                                 in_reply_to=message_id, references=references)
 
@@ -778,27 +788,30 @@ def process_client(client, processed_ids):
             emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
                      'negative': '🚫', 'ooo': '🏖', 'other': '⚠️'}.get(classification, '📬')
 
-            campaign_name = client.get('campaign_name', client.get('instantly_campaign_id', '')[:8] if client.get('instantly_campaign_id') else '')
-            msg_lines = [
-                f"{emoji} *{firm}* — {classification.upper()}",
-                f"Campaign: {campaign_name}" if campaign_name else None,
-                f"From: {from_name or from_email}",
-                f"_{result.get('reasoning', '')}_ ",
-            ]
-            msg_lines = [l for l in msg_lines if l is not None]
-
-            if approval_id and draft:
-                msg_lines += [
-                    f"\n*Draft ready:*",
-                    f"```\n{draft[:500]}\n```",
-                    f"→ Reply *APPROVE {approval_id}* or *REJECT {approval_id}*",
+            if is_new_notification:
+                campaign_name = client.get('campaign_name', client.get('instantly_campaign_id', '')[:8] if client.get('instantly_campaign_id') else '')
+                msg_lines = [
+                    f"{emoji} *{firm}* — {classification.upper()}",
+                    f"Campaign: {campaign_name}" if campaign_name else None,
+                    f"From: {from_name or from_email}",
+                    f"_{result.get('reasoning', '')}_ ",
                 ]
-            elif sent:
-                msg_lines.append("✅ Auto-sent")
-            elif TEST_MODE:
-                msg_lines.append("🔬 Test mode — not sent")
+                msg_lines = [l for l in msg_lines if l is not None]
 
-            notify('\n'.join(msg_lines))
+                if approval_id and draft:
+                    msg_lines += [
+                        f"\n*Draft ready:*",
+                        f"```\n{draft[:500]}\n```",
+                        f"→ Reply *APPROVE {approval_id}* or *REJECT {approval_id}*",
+                    ]
+                elif sent:
+                    msg_lines.append("✅ Auto-sent")
+                elif TEST_MODE:
+                    msg_lines.append("🔬 Test mode — not sent")
+
+                notify('\n'.join(msg_lines))
+            else:
+                log(f"{label} Suppressing duplicate notification for {from_email}")
 
             mail.store(msg_id, '+FLAGS', '\\Seen')
             new_processed.add(fingerprint)
