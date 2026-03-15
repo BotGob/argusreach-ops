@@ -28,6 +28,13 @@
 
 ## 🔴 Pre-Launch Gates — Must Complete Before First Real Client
 
+### 5a. Fix PT Tampa Bay Instantly Sequence Copy (BLOCKING — do before any real prospect)
+- Current sequence says "mental health practices" — wrong vertical entirely
+- Also: CEO → Founder, fix any dead URLs
+- Monitor ESCALATION confirmed this is live and broken
+- **Action:** Rewrite all 3 touches in Instantly dashboard for PT Tampa Bay campaign
+- Cannot enroll real prospects until this is fixed
+
 ### 5. Campaign Creation Script (PINNED — highest priority)
 - Reads `campaigns/[client_id]/sequence.md`, creates Instantly campaign via API with proper HTML formatting
 - Also handles: prospect import into Instantly AND prospects.csv simultaneously (prevents the sync gap that caused missed replies)

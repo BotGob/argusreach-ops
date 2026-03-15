@@ -714,6 +714,19 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="font-size:0.75rem;color:#888;">• Meeting booking tracking SOP added — client notification process + Calendly webhook plan documented</div>
     <div style="font-size:0.75rem;color:#888;">• Calendly client requirement added to onboarding gates — free Basic required before launch</div>
     <div style="font-size:0.75rem;color:#888;">• Instantly paid ($47/mo) flagged as urgent — free trial expires March 23</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Monitor — Reliability (Evening)</div>
+    <div style="font-size:0.75rem;color:#888;">• UNSEEN → date-based search: monitor now fetches yesterday + today regardless of read status — manually opening an email no longer causes missed alerts</div>
+    <div style="font-size:0.75rem;color:#888;">• IMAP SINCE is date-only (no time granularity) — settled on timedelta(days=1) as correct implementation</div>
+    <div style="font-size:0.75rem;color:#888;">• MAX_PER_CLIENT raised 15 → 50 to handle wider search window</div>
+    <div style="font-size:0.75rem;color:#888;">• queue_pending() deduplicates by prospect — one pending entry per prospect per client; duplicate Telegram notifications suppressed via is_new flag</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Website Audit — Evening Passes</div>
+    <div style="font-size:0.75rem;color:#888;">• JS stepData and demo sequence bar corrected (were still showing 4-5 touch / 4-step demo)</div>
+    <div style="font-size:0.75rem;color:#888;">• CTA: "15-minute" → "30-minute" strategy call (matches Calendly)</div>
+    <div style="font-size:0.75rem;color:#888;">• faq.html: open rates removed from reporting, A/B variants removed from setup fee description</div>
+    <div style="font-size:0.75rem;color:#888;">• Messaging reframe: removed "No salary/overhead/$70K+ hiring" framing — replaced with sales enablement positioning ("closers focus on closing")</div>
+    <div style="font-size:0.75rem;color:#888;">• Footer: "Founded by Vito Resciniti · Tampa Bay, FL" added for credibility</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Known Issue — Action Required</div>
+    <div style="font-size:0.75rem;color:#888;">• PT Tampa Bay Instantly sequence has wrong copy (says "mental health practices") — confirmed by monitor ESCALATION. Must rewrite before any real prospect is enrolled.</div>
   </div>
 </div>
 <div style="margin-bottom:40px;">
