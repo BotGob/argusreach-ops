@@ -2,82 +2,65 @@
   "_readme": "Set active=true to enable a client. Set active=false to pause without deleting. Mode: automated or draft_approval.",
   "clients": [
     {
-      "_comment": "DRY RUN TEST CLIENT — fake PT practice, gobbot95@gmail.com inbox, draft_approval mode",
+      "_comment": "DRY RUN TEST CLIENT \u2014 fake PT practice, gobbot95@gmail.com inbox, draft_approval mode",
       "id": "test_pt_dryryn",
       "active": false,
       "mode": "draft_approval",
-
       "outreach_email": "gobbot95@gmail.com",
       "app_password": "hpck wpdv baad nmbx",
-
       "sender_name": "Mike T.",
       "title": "Owner",
       "firm_name": "Gulf Coast Physical Therapy",
       "vertical": "PhysicalTherapy",
-
       "calendly_link": "https://calendly.com/vito-argusreach/30min",
       "instantly_campaign_id": "",
-
       "icp_summary": "Orthopedic surgeons, sports medicine doctors, PCPs, and chiropractors in Tampa Bay area who can refer PT patients",
-
       "tone": "warm-professional",
       "compliance_note": "Do not make any clinical claims, do not promise outcomes or recovery times, do not discuss insurance reimbursement rates"
     },
     {
-      "_comment": "PT Tampa Bay Test Campaign — vito@argusreach.com inbox, draft_approval mode",
+      "_comment": "PT Tampa Bay Test Campaign \u2014 vito@argusreach.com inbox, draft_approval mode",
       "id": "pt_tampa_bay_test",
       "active": true,
       "mode": "draft_approval",
-
       "prospects_csv": "campaigns/pt-tampa-bay-test/prospects.csv",
-
       "outreach_email": "vito@argusreach.com",
       "title": "Founder",
       "app_password": "dsvu rotk mehv qrww",
-
       "sender_name": "Vito Resciniti",
       "firm_name": "ArgusReach",
       "vertical": "PhysicalTherapy",
-
       "calendly_link": "https://calendly.com/vito-argusreach/30min",
-      "instantly_campaign_id": "d1b7a0af-ae35-4715-9619-6fd18811c528",
-
+      "instantly_campaign_id": "9f7a5ffd-2577-438e-9045-70f4c9f1bf84",
       "icp_summary": "Independent PT clinic owners in Tampa Bay area. We are reaching out to offer physician referral outreach services - identifying PCPs, orthos, and sports med docs in their market and managing outreach on their behalf.",
-
       "tone": "warm-professional",
       "compliance_note": "Do not make any clinical claims, do not promise specific referral numbers or revenue outcomes, do not discuss insurance reimbursement rates",
       "positioning_note": "ArgusReach is a tool that helps clinic owners make more sales and build physician networks - we are not replacing their sales efforts or relationships. We identify the right doctors and manage outreach on their behalf so they can focus on patient care. Emphasize partnership and amplification, not replacement."
     },
     {
-      "_comment": "EXAMPLE CLIENT — copy this block to add a new client, fill in all fields, set active=true",
+      "_comment": "EXAMPLE CLIENT \u2014 copy this block to add a new client, fill in all fields, set active=true",
       "id": "bay_harbor_wealth",
       "active": false,
       "mode": "draft_approval",
-
       "outreach_email": "james.k@bayharborwealth.com",
       "app_password": "xxxx xxxx xxxx xxxx",
-
       "sender_name": "James K.",
       "firm_name": "Bay Harbor Wealth Advisors",
       "vertical": "RIA",
-
       "calendly_link": "https://calendly.com/jamesk-bayharborwealth/30min",
       "instantly_campaign_id": "",
-
       "icp_summary": "Business owners post-exit, HNW individuals 50-65 in Tampa Bay seeking wealth management after a liquidity event, inheritance, or business sale",
-
       "tone": "warm-professional",
       "compliance_note": "No specific return promises, no mention of specific securities or investment strategies, no performance guarantees of any kind",
-
       "_field_notes": {
-        "id": "Unique snake_case identifier — used in APPROVE/REJECT commands and log files",
+        "id": "Unique snake_case identifier \u2014 used in APPROVE/REJECT commands and log files",
         "mode": "automated = AI responds immediately; draft_approval = AI drafts, Vito gets Telegram message to APPROVE or REJECT",
-        "outreach_email": "The dedicated Gmail on the client's domain — NOT their main email",
+        "outreach_email": "The dedicated Gmail on the client's domain \u2014 NOT their main email",
         "app_password": "16-char Gmail App Password (Google Account > Security > App Passwords). Never their actual password.",
         "vertical": "RIA | Insurance | PhysicalTherapy | MentalHealth | Mortgage | Other",
-        "tone": "warm-professional | formal | conversational — affects AI response style",
+        "tone": "warm-professional | formal | conversational \u2014 affects AI response style",
         "compliance_note": "What the AI should NEVER say or promise for this client specifically",
-        "instantly_campaign_id": "Campaign ID from Instantly dashboard. IMPORTANT: all campaigns must be created with stop_on_reply=true in Instantly UI — this handles sequence pausing automatically when a prospect replies."
+        "instantly_campaign_id": "Campaign ID from Instantly dashboard. IMPORTANT: all campaigns must be created with stop_on_reply=true in Instantly UI \u2014 this handles sequence pausing automatically when a prospect replies."
       }
     }
   ]

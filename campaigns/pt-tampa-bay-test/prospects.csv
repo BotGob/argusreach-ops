@@ -1,23 +1,5 @@
 first_name,last_name,email,company,website,email_verified,notes
-Lisa,Chase,info@back2normalpt.com,Back 2 Normal PT,https://back2normalpt.com,false,Owner/founder; contact page JS-based so no verified email found; guessed info@
-Amy,Welsh,amy@choosephysicaltherapy.com,CHOOSE Physical Therapy,https://choosephysicaltherapy.com,false,Owner/founder; ZoomInfo shows a@choosephysicaltherapy.com pattern so guessed amy@
-Carmine,Chioccariello,intake@sportsinjurypt.com,Sports Injury and Physical Therapy,https://sportsinjuryandphysicaltherapy.com,true,Owner RPT; email from contact page (intake@sportsinjurypt.com)
-John,Magee,info@westchasetherapy.com,Westchase Physical Therapy,https://www.westchasetherapy.com,true,Owner/CEO; family-owned with wife Roisin; email from contact page
-Nicholas,Tanner,info@forward-physio.com,Forward Physio,https://forward-physio.com,true,Owner/founder; email from contact page (info@forward-physio.com)
-Richard,Hutchins,info@therapyandsportscenter.com,Therapy & Sports Center,https://www.therapyandsportscenter.com,false,Founder/Director; multiple St Pete/Tampa Bay locations; email guessed
-Robert,Collewijn,info@freemotionfloridapt.com,Free Motion Physical Therapy,https://freemotionfloridapt.com,false,Founder (2014); cash-based private practice; email guessed
-Keith,Pacific,info@physiquetherapy.com,Physique Physical Therapy,https://physiquetherapy.com,false,Owner/founder; Tampa; email guessed
-Elissa,Deusner,elissa@stpetephysio.com,St Pete Physio,https://www.stpetephysio.com,false,Owner; concierge 1-on-1 PT in St Pete EDGE district; email guessed
-Andrea,Higgins,info@peakmovementpt.com,Peak Movement Physical Therapy,https://www.peakmovementpt.com,false,Owner; family-operated; pelvic health specialty; Clearwater; email guessed
-Ken,Clark,frontdesk@purposephysicaltherapy.com,Purpose Physical Therapy,https://purposephysicaltherapy.com,true,Co-founder with wife Jeana Clark; South Pasadena/St Pete; email from contact page
-Patricia,Farese,4street@fareserehab.com,Farese Physical Therapy Center,https://www.fareserehab.com,true,Owner/director; email from contact page (4street@fareserehab.com)
-Peggy,Kirk,info@baysidephysicaltherapy.net,Bayside Physical Therapy,https://baysidephysicaltherapy.net,false,Owner; 35+ yrs experience; 1-on-1 by appointment only; Clearwater; email guessed
-Carlos,Riveros,info@lifeinmotion-therapy.com,Life in Motion Physical & Hand Therapy,https://lifeinmotion-therapy.com,true,Co-owner with wife Adrienne Driggers Riveros; Pinellas Park; email from footer
-Han,Nguyen,info@neubilityrehab.com,Neubility Rehabilitation & Wellness,https://neubilityrehab.com,true,Founder; neurological PT specialty; Pinellas Park; email from contact page
-Bryant,Villota,bvillota@crossoverptp.com,Crossover PTP,https://www.crossoverptp.com,true,Founder/CEO; sports PT for athletes; Tampa; email from Jane booking system
-Kelly,Baez,kellybaez@brisawellness.com,Brisa Wellness,https://brisawellness.com,false,Founder/CEO; concierge mobile PT; Tampa Bay; email guessed (owner-named pattern)
-Leighton,Peavler,info@floridaphysio.com,Florida Physio,https://floridaphysio.com,true,Owner (PT DPT OCS); Clearwater/North St Pete; email from contact page
-Jennifer,Hauskey,info@catalystpt.org,Catalyst Physical Therapy & Diagnostics,https://catalystpt.org,false,Lead DPT/founder; Clearwater & Palm Harbor locations; email guessed
-Brian,Broussard,info@thealliancerx.com,Alliance Regen & Rehab,https://thealliancerx.com,false,Co-owner (PT/DPT); with brother Dr. John Broussard DO; St Pete; email guessed
-Vito,Resciniti,vresciniti27@gmail.com,Test Account,,true,Test account for Instantly variable test — delete after
-Mike,T.,vitoresciniti27@yahoo.com,Gulf Coast Physical Therapy,,true,Test account for sandbox testing
+Joe,Smith,vresciniti27@gmail.com,PT Tampa,,true,Test account — go-live simulation
+John,Jacob,vitoresciniti27@yahoo.com,PT St Pete,,true,Test account — go-live simulation
+David,John,gobbot95@gmail.com,PT Clearwater,,true,Test account — go-live simulation
+Silvana,Resciniti,silvanadantonio1@gmail.com,PT Palm Harbor,,true,Test account — go-live simulation
