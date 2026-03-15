@@ -76,7 +76,7 @@ All outreach includes an unsubscribe mechanism. Provider will immediately remove
 
 ## 5. Performance & Expectations
 
-Provider does not guarantee specific results including but not limited to: open rates, reply rates, meetings booked, or revenue generated. All projected benchmarks provided are estimates based on industry averages and are not contractual commitments.
+Provider does not guarantee specific results including but not limited to: open rates, reply rates, meetings booked, or revenue generated.
 
 Provider commits to: accurate contact sourcing, professional-quality email copy, consistent campaign execution, transparent reporting, and prompt notification of any deliverability issues.
 
