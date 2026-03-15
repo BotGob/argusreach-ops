@@ -25,7 +25,7 @@ c) Execute and manage automated email sequences to Prospects, including follow-u
 
 d) Monitor inbound replies to outreach emails and route positive or interested responses to Client in a timely manner.
 
-e) Provide periodic performance reports as outlined in the selected plan.
+e) Provide a monthly activity summary including contacts reached, replies received, and meetings booked.
 
 All outreach is conducted in Client's name. Provider will not identify itself as the author or operator of any outreach communications. Client acknowledges that all outreach is subject to Client's review and approval prior to deployment.
 
@@ -60,7 +60,7 @@ e) Comply with all applicable laws governing commercial email outreach, includin
 
 f) If providing a client-supplied prospect list, warrant that all contacts on that list have a legitimate business basis for outreach and that Client has not purchased, scraped, or otherwise obtained the list in violation of applicable law. Client assumes full legal responsibility for any client-supplied contact data.
 
-f) Notify Provider of any compliance constraints, regulatory requirements, or restrictions applicable to their industry before campaign launch.
+g) Notify Provider of any compliance constraints, regulatory requirements, or restrictions applicable to their industry before campaign launch.
 
 ---
 
