@@ -98,5 +98,25 @@
     "sent": false,
     "notes": "CONTEXT MISMATCH + POTENTIAL INTERNAL MAIL: The original outreach was sent to vresciniti27@gmail.com and misidentified the recipient as running a mental health practice in Tampa Bay. The reply is from someone named Vito Resciniti saying 'Argus sounds like a cool product' - this appears to be either a case of mistaken identity, an internal email loop, or a test scenario. Vito needs to verify the actual prospect identity and intent before proceeding.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T16:54:36.653777",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "question",
+    "draft_preview": "Hi Vito,\n\nGreat question - that's exactly what I'd want to cover on a quick call. We identify physicians in your market and manage outreach to build your referral pipeline, and I found Clearwater Spor",
+    "sent": false,
+    "notes": "Prospect responding with genuine interest - same first name creates potential for manual review before send.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T17:30:16.400824",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "question",
+    "draft_preview": "Hey Vito,\n\nAbsolutely - I'm the founder of ArgusReach, and we help independent PT clinics like yours build referral pipelines by identifying local physicians and managing outreach on your behalf. That",
+    "sent": false,
+    "notes": "Warm prospect responding positively - same name creates opportunity for rapport.",
+    "test_mode": false
   }
 ]

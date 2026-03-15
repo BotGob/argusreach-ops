@@ -233,7 +233,61 @@ def main():
         elif body:
             print(f"  ✓ Step {i+1}: HTML formatting detected")
 
-    # --- 6. Sending account ---
+    # --- 6. Prospect CSV cross-check ---
+    print("\n[ PROSPECT CSV SYNC ]")
+    # Find the client whose instantly_campaign_id matches
+    clients_path = os.path.join(os.path.dirname(__file__), "..", "monitor", "clients.json")
+    csv_emails = None
+    csv_path_used = None
+    try:
+        with open(clients_path) as f:
+            clients_data = json.load(f)
+        matched_client = None
+        for client in clients_data.get("clients", []):
+            if client.get("instantly_campaign_id") == campaign_id:
+                matched_client = client
+                break
+        if matched_client and matched_client.get("prospects_csv"):
+            import csv as csv_module
+            csv_path_used = os.path.join(os.path.dirname(__file__), "..", "monitor", matched_client["prospects_csv"])
+            csv_emails = set()
+            with open(csv_path_used, newline="", encoding="utf-8-sig") as f:
+                reader = csv_module.DictReader(f)
+                for row in reader:
+                    em = (row.get("email") or "").strip().lower()
+                    if em:
+                        csv_emails.add(em)
+            print(f"  ✓ Prospect CSV found: {matched_client['prospects_csv']} ({len(csv_emails)} emails)")
+
+            # Check every Instantly lead exists in the CSV
+            instantly_emails = {(l.get("email") or "").strip().lower() for l in leads}
+            missing_from_csv = instantly_emails - csv_emails
+            missing_from_instantly = csv_emails - instantly_emails
+
+            if missing_from_csv:
+                print(f"  ✗ {len(missing_from_csv)} Instantly leads NOT in prospects.csv — monitor will SKIP their replies:")
+                for em in sorted(missing_from_csv):
+                    print(f"       {em}")
+                errors += len(missing_from_csv)
+            else:
+                print(f"  ✓ All Instantly leads exist in prospects.csv — reply monitor will process them")
+
+            if missing_from_instantly:
+                print(f"  ⚠  {len(missing_from_instantly)} CSV emails not in Instantly — not yet contacted:")
+                for em in sorted(missing_from_instantly):
+                    print(f"       {em}")
+                warnings += len(missing_from_instantly)
+        elif matched_client:
+            print(f"  ⚠  Client found but no prospects_csv configured — skipping CSV check")
+            warnings += 1
+        else:
+            print(f"  ⚠  No client in clients.json matches this campaign ID — skipping CSV check")
+            warnings += 1
+    except Exception as e:
+        print(f"  ⚠  Could not run CSV check: {e}")
+        warnings += 1
+
+    # --- 7. Sending account ---
     print("\n[ SENDING ACCOUNT ]")
     email_list = campaign.get("email_list", [])
     check(len(email_list) > 0, f"Sending account configured: {email_list}")

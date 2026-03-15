@@ -47,7 +47,7 @@
 ## Step 3 — Build Campaign in Instantly
 
 1. Create new campaign: `[ClientFirm] — [Month] — [Vertical]`
-2. Import cleaned CSV of prospects
+2. Import cleaned CSV of prospects — **the same CSV file must also be saved as the client's `prospects_csv` in clients.json BEFORE launch. Every lead in Instantly must exist in the CSV — the monitor uses this file to filter replies. Missing entries = missed replies.**
 3. Configure sequence:
    - **Step 1** (Day 0): Initial outreach
    - **Step 2** (Day 3): Follow-up variant
@@ -82,7 +82,7 @@ cd /home/argus/.openclaw/workspace/argusreach
 python3 tools/validate_campaign.py [client_id]
 ```
 
-This checks: prospect list format, required CSV columns, clients.json config, DNC conflicts, and prospects_csv path. **Do not proceed to Step 5 until this passes with zero errors.**
+This checks: prospect list format, required CSV columns, clients.json config, DNC conflicts, prospects_csv path, **AND cross-references every Instantly lead against the prospects.csv — any lead missing from the CSV will have their replies silently skipped by the monitor.** Do not proceed to Step 5 until this passes with zero errors.
 
 ---
 
