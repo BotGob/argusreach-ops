@@ -148,5 +148,40 @@ Before considering the campaign live:
 
 ---
 
+---
+
+## Meeting Booking Tracking
+
+### Client Requirement — Calendly Setup (Onboarding Gate)
+Every client must have a free Calendly Basic account before launch:
+- One event type: "15-Minute Intro Call" (or equivalent)
+- Connected to their calendar
+- Link provided to ArgusReach for use in all sequences
+
+Free Calendly Basic is sufficient for campaigns to function. Paid ($10/mo) is only needed for automated webhook tracking.
+
+### Tracking Meetings Booked (Current Process)
+
+ArgusReach has no automatic visibility into Calendly bookings on the client's account. Until the webhook integration is built:
+
+**Client responsibility:** When you confirm a meeting with a prospect from ArgusReach outreach, email vito@argusreach.com with the prospect's name and email address. We will:
+1. Mark them as "Meeting Booked" in Airtable
+2. Add them to the DNC list so they are never contacted again
+3. Include the meeting in the monthly activity summary
+
+This prevents the risk of re-contacting someone who has already engaged.
+
+**Why this matters:** `stop_on_reply` halts the current sequence when a prospect replies, but does not prevent re-enrollment in future sequences. Manual notification is the safeguard until the webhook is live.
+
+### Tracking Meetings Booked (Planned — Calendly Webhook)
+When Calendly paid is active:
+- Calendly webhook fires on every new booking
+- ArgusReach auto-updates Airtable status → "Meeting Booked"
+- Prospect auto-added to DNC
+- Telegram alert fires to Vito
+- Zero reliance on client notification
+
+---
+
 **Owner:** Vito R. (ArgusReach)
 **Last updated:** March 2026

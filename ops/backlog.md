@@ -61,8 +61,10 @@
 ## 🟡 High Value — Build When First Client is Live
 
 ### 11. Calendly Webhook → Airtable + Telegram
-- Meeting booked → auto-update Prospect record + alert Vito
-- Requires Calendly paid plan ($10/mo)
+- Meeting booked → auto-update Prospect status, add to DNC, alert Vito via Telegram
+- **Without this:** client must manually email vito@argusreach.com when a meeting is confirmed (documented in SOP). Risk: if they forget, prospect could get re-contacted after already booking.
+- **Architecture:** Client uses free Calendly Basic (our requirement). If they want webhook tracking, they upgrade to paid ($10/mo) — we can pass cost through or build into Growth plan pricing. OR: we provide Calendly link via ArgusReach account and control webhook ourselves.
+- Requires Calendly paid plan ($10/mo on client or ArgusReach account)
 
 ### 12. Monthly Report Auto-Generation
 - Pull stats from Airtable → populate report template → email to client 1st of month
