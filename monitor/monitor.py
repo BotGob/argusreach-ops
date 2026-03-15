@@ -51,7 +51,7 @@ TELEGRAM_CHAT_ID    = os.environ.get('ARGUSREACH_CHAT_ID', '-1003821840813')
 ANTHROPIC_API_KEY   = os.environ.get('ANTHROPIC_API_KEY', '')
 
 POLL_INTERVAL       = 600       # seconds between inbox checks (10 min)
-MAX_PER_CLIENT      = 15        # hard cap per cycle
+MAX_PER_CLIENT      = 50        # hard cap per cycle (24h window, most filtered by dedup/spam)
 MAX_AI_CALLS_DAY    = 100       # daily Claude budget
 DIGEST_HOUR         = 18        # 24h local hour to send daily digest (6pm)
 AI_MODEL            = 'claude-haiku-4-5-20251001'  # updated 2026-03-11
