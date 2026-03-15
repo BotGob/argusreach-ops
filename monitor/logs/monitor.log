@@ -5804,3 +5804,34 @@ No replies processed today.
 2026-03-15 23:22:20 Daily digest sent.
 2026-03-15 23:22:20 Cycle complete. Next check in 10 min.
 
+2026-03-15 23:22:38 ArgusReach Monitor v2 starting
+2026-03-15 23:22:38 [ArgusReach] Checking inbox...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:604: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(hours=24)).strftime('%d-%b-%Y')
+2026-03-15 23:22:39 [ArgusReach] 23 message(s) in last 24h.
+2026-03-15 23:22:39 [ArgusReach] Skipping duplicate: silvanadantonio1@gmail.com
+2026-03-15 23:22:40 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:40 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:40 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:41 [ArgusReach] Skipping duplicate: dealermail@netaudiencepro3.click
+2026-03-15 23:22:41 [ArgusReach] Skipping duplicate: a.ahmed@woodburybusinessbroker.com
+2026-03-15 23:22:41 [ArgusReach] Skipping duplicate: j-grabowski@01-machine.top
+2026-03-15 23:22:42 [ArgusReach] Skipping duplicate: autum.winters@cozychics.com
+2026-03-15 23:22:42 [ArgusReach] Skipping duplicate: jude.pedraza@rontervia.com
+2026-03-15 23:22:42 [ArgusReach] Skipping duplicate: breonna.heinrich@greatoutdoorguides.com
+2026-03-15 23:22:43 [ArgusReach] Skipping duplicate: iris.carlberg@talkmore.forum
+2026-03-15 23:22:43 [ArgusReach] Skipping duplicate: h.schott@metroheadlinehub.com
+2026-03-15 23:22:43 [ArgusReach] Skipping duplicate: esahc.bm@emtny.tec-send5.com
+2026-03-15 23:22:44 [ArgusReach] Skipping duplicate: james@en-news0523.com
+2026-03-15 23:22:44 [ArgusReach] Skipping duplicate: nicole.oneill@usetegteam.com
+2026-03-15 23:22:45 [ArgusReach] Skipping duplicate: victoriaevans@nassaustreetfixedincomefundridge.help
+2026-03-15 23:22:45 [ArgusReach] Skipping duplicate: sienna.h@revgenrock.com
+2026-03-15 23:22:46 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:46 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:46 [ArgusReach] Skipping duplicate: vitoresciniti27@yahoo.com
+2026-03-15 23:22:47 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-15 23:22:47 [ArgusReach] Skipping duplicate: gobbot95@gmail.com
+2026-03-15 23:22:48 [ArgusReach] Skipping duplicate: silvanadantonio1@gmail.com
+2026-03-15 23:22:48 Daily digest sent.
+2026-03-15 23:22:48 Cycle complete. Next check in 10 min.
+

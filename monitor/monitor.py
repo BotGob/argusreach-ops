@@ -600,8 +600,8 @@ def process_client(client, processed_ids):
         mail.login(client['outreach_email'], client['app_password'])
         mail.select('inbox')
 
-        # Search last 24h — survives manual reads; dedup prevents double-processing
-        since_date = (datetime.utcnow() - timedelta(hours=24)).strftime('%d-%b-%Y')
+        # Search since yesterday — IMAP SINCE is date-only; catches manually-read emails; dedup prevents double-processing
+        since_date = (datetime.utcnow() - timedelta(days=1)).strftime('%d-%b-%Y')
         _, raw = mail.search(None, f'SINCE {since_date}')
         msg_ids = raw[0].split() if raw[0] else []
 
