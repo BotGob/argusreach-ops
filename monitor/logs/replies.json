@@ -68,5 +68,35 @@
     "sent": true,
     "notes": "Wrong prospect in database - email domain and company name indicate non-PT vertical.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-14T17:00:12.520549",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Prospect requesting 'all personal information' and 'all data' on the company - potential privacy, compliance, or legal concern that requires human review before any response.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-14T17:24:36.916196",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Classification failed: No ANTHROPIC_API_KEY configured",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-14T17:42:29.084301",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH + POTENTIAL INTERNAL MAIL: The original outreach was sent to vresciniti27@gmail.com and misidentified the recipient as running a mental health practice in Tampa Bay. The reply is from someone named Vito Resciniti saying 'Argus sounds like a cool product' - this appears to be either a case of mistaken identity, an internal email loop, or a test scenario. Vito needs to verify the actual prospect identity and intent before proceeding.",
+    "test_mode": false
   }
 ]

@@ -47,7 +47,7 @@ DNC_DIR.mkdir(exist_ok=True)
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 TELEGRAM_BOT_TOKEN  = os.environ.get('ARGUSREACH_BOT_TOKEN',
                                       '8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk')
-TELEGRAM_CHAT_ID    = os.environ.get('ARGUSREACH_CHAT_ID', '8135725412')
+TELEGRAM_CHAT_ID    = os.environ.get('ARGUSREACH_CHAT_ID', '-1003821840813')
 ANTHROPIC_API_KEY   = os.environ.get('ANTHROPIC_API_KEY', '')
 
 POLL_INTERVAL       = 600       # seconds between inbox checks (10 min)
