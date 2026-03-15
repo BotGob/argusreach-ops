@@ -37,14 +37,13 @@
 
 ---
 
-### 7:00–10:00 — Proof Points
+### 7:00–10:00 — The Value Case
 
-"Let me give you a sense of what the numbers look like. With a properly targeted, personalized cold email sequence:"
-- "Open rates are typically 35–55% — compared to the industry average of 15–20%."
-- "Positive reply rate is 4–8% of contacts reached."
-- "On our Starter plan — 200 contacts a month — that's 8–16 qualified conversations started. Not cold calls. Not ads. Real people who replied and expressed interest."
+"Here's how I think about the value. A junior SDR hire costs $60–70K a year before benefits. They prospect maybe 100–200 people a month if you're lucky, and you spend time managing them. Our Starter plan is $750 a month — 200 contacts, fully managed, no management overhead from you."
 
-"For context: a junior SDR hire costs $60–70K a year before benefits. Our Starter plan is $750 a month."
+"The math isn't complicated. One new client from outreach typically pays for months of ArgusReach. That's the case you're making to yourself."
+
+*Do not quote specific open rate or reply rate projections — performance varies by vertical and we don't have our own client data yet. If pressed, say: "I'd rather show you what it looks like in your specific vertical than give you a number that doesn't apply to you."*
 
 ---
 
@@ -60,7 +59,7 @@
 "Honestly, the only way to know is to run it. That's why we do a 3-month engagement — it takes 4–6 weeks to fully optimize targeting and sequences. The clients who get the most out of it let us iterate. We're not promising 20 meetings in month one. We're building you a consistent, predictable pipeline."
 
 **"I have compliance concerns." (RIAs)**
-"Fair — and that's something we address in onboarding. We don't make specific performance promises in the outreach. Every email is subject to your review before we launch. You approve the copy. We execute."
+"Fair — and that's something we address in onboarding. We don't make specific performance promises in the outreach. You review and approve the email sequences before a single email goes out. You control what goes out under your name. We execute."
 
 ---
 
@@ -101,8 +100,8 @@
 ---
 
 ## Pricing Recap for Call
-- Starter: $750/mo — 200 contacts, 1 sequence, 4-touch follow-up
-- Growth: $1,500/mo — 500 contacts, 2 sequences, A/B testing, monthly call
+- Starter: $750/mo — 200 contacts, 1 sequence, 3-touch follow-up
+- Growth: $1,500/mo — 500 contacts, 2 sequences, monthly call
 - Scale: $2,500/mo — 1,000+ contacts, 3 sequences, dedicated account mgmt
 - All plans: $500 one-time setup fee, 3-month minimum
 

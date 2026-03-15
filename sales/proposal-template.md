@@ -39,39 +39,21 @@ Based on our onboarding session, your ideal prospect looks like this:
 
 ### Month 1
 - ICP finalization and prospect list build (first [X] contacts)
-- Email sequence writing (1–[X] sequences, [X] touches each)
+- Email sequence writing (1–[X] sequences, 3 touches each)
 - Deliverability infrastructure setup (sending domain warm-up)
-- Sequence launch — first emails deployed by Day [X] of engagement
-- Weekly check-in: sequence performance review, adjustments
+- Sequence review and approval by you before launch
+- Campaign launch — first emails deployed by Day [X] of engagement
 
 ### Month 2
 - Full sequence running at volume
-- A/B testing on subject lines (Growth/Scale plans)
-- Response monitoring — all positive replies routed to your calendar
-- Mid-engagement performance report
-- Sequence optimization based on open/reply data
+- Response monitoring — all positive replies handled and routed to your calendar
+- Mid-engagement check-in
+- Sequence adjustments based on reply data
 
 ### Month 3
 - Continued execution and optimization
-- End-of-quarter review: what worked, what to expand, go-forward plan
+- End-of-quarter activity summary
 - Option to continue, upgrade, or add a second target vertical
-
----
-
-## Projected Performance Benchmarks
-
-*Industry benchmarks for B2B cold email outreach with AI personalization:*
-
-| Metric | Conservative | Expected |
-|--------|-------------|---------|
-| Open Rate | 30% | 40–55% |
-| Positive Reply Rate | 3% | 5–8% |
-| Meetings Booked / Month | [X based on plan volume] | [X] |
-
-*Starter (200 contacts): 6–16 meetings/month projected*
-*Growth (500 contacts): 15–40 meetings/month projected*
-
-These are projections, not guarantees. Performance depends on offer clarity, vertical response rates, and sequencing optimization.
 
 ---
 
@@ -93,18 +75,18 @@ Payment: Setup fee due upon signing. Monthly retainer due on the 1st of each act
 1. **Sign & Pay Setup Fee** — DocuSign agreement + invoice
 2. **Onboarding Call** (45 min) — ICP deep-dive, sequence brief, calendar access
 3. **We Build** — list, sequences, deliverability infra (3–5 business days)
-4. **You Approve** — review emails before launch, request any changes
-5. **Launch** — first outreach deployed (typically 1–2 weeks after onboarding); monthly billing begins; you receive Telegram notifications with AI-drafted replies for your approval before anything sends
+4. **You Approve** — review and approve the email sequences before launch; request any changes
+5. **Launch** — first outreach deployed (typically 1–2 weeks after onboarding); monthly billing begins
 6. **Meetings** — qualified prospects book directly on your calendar
 
 ---
 
 ## Our Commitment
 
-- Every AI-drafted reply approved by you before it sends (standard for all clients — nothing sends without your sign-off)
+- You review and approve all email sequences before a single email sends — nothing goes out under your name without your sign-off
 - No promises of specific results — we commit to volume, quality, and iteration
 - You are never associated with ArgusReach publicly — we are invisible to your prospects
-- Transparent monthly reporting: sent, opened, replied, meetings booked
+- Monthly activity summary: contacts reached, replies received, meetings booked
 
 ---
 
@@ -130,5 +112,3 @@ By signing below, [CLIENT] agrees to the terms outlined in this proposal and the
 | Starter ($750/mo) | https://buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02 |
 | Growth ($1,500/mo) | https://buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00 |
 | Scale ($2,500/mo) | https://buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03 |
-
-

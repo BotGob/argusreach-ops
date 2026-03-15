@@ -22,7 +22,7 @@ That's exactly what we built this to solve.
 - Build a targeted list of physicians in your area — PCPs, orthopedic surgeons, sports medicine, neurologists, whatever mix makes sense for your specialties
 - Cross-reference against your existing referral relationships so we never contact someone you already work with
 - Write personalized outreach in your voice — every email feels like it came directly from your practice, because it does
-- Handle every reply automatically — interested physicians get a booking link immediately, others get a follow-up at the right time
+- Handle every reply — interested physicians get a booking link routed to your calendar immediately, others get a professional follow-up at the right time
 - Log every single touchpoint: who was contacted, when, what they said, and when to follow up. No more guessing.
 - Deliver a monthly report showing exactly what's working
 
@@ -49,7 +49,7 @@ After the initial 3 months, it's month-to-month. Cancel anytime with 30 days not
 
 **Before week 1:** Sign the service agreement, set up a dedicated outreach email on your domain (we handle the technical config), and create a free Calendly account connected to your calendar. Total time: about 20 minutes.
 
-**Week 1:** Onboarding call → we build your physician list and write the sequences → you review and approve
+**Week 1:** Onboarding call → we build your physician list and write the sequences → you review and approve the copy before anything sends
 
 **Week 2:** First emails go out. You start receiving weekly updates.
 

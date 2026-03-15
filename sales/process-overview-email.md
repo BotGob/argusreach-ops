@@ -22,34 +22,22 @@ ArgusReach builds you a second engine: a consistent, proactive outbound system t
 After one 45-minute onboarding call, here's what happens:
 
 **1. We build your prospect list**
-We research and source verified contacts that match your exact ideal client profile — right title, right company size, right geography, right industry. Clean data, no bounces.
+We research and source targeted contacts that match your exact ideal client profile — right title, right company size, right geography, right industry. Every address is verified before anything sends.
 
 **2. We write every email**
 Every message is written specifically for the individual prospect — referencing their company, their role, their market context. Not a template. Not a mail merge. Something that reads like you wrote it yourself, because we wrote it to sound exactly like you.
 
-**3. You approve before anything sends**
-We send you every AI-drafted reply for your approval before it goes out. Nothing sends without your sign-off — this is the standard for all clients. Once you've reviewed drafts for 30+ days and are confident in the quality, we can discuss switching to fully automated mode if you prefer.
+**3. You approve the sequences before launch**
+Before anything goes out, you review and approve the full email sequence. You control what goes out under your name. We don't send a single email until you've signed off on the copy.
 
 **4. We run the follow-up**
-4–5 touches over three weeks. Most positive replies come after touch 3 or 4. We never stop too early.
+3 touches over roughly two weeks. Most positive replies come after touch 2 or 3. We never stop too early.
 
 **5. Hot replies come to you**
-When a prospect responds with interest, we notify you immediately and route them to your booking link. You show up to the meeting. We handle everything before that.
+When a prospect responds with interest, we handle the reply and route them to your booking link. You show up to the meeting. We handle everything before that.
 
-**6. You get a monthly report**
-Open rates, reply rates, meetings booked, what's working, what we're changing. Full transparency.
-
----
-
-**What results look like**
-
-Based on industry benchmarks for AI-personalized B2B cold email:
-
-- Open rates: 35–55% (industry average: 15–20%)
-- Positive reply rate: 4–8% of contacts reached
-- Meetings booked: 4–12 per month depending on plan and vertical
-
-These are projections, not guarantees. Performance depends on your offer, your vertical, and how clearly we can define your ideal prospect.
+**6. You get a monthly activity summary**
+What was sent, who replied, what's in progress. Full transparency on activity — no surprises.
 
 ---
 

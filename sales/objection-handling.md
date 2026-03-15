@@ -22,7 +22,7 @@ The channel works. The execution is what fails 90% of the time."
 **Response:**
 "That's exactly the right concern — and it's the first thing we protect. We don't send blast emails. We're not doing 'spray and pray.'
 
-Every email we send is personalized, professional, and relevant to the recipient. The volume is controlled — we're not hitting 5,000 people a day. And every sequence is reviewed and approved by you before a single email goes out.
+Every email we send is personalized, professional, and relevant to the recipient. The volume is controlled — we're not hitting 5,000 people a day. You review and approve the full sequence before launch — nothing goes out under your name that you haven't seen.
 
 Your name, your firm, your reputation — we treat it like our own."
 
@@ -98,7 +98,7 @@ If it's timing — when would be the right time? I'd rather schedule a follow-up
 
 First, we never make specific performance promises in the outreach — no 'guaranteed returns' or 'outperform the market.' It's a professional introduction, not an advertisement.
 
-Second, every email goes through you for approval before launch. You can edit anything, remove anything, or tell us to rewrite entirely. You have full control over what goes out under your name.
+Second, you review and approve the full email sequence before a single email goes out. You can edit anything, remove anything, or tell us to rewrite entirely. You have full control over what goes out under your name.
 
 Third, we're not doing anything different than a human advisor making introductory calls or sending LinkedIn messages — we're just doing it at scale, professionally."
 
