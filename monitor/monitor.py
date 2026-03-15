@@ -285,9 +285,11 @@ def save_processed(ids: set):
     trimmed = list(ids)[-10000:]
     PROCESSED_FILE.write_text(json.dumps(trimmed))
 
-def msg_fingerprint(from_email, subject, date_str):
-    """Stable ID for a message to prevent double-processing."""
-    return hashlib.sha256(f"{from_email}|{subject}|{date_str}".encode()).hexdigest()[:16]
+def msg_fingerprint(from_email, subject, date_str, message_id=''):
+    """Stable ID for a message to prevent double-processing.
+    Includes Message-ID when available — prevents collision when same sender
+    sends two different emails on the same day with the same subject."""
+    return hashlib.sha256(f"{from_email}|{subject}|{date_str}|{message_id}".encode()).hexdigest()[:16]
 
 # ── PENDING APPROVALS ─────────────────────────────────────────────────────────
 def load_pending():
@@ -626,7 +628,7 @@ def process_client(client, processed_ids):
                 continue
 
             # Deduplication — skip if we've already processed this message
-            fingerprint = msg_fingerprint(from_email, subject, date_str)
+            fingerprint = msg_fingerprint(from_email, subject, date_str, message_id)
             if fingerprint in processed_ids:
                 log(f"{label} Skipping duplicate: {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
