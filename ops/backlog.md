@@ -171,3 +171,9 @@
 - Vertical-specific landing pages — deeper pages per vertical
 - Case study machine — auto-generate from Airtable data after first result
 - AI-personalized opening lines at scale — Clay + Claude
+
+## 17. Route Reply Emails Through Instantly (Not Raw SMTP)
+**Priority:** High — before first real client launch
+**Why:** Monitor currently sends approved reply drafts via raw SMTP from our server. This has poor deliverability to Yahoo, Outlook, and other aggressive spam filters. Instantly's sending infrastructure has warmed IPs and better reputation.
+**Fix:** Use Instantly's email API to send replies rather than direct SMTP. Keeps all outbound mail going through the same infrastructure, consistent deliverability.
+**Discovered:** 2026-03-15 sandbox test — Yahoo received Touch 2 (Instantly) but not our SMTP reply.

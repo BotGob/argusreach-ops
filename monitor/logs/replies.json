@@ -118,5 +118,15 @@
     "sent": false,
     "notes": "Warm prospect responding positively - same name creates opportunity for rapport.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T19:10:31.799455",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vitoresciniti27@yahoo.com",
+    "classification": "negative",
+    "draft_preview": "Mike,\n\nUnderstood completely - removing you from our list right now, and I apologize for the outreach.\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": false,
+    "notes": "Prospect explicitly rejected service due to AI concerns and demanded removal. This may indicate a market perception issue worth noting.",
+    "test_mode": false
   }
 ]
