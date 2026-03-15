@@ -35,11 +35,6 @@
 - **Root cause solved:** Instantly editor doesn't format paragraphs — API is the only reliable path
 - **Decision:** Build before PT Tampa Bay launch
 
-### 6. Route Reply Emails Through Instantly (Not Raw SMTP)
-- **Partial fix done (2026-03-15):** Added `In-Reply-To` / `References` threading headers — significantly improves deliverability by signaling replies vs cold outreach
-- **Remaining:** Route approved reply drafts through Instantly's sending infrastructure instead of raw SMTP — Instantly's warmed IPs have better reputation with Yahoo/Outlook
-- **Discovered:** Yahoo received Instantly sequence email but not our raw SMTP reply in sandbox test
-
 ### 7. Wire first real client into clients.json
 - Copy example block, fill in: outreach email, app password, Calendly URL, ICP, prospects_csv path
 - Set `active: true`, `mode: "draft_approval"`
