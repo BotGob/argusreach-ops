@@ -138,5 +138,15 @@
     "sent": false,
     "notes": "Warm lead interested in service but temporarily unavailable; consider light follow-up after his return window.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T22:32:51.510568",
+    "client": "pt_tampa_bay_test",
+    "prospect": "gobbot95@gmail.com",
+    "classification": "negative",
+    "draft_preview": "Understood, removing you now - sorry for the interruption.\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": false,
+    "notes": "Unsubscribe request processed. Prospect rejected outreach and expressed anti-AI sentiment. Do not re-contact.",
+    "test_mode": false
   }
 ]

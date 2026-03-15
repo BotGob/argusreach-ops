@@ -16,7 +16,8 @@
       "instantly_campaign_id": "",
       "icp_summary": "Orthopedic surgeons, sports medicine doctors, PCPs, and chiropractors in Tampa Bay area who can refer PT patients",
       "tone": "warm-professional",
-      "compliance_note": "Do not make any clinical claims, do not promise outcomes or recovery times, do not discuss insurance reimbursement rates"
+      "compliance_note": "Do not make any clinical claims, do not promise outcomes or recovery times, do not discuss insurance reimbursement rates",
+      "campaign_name": "DRY RUN \u2014 Test"
     },
     {
       "_comment": "PT Tampa Bay Test Campaign \u2014 vito@argusreach.com inbox, draft_approval mode",
@@ -35,7 +36,8 @@
       "icp_summary": "Independent PT clinic owners in Tampa Bay area. We are reaching out to offer physician referral outreach services - identifying PCPs, orthos, and sports med docs in their market and managing outreach on their behalf.",
       "tone": "warm-professional",
       "compliance_note": "Do not make any clinical claims, do not promise specific referral numbers or revenue outcomes, do not discuss insurance reimbursement rates",
-      "positioning_note": "ArgusReach is a tool that helps clinic owners make more sales and build physician networks - we are not replacing their sales efforts or relationships. We identify the right doctors and manage outreach on their behalf so they can focus on patient care. Emphasize partnership and amplification, not replacement."
+      "positioning_note": "ArgusReach is a tool that helps clinic owners make more sales and build physician networks - we are not replacing their sales efforts or relationships. We identify the right doctors and manage outreach on their behalf so they can focus on patient care. Emphasize partnership and amplification, not replacement.",
+      "campaign_name": "PT Tampa Bay \u2014 March 2026"
     },
     {
       "_comment": "EXAMPLE CLIENT \u2014 copy this block to add a new client, fill in all fields, set active=true",

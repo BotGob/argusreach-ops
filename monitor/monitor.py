@@ -777,17 +777,20 @@ def process_client(client, processed_ids):
             emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
                      'negative': '🚫', 'ooo': '🏖', 'other': '⚠️'}.get(classification, '📬')
 
+            campaign_name = client.get('campaign_name', client.get('instantly_campaign_id', '')[:8] if client.get('instantly_campaign_id') else '')
             msg_lines = [
                 f"{emoji} *{firm}* — {classification.upper()}",
+                f"Campaign: {campaign_name}" if campaign_name else None,
                 f"From: {from_name or from_email}",
                 f"_{result.get('reasoning', '')}_ ",
             ]
+            msg_lines = [l for l in msg_lines if l is not None]
 
             if approval_id and draft:
                 msg_lines += [
                     f"\n*Draft ready:*",
                     f"```\n{draft[:500]}\n```",
-                    f"→ Tell Go: *approve* or *reject* this reply",
+                    f"→ Reply *APPROVE {approval_id}* or *REJECT {approval_id}*",
                 ]
             elif sent:
                 msg_lines.append("✅ Auto-sent")
