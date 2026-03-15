@@ -429,7 +429,7 @@ def _send_email(outreach_email, app_password, sender_name, to_email, subject, bo
         msg['References'] = references or in_reply_to
     # Convert plain text body to clean HTML with proper spacing
     paragraphs = [p.strip() for p in body.strip().split('\n\n') if p.strip()]
-    html_body = '\n'.join(f'<p>{p.replace(chr(10), "<br>")}</p>' for p in paragraphs)
+    html_body = '\n'.join(f'<p style="margin-bottom:16px;">{p.replace(chr(10), "<br>")}</p>' for p in paragraphs)
     html_body = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
 {html_body}
 </body></html>"""

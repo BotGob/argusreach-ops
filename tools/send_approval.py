@@ -64,7 +64,7 @@ def send_reply(entry):
 
     # HTML
     paragraphs = [p.strip() for p in body.strip().split("\n\n") if p.strip()]
-    html_body = "\n".join(f"<p>{p.replace(chr(10), '<br>')}</p>" for p in paragraphs)
+    html_body = "\n".join(f'<p style="margin-bottom:16px;">{p.replace(chr(10), "<br>")}</p>' for p in paragraphs)
     html = f"""<html><body style="font-family:Arial,sans-serif;font-size:14px;color:#222;line-height:1.6;">
 {html_body}
 </body></html>"""

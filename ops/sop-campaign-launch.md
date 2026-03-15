@@ -71,7 +71,7 @@
 - [ ] Verify personalization tags are populating (not showing `{{firstName}}` literally)
 - [ ] Check unsubscribe mechanism is present (Instantly auto-inserts footer)
 - [ ] Confirm reply-to routes to monitored inbox
-- [ ] Confirm all email bodies use HTML `<p>` tags — NOT plain text with `\n\n` line breaks
+- [ ] Confirm all email bodies use HTML `<p style="margin-bottom:16px;">` tags — NOT plain `<p>` or plain text. The margin-bottom is required for proper spacing in Yahoo and Outlook which strip default paragraph margins.
 
 ---
 
