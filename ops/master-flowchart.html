@@ -689,6 +689,34 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 <!-- RECENT CHANGES LOG -->
 <div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-15</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Full Go-Live Simulation Test</div>
+    <div style="font-size:0.75rem;color:#888;">• 4-contact test campaign built and launched end-to-end — all 3 touches sent, correct format, correct timing</div>
+    <div style="font-size:0.75rem;color:#888;">• Monitor caught replies from all test accounts — classified, drafted, notified to Telegram alerts group</div>
+    <div style="font-size:0.75rem;color:#888;">• APPROVE/REJECT from Telegram group confirmed working — full approval loop closed without returning to DM</div>
+    <div style="font-size:0.75rem;color:#888;">• Dedicated Telegram alerts group configured and confirmed (-1003821840813) — all monitor alerts route there, not to DM</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Monitor / Deliverability Fixes</div>
+    <div style="font-size:0.75rem;color:#888;">• In-Reply-To / References headers added to all outbound replies — fixes Yahoo/Outlook spam filtering on replies</div>
+    <div style="font-size:0.75rem;color:#888;">• Message-ID included in deduplication fingerprint — prevents collision when same sender emails twice in one day</div>
+    <div style="font-size:0.75rem;color:#888;">• margin-bottom:16px added to all &lt;p&gt; tags in sequences and reply HTML — fixes Yahoo/Outlook paragraph spacing</div>
+    <div style="font-size:0.75rem;color:#888;">• Instantly lead add protocol confirmed: campaign must be active before adding leads; use "campaign" field not "campaign_id"</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Validator Improvements</div>
+    <div style="font-size:0.75rem;color:#888;">• Prospect CSV cross-check added — hard error if any Instantly lead is missing from prospects.csv (monitor would silently skip their replies)</div>
+    <div style="font-size:0.75rem;color:#888;">• CSV path bug fixed; delay_unit minutes/hours now treated as warning not error; workspace-level lead duplicates suppressed</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Notifications</div>
+    <div style="font-size:0.75rem;color:#888;">• Campaign name added to all Telegram notifications — each alert now shows client + campaign for multi-client clarity</div>
+    <div style="font-size:0.75rem;color:#888;">• Approval prompt updated — shows exact APPROVE/REJECT command with full ID (no ambiguity)</div>
+    <div style="font-size:0.75rem;color:#888;">• send_approval.py tool created — handles approval sends with proper threading headers automatically</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Sales & Ops</div>
+    <div style="font-size:0.75rem;color:#888;">• Full sales materials audit — removed fabricated metrics, fixed client approval language, removed A/B testing / weekly check-ins</div>
+    <div style="font-size:0.75rem;color:#888;">• Service agreement: fixed duplicate clause f), simplified performance disclaimer</div>
+    <div style="font-size:0.75rem;color:#888;">• Meeting booking tracking SOP added — client notification process + Calendly webhook plan documented</div>
+    <div style="font-size:0.75rem;color:#888;">• Calendly client requirement added to onboarding gates — free Basic required before launch</div>
+    <div style="font-size:0.75rem;color:#888;">• Instantly paid ($47/mo) flagged as urgent — free trial expires March 23</div>
+  </div>
+</div>
+<div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-14</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Monitor / Security</div>
