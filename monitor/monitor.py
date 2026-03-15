@@ -593,16 +593,17 @@ def process_client(client, processed_ids):
         mail.login(client['outreach_email'], client['app_password'])
         mail.select('inbox')
 
-        # Fetch ALL unseen — more reliable than date-filtering (catches up after downtime)
-        _, raw = mail.search(None, 'UNSEEN')
+        # Search last 24h — survives manual reads; dedup prevents double-processing
+        since_date = (datetime.utcnow() - timedelta(hours=24)).strftime('%d-%b-%Y')
+        _, raw = mail.search(None, f'SINCE {since_date}')
         msg_ids = raw[0].split() if raw[0] else []
 
         if not msg_ids:
-            log(f"{label} No unread messages.")
+            log(f"{label} No messages in last 24h.")
             mail.logout()
             return new_processed
 
-        log(f"{label} {len(msg_ids)} unread message(s).")
+        log(f"{label} {len(msg_ids)} message(s) in last 24h.")
 
         if len(msg_ids) > MAX_PER_CLIENT:
             notify(

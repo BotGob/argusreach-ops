@@ -5628,3 +5628,56 @@ No replies processed today.
 2026-03-15 22:41:26 Daily digest sent.
 2026-03-15 22:41:26 Cycle complete. Next check in 10 min.
 
+2026-03-15 22:50:59 [ArgusReach] Checking inbox...
+2026-03-15 22:51:00 [ArgusReach] No unread messages.
+2026-03-15 22:51:00 Cycle complete. Next check in 10 min.
+
+2026-03-15 22:51:26 [ArgusReach] Checking inbox...
+2026-03-15 22:51:26 [ArgusReach] No unread messages.
+2026-03-15 22:51:26 Cycle complete. Next check in 10 min.
+
+2026-03-15 23:01:00 [ArgusReach] Checking inbox...
+2026-03-15 23:01:01 [ArgusReach] 1 unread message(s).
+2026-03-15 23:01:01 [ArgusReach] Processing: Silvana Maria <silvanadantonio1@gmail.com>
+2026-03-15 23:01:04 [Instantly] Pause handled by stop_on_reply campaign setting for silvanadantonio1@gmail.com
+2026-03-15 23:01:06 [Airtable] Prospect not found: silvanadantonio1@gmail.com — skipping sync
+2026-03-15 23:01:06 Cycle complete. Next check in 10 min.
+
+2026-03-15 23:01:26 [ArgusReach] Checking inbox...
+2026-03-15 23:01:27 [ArgusReach] No unread messages.
+2026-03-15 23:01:27 Cycle complete. Next check in 10 min.
+
+2026-03-15 23:11:06 [ArgusReach] Checking inbox...
+2026-03-15 23:11:07 [ArgusReach] 1 unread message(s).
+2026-03-15 23:11:08 [ArgusReach] Skipping duplicate: silvanadantonio1@gmail.com
+2026-03-15 23:11:08 Cycle complete. Next check in 10 min.
+
+2026-03-15 23:11:27 [ArgusReach] Checking inbox...
+2026-03-15 23:11:28 [ArgusReach] No unread messages.
+2026-03-15 23:11:28 Cycle complete. Next check in 10 min.
+
+2026-03-15 23:15:12 ArgusReach Monitor v2 starting
+2026-03-15 23:15:13 [ArgusReach] Checking inbox...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:597: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(hours=24)).strftime('%d-%b-%Y')
+2026-03-15 23:15:14 [ArgusReach] 23 message(s) in last 24h.
+2026-03-15 23:15:14 [ArgusReach] Processing: Silvana Maria <silvanadantonio1@gmail.com>
+2026-03-15 23:15:16 [Instantly] Pause handled by stop_on_reply campaign setting for silvanadantonio1@gmail.com
+2026-03-15 23:15:18 [Airtable] Prospect not found: silvanadantonio1@gmail.com — skipping sync
+2026-03-15 23:15:19 [ArgusReach] Processing: Vito Resciniti <vresciniti27@gmail.com>
+2026-03-15 23:15:23 [ArgusReach] Skipping — not a reply to our outreach: vresciniti27@gmail.com
+2026-03-15 23:15:23 [ArgusReach] Processing: Vito Resciniti <vresciniti27@gmail.com>
+2026-03-15 23:15:27 [ArgusReach] Skipping — not in prospect list: dealermail@netaudiencepro3.click
+2026-03-15 23:15:28 [ArgusReach] Skipping — not in prospect list: a.ahmed@woodburybusinessbroker.com
+2026-03-15 23:15:28 [ArgusReach] Skipping — not in prospect list: j-grabowski@01-machine.top
+2026-03-15 23:15:28 [ArgusReach] Skipping — not in prospect list: autum.winters@cozychics.com
+2026-03-15 23:15:28 [ArgusReach] Skipping — not in prospect list: jude.pedraza@rontervia.com
+2026-03-15 23:15:29 [ArgusReach] Skipping — not in prospect list: breonna.heinrich@greatoutdoorguides.com
+2026-03-15 23:15:29 [ArgusReach] Skipping — not in prospect list: iris.carlberg@talkmore.forum
+2026-03-15 23:15:29 [ArgusReach] Skipping — not in prospect list: h.schott@metroheadlinehub.com
+2026-03-15 23:15:30 [ArgusReach] Skipping — not a reply to our outreach: esahc.bm@emtny.tec-send5.com
+2026-03-15 23:15:30 [ArgusReach] Skipping — not in prospect list: james@en-news0523.com
+2026-03-15 23:15:30 [ArgusReach] Skipping — not in prospect list: nicole.oneill@usetegteam.com
+2026-03-15 23:15:31 Daily digest sent.
+2026-03-15 23:15:31 Cycle complete. Next check in 10 min.
+

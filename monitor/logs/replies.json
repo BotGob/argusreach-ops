@@ -148,5 +148,45 @@
     "sent": false,
     "notes": "Unsubscribe request processed. Prospect rejected outreach and expressed anti-AI sentiment. Do not re-contact.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:01:06.741264",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "not_now",
+    "draft_preview": "Silvana,\n\nTotally understand - team buy-in matters. If things shift down the line or you want to explore how this works without disrupting your team dynamic, I'm here.\n\nhttps://calendly.com/vito-argus",
+    "sent": false,
+    "notes": "Prospect has internal blockers around AI adoption - may be worth revisiting in 3-6 months or with different messaging around amplification vs replacement.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:15:19.506657",
+    "client": "pt_tampa_bay_test",
+    "prospect": "silvanadantonio1@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Silvana,\n\nPerfect - looking forward to connecting. Let me know if you have any questions before we chat.\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": false,
+    "notes": "Prospect confirmed booking intent - warm lead ready for calendar step.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:15:22.938904",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH - Prospect name is 'Vito Resciniti' (same as sender). Email requests 'all personal information on this company' and 'all your data,' suggesting confusion about who is being contacted or potential impersonation/security concern. Requires manual review before any response.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-15T23:15:27.413654",
+    "client": "pt_tampa_bay_test",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH + IDENTITY VERIFICATION NEEDED: Outbound email referenced mental health practices and OB-GYNs/neurologists (wrong vertical for PT), but prospect name matches sender (Vito Resciniti). Verify this is a legitimate prospect and not an internal email, misdirected campaign, or system error before responding.",
+    "test_mode": false
   }
 ]
