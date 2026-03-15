@@ -301,7 +301,8 @@ def load_pending():
 def save_pending(pending):
     PENDING_FILE.write_text(json.dumps(pending, indent=2))
 
-def queue_pending(client, from_email, from_name, subject, draft, classification):
+def queue_pending(client, from_email, from_name, subject, draft, classification,
+                  in_reply_to=None, references=None):
     pending = load_pending()
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
@@ -316,6 +317,8 @@ def queue_pending(client, from_email, from_name, subject, draft, classification)
         'draft': draft,
         'classification': classification,
         'queued_at': datetime.now().isoformat(),
+        'in_reply_to': in_reply_to or '',
+        'references': references or in_reply_to or '',
     }
     pending.append(entry)
     save_pending(pending)
@@ -406,8 +409,9 @@ def is_spam(msg, body):
         return True
     return False
 
-def _send_email(outreach_email, app_password, sender_name, to_email, subject, body, retry=1):
-    """Send via Gmail SMTP with one retry."""
+def _send_email(outreach_email, app_password, sender_name, to_email, subject, body, retry=1,
+                in_reply_to=None, references=None):
+    """Send via Gmail SMTP with one retry. Pass in_reply_to/references for proper threading."""
     msg = MIMEMultipart('alternative')
     msg['From'] = f'{sender_name} <{outreach_email}>'
     msg['To'] = to_email
@@ -416,6 +420,11 @@ def _send_email(outreach_email, app_password, sender_name, to_email, subject, bo
     if isinstance(decoded_subject, bytes):
         decoded_subject = decoded_subject.decode('utf-8', errors='ignore')
     msg['Subject'] = decoded_subject if decoded_subject.lower().startswith('re:') else f'Re: {decoded_subject}'
+    # Threading headers — critical for deliverability and inbox threading
+    # Without these, Yahoo/Outlook treat the reply as a new cold email and spam-filter it
+    if in_reply_to:
+        msg['In-Reply-To'] = in_reply_to
+        msg['References'] = references or in_reply_to
     # Convert plain text body to clean HTML with proper spacing
     paragraphs = [p.strip() for p in body.strip().split('\n\n') if p.strip()]
     html_body = '\n'.join(f'<p>{p.replace(chr(10), "<br>")}</p>' for p in paragraphs)
@@ -606,9 +615,11 @@ def process_client(client, processed_ids):
             msg = email.message_from_bytes(raw_email)
 
             from_name, from_email = email.utils.parseaddr(msg.get('From', ''))
-            subject   = msg.get('Subject', '(no subject)')
-            date_str  = msg.get('Date', '')
-            body      = get_body(msg)
+            subject      = msg.get('Subject', '(no subject)')
+            date_str     = msg.get('Date', '')
+            body         = get_body(msg)
+            message_id   = msg.get('Message-ID', '')
+            references   = msg.get('References', message_id)
 
             if not body.strip():
                 mail.store(msg_id, '+FLAGS', '\\Seen')
@@ -679,7 +690,8 @@ def process_client(client, processed_ids):
             if escalate:
                 # Save to pending_approvals so Gob can read body and draft a response
                 esc_id = queue_pending(client, from_email, from_name, subject,
-                                       draft='', classification='escalated')
+                                       draft='', classification='escalated',
+                                       in_reply_to=message_id, references=references)
                 # Overwrite draft field with the raw email body so it's readable
                 pending = load_pending()
                 for entry in pending:
@@ -727,7 +739,8 @@ def process_client(client, processed_ids):
                         if not TEST_MODE:
                             try:
                                 _send_email(client['outreach_email'], client['app_password'],
-                                            client['sender_name'], from_email, subject, draft)
+                                            client['sender_name'], from_email, subject, draft,
+                                            in_reply_to=message_id, references=references)
                                 sent = True
                             except Exception as e:
                                 log(f"SMTP error (removal ack): {e}")
@@ -736,14 +749,16 @@ def process_client(client, processed_ids):
                             log(f"[TEST] Would send removal ack to {from_email}")
                     elif client['mode'] == 'draft_approval':
                         approval_id = queue_pending(client, from_email, from_name,
-                                                    subject, draft, classification)
+                                                    subject, draft, classification,
+                                                    in_reply_to=message_id, references=references)
                         log(f"{label} Negative queued for approval (draft_approval mode): {from_email}")
 
                 elif client['mode'] == 'automated':
                     if not TEST_MODE:
                         try:
                             _send_email(client['outreach_email'], client['app_password'],
-                                        client['sender_name'], from_email, subject, draft)
+                                        client['sender_name'], from_email, subject, draft,
+                                        in_reply_to=message_id, references=references)
                             sent = True
                         except Exception as e:
                             log(f"SMTP error: {e}")
@@ -753,7 +768,8 @@ def process_client(client, processed_ids):
 
                 elif client['mode'] == 'draft_approval':
                     approval_id = queue_pending(client, from_email, from_name,
-                                                subject, draft, classification)
+                                                subject, draft, classification,
+                                                in_reply_to=message_id, references=references)
 
             # ── TELEGRAM NOTIFICATION
             emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
