@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Reports — ArgusReach Admin{% endblock %}
+{% block content %}
+<h1>Monthly Reports</h1>
+<p class="subtitle">All generated client reports. Click to view.</p>
+
+{% if files %}
+<table>
+  <thead><tr><th>File</th><th>Date</th><th>Size</th><th></th></tr></thead>
+  <tbody>
+  {% for f in files %}
+  <tr>
+    <td>{{ f.name }}</td>
+    <td style="color:#64748b;font-size:12px">{{ f.modified }}</td>
+    <td style="color:#64748b;font-size:12px">{{ (f.size / 1024)|round(1) }} KB</td>
+    <td><a href="{{ url_for('view_report', filename=f.name) }}" target="_blank" class="btn btn-ghost btn-sm">View</a></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="section" style="text-align:center;color:#64748b;padding:40px">
+  No reports generated yet. Run <code>python3 tools/monthly_report.py --client [id] --month "March 2026"</code> to generate one.
+</div>
+{% endif %}
+{% endblock %}

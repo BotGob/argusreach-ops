@@ -442,6 +442,53 @@ def campaigns():
     return render_template("campaigns.html", rows=rows, unregistered=unregistered)
 
 
+@app.route("/stats")
+@login_required
+def stats():
+    """Embed the ops dashboard HTML inside the portal."""
+    dash_path = BASE_DIR / "db" / "dashboard.html"
+    if dash_path.exists():
+        content = dash_path.read_text()
+        # Strip <html>/<body> wrapper so it embeds cleanly in iframe
+    return render_template("stats.html")
+
+
+@app.route("/flowchart")
+@login_required
+def flowchart():
+    return render_template("flowchart.html")
+
+
+@app.route("/backlog")
+@login_required
+def backlog():
+    backlog_path = BASE_DIR / "ops" / "backlog.md"
+    content = backlog_path.read_text() if backlog_path.exists() else "No backlog file found."
+    return render_template("backlog.html", content=content)
+
+
+@app.route("/reports")
+@login_required
+def reports_list():
+    reports_dir = BASE_DIR / "reports"
+    files = []
+    if reports_dir.exists():
+        for f in sorted(reports_dir.glob("*.html"), reverse=True):
+            files.append({"name": f.name, "size": f.stat().st_size, "modified": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d")})
+    return render_template("reports.html", files=files)
+
+
+@app.route("/reports/<filename>")
+@login_required
+def view_report(filename):
+    reports_dir = BASE_DIR / "reports"
+    path = reports_dir / filename
+    if not path.exists() or not path.suffix == ".html":
+        flash("Report not found.", "error")
+        return redirect(url_for("reports_list"))
+    return path.read_text()
+
+
 @app.route("/health")
 def health():
     return {"status": "ok", "ts": datetime.utcnow().isoformat()}
