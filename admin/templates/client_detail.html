@@ -19,6 +19,47 @@
   <div class="card"><div class="card-label">DNC Entries</div><div class="card-value">{{ dnc_count }}</div></div>
 </div>
 
+<!-- Campaign Setup Panel -->
+<div class="section" style="margin-bottom:20px;border:1px solid {% if client.instantly_campaign_id %}rgba(34,197,94,0.3){% else %}rgba(239,68,68,0.3){% endif %}">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="section-title">🔗 Campaign Connection</div>
+    {% if client.instantly_campaign_id %}
+      <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:3px 10px;border-radius:20px">Connected</span>
+    {% else %}
+      <span style="font-size:11px;background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:3px 10px;border-radius:20px">⚠️ Not connected — monitor will not run</span>
+    {% endif %}
+  </div>
+  <form method="POST" action="{{ url_for('client_update', client_id=client.id) }}">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID</label>
+        <input name="instantly_campaign_id" value="{{ client.instantly_campaign_id or '' }}" placeholder="UUID from Instantly" style="width:100%;font-family:monospace;font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label>
+        <input name="campaign_name" value="{{ client.campaign_name or '' }}" placeholder="ArgusReach — Firm — Month Year" style="width:100%;font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label>
+        <input name="launch_date" value="{{ client.launch_date or '' }}" placeholder="YYYY-MM-DD" style="width:100%;font-size:12px">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Monitor Status</label>
+        <select name="active" style="width:100%;font-size:12px">
+          <option value="true" {% if client.active %}selected{% endif %}>🟢 Active — monitor running</option>
+          <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused — monitor skipping</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Save Campaign Settings</button>
+    {% if not client.instantly_campaign_id %}
+    <p style="font-size:11px;color:#64748b;margin-top:10px">
+      Run <code style="background:#1a2030;padding:2px 6px;border-radius:3px">python3 tools/campaign_create.py --client {{ client.id }}</code> on the server to create the Instantly campaign, then paste the campaign ID above.
+    </p>
+    {% endif %}
+  </form>
+</div>
+
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
   <!-- Upload DNC -->

@@ -298,6 +298,32 @@ def client_detail(client_id):
     )
 
 
+@app.route("/clients/<client_id>/update", methods=["POST"])
+@login_required
+def client_update(client_id):
+    """Update campaign ID, activate/deactivate, set launch date — the fields that connect a client to Instantly."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    f = request.form
+    if "instantly_campaign_id" in f:
+        client["instantly_campaign_id"] = f["instantly_campaign_id"].strip()
+    if "campaign_name" in f:
+        client["campaign_name"] = f["campaign_name"].strip()
+    if "launch_date" in f:
+        client["launch_date"] = f["launch_date"].strip()
+    if "active" in f:
+        client["active"] = f["active"] == "true"
+
+    save_clients(config)
+    sync_client_from_config(client)
+    flash("Client updated.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/clients/<client_id>/dnc", methods=["POST"])
 @login_required
 def upload_dnc(client_id):
