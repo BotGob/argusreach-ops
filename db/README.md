@@ -2,90 +2,108 @@
 
 Single SQLite source of truth for all prospect, campaign, event, meeting, and revenue data.
 
-## Why This Exists
+## What's in the DB
 
-Instantly tracks opens/clicks/sends. We track everything downstream:
-- Reply intent (interested / not_now / ooo / unsubscribe)
-- Draft approval state
-- Meetings booked (via Calendly)
-- Revenue (via Stripe)
-- Full prospect journey from first email → closed deal
+| Table | Purpose |
+|-------|---------|
+| `clients` | One row per client (synced from clients.json) |
+| `campaigns` | Campaign stats synced from Instantly API |
+| `prospects` | Every prospect with current stage |
+| `events` | Immutable event log — every touchpoint |
+| `meetings` | Calendly bookings |
+| `revenue` | Stripe payments |
+
+## Prospect Stages
+
+`added → emailed → opened → replied → replied_by_us → meeting_booked → closed_won / closed_lost / unsubscribed`
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `database.py` | Schema, connection helpers, write functions |
-| `instantly_sync.py` | Pull campaign stats from Instantly API → DB |
-| `generate_dashboard.py` | Generate `dashboard.html` from DB |
+| `database.py` | Schema, helpers, DB connection |
+| `instantly_sync.py` | Pull campaign stats from Instantly API |
+| `generate_dashboard.py` | Build `dashboard.html` from DB |
+| `dashboard.html` | Generated ops dashboard (open in browser) |
 | `argusreach.db` | SQLite database (gitignored) |
-| `dashboard.html` | Generated ops dashboard (gitignored) |
 
 ## Setup
 
-### 1. Install dependencies
+### 1. Install deps
 ```bash
-pip install flask stripe requests python-dotenv
+pip install flask stripe python-dotenv requests
 ```
 
-### 2. Initialize DB
-```bash
-cd argusreach/db
-python3 database.py
-```
-
-### 3. Add env vars to `monitor/.env`
+### 2. Add to monitor/.env
 ```
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_SECRET_KEY=sk_live_...
 ```
 
-## Usage
+Get `STRIPE_WEBHOOK_SECRET` from Stripe Dashboard → Developers → Webhooks → your endpoint → Signing secret.
 
-### Sync Instantly campaign stats
+### 3. Initialize DB
 ```bash
-python3 argusreach/db/instantly_sync.py
+cd argusreach/db
+python3 database.py
 ```
 
-### Generate dashboard
+## Running the Webhook Server
+
+### Manual
 ```bash
-python3 argusreach/db/generate_dashboard.py
-# Opens argusreach/db/dashboard.html
+cd argusreach/webhooks
+python3 server.py
 ```
 
-### Start webhook server
+### As a systemd service
 ```bash
-python3 argusreach/webhooks/server.py
-# Runs on port 5055
-```
-
-### Install as systemd service
-```bash
-sudo cp argusreach/webhooks/argusreach-webhooks.service /etc/systemd/system/
+sudo cp argusreach-webhooks.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now argusreach-webhooks
+sudo systemctl enable argusreach-webhooks
+sudo systemctl start argusreach-webhooks
 sudo systemctl status argusreach-webhooks
 ```
 
-## Stripe Webhook Setup
-1. Go to Stripe Dashboard → Webhooks → Add endpoint
-2. URL: `https://yourdomain.com/webhooks/stripe`
-3. Event: `checkout.session.completed`
-4. Copy signing secret → add as `STRIPE_WEBHOOK_SECRET` in `monitor/.env`
+### Expose to internet (for Stripe/Calendly)
+If behind NAT, use a tunnel or configure nginx. Stripe and Calendly need a public HTTPS URL.
+Webhook URLs to register:
+- **Stripe:** `https://yourdomain.com/webhooks/stripe`
+- **Calendly:** `https://yourdomain.com/webhooks/calendly`
 
-## Calendly Webhook Setup
-1. Go to Calendly → Integrations → Webhooks
-2. URL: `https://yourdomain.com/webhooks/calendly`
-3. Events: `invitee.created`, `invitee.canceled`
+## Syncing Instantly Stats
 
-## DB Schema
+```bash
+cd argusreach/db
+python3 instantly_sync.py
+```
 
-- **clients** — one row per client (synced from clients.json)
-- **campaigns** — Instantly campaign stats (updated by sync)
-- **prospects** — every contact, with current stage
-- **events** — immutable log of every touchpoint
-- **meetings** — Calendly bookings
-- **revenue** — Stripe payments
+Add to crontab for hourly sync:
+```
+0 * * * * cd /home/argus/.openclaw/workspace/argusreach/db && python3 instantly_sync.py >> /tmp/instantly_sync.log 2>&1
+```
 
-## Prospect Stages
-`added → emailed → opened → replied → replied_by_us → meeting_booked → closed_won / closed_lost / unsubscribed`
+## Generating the Dashboard
+
+```bash
+cd argusreach/db
+python3 generate_dashboard.py
+# Opens: argusreach/db/dashboard.html
+```
+
+Add to crontab for hourly refresh:
+```
+15 * * * * cd /home/argus/.openclaw/workspace/argusreach/db && python3 generate_dashboard.py >> /tmp/dashboard.log 2>&1
+```
+
+## Environment Variables
+
+All loaded from `argusreach/monitor/.env`:
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `INSTANTLY_API_KEY` | Yes | Instantly API sync |
+| `STRIPE_WEBHOOK_SECRET` | Yes (webhooks) | Verify Stripe payloads |
+| `STRIPE_SECRET_KEY` | Yes (webhooks) | Stripe SDK |
+| `ARGUSREACH_BOT_TOKEN` | Yes | Telegram notifications |
+| `ARGUSREACH_CHAT_ID` | Yes | Telegram chat target |

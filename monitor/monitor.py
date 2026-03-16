@@ -33,6 +33,17 @@ from dotenv import load_dotenv
 # ── PATHS ─────────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
 load_dotenv(BASE_DIR / '.env')   # load .env before reading os.environ below
+
+# ── DATABASE ──────────────────────────────────────────────────────────────────
+try:
+    sys.path.insert(0, str(BASE_DIR.parent))
+    from db.database import init_db as _init_db, log_event as _log_event, \
+        upsert_prospect as _upsert_prospect, update_prospect_stage as _update_stage, \
+        prospect_id as _prospect_id
+    _DB_ENABLED = True
+except Exception as _db_err:
+    _DB_ENABLED = False
+    print(f"[DB] Warning: database layer not available: {_db_err}")
 CLIENTS_FILE    = BASE_DIR / 'clients.json'
 LOG_DIR         = BASE_DIR / 'logs'
 DNC_DIR         = BASE_DIR / 'dnc'
@@ -43,6 +54,13 @@ MONITOR_LOG     = LOG_DIR / 'monitor.log'
 
 LOG_DIR.mkdir(exist_ok=True)
 DNC_DIR.mkdir(exist_ok=True)
+
+# Init DB on startup
+if _DB_ENABLED:
+    try:
+        _init_db()
+    except Exception as _e:
+        print(f"[DB] Init failed: {_e}")
 
 # ── DATABASE ──────────────────────────────────────────────────────────────────
 try:
@@ -825,6 +843,19 @@ def process_client(client, processed_ids):
                 new_processed.add(fingerprint)
                 continue
 
+            # ── DATABASE: log classification event
+            if _DB_ENABLED:
+                try:
+                    _pid = _upsert_prospect(cid, client.get('instantly_campaign_id',''),
+                                            from_email, '', '', '', 'replied')
+                    _log_event(cid, _pid, 'classified', {
+                        'classification': classification,
+                        'subject': subject,
+                        'from_name': from_name
+                    })
+                except Exception as _e:
+                    log(f"[DB] classify log failed: {_e}")
+
             # ── INSTANTLY: pause sequence on any real reply
             if classification not in ('ooo',) and not escalate:
                 instantly_pause_contact(
@@ -916,6 +947,21 @@ def process_client(client, processed_ids):
             new_processed.add(fingerprint)
             log_reply(cid, from_email, classification, draft, sent,
                       result.get('notify_reason', ''))
+
+            # ── DATABASE: log send/queue outcome
+            if _DB_ENABLED:
+                try:
+                    _pid2 = _prospect_id(cid, from_email)
+                    if sent:
+                        _log_event(cid, _pid2, 'reply_sent', {'to': from_email, 'subject': subject})
+                        _update_stage(_pid2, 'replied_by_us')
+                    elif approval_id:
+                        _log_event(cid, _pid2, 'draft_queued', {
+                            'classification': classification,
+                            'approval_id': approval_id
+                        })
+                except Exception as _e:
+                    log(f"[DB] outcome log failed: {_e}")
 
             # ── DB: record prospect + events
             if _DB_ENABLED:

@@ -4,4 +4,5 @@ monitor/.env
 
 # Database
 db/argusreach.db
-db/dashboard.html
+__pycache__/
+*.pyc
