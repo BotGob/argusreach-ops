@@ -76,6 +76,29 @@
         "compliance_note": "What the AI should NEVER say or promise for this client specifically",
         "instantly_campaign_id": "Campaign ID from Instantly dashboard. IMPORTANT: all campaigns must be created with stop_on_reply=true in Instantly UI \u2014 this handles sequence pausing automatically when a prospect replies."
       }
+    },
+    {
+      "_comment": "MULTI-CLIENT TEST \u2014 fake sober living practice, gobbot95@gmail.com inbox",
+      "id": "sober_living_test",
+      "active": false,
+      "mode": "draft_approval",
+      "outreach_email": "gobbot95@gmail.com",
+      "app_password": "hpck wpdv baad nmbx",
+      "sender_name": "Vito Resciniti",
+      "title": "Founder",
+      "firm_name": "Creekside Recovery",
+      "vertical": "SoberLiving",
+      "calendly_link": "https://calendly.com/vito-argusreach/30min",
+      "instantly_campaign_id": "",
+      "campaign_name": "",
+      "launch_date": "",
+      "contacts_per_month": 200,
+      "client_email": "",
+      "icp_summary": "Therapists, treatment centers, and discharge planners who refer clients to sober living homes in Atlanta and Tampa Bay.",
+      "tone": "warm-professional",
+      "compliance_note": "Do not make clinical claims. Do not promise specific referral numbers.",
+      "positioning_note": "ArgusReach builds the referral pipeline so Creekside can focus on resident care.",
+      "prospects_csv": "campaigns/sober_living_test/prospects.csv"
     }
   ]
 }
