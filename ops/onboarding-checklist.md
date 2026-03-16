@@ -43,7 +43,7 @@
   - [ ] Email forward
   - [ ] Telegram/text notification
   - [ ] Slack
-- Reporting preference: weekly digest or real-time?
+- Reporting preference: client receives monthly activity summary by email (standard)
 - Do-not-contact list: upload any existing contacts we must skip
 
 ---
@@ -63,7 +63,7 @@
 - [ ] Export first batch (200–1,000 based on plan) — verify quality
 
 ### Email Sequences
-- [ ] Write sequence drafts (3 versions per touch for A/B)
+- [ ] Write 3-touch sequence (one version per touch — no A/B testing)
 - [ ] Apply client voice — read against their LinkedIn posts, website copy
 - [ ] Compliance review (especially for RIAs): no performance promises
 - [ ] Send sequence drafts to client via email for review
@@ -110,31 +110,24 @@
 
 ---
 
-## Week 1 Check-In
-- [ ] Send client summary: emails sent, open rate, early replies
-- [ ] Flag any positive replies immediately (same day)
-- [ ] Adjust subject lines if open rate < 25%
-- [ ] Adjust body copy if positive reply rate < 2% after 100+ sends
-- [ ] Confirm calendar integration is working — test with a fake booking if needed
+## Week 1 Monitor
+- [ ] Verify first emails sent in Instantly — confirm delivery, no bounce spike
+- [ ] Monitor replies.json — flag any positive replies to Vito immediately (same day)
+- [ ] Confirm Calendly link in sequence is correct and working
+- [ ] Check Telegram alerts group — confirm monitor is firing notifications correctly
+- [ ] Note: no client-facing check-in in Week 1 — next client touchpoint is monthly report
 
 ---
 
-## Monthly Reporting Template
+## Monthly Reporting
 
-**Subject:** ArgusReach — [Month] Performance Report — [Client Firm]
+Use `tools/monthly_report.py` — do not use this template manually.
 
-**Summary:**
-- Emails sent: [X]
-- Open rate: [X%]
-- Positive replies: [X] ([X%])
-- Meetings booked: [X]
-- Hot leads in progress: [X]
+```
+python3 tools/monthly_report.py --client [client_id] --month "Month YYYY"
+```
 
-**What worked:** [e.g., Subject line variant B outperformed A by 40%]
-
-**What we're changing next month:** [e.g., Testing a new angle focused on renewal timing]
-
-**Next steps:** [Your calendar link for monthly call if applicable]
+Report includes: contacts reached, positive replies, not-now, meetings booked, unsubscribes, campaign history table, what worked, what's changing. Sent automatically to client_email in clients.json.
 
 ---
 

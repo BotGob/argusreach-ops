@@ -176,27 +176,32 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
       <!-- Phase 2 -->
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup</td>
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup<br><span style="font-weight:400;color:#555;font-size:0.65rem;">~2 weeks</span></td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#60a5fa;">●</span> 45-min onboarding call (ICP, voice, targets)<br>
-          <span style="color:#60a5fa;">●</span> Set up client sending domain + Gmail Workspace<br>
+          <span style="color:#60a5fa;">●</span> 45-min onboarding call (ICP, voice, targets, DNC list)<br>
+          <span style="color:#60a5fa;">●</span> Access client's domain registrar (screen share or login)<br>
           <span style="color:#60a5fa;">●</span> Configure SPF / DKIM / DMARC DNS records<br>
-          <span style="color:#60a5fa;">●</span> Add client to Instantly + begin warmup<br>
-          <span style="color:#60a5fa;">●</span> Add client block to clients.json (launch_date, client_email, etc.)<br>
-          <span style="color:#60a5fa;">●</span> Build Apollo prospect list → NeverBounce verify<br>
-          <span style="color:#60a5fa;">●</span> Write 3-touch sequence (sequence.md)<br>
-          <span style="color:#60a5fa;">●</span> Create Instantly campaign + load prospects<br>
-          <span style="color:#60a5fa;">●</span> Run validator (validate_campaign.py) — must pass 0 errors
+          <span style="color:#60a5fa;">●</span> Create Gmail app password on client's sending account<br>
+          <span style="color:#60a5fa;">●</span> Add sending email to Instantly + begin warmup<br>
+          <span style="color:#60a5fa;">●</span> Add client block to clients.json (all required fields)<br>
+          <span style="color:#60a5fa;">●</span> Build Apollo prospect list → NeverBounce verify → dedupe.py vs DNC + relationships<br>
+          <span style="color:#60a5fa;">●</span> Write 3-touch sequence → send to client for approval<br>
+          <span style="color:#fbbf24;">⚠️ Create Instantly campaign manually</span> <span style="color:#555;font-size:0.65rem;">(campaign creation script not built yet)</span><br>
+          <span style="color:#60a5fa;">●</span> Run validator (validate_campaign.py) — must pass 0 errors<br>
+          <span style="color:#60a5fa;">●</span> Set active: true in clients.json once approved + warmed
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#4ade80;">●</span> Instantly: email warmup runs automatically (~2 wks)<br>
           <span style="color:#4ade80;">●</span> DNS propagates (SPF/DKIM/DMARC)<br>
-          <span style="color:#4ade80;">●</span> Monitor begins watching new client inbox (active: true)
+          <span style="color:#4ade80;">●</span> Monitor automatically begins watching new inbox when active: true
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#a78bfa;">●</span> Reviews 3-touch email sequence<br>
-          <span style="color:#a78bfa;">●</span> Approves or requests edits (one round)<br>
-          <span style="color:#a78bfa;">●</span> Provides existing contact list (people to exclude)
+          <span style="color:#a78bfa;">●</span> Purchases secondary sending domain (e.g. outreach.theirfirm.com) — NOT their main domain<br>
+          <span style="color:#a78bfa;">●</span> Purchases Google Workspace on that domain (~$7/mo)<br>
+          <span style="color:#a78bfa;">●</span> Provides domain registrar access OR joins 30-min screen share for DNS setup<br>
+          <span style="color:#a78bfa;">●</span> Provides existing contact / relationship list (DNC cross-reference)<br>
+          <span style="color:#a78bfa;">●</span> Reviews 3-touch email sequence — approves or requests one round of edits<br>
+          <span style="color:#a78bfa;">●</span> Written approval to launch (email confirmation)
         </td>
       </tr>
 
@@ -866,6 +871,48 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">FUTURE</span>
           <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Monthly report auto-gen + client dashboard</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Pull stats from Airtable → report template → email to client. Build once revenue justifies investment.</div></div>
         </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CHAIN GAPS -->
+<div style="margin-bottom:48px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#f87171;margin-bottom:6px;">⚠️ Chain Gaps — Breaks in the System</h2>
+  <div style="font-size:0.72rem;color:#555;margin-bottom:20px;">Things that are not yet built or not yet done — gaps in the full chain from sale to report. Must be resolved before scaling.</div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <div style="background:#1a0f0f;border:1px solid rgba(248,113,113,0.25);border-radius:8px;padding:16px 20px;">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f87171;margin-bottom:8px;">🔴 CRITICAL — Must Fix Before First Client</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Payment System</span> — No way for clients to pay the $500 setup fee or $750+/mo. No Stripe, invoice system, or payment link exists. Cannot formally onboard a paying client without this.</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">DocuSign / HelloSign</span> — No digital signature capability. Service agreement cannot be formally executed. (Vito action: set up free tier on DocuSign or HelloSign.)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Client-Facing Onboarding Guide</span> — No document exists telling the client what THEY need to do: buy domain, buy Google Workspace, provide access, set up Calendly. The internal checklist exists but nothing is client-ready.</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Campaign Creation Script</span> — Creating a new Instantly campaign is still fully manual (copy-paste, API calls, prospects.csv sync). One wrong step corrupts the campaign. Script must be built before first client launch. (Backlog #5)</div>
+      </div>
+    </div>
+
+    <div style="background:#141209;border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:16px 20px;">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fbbf24;margin-bottom:8px;">🟡 GAPS — System Exists But Chain Is Broken</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Contacts Reached (Monthly Report)</span> — Vito must manually enter how many contacts were sent to. Not pulled from Instantly API automatically. Risk: wrong number in client report.</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Meetings Booked (Monthly Report + Records)</span> — No Calendly webhook. Client must manually email vito@argusreach.com when a meeting is confirmed. Risk: client forgets → prospect gets re-contacted → bad experience. (Backlog #11)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">DNC List System</span> — No formal do-not-contact registry across clients. Prospects who book, unsubscribe, or opt out are not centrally tracked. Risk: re-contacting someone who already said no.</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Apollo Paid + NeverBounce</span> — Free Apollo tier gives generic info@ emails only. Paid ($49/mo) required for personal emails by title. NeverBounce required to verify list before loading. Neither is active yet. (Vito action: backlog #9)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Instantly Trial Expiring</span> — Free trial expires March 23, 2026. Growth plan ($47/mo) must be purchased before then or all campaigns pause. (Vito action: upgrade now)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Instantly Sequence Copy (PT Tampa Bay)</span> — Current test campaign sequence says "mental health practices" — wrong vertical. Must be rewritten before any real prospect is enrolled. (Backlog #5a)</div>
+      </div>
+    </div>
+
+    <div style="background:#0f1209;border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:16px 20px;">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:8px;">🟢 KNOWN — Planned, Not Yet Built (Post-MVP)</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Calendly Webhook → Airtable + Telegram</span> — When prospect books, auto-update records + alert Vito. Needs Calendly paid ($10/mo). (Backlog #11)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Monthly Report Auto-Generation</span> — Pull contacts + meetings from Instantly/Calendly APIs automatically, no manual entry. (Backlog #12)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Client Dashboard</span> — Read-only Airtable share link per client for campaign visibility. (Backlog #14)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Bitcoin Payment Acceptance</span> — BTCPay Server or similar. (Backlog)</div>
       </div>
     </div>
 
