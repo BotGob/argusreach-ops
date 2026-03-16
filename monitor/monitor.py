@@ -337,13 +337,14 @@ def save_pending(pending):
 def queue_pending(client, from_email, from_name, subject, draft, classification,
                   in_reply_to=None, references=None):
     pending = load_pending()
-    # Dedup: if a pending entry already exists for this prospect, replace it (don't double-notify)
+    # Dedup: if a pending entry already exists for this prospect, replace it but ALWAYS notify
+    # (suppressing was causing silent re-queues with no Telegram alert — fixed 2026-03-16)
     is_new = True
     existing_idx = next((i for i, e in enumerate(pending) if e.get('from_email') == from_email and e.get('client_id') == client['id']), None)
     if existing_idx is not None:
-        log(f"[{client['firm_name']}] Replacing existing pending entry for {from_email} (suppressing duplicate notification)")
+        log(f"[{client['firm_name']}] Replacing existing pending entry for {from_email} (re-notifying)")
         pending.pop(existing_idx)
-        is_new = False
+        is_new = True  # always notify so nothing sits silently
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
         'client_id': client['id'],
