@@ -347,19 +347,22 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
         is_new = True  # always notify so nothing sits silently
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
-        'client_id': client['id'],
-        'firm_name': client['firm_name'],
-        'outreach_email': client['outreach_email'],
-        'app_password': client['app_password'],
-        'sender_name': client['sender_name'],
-        'from_email': from_email,
-        'from_name': from_name,
-        'subject': subject,
-        'draft': draft,
-        'classification': classification,
-        'queued_at': datetime.now().isoformat(),
-        'in_reply_to': in_reply_to or '',
-        'references': references or in_reply_to or '',
+        'client_id':             client['id'],
+        'firm_name':             client['firm_name'],
+        'campaign_name':         client.get('campaign_name', ''),
+        'instantly_campaign_id': client.get('instantly_campaign_id', ''),
+        'client_email':          client.get('client_email', ''),
+        'outreach_email':        client['outreach_email'],
+        'app_password':          client['app_password'],
+        'sender_name':           client['sender_name'],
+        'from_email':            from_email,
+        'from_name':             from_name,
+        'subject':               subject,
+        'draft':                 draft,
+        'classification':        classification,
+        'queued_at':             datetime.now().isoformat(),
+        'in_reply_to':           in_reply_to or '',
+        'references':            references or in_reply_to or '',
     }
     pending.append(entry)
     save_pending(pending)
@@ -921,11 +924,11 @@ def process_client(client, processed_ids):
                      'negative': '🚫', 'ooo': '🏖', 'other': '⚠️'}.get(classification, '📬')
 
             if is_new_notification:
-                campaign_name = client.get('campaign_name', client.get('instantly_campaign_id', '')[:8] if client.get('instantly_campaign_id') else '')
+                campaign_name = client.get('campaign_name', '')
                 msg_lines = [
                     f"{emoji} *{firm}* — {classification.upper()}",
-                    f"Campaign: {campaign_name}" if campaign_name else None,
-                    f"From: {from_name or from_email}",
+                    f"📋 Campaign: {campaign_name}" if campaign_name else None,
+                    f"👤 From: {from_name or from_email} `<{from_email}>`",
                     f"_{result.get('reasoning', '')}_ ",
                 ]
                 msg_lines = [l for l in msg_lines if l is not None]

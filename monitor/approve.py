@@ -32,6 +32,15 @@ PENDING_FILE = BASE_DIR / 'logs' / 'pending_approvals.json'
 REPLY_LOG    = BASE_DIR / 'logs' / 'replies.json'
 MONITOR_LOG  = BASE_DIR / 'logs' / 'monitor.log'
 
+# Database integration (non-fatal if unavailable)
+_DB_ENABLED = False
+try:
+    sys.path.insert(0, str(BASE_DIR.parent))
+    from db.database import get_db, upsert_prospect, log_event, update_prospect_stage
+    _DB_ENABLED = True
+except Exception:
+    pass
+
 
 def log(msg):
     line = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [approve] {msg}"
@@ -73,11 +82,46 @@ def log_reply(client_id, prospect_email, classification, draft, sent, notes=''):
     REPLY_LOG.write_text(json.dumps(replies, indent=2))
 
 
+def db_write_approval(entry, approved: bool):
+    """Write approval/rejection outcome back to database."""
+    if not _DB_ENABLED:
+        return
+    try:
+        cid          = entry['client_id']
+        from_email   = entry['from_email']
+        from_name    = entry.get('from_name', '')
+        classification = entry.get('classification', 'other')
+        campaign_id  = entry.get('instantly_campaign_id', '')
+
+        pid = upsert_prospect(cid, campaign_id, from_email,
+                              from_name.split()[0] if from_name else '',
+                              from_name.split()[-1] if from_name and ' ' in from_name else '',
+                              '', 'replied')
+
+        if approved:
+            log_event(cid, pid, 'draft_approved', {
+                'classification': classification,
+                'approved_by': 'vito',
+                'approved_at': datetime.utcnow().isoformat(),
+            })
+            update_prospect_stage(pid, 'replied_by_us')
+            log(f"[DB] logged draft_approved for {from_email} → stage: replied_by_us")
+        else:
+            log_event(cid, pid, 'draft_rejected', {
+                'classification': classification,
+                'rejected_by': 'vito',
+                'rejected_at': datetime.utcnow().isoformat(),
+            })
+            log(f"[DB] logged draft_rejected for {from_email}")
+    except Exception as e:
+        log(f"[DB] write failed (non-fatal): {e}")
+
+
 def send_email(outreach_email, app_password, sender_name, to_email,
                subject, body, in_reply_to=None, references=None):
     msg = MIMEMultipart('alternative')
-    msg['From'] = f'{sender_name} <{outreach_email}>'
-    msg['To'] = to_email
+    msg['From']    = f'{sender_name} <{outreach_email}>'
+    msg['To']      = to_email
 
     decoded_subject = email_lib.header.decode_header(subject)[0][0]
     if isinstance(decoded_subject, bytes):
@@ -94,6 +138,45 @@ def send_email(outreach_email, app_password, sender_name, to_email,
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=30) as smtp:
         smtp.login(outreach_email, app_password)
         smtp.send_message(msg)
+
+
+def send_client_booking_alert(entry):
+    """
+    For positive replies: email the client (firm) to watch their calendar.
+    Only fires when the classification was 'positive' and there's a client_email set.
+    """
+    classification = entry.get('classification', '')
+    client_email   = entry.get('client_email', '')
+    if classification != 'positive' or not client_email:
+        return
+
+    prospect_display = entry.get('from_name') or entry['from_email']
+    firm_name        = entry.get('firm_name', '')
+
+    body = f"""Hi,
+
+Quick heads up — we just sent a reply to {prospect_display} ({entry['from_email']}) on your behalf and included your booking link.
+
+They indicated interest, so you may see a meeting land on your calendar soon.
+
+Please reply to this email or log in to confirm when the meeting is officially booked. This helps us track your results accurately.
+
+If the meeting doesn't materialize within a few days, no action needed — we'll continue the follow-up sequence.
+
+— ArgusReach"""
+
+    try:
+        send_email(
+            outreach_email=entry['outreach_email'],
+            app_password=entry['app_password'],
+            sender_name='ArgusReach',
+            to_email=client_email,
+            subject=f"[ArgusReach] Heads up — {prospect_display} may be booking",
+            body=body,
+        )
+        log(f"Booking alert sent to {client_email} re: {entry['from_email']}")
+    except Exception as e:
+        log(f"Booking alert failed (non-fatal): {e}")
 
 
 def do_approve(entry):
@@ -113,9 +196,16 @@ def do_approve(entry):
             in_reply_to=entry.get('in_reply_to'),
             references=entry.get('references'),
         )
-        log(f"✅ Sent to {entry['from_email']} (client: {entry['client_id']})")
+        log(f"✅ Sent to {entry['from_email']} | client: {entry['firm_name']} ({entry['client_id']}) | class: {entry.get('classification','?')}")
         log_reply(entry['client_id'], entry['from_email'],
                   entry.get('classification', 'unknown'), draft, True, 'approved by Vito')
+
+        # Write outcome to DB
+        db_write_approval(entry, approved=True)
+
+        # Alert client if positive reply
+        send_client_booking_alert(entry)
+
         return True
     except Exception as e:
         log(f"❌ SMTP error sending to {entry['from_email']}: {e}")
@@ -130,12 +220,13 @@ def cmd_list():
         return
     for p in pending:
         print(f"\n{'─'*60}")
-        print(f"ID:      {p['id']}")
-        print(f"Client:  {p['client_id']}")
-        print(f"From:    {p.get('from_name','')} <{p['from_email']}>")
-        print(f"Subject: {p['subject']}")
-        print(f"Class:   {p.get('classification','')}")
-        print(f"Queued:  {p.get('queued_at','')}")
+        print(f"ID:       {p['id']}")
+        print(f"Client:   {p['firm_name']} ({p['client_id']})")
+        print(f"Campaign: {p.get('campaign_name', p.get('client_id',''))}")
+        print(f"From:     {p.get('from_name','')} <{p['from_email']}>")
+        print(f"Subject:  {p['subject']}")
+        print(f"Class:    {p.get('classification','')}")
+        print(f"Queued:   {p.get('queued_at','')}")
         print(f"\nDraft:\n{p.get('draft','(empty)')}")
     print(f"\n{'─'*60}")
     print(f"Total: {len(pending)} pending")
@@ -156,12 +247,12 @@ def cmd_approve(target):
             print(f"No entry found matching: {target}")
             print("IDs available:")
             for p in pending:
-                print(f"  {p['id']}  ({p['from_email']})")
+                print(f"  {p['id']}  ({p['from_email']}) — {p.get('firm_name','')}")
             return
 
     sent_ids = set()
     for entry in targets:
-        print(f"\n→ Approving: {entry['from_name'] or entry['from_email']}")
+        print(f"\n→ Approving: {entry.get('from_name') or entry['from_email']} | {entry.get('firm_name','')} | {entry.get('classification','?')}")
         if do_approve(entry):
             sent_ids.add(entry['id'])
 
@@ -177,7 +268,7 @@ def cmd_reject(target):
         return
 
     if target == 'all':
-        rejected = list(pending)
+        rejected  = list(pending)
         remaining = []
     else:
         rejected  = [p for p in pending if p['id'] == target or
@@ -185,10 +276,11 @@ def cmd_reject(target):
         remaining = [p for p in pending if p not in rejected]
 
     for entry in rejected:
-        log(f"Rejected draft for {entry['from_email']} (client: {entry['client_id']})")
+        log(f"Rejected draft for {entry['from_email']} | client: {entry.get('firm_name','?')} ({entry['client_id']})")
         log_reply(entry['client_id'], entry['from_email'],
                   entry.get('classification', 'unknown'),
                   entry.get('draft', ''), False, 'rejected by Vito')
+        db_write_approval(entry, approved=False)
 
     save_pending(remaining)
     print(f"✅ Rejected {len(rejected)}, {len(remaining)} remaining in queue.")
