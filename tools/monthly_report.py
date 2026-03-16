@@ -24,7 +24,31 @@ REPORTS_DIR.mkdir(exist_ok=True)
 REPLY_LOG = BASE_DIR / 'monitor' / 'logs' / 'replies.json'
 
 def get_log_stats(client_id, month_str):
-    """Pull real reply counts from monitor reply log for a given client + month."""
+    """Pull reply counts from DB (primary) with replies.json fallback."""
+    # Try DB first
+    try:
+        sys.path.insert(0, str(BASE_DIR))
+        from db.database import get_db
+        conn = get_db()
+        counts = {'positive': 0, 'not_now': 0, 'ooo': 0, 'negative': 0, 'escalated': 0}
+        rows = conn.execute("""
+            SELECT json_extract(metadata,'$.classification') as cls, COUNT(*) as cnt
+            FROM events
+            WHERE client_id=? AND event_type='classified' AND metadata IS NOT NULL
+              AND strftime('%m %Y', created_at) = strftime('%m %Y', ?)
+            GROUP BY cls
+        """, (client_id, datetime.strptime(month_str, '%B %Y').strftime('%Y-%m-01'))).fetchall()
+        conn.close()
+        for row in rows:
+            cls = row['cls'] or 'other'
+            if cls in counts:
+                counts[cls] = row['cnt']
+        if sum(counts.values()) > 0:
+            return counts
+    except Exception:
+        pass
+
+    # Fallback to replies.json
     try:
         data = json.loads(REPLY_LOG.read_text()) if REPLY_LOG.exists() else []
     except Exception:

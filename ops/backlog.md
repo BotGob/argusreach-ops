@@ -1,150 +1,77 @@
-# ArgusReach — Ops & Product Backlog
+# ArgusReach — Ops Backlog
 
-> COO-maintained. Active items only — completed items live in the flowchart.
-> Last updated: 2026-03-16 by Gob
+> Active items only. Completed items live in the flowchart changelog.
+> Last updated: 2026-03-16
 
 ---
 
 ## 🔴 Vito — Action Required
 
 ### 1. Reach out to Creekside Recovery Residences (Carter Pope)
-- Warm intro, friend relationship — highest probability first client
-- Vertical: sober living referral pipeline (therapists, treatment centers, discharge planners)
-- Markets: Atlanta (down 25% YoY — pain point) + Tampa Bay
-- **Action:** Send the message Gob drafted.
+Warm intro, friend relationship — highest probability first client. Atlanta down 25% YoY. Message drafted.
 
-### 2. Identify 4 more warm contacts in your network to pitch
-- Use `sales/pitch-deck-script.md` for guidance
+### 2. DocuSign or HelloSign — free account
+Need for service agreement signing before first client. Free tier is fine to start.
 
-### 3. DocuSign or HelloSign account setup
-- Need for service agreement signing when first client is ready
-- Both have free tiers for low volume
+### 3. LLC filing — ArgusReach LLC
+sunbiz.org — Florida — $125. Do before first client signs.
 
-### 4. LLC filing — ArgusReach LLC
-- sunbiz.org — Florida LLC — $125
-- Do before first client signs
+### 4. Instantly.ai — upgrade to Growth ($47/mo) by March 23
+Free trial expires March 23. Don't wait — upgrade now.
 
----
+### 5. Apollo.io — upgrade to Basic ($49/mo) when first client signs
+Free tier (50 exports/mo) insufficient for client campaigns.
 
-## ✅ Completed This Session (2026-03-16) — Moved to Flowchart
-- Monthly client report generator (`tools/monthly_report.py`) — auto-pulls reply stats from log, sends HTML email, saves archive
-- Campaign history tracking per client — `reports/[client_id]_history.json`, shown in report with running totals
-- Client status dashboard (`tools/status.py`) — all clients, months active, pending approvals, reply stats
-- `/status` and `/pending` Telegram bot commands in alerts group — monitor responds with live summary
-- Monitor: UNSEEN → date-based search (survives manual inbox reads), MAX_PER_CLIENT raised to 50, per-prospect dedup in queue_pending
-- Website: 4 audit passes — touch count, open rates, A/B testing, weekly reports, demo sequence, CTA timing, stats bar, messaging reframe, performance lag fixes
-- clients.json schema: `launch_date`, `client_email`, `contacts_per_month`, `campaign_name` now required fields
-- SOUL.md updated: COO role framing added
+### 6. Stripe webhook secret + Stripe secret key
+Add to monitor/.env so Stripe payments auto-log:
+- `STRIPE_SECRET_KEY=sk_live_...`
+- `STRIPE_WEBHOOK_SECRET=whsec_...`
+Then register: https://hooks.argusreach.com/webhooks/stripe in Stripe Dashboard → Developers → Webhooks
+
+### 7. Calendly webhook registration
+Register: https://hooks.argusreach.com/webhooks/calendly in Calendly → Integrations → Webhooks
 
 ---
 
-## 🔴 Pre-Launch Gates — Must Complete Before First Real Client
+## 🔴 Pre-Launch Gates (Gob)
 
-### 5a. Fix PT Tampa Bay Instantly Sequence Copy (BLOCKING — do before any real prospect)
-- Current sequence says "mental health practices" — wrong vertical entirely
-- Also: CEO → Founder, fix any dead URLs
-- Monitor ESCALATION confirmed this is live and broken
-- **Action:** Rewrite all 3 touches in Instantly dashboard for PT Tampa Bay campaign
-- Cannot enroll real prospects until this is fixed
+### 8. Fix PT Tampa Bay sequence copy in Instantly
+Sequence says "mental health practices" — wrong vertical. Must rewrite all 3 touches before any real prospect enrolled.
 
-### 5. Campaign Creation Script (PINNED — highest priority)
-- Reads `campaigns/[client_id]/sequence.md`, creates Instantly campaign via API with proper HTML formatting
-- Also handles: prospect import into Instantly AND prospects.csv simultaneously (prevents the sync gap that caused missed replies)
-- Eliminates manual copy-paste, formatting errors, and the Instantly lead API pitfalls we discovered in testing
-- **Root cause solved:** Instantly editor doesn't format paragraphs — API is the only reliable path
-- **Decision:** Build before PT Tampa Bay launch
-
-### 7. Wire first real client into clients.json
-- Copy example block, fill in: outreach email, app password, Calendly URL, ICP, prospects_csv path
-- Set `active: true`, `mode: "draft_approval"`
-- Test IMAP connection before going live
-
-### 8. Set up client sending domain in Instantly
-- Full SOP: `ops/client-email-setup-sop.md`
-- Secondary domain (NOT user alias) required for standalone mailbox
-- DNS: MX, SPF, DKIM, DMARC — all required before launch
-- Warmup minimum 2–3 weeks before any campaign sends
-
-### 9. Apollo paid + NeverBounce (pre-campaign gate)
-- Apollo Basic ($49/mo) — needed for verified personal emails by title. Free tier only gives info@ generics.
-- NeverBounce — verify every list before loading into Instantly. Target <2% bounce rate.
-- Process: Apollo → export CSV → NeverBounce → remove invalid → load into Instantly + prospects.csv
-
-### 10. Prospect List Ingestion & Hygiene Test
-- Simulate real client onboarding with fake data before going live with a paying client
-- Cross-reference client's existing contacts vs Apollo prospects → flag overlaps → check DNC → output clean list
-- Non-negotiable: first client will have existing relationships we must not contact
+### 9. Run timers setup
+```
+sudo bash /home/argus/.openclaw/workspace/argusreach/ops/setup-timers.sh
+```
+Installs hourly systemd timers for Instantly sync + dashboard refresh.
 
 ---
 
-## 🟡 High Value — Build When First Client is Live
+## 🟡 High Value — Build After First Client Live
 
-### 11. Calendly Webhook → Airtable + Telegram
-- Meeting booked → auto-update Prospect status, add to DNC, alert Vito via Telegram
-- **Without this:** client must manually email vito@argusreach.com when a meeting is confirmed (documented in SOP). Risk: if they forget, prospect could get re-contacted after already booking.
-- **Architecture:** Client uses free Calendly Basic (our requirement). If they want webhook tracking, they upgrade to paid ($10/mo) — we can pass cost through or build into Growth plan pricing. OR: we provide Calendly link via ArgusReach account and control webhook ourselves.
-- Requires Calendly paid plan ($10/mo on client or ArgusReach account)
+### 10. Campaign creation script (sequence.json → Instantly API)
+Fully automate campaign setup from a sequence.json file. Currently `campaign_create.py` handles leads + structure but sequence must be written manually in Instantly UI first.
 
-### 12. Monthly Report Auto-Generation
-- Pull stats from Airtable → populate report template → email to client 1st of month
+### 11. Calendly webhook — client-side limitation
+For client campaigns (their Calendly), bookings go to their calendar — no visibility. Interim: client emails vito@argusreach.com when meeting confirms. Long-term: provide ArgusReach Calendly link and own the webhook.
 
-### 13. ArgusReach Self-Prospecting Domain Warm-Up
-- Set up `outreach@mail.argusreach.com` in Google Workspace
-- Add to Instantly, start warmup — for ArgusReach's own cold outreach
-- Start when first client signs (parallel track)
+### 12. ArgusReach self-prospecting domain warm-up
+Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client signs.
 
 ---
 
 ## 🟢 Scale Features (3+ Clients)
 
-### 14. Client-Facing Dashboard
-- Read-only Airtable share link per client — zero build cost
+### 13. Client-facing dashboard
+Per-client read-only view: campaign stats, reply breakdown, meetings booked. Internal portal exists — client version needs auth + filtering.
 
-### 15. Daily Send Cap Per Client (Circuit Breaker)
-- Add `max_auto_responses_per_day` to clients.json — default 10
+### 14. HubSpot CRM migration
+At 5+ clients, migrate from SQLite DB to HubSpot for CRM layer.
 
-### 16. HubSpot CRM Migration
-- Move from Airtable when 5+ clients
+### 15. Lead sourcing automation (Clay.com)
+$149/mo — replaces manual Apollo exports at 3+ simultaneous campaigns.
 
-### 17. Lead Sourcing Automation (Clay.com)
-- $149/mo — replace manual Apollo exports at 3+ simultaneous campaigns
+### 16. Bitcoin payment acceptance
+BTCPay Server (self-hosted) — when payment infrastructure is being formalized.
 
----
-
-## 💰 Pending Costs — Upgrade When First Client Signs
-
-| Tool | Current | Cost | Trigger |
-|------|---------|------|---------|
-| Instantly.ai | Free trial (expires Mar 23) | $47/mo (Growth) | First client campaign ready |
-| Apollo.io | Free (50 exports/mo) | $49/mo (Basic) | First client campaign ready |
-| Calendly | Free Basic | $10/mo | Webhook → Airtable needed |
-| Airtable | Free (1,000 records) | $20/mo | 5+ clients |
-| DocuSign/HelloSign | Free (limited) | $15-25/mo | High signing volume |
-
-> **Current monthly burn:** ~$129/mo (Claude Pro $100 + Hostinger $19.99 + Google Workspace $6 + Claude API ~$3)
-> **At first client launch:** ~$225/mo (+ Instantly $47 + Apollo $49)
-> ⚠️ Hostinger renews Mar 19 at $19.99/mo — staying monthly for now
-
----
-
-## 🚀 Post-MVP Expansion
-
-### Bitcoin Payment Acceptance
-- Build out infrastructure to accept Bitcoin as a payment method from clients
-- Research: BTCPay Server (self-hosted, no fees) vs Strike vs OpenNode vs Coinbase Commerce
-- Determine: invoice flow, confirmation handling, accounting/bookkeeping impact
-- Build when: first client is live and payment infrastructure is being formalized
-
-
-
-### Voice Calling — Argus Books Meetings by Phone
-- Argus calls positive replies within minutes, books meeting on calendar
-- Tools: Bland.ai, Vapi.ai, Retell.ai
-- Build when: 3+ active clients, proven email ROI
-
-### Longer-Term
-- Referral partner program (attorneys/accountants refer clients)
-- White-label option
-- Vertical-specific landing pages
-- Case study machine (auto-generate from Airtable data)
-- AI-personalized opening lines at scale (Clay + Claude)
+### 17. Voice calling — Argus books meetings by phone
+Bland.ai / Vapi.ai — call positive replies within minutes, book meeting on calendar. Build at 3+ clients.

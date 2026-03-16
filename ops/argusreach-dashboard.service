@@ -1,0 +1,10 @@
+[Unit]
+Description=ArgusReach — Dashboard Refresh
+
+[Service]
+Type=oneshot
+User=argus
+WorkingDirectory=/home/argus/.openclaw/workspace/argusreach/db
+ExecStart=/usr/bin/python3 generate_dashboard.py
+StandardOutput=journal
+StandardError=journal

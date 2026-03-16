@@ -1,0 +1,12 @@
+[Unit]
+Description=ArgusReach — Instantly Sync
+After=network.target
+
+[Service]
+Type=oneshot
+User=argus
+WorkingDirectory=/home/argus/.openclaw/workspace/argusreach/db
+EnvironmentFile=/home/argus/.openclaw/workspace/argusreach/monitor/.env
+ExecStart=/usr/bin/python3 instantly_sync.py
+StandardOutput=journal
+StandardError=journal

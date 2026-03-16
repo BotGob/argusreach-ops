@@ -442,6 +442,39 @@ def campaigns():
     return render_template("campaigns.html", rows=rows, unregistered=unregistered)
 
 
+@app.route("/pipeline")
+@login_required
+def pipeline():
+    conn = get_db()
+    stages = ["added","emailed","replied","replied_by_us","meeting_booked","closed_won","closed_lost","unsubscribed"]
+    
+    config = load_clients()
+    clients = [c for c in config.get("clients",[]) if not c.get("id","").startswith("_") and "example" not in c.get("id","")]
+    
+    data = []
+    for client in clients:
+        cid = client["id"]
+        stage_counts = {}
+        for row in conn.execute("SELECT stage, COUNT(*) as cnt FROM prospects WHERE client_id=? GROUP BY stage", (cid,)):
+            stage_counts[row["stage"]] = row["cnt"]
+        
+        recent = conn.execute("""
+            SELECT e.created_at, e.event_type, e.metadata, p.email, p.first_name, p.company
+            FROM events e LEFT JOIN prospects p ON p.id=e.prospect_id
+            WHERE e.client_id=? ORDER BY e.created_at DESC LIMIT 10
+        """, (cid,)).fetchall()
+        
+        data.append({
+            "id": cid,
+            "name": client.get("firm_name", cid),
+            "stage_counts": stage_counts,
+            "total": sum(stage_counts.values()),
+            "recent": [dict(r) for r in recent],
+        })
+    conn.close()
+    return render_template("pipeline.html", data=data, stages=stages)
+
+
 @app.route("/stats")
 @login_required
 def stats():

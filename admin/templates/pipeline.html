@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Pipeline — ArgusReach Admin{% endblock %}
+{% block content %}
+
+<h1>Prospect Pipeline</h1>
+<p class="subtitle">Every prospect tracked by stage across all clients.</p>
+
+{% set stage_colors = {
+  'added': '#475569',
+  'emailed': '#60a5fa',
+  'replied': '#f59e0b',
+  'replied_by_us': '#a78bfa',
+  'meeting_booked': '#a855f7',
+  'closed_won': '#22c55e',
+  'closed_lost': '#ef4444',
+  'unsubscribed': '#64748b'
+} %}
+
+{% for client in data %}
+<div class="section" style="margin-bottom:20px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div class="section-title">{{ client.name }} <span style="color:#64748b;font-weight:400;font-size:12px">— {{ client.total }} prospects tracked</span></div>
+    <a href="{{ url_for('client_detail', client_id=client.id) }}" class="btn btn-ghost btn-sm">View Client</a>
+  </div>
+
+  <!-- Funnel bar -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+    {% for stage in stages %}
+      {% set cnt = client.stage_counts.get(stage, 0) %}
+      {% if cnt > 0 %}
+      {% set color = stage_colors.get(stage, '#94a3b8') %}
+      <div style="background:{{ color }}22;border:1px solid {{ color }}44;border-radius:6px;padding:8px 14px;text-align:center;min-width:80px">
+        <div style="font-size:20px;font-weight:700;color:{{ color }}">{{ cnt }}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">{{ stage.replace('_',' ') }}</div>
+      </div>
+      {% endif %}
+    {% endfor %}
+    {% if client.total == 0 %}
+      <div style="color:#64748b;font-size:13px;padding:8px">No prospects tracked yet — will populate after first monitor cycle.</div>
+    {% endif %}
+  </div>
+
+  <!-- Recent events -->
+  {% if client.recent %}
+  <table style="border:none;background:none">
+    <thead><tr>
+      <th style="background:none;border-bottom:1px solid #1e2535">Time</th>
+      <th style="background:none;border-bottom:1px solid #1e2535">Event</th>
+      <th style="background:none;border-bottom:1px solid #1e2535">Prospect</th>
+      <th style="background:none;border-bottom:1px solid #1e2535">Detail</th>
+    </tr></thead>
+    <tbody>
+    {% for ev in client.recent %}
+    <tr>
+      <td style="color:#64748b;font-size:11px;border-bottom:1px solid #1a2030">{{ (ev.created_at or '')[:16]|replace('T',' ') }}</td>
+      <td style="border-bottom:1px solid #1a2030">
+        {% set ec = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e','draft_rejected':'#ef4444'}.get(ev.event_type,'#94a3b8') %}
+        <span style="font-size:11px;background:{{ ec }}22;color:{{ ec }};border:1px solid {{ ec }}44;padding:2px 7px;border-radius:20px">{{ ev.event_type }}</span>
+      </td>
+      <td style="font-size:12px;border-bottom:1px solid #1a2030">
+        {% if ev.first_name %}{{ ev.first_name }} — {% endif %}{{ ev.email or '—' }}
+        {% if ev.company %}<span style="color:#64748b"> · {{ ev.company }}</span>{% endif %}
+      </td>
+      <td style="font-size:11px;color:#64748b;border-bottom:1px solid #1a2030">
+        {% if ev.metadata %}{{ ev.metadata[:80] }}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% else %}
+<div class="section" style="text-align:center;color:#64748b;padding:40px">
+  No clients yet — <a href="{{ url_for('client_new') }}">add one</a>
+</div>
+{% endfor %}
+
+{% endblock %}
