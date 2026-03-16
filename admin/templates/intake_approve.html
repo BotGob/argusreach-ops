@@ -16,7 +16,7 @@
       ('Business Address', intake.business_address),
       ('Vertical', intake.vertical),
       ('Contact', intake.contact_name ~ ' · ' ~ intake.contact_email ~ (' · ' ~ intake.contact_phone if intake.contact_phone else '')),
-      ('Target Geography', intake.target_geography),
+      ('Target Geography', intake.target_geography ~ (' · ' ~ intake.target_radius if intake.target_radius else '')),
       ('Target Titles', intake.target_titles),
       ('Ideal Prospect', intake.icp_summary),
       ('Value Proposition', intake.value_prop),

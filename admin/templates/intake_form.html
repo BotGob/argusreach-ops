@@ -95,11 +95,29 @@
     </div>
 
     <div class="section-header">Who We're Targeting For You</div>
-    <div class="field">
-      <label>Target Geography <span class="req">*</span>
-        <span class="hint">City, metro area, radius, or specific zip codes. Be as specific as possible.</span>
-      </label>
-      <input name="target_geography" required placeholder="Tampa Bay area — Hillsborough, Pinellas, Pasco counties">
+    <div class="grid2">
+      <div class="field">
+        <label>Target Geography <span class="req">*</span>
+          <span class="hint">City, metro area, or specific counties/zip codes.</span>
+        </label>
+        <input name="target_geography" required placeholder="Tampa Bay area — Hillsborough, Pinellas, Pasco counties">
+      </div>
+      <div class="field">
+        <label>Target Radius from Your Office <span class="req">*</span>
+          <span class="hint">How far should we look for prospects? Closer = more referral-friendly.</span>
+        </label>
+        <select name="target_radius" required>
+          <option value="">— Select —</option>
+          <option value="5 miles">5 miles — very local</option>
+          <option value="10 miles">10 miles</option>
+          <option value="15 miles">15 miles</option>
+          <option value="25 miles">25 miles</option>
+          <option value="50 miles">50 miles</option>
+          <option value="Entire metro area">Entire metro area</option>
+          <option value="Statewide">Statewide</option>
+          <option value="No restriction">No restriction — geography doesn't matter</option>
+        </select>
+      </div>
     </div>
     <div class="field">
       <label>Target Job Titles / Roles <span class="req">*</span>

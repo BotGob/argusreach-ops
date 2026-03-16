@@ -589,6 +589,7 @@ def intake():
             "vertical":         f.get("vertical","").strip(),
             "website":          f.get("website","").strip(),
             "target_geography": f.get("target_geography","").strip(),
+            "target_radius":    f.get("target_radius","").strip(),
             "target_titles":    f.get("target_titles","").strip(),
             "icp_summary":      f.get("icp_summary","").strip(),
             "value_prop":       f.get("value_prop","").strip(),
@@ -673,6 +674,7 @@ def intake_approve(intake_id):
             "_intake_id":           intake_id,
             "_contact_name":        intake.get("contact_name",""),
             "_target_geography":    intake.get("target_geography",""),
+            "_target_radius":       intake.get("target_radius",""),
             "_target_titles":       intake.get("target_titles",""),
             "_value_prop":          intake.get("value_prop",""),
         }
