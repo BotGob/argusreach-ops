@@ -19,8 +19,9 @@ OUTPUT = Path(__file__).parent / "dashboard.html"
 def fetch_stats():
     conn = get_db()
 
-    total_prospects = conn.execute("SELECT COUNT(*) FROM prospects").fetchone()[0]
-    total_replies   = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='classified'").fetchone()[0]
+    # Pull from Instantly-synced campaigns table for accurate top-line numbers
+    total_prospects = conn.execute("SELECT COALESCE(SUM(leads_count),0) FROM campaigns").fetchone()[0]
+    total_replies   = conn.execute("SELECT COALESCE(SUM(replies),0) FROM campaigns").fetchone()[0]
     total_meetings  = conn.execute("SELECT COUNT(*) FROM meetings WHERE status='scheduled' OR status='completed'").fetchone()[0]
     total_revenue   = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue").fetchone()[0]
 
@@ -90,8 +91,8 @@ def render(stats):
     # Summary cards
     cards_html = ""
     for label, value in [
-        ("Prospects Tracked", f"{stats['total_prospects']:,}"),
-        ("Replies Received",  f"{stats['total_replies']:,}"),
+        ("Prospects Contacted", f"{stats['total_prospects']:,}"),
+        ("Replies Received",   f"{stats['total_replies']:,}"),
         ("Meetings Booked",   f"{stats['total_meetings']:,}"),
         ("Total Revenue",     rev),
     ]:
