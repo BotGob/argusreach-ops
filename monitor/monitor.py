@@ -39,7 +39,8 @@ try:
     sys.path.insert(0, str(BASE_DIR.parent))
     from db.database import init_db as _init_db, log_event as _log_event, \
         upsert_prospect as _upsert_prospect, update_prospect_stage as _update_stage, \
-        prospect_id as _prospect_id
+        prospect_id as _prospect_id, set_follow_up_date as _set_follow_up_date, \
+        get_due_followups as _get_due_followups, mark_follow_up_sent as _mark_follow_up_sent
     _DB_ENABLED = True
 except Exception as _db_err:
     _DB_ENABLED = False
@@ -134,10 +135,17 @@ def is_dnc(client_id, email_addr):
     return email_addr.lower().strip() in p.read_text().lower()
 
 def add_dnc(client_id, email_addr):
+    email_addr = email_addr.lower().strip()
+    # Write to client-specific DNC
     p = dnc_path(client_id)
     with open(p, 'a') as f:
-        f.write(email_addr.lower().strip() + '\n')
-    log(f"[DNC] Added {email_addr} for client {client_id}")
+        f.write(email_addr + '\n')
+    # Write to global DNC — protects all future clients from re-contacting this person
+    global_dnc = BASE_DIR / 'dnc' / 'global.txt'
+    global_dnc.parent.mkdir(exist_ok=True)
+    with open(global_dnc, 'a') as f:
+        f.write(email_addr + '\n')
+    log(f"[DNC] Added {email_addr} to client DNC + global DNC")
 
 # ── INSTANTLY INTEGRATION ─────────────────────────────────────────────────────
 def instantly_pause_contact(prospect_email: str, campaign_id: str = None) -> bool:
@@ -1007,6 +1015,14 @@ def process_client(client, processed_ids):
                     if sent:
                         log_event(cid, _pid, 'reply_sent', {'to': from_email})
                         update_prospect_stage(_pid, 'replied_by_us')
+                    # Store follow-up date for OOO and not_now
+                    follow_up_date = result.get('follow_up_date')
+                    if follow_up_date and classification in ('ooo', 'not_now'):
+                        try:
+                            _set_follow_up_date(_pid, follow_up_date)
+                            log(f"[DB] Follow-up date set for {from_email}: {follow_up_date}")
+                        except Exception as _fe:
+                            log(f"[DB] follow_up_date set failed (non-fatal): {_fe}")
                 except Exception as _dbe:
                     log(f"DB write error (non-fatal): {_dbe}")
 
@@ -1023,6 +1039,31 @@ def process_client(client, processed_ids):
 
 # ── DAILY DIGEST ──────────────────────────────────────────────────────────────
 _last_digest_day = None
+
+def check_due_followups():
+    """Alert when OOO or not-now prospects have hit their follow-up date."""
+    if not _DB_ENABLED:
+        return
+    try:
+        due = _get_due_followups()
+        if not due:
+            return
+        for prospect in due:
+            cid   = prospect['client_id']
+            email = prospect['email']
+            fname = prospect.get('first_name', '') or email
+            stage = prospect.get('stage', '')
+            log(f"[Follow-up] {email} ({cid}) is due for follow-up (was: {stage})")
+            notify(
+                f"📅 *Follow-up Due* — {cid}\n"
+                f"👤 {fname} `{email}`\n"
+                f"They previously replied OOO or not-now. Follow-up date has arrived.\n"
+                f"Check their thread and re-engage if appropriate."
+            )
+            _mark_follow_up_sent(prospect['id'])
+    except Exception as e:
+        log(f"[Follow-up] check failed (non-fatal): {e}")
+
 
 def maybe_send_digest():
     global _last_digest_day
@@ -1096,9 +1137,17 @@ def run():
 
             check_telegram_commands()
             maybe_send_digest()
+            check_due_followups()
 
         except Exception as e:
             log(f"Main loop error: {e}")
+
+        # Write heartbeat so external health checks can verify monitor is alive
+        try:
+            heartbeat_file = LOG_DIR / 'monitor_heartbeat.txt'
+            heartbeat_file.write_text(datetime.utcnow().isoformat())
+        except Exception:
+            pass
 
         log(f"Cycle complete. Next check in {POLL_INTERVAL // 60} min.\n")
         time.sleep(POLL_INTERVAL)

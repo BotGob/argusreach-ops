@@ -63,9 +63,13 @@ def init_db():
         last_name TEXT,
         company TEXT,
         stage TEXT DEFAULT 'added',
+        follow_up_date TEXT,
+        follow_up_sent INTEGER DEFAULT 0,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
     );
+    -- Migration: add follow_up columns if they don't exist yet
+    CREATE INDEX IF NOT EXISTS idx_prospects_followup ON prospects(follow_up_date) WHERE follow_up_date IS NOT NULL;
 
     CREATE TABLE IF NOT EXISTS events (
         id TEXT PRIMARY KEY,
@@ -153,6 +157,44 @@ def update_prospect_stage(pid: str, stage: str):
         "UPDATE prospects SET stage=?, updated_at=? WHERE id=?",
         (stage, datetime.utcnow().isoformat(), pid)
     )
+    conn.commit()
+    conn.close()
+
+
+def set_follow_up_date(pid: str, follow_up_date: str):
+    """Store OOO / not-now follow-up date on a prospect."""
+    conn = get_db()
+    conn.execute(
+        "UPDATE prospects SET follow_up_date=?, follow_up_sent=0, updated_at=? WHERE id=?",
+        (follow_up_date, datetime.utcnow().isoformat(), pid)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_due_followups(client_id: str = None) -> list:
+    """Return prospects whose follow_up_date is today or past and not yet re-surfaced."""
+    conn = get_db()
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+    query = """
+        SELECT * FROM prospects
+        WHERE follow_up_date IS NOT NULL
+          AND follow_up_date <= ?
+          AND follow_up_sent = 0
+    """
+    params = [today]
+    if client_id:
+        query += " AND client_id = ?"
+        params.append(client_id)
+    rows = [dict(r) for r in conn.execute(query, params).fetchall()]
+    conn.close()
+    return rows
+
+
+def mark_follow_up_sent(pid: str):
+    conn = get_db()
+    conn.execute("UPDATE prospects SET follow_up_sent=1, updated_at=? WHERE id=?",
+                 (datetime.utcnow().isoformat(), pid))
     conn.commit()
     conn.close()
 

@@ -37,3 +37,13 @@ fi
 
 systemctl status argusreach-watcher --no-pager | grep -E "Active|running"
 echo "✅ Admin watcher installed — code changes now auto-restart the portal"
+
+# ── MONITOR HEALTH CHECK TIMER ────────────────────────────────────────────────
+echo "Installing monitor health check timer..."
+chmod +x /home/argus/.openclaw/workspace/argusreach/ops/monitor-healthcheck.sh
+cp /home/argus/.openclaw/workspace/argusreach/ops/argusreach-healthcheck.service /etc/systemd/system/
+cp /home/argus/.openclaw/workspace/argusreach/ops/argusreach-healthcheck.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable argusreach-healthcheck.timer
+systemctl start argusreach-healthcheck.timer
+echo "✅ Health check timer installed — alerts Telegram if monitor silent for 35+ min"

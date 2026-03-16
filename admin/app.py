@@ -102,6 +102,14 @@ def fetch_instantly_analytics():
     except:
         return {}
 
+def load_global_dnc():
+    """Load the global DNC — anyone who unsubscribed from any ArgusReach campaign ever."""
+    p = DNC_DIR / "global.txt"
+    if not p.exists():
+        return set()
+    return {line.strip().lower() for line in p.read_text().splitlines()
+            if line.strip() and not line.startswith('#')}
+
 def load_dnc(client_id):
     p = DNC_DIR / f"{client_id}.txt"
     if not p.exists():
@@ -127,7 +135,7 @@ def prep_leads(client_id, raw_rows, warm=False):
     - Cross-reference against DNC
     Returns (clean_rows, stats_dict)
     """
-    dnc = load_dnc(client_id)
+    dnc = load_dnc(client_id) | load_global_dnc()  # client DNC + global unsubscribes
     seen = set()
     clean = []
     stats = {"total": 0, "invalid": 0, "dupes": 0, "dnc_hit": 0, "clean": 0}

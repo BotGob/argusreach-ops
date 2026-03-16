@@ -46,6 +46,34 @@ def health():
     return jsonify({"status": "ok", "ts": datetime.utcnow().isoformat()})
 
 
+@app.route("/health/monitor")
+def monitor_health():
+    """Check if the monitor is alive by reading its heartbeat file."""
+    heartbeat_file = BASE_DIR / "monitor" / "logs" / "monitor_heartbeat.txt"
+    max_stale_minutes = 35  # monitor runs every 10 min; alert if silent for 35+
+
+    if not heartbeat_file.exists():
+        return jsonify({"status": "unknown", "reason": "No heartbeat file found — monitor may not have run yet"}), 503
+
+    try:
+        last_beat = datetime.fromisoformat(heartbeat_file.read_text().strip())
+        age_minutes = (datetime.utcnow() - last_beat).total_seconds() / 60
+        if age_minutes > max_stale_minutes:
+            return jsonify({
+                "status": "stale",
+                "last_beat": last_beat.isoformat(),
+                "age_minutes": round(age_minutes, 1),
+                "reason": f"Monitor last cycled {age_minutes:.0f} min ago — may be stuck or crashed"
+            }), 503
+        return jsonify({
+            "status": "alive",
+            "last_beat": last_beat.isoformat(),
+            "age_minutes": round(age_minutes, 1)
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "reason": str(e)}), 500
+
+
 @app.route("/webhooks/stripe", methods=["POST"])
 def stripe_webhook():
     payload    = request.get_data()

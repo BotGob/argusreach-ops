@@ -75,3 +75,28 @@ BTCPay Server (self-hosted) — when payment infrastructure is being formalized.
 
 ### 17. Voice calling — Argus books meetings by phone
 Bland.ai / Vapi.ai — call positive replies within minutes, book meeting on calendar. Build at 3+ clients.
+
+---
+
+## 🟡 Backlog — Added 2026-03-16
+
+### 18. Monthly report auto-send
+`tools/monthly_report.py` works and sends to client. Needs a systemd timer to run on the 1st of each month. Holding at MVP — Vito wants to review before sending.
+
+### 19. Campaign completion notification
+When Instantly finishes all prospects in a campaign (status → completed), send Vito a Telegram alert to renew the lead list or close it out. No current hook.
+
+### 20. Welcome email to new client on onboarding
+When intake is approved and client is created, auto-send a welcome/onboarding email to the client. Currently nothing is sent.
+
+### 21. Service agreement / DocuSign
+No signed contract flow in the system. Client signs → record stored. Free tier HelloSign or DocuSign. Required before first paid client.
+
+### 22. Reports tab
+Admin portal Reports tab exists but empty — no reports have ever been generated. Populates automatically once `monthly_report.py` runs for the first time.
+
+### 23. Cross-client warm lead tracking ✅ DONE
+Global DNC now protects against re-contacting unsubscribes across all clients.
+
+### 24. Monitor health check timer
+Needs `sudo bash ops/setup-timers.sh` re-run to install the new healthcheck timer.

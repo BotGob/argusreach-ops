@@ -1,0 +1,9 @@
+[Unit]
+Description=ArgusReach Monitor Health Check
+
+[Service]
+Type=oneshot
+User=argus
+ExecStart=/bin/bash /home/argus/.openclaw/workspace/argusreach/ops/monitor-healthcheck.sh
+StandardOutput=journal
+StandardError=journal
