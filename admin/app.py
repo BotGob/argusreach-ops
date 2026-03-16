@@ -445,18 +445,33 @@ def campaigns():
 @app.route("/stats")
 @login_required
 def stats():
-    """Embed the ops dashboard HTML inside the portal."""
+    return render_template("stats.html")
+
+
+@app.route("/stats/data")
+@login_required
+def stats_data():
+    """Serve the dashboard HTML directly from the server."""
     dash_path = BASE_DIR / "db" / "dashboard.html"
     if dash_path.exists():
-        content = dash_path.read_text()
-        # Strip <html>/<body> wrapper so it embeds cleanly in iframe
-    return render_template("stats.html")
+        return dash_path.read_text(), 200, {"Content-Type": "text/html"}
+    return "<p style='color:#fff;font-family:sans-serif;padding:40px'>Dashboard not generated yet. Run: python3 db/generate_dashboard.py</p>", 200
 
 
 @app.route("/flowchart")
 @login_required
 def flowchart():
     return render_template("flowchart.html")
+
+
+@app.route("/flowchart/data")
+@login_required
+def flowchart_data():
+    """Serve the flowchart HTML directly from the server."""
+    path = BASE_DIR / "ops" / "master-flowchart.html"
+    if path.exists():
+        return path.read_text(), 200, {"Content-Type": "text/html"}
+    return "<p>Flowchart not found.</p>", 404
 
 
 @app.route("/backlog")

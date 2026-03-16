@@ -6,9 +6,9 @@
     <h1>Master Operations Flowchart</h1>
     <p class="subtitle" style="margin-bottom:0">Single source of truth for how ArgusReach works end to end.</p>
   </div>
-  <a href="https://botgob.github.io/argusreach-website/flowchart.html" target="_blank" class="btn btn-ghost btn-sm">⛶ Open fullscreen</a>
+  <a href="{{ url_for('flowchart_data') }}" target="_blank" class="btn btn-ghost btn-sm">⛶ Open fullscreen</a>
 </div>
-<iframe src="https://botgob.github.io/argusreach-website/flowchart.html"
+<iframe src="{{ url_for('flowchart_data') }}"
   style="width:100%;height:calc(100vh - 140px);border:1px solid #2d3448;border-radius:10px;background:#0f0f0f"
   frameborder="0">
 </iframe>

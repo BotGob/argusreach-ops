@@ -6,9 +6,9 @@
     <h1>Campaign Stats</h1>
     <p class="subtitle" style="margin-bottom:0">Live data from the database — refreshes hourly.</p>
   </div>
-  <a href="https://botgob.github.io/argusreach-website/dashboard.html" target="_blank" class="btn btn-ghost btn-sm">⛶ Open fullscreen</a>
+  <a href="{{ url_for('stats_data') }}" target="_blank" class="btn btn-ghost btn-sm">⛶ Open fullscreen</a>
 </div>
-<iframe src="https://botgob.github.io/argusreach-website/dashboard.html"
+<iframe src="{{ url_for('stats_data') }}"
   style="width:100%;height:calc(100vh - 140px);border:1px solid #2d3448;border-radius:10px;background:#1a1f2e"
   frameborder="0">
 </iframe>
