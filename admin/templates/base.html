@@ -63,7 +63,7 @@ textarea{min-height:80px;resize:vertical}
   <a href="{{ url_for('flowchart') }}" class="{{ 'active' if request.endpoint == 'flowchart' }}">Flowchart</a>
   <a href="{{ url_for('backlog') }}" class="{{ 'active' if request.endpoint == 'backlog' }}">Backlog</a>
   <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
-  <a href="{{ url_for('client_new') }}" class="{{ 'active' if request.endpoint == 'client_new' }}">+ New Client</a>
+  {# + New Client removed from nav — use /intake for client onboarding #}
   <div class="nav-right">
     <a href="{{ url_for('logout') }}" style="color:#ef4444;font-size:12px">Logout</a>
   </div>
