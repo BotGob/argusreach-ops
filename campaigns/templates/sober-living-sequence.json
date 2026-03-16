@@ -1,0 +1,17 @@
+[
+  {
+    "subject": "referral partnership, {{firstName}}",
+    "delay_days": 0,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">I came across {{companyName}} while researching treatment resources in the area and wanted to reach out directly.</p><p style=\"margin-bottom:16px\">I work with sober living homes that are looking to build more consistent referral relationships with therapists, treatment centers, and discharge planners. Most homes I talk to are doing great work but relying on a handful of relationships for most of their referrals — with no real system for reaching the broader clinical community.</p><p style=\"margin-bottom:16px\">We handle the outreach: identifying the right clinicians in your area, writing personalized messages in your voice, and managing every response. When someone is interested in learning more about your program, they book directly on your calendar.</p><p style=\"margin-bottom:16px\">Would a quick 30-minute call make sense to see if this is a fit for {{companyName}}?</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p>"
+  },
+  {
+    "subject": "re: referral partnership, {{firstName}}",
+    "delay_days": 5,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">Following up on my note from last week.</p><p style=\"margin-bottom:16px\">The homes we work with typically have strong outcomes and a solid reputation — the gap is visibility with the clinical community. Therapists and discharge planners refer to homes they've heard of. We make sure {{companyName}} is on their radar.</p><p style=\"margin-bottom:16px\">The process is straightforward: we build a targeted list of relevant clinicians in your market, write outreach in your voice, and handle every reply. You only get involved when someone wants to connect — and they book directly on your calendar.</p><p style=\"margin-bottom:16px\">Happy to walk you through it:</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p>"
+  },
+  {
+    "subject": "last note — {{companyName}}",
+    "delay_days": 7,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">Last one from me.</p><p style=\"margin-bottom:16px\">If building more consistent clinical referral relationships is on your radar this year, I'd love to show you how we do it for other homes in the recovery space. Takes 30 minutes.</p><p style=\"margin-bottom:16px\">If the timing isn't right, just reply and I'll leave you alone.</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p>"
+  }
+]

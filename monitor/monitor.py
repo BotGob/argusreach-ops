@@ -714,7 +714,8 @@ def process_client(client, processed_ids):
     new_processed = set()
 
     try:
-        mail = imaplib.IMAP4_SSL('imap.gmail.com')
+        imaplib.IMAP4_SSL.port = 993
+        mail = imaplib.IMAP4_SSL('imap.gmail.com', timeout=30)
         mail.login(client['outreach_email'], client['app_password'])
         mail.select('inbox')
 

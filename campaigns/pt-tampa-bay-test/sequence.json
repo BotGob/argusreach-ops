@@ -1,0 +1,17 @@
+[
+  {
+    "subject": "referral pipeline, {{firstName}}",
+    "delay_days": 0,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">I came across {{companyName}} while researching PT practices in the area — looks like a great clinic.</p><p style=\"margin-bottom:16px\">I started ArgusReach to help practices like yours build a consistent physician referral pipeline. Most PT owners I talk to have the same situation: a few strong referral relationships, and no real system for reaching the rest. The ortho who has known you for years keeps sending patients. The other physicians in your area don't know you exist yet.</p><p style=\"margin-bottom:16px\">We handle the outreach for you — identifying PCPs, orthos, and sports med docs in your market, writing personalized emails in your voice, and managing every reply. When a physician is interested, they book directly on your calendar. We track every contact and report back monthly.</p><p style=\"margin-bottom:16px\">Worth a quick 30-minute call to see if it makes sense for {{companyName}}?</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p><p style=\"color:#888;font-size:0.9em\">If you're not the right person for this, I'd appreciate you passing this along to whoever handles business development at {{companyName}}.</p>"
+  },
+  {
+    "subject": "re: referral pipeline, {{firstName}}",
+    "delay_days": 5,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">Following up on my note from last week.</p><p style=\"margin-bottom:16px\">Quick context on why {{companyName}} specifically — PT practices your size tend to have the strongest clinical outcomes but the weakest physician visibility. You're doing the work. We make sure the right doctors in your area know about it.</p><p style=\"margin-bottom:16px\">Here's how it works: we build a targeted list of every relevant physician in your market, write outreach in your voice, and manage every reply. You only hear from us when a physician wants to connect — and they book directly on your calendar.</p><p style=\"margin-bottom:16px\">Happy to walk you through it in 30 minutes:</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p>"
+  },
+  {
+    "subject": "last note — {{companyName}}",
+    "delay_days": 7,
+    "body": "<p style=\"margin-bottom:16px\">Hey {{firstName}},</p><p style=\"margin-bottom:16px\">Last one from me — I know your inbox is full.</p><p style=\"margin-bottom:16px\">If building a more consistent referral pipeline from physicians in your area is something on your radar this year, I'd love to show you how we do it for other PT practices. Takes 30 minutes.</p><p style=\"margin-bottom:16px\">If the timing isn't right, no worries at all — just reply and I'll leave you alone.</p><p style=\"margin-bottom:16px\"><a href=\"https://calendly.com/vito-argusreach/30min\">calendly.com/vito-argusreach/30min</a></p><p style=\"margin-bottom:16px\">Vito Resciniti<br />Founder, ArgusReach</p>"
+  }
+]
