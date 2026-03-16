@@ -300,9 +300,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <tr>
         <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">7. Status &amp; Ops<br><span style="font-weight:400;color:#555;font-size:0.65rem;">On-demand</span></td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#60a5fa;">●</span> Types <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">/status</span> in argus-alerts group for live dashboard<br>
+          <span style="color:#60a5fa;">●</span> Types <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">/status</span> in argus-alerts group for live summary<br>
           <span style="color:#60a5fa;">●</span> Types <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">/pending</span> to see all pending approvals<br>
-          <span style="color:#60a5fa;">●</span> Runs <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">python3 tools/status.py</span> for full terminal view
+          <span style="color:#60a5fa;">●</span> Views <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">admin.argusreach.com</span> — password-protected internal portal (Dashboard · Campaigns · Stats · Flowchart · Backlog · Reports)
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#4ade80;">●</span> Monitor polls for /status command every cycle<br>
@@ -857,7 +857,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Data infrastructure — SQLite DB + Instantly sync + webhook server + ops dashboard</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Built 2026-03-16. db/database.py (schema), db/instantly_sync.py (hourly Instantly stats), webhooks/server.py (Stripe + Calendly), db/generate_dashboard.py + dashboard.html. Monitor now writes to DB on every classification. Needs public URL to activate Stripe/Calendly webhooks.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Data infrastructure + Admin Portal — fully live</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">SQLite DB (db/database.py), Instantly hourly sync, webhook server (hooks.argusreach.com — Stripe + Calendly), admin portal (admin.argusreach.com — password protected). All internal tools behind login. Dashboard removed from public site. Monitor writes to DB on every classification.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">NEXT</span>
@@ -912,7 +912,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="background:#0f1209;border:1px solid rgba(74,222,128,0.15);border-radius:8px;padding:16px 20px;">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#4ade80;margin-bottom:8px;">🟢 KNOWN — Planned, Not Yet Built (Post-MVP)</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Client-Facing Dashboard</span> — Read-only view of their campaign stats, reply breakdown, meetings booked. Internal ops dashboard exists (db/dashboard.html). Client version needs auth + per-client filtering. (Post-MVP)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Client-Facing Dashboard</span> — Read-only view per client: campaign stats, reply breakdown, meetings booked. Internal ops portal exists (admin.argusreach.com). Client version needs per-client auth + filtered view. (Post-MVP)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Monthly Report — Full Auto-Gen</span> — Contacts reached now auto-pulled from Instantly API sync. Meetings booked still manual until Calendly webhook is live. (Partial — see gaps)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Instantly Campaign Creation Script</span> — Create + configure campaigns via API. Build when first real client is ready to launch.</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Bitcoin Payment Acceptance</span> — BTCPay Server or similar. (Backlog)</div>
