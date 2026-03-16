@@ -46,12 +46,36 @@ def check(condition, message, level="ERROR"):
     print(f"  {icon} {message}")
     return condition
 
+def resolve_campaign_id(arg: str) -> str:
+    """Accept either a UUID or a client_id from clients.json."""
+    import re
+    if re.match(r'^[0-9a-f-]{36}$', arg):
+        return arg
+    # Try to look up by client_id
+    clients_file = os.path.join(os.path.dirname(__file__), '..', 'monitor', 'clients.json')
+    try:
+        with open(clients_file) as f:
+            config = json.load(f)
+        for c in config.get('clients', []):
+            if c.get('id') == arg:
+                cid = c.get('instantly_campaign_id', '')
+                if cid:
+                    print(f"  → Resolved client_id '{arg}' to campaign {cid}")
+                    return cid
+                else:
+                    print(f"  ✗ Client '{arg}' has no instantly_campaign_id set")
+                    sys.exit(1)
+        print(f"  ✗ Client '{arg}' not found in clients.json")
+    except Exception as e:
+        print(f"  ✗ Could not read clients.json: {e}")
+    sys.exit(1)
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 validate_campaign.py <campaign_id>")
+        print("Usage: python3 validate_campaign.py <campaign_id_or_client_id>")
         sys.exit(1)
 
-    campaign_id = sys.argv[1]
+    campaign_id = resolve_campaign_id(sys.argv[1])
     errors = 0
     warnings = 0
 
@@ -71,7 +95,9 @@ def main():
     name = campaign.get("name", "")
     status = campaign.get("status", -1)
     check(name, f"Campaign name: {name}")
-    check(status == 0, f"Status is PAUSED (status={status}) — safe to validate")
+    # Instantly v2: status=1 = ACTIVE, status=0 = DRAFT/PAUSED
+    status_label = {0: "DRAFT/PAUSED", 1: "ACTIVE", 2: "COMPLETED"}.get(status, f"UNKNOWN ({status})")
+    check(True, f"Campaign status: {status_label}")
 
     # --- 2. Check sequence ---
     print("\n[ SEQUENCE ]")

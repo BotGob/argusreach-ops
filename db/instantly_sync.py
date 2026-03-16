@@ -29,25 +29,30 @@ def sync_campaign_stats(campaign_id: str, client_id: str, campaign_name: str = "
         print("  ⚠️  No INSTANTLY_API_KEY — skipping")
         return None
 
-    url = f"https://api.instantly.ai/api/v2/campaigns/{campaign_id}"
+    # Correct endpoint: /api/v2/campaigns/analytics returns array of all campaigns
+    url = "https://api.instantly.ai/api/v2/campaigns/analytics"
     headers = {"Authorization": f"Bearer {INSTANTLY_API_KEY}"}
 
     try:
         r = requests.get(url, headers=headers, timeout=15)
         r.raise_for_status()
-        data = r.json()
+        all_stats = r.json()
     except Exception as e:
-        print(f"  ❌ Instantly API error for {campaign_id}: {e}")
+        print(f"  ❌ Instantly API error: {e}")
         return None
 
-    # Extract stats — Instantly v2 nests stats under campaign object
-    stats = data.get("campaign_stats", data.get("stats", {}))
-    leads_count  = data.get("leads_count") or stats.get("total_leads", 0)
-    emails_sent  = stats.get("emails_sent", 0)
-    opens        = stats.get("unique_opens", stats.get("opens", 0))
-    clicks       = stats.get("unique_clicks", stats.get("clicks", 0))
-    replies      = stats.get("total_replies", stats.get("replies", 0))
-    status       = data.get("status_summary", "active")
+    # Find this campaign in the array
+    data = next((c for c in all_stats if c.get("campaign_id") == campaign_id), None)
+    if not data:
+        print(f"  ⚠️  Campaign {campaign_id} not found in analytics response")
+        return None
+
+    leads_count  = data.get("leads_count", 0)
+    emails_sent  = data.get("emails_sent_count", 0)
+    opens        = data.get("open_count_unique", 0)
+    clicks       = data.get("link_click_count_unique", 0)
+    replies      = data.get("reply_count_unique", 0)
+    status       = "active" if data.get("campaign_status") == 1 else "paused"
 
     now = datetime.utcnow().isoformat()
     conn = get_db()
