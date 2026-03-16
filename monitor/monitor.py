@@ -965,6 +965,28 @@ def process_client(client, processed_ids):
                 except Exception as _e:
                     log(f"[DB] outcome log failed: {_e}")
 
+            # ── CLIENT BOOKING ALERT: for positive replies, notify client to watch their calendar
+            client_email = client.get('client_email', '')
+            if classification == 'positive' and sent and client_email and not TEST_MODE:
+                try:
+                    prospect_display = from_name if from_name else from_email
+                    booking_alert = f"""<p>Hi,</p>
+<p>Quick heads up — we just sent a reply to <strong>{prospect_display}</strong> ({from_email}) on your behalf and included your booking link.</p>
+<p>They indicated interest, so you may see a meeting land on your calendar soon.</p>
+<p><strong>Please reply to this email or log in to confirm when the meeting is officially booked.</strong> This helps us track your results accurately.</p>
+<p>If the meeting doesn't materialize within a few days, no action needed — we'll continue the follow-up sequence.</p>
+<br>
+<p>— ArgusReach</p>"""
+                    _send_email(
+                        client['outreach_email'], client['app_password'],
+                        'ArgusReach', client_email,
+                        f"[ArgusReach] Heads up — {prospect_display} may be booking",
+                        booking_alert
+                    )
+                    log(f"{label} Booking alert sent to client ({client_email}) re: {from_email}")
+                except Exception as _be:
+                    log(f"{label} Booking alert failed (non-fatal): {_be}")
+
             # ── DB: record prospect + events
             if _DB_ENABLED:
                 try:

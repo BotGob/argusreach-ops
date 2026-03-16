@@ -699,6 +699,39 @@ def intake_approve(intake_id):
     return render_template("intake_approve.html", intake=intake, form={})
 
 
+@app.route("/meetings/log", methods=["POST"])
+@login_required
+def log_meeting():
+    """Manually log a meeting booking — for client-confirmed meetings that didn't come through webhook."""
+    f = request.form
+    client_id    = f.get("client_id","").strip()
+    prospect_email = f.get("prospect_email","").strip()
+    prospect_name  = f.get("prospect_name","").strip()
+    meeting_date   = f.get("meeting_date","").strip()
+    notes          = f.get("notes","").strip()
+
+    if not client_id or not prospect_email:
+        flash("Client and prospect email required.", "error")
+        return redirect(url_for("dashboard"))
+
+    conn = get_db()
+    conn.execute("""
+        INSERT INTO meetings (client_id, prospect_email, prospect_name, meeting_date, status, source, notes, created_at)
+        VALUES (?,?,?,?,?,?,?,?)
+    """, (client_id, prospect_email, prospect_name, meeting_date, 'confirmed', 'manual', notes, datetime.utcnow().isoformat()))
+    conn.commit()
+
+    # Update prospect stage
+    pid = conn.execute("SELECT id FROM prospects WHERE client_id=? AND email=?", (client_id, prospect_email)).fetchone()
+    if pid:
+        conn.execute("UPDATE prospects SET stage='meeting_booked' WHERE id=?", (pid[0],))
+        conn.commit()
+    conn.close()
+
+    flash(f"Meeting logged for {prospect_name or prospect_email}.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/intakes/<intake_id>/dismiss", methods=["POST"])
 @login_required
 def intake_dismiss(intake_id):

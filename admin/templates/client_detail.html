@@ -122,6 +122,32 @@
   </table>
 </div>
 
+<!-- Log Meeting -->
+<div class="section" style="margin-bottom:20px">
+  <div class="section-title">📅 Log a Meeting Booking</div>
+  <p style="font-size:12px;color:#64748b;margin-bottom:14px">Use this when a client confirms a meeting landed on their calendar that didn't come through automatically.</p>
+  <form method="POST" action="{{ url_for('log_meeting') }}" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end">
+    <input type="hidden" name="client_id" value="{{ client.id }}">
+    <div>
+      <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospect Email *</label>
+      <input name="prospect_email" required placeholder="prospect@theirclinic.com" style="font-size:12px">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospect Name</label>
+      <input name="prospect_name" placeholder="Dr. Jane Smith" style="font-size:12px">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Meeting Date</label>
+      <input name="meeting_date" type="date" style="font-size:12px">
+    </div>
+    <div>
+      <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Notes</label>
+      <input name="notes" placeholder="Optional context" style="font-size:12px">
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap">Log Meeting</button>
+  </form>
+</div>
+
 <!-- Recent Events -->
 {% if events %}
 <h2>Recent Events</h2>
