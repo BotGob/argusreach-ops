@@ -22,6 +22,16 @@ CLIENTS_FILE = BASE_DIR / 'monitor' / 'clients.json'
 REPORTS_DIR  = BASE_DIR / 'reports'
 REPORTS_DIR.mkdir(exist_ok=True)
 
+def history_path(client_id):
+    return REPORTS_DIR / f"{client_id}_history.json"
+
+def load_history(client_id):
+    p = history_path(client_id)
+    return json.loads(p.read_text()) if p.exists() else []
+
+def save_history(client_id, history):
+    history_path(client_id).write_text(json.dumps(history, indent=2))
+
 # ── Load clients ───────────────────────────────────────────────────────────────
 def load_clients():
     with open(CLIENTS_FILE) as f:
@@ -29,7 +39,55 @@ def load_clients():
     return data['clients'] if isinstance(data, dict) and 'clients' in data else data
 
 # ── HTML template ──────────────────────────────────────────────────────────────
-def build_report_html(client, month, stats, notes):
+def build_timeline_html(history):
+    if not history:
+        return ''
+    rows = ''
+    total_contacts = total_positive = total_meetings = 0
+    for i, entry in enumerate(history):
+        is_current = (i == len(history) - 1)
+        bg = '#f0fdf4' if is_current else 'transparent'
+        border = 'border-left:3px solid #4ade80;' if is_current else 'border-left:3px solid transparent;'
+        label = ' <span style="font-size:0.65rem;background:#dcfce7;color:#15803d;padding:1px 6px;border-radius:99px;font-weight:600;letter-spacing:0.05em;">THIS MONTH</span>' if is_current else ''
+        launch_tag = ' <span style="font-size:0.65rem;background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:99px;font-weight:600;">LAUNCH</span>' if entry.get('launch') else ''
+        contacts = entry.get('contacts', '—')
+        positive = entry.get('positive', '—')
+        meetings = entry.get('meetings', '—')
+        if isinstance(contacts, int): total_contacts += contacts
+        if isinstance(positive, int): total_positive += positive
+        if isinstance(meetings, int): total_meetings += meetings
+        rows += f"""<tr style="background:{bg};{border}">
+          <td style="padding:10px 12px;font-size:0.8rem;font-weight:{'600' if is_current else '400'};color:#111827;white-space:nowrap;">{entry['month']}{launch_tag}{label}</td>
+          <td style="padding:10px 12px;font-size:0.8rem;color:#374151;text-align:center;">{contacts}</td>
+          <td style="padding:10px 12px;font-size:0.8rem;color:#374151;text-align:center;">{positive}</td>
+          <td style="padding:10px 12px;font-size:0.8rem;color:#15803d;font-weight:600;text-align:center;">{meetings}</td>
+        </tr>"""
+    months_active = len(history)
+    return f"""
+  <div style="padding:0 40px 32px;">
+    <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#9ca3af;margin-bottom:14px;">Campaign History &nbsp;·&nbsp; Active {months_active} month{'s' if months_active != 1 else ''}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+      <thead>
+        <tr style="border-bottom:1px solid #e5e7eb;">
+          <th style="padding:6px 12px;text-align:left;font-size:0.65rem;color:#9ca3af;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Month</th>
+          <th style="padding:6px 12px;text-align:center;font-size:0.65rem;color:#9ca3af;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Contacts</th>
+          <th style="padding:6px 12px;text-align:center;font-size:0.65rem;color:#9ca3af;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Positive</th>
+          <th style="padding:6px 12px;text-align:center;font-size:0.65rem;color:#9ca3af;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">Meetings</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+      <tfoot>
+        <tr style="border-top:2px solid #e5e7eb;">
+          <td style="padding:10px 12px;font-size:0.78rem;font-weight:700;color:#111827;">Total</td>
+          <td style="padding:10px 12px;font-size:0.78rem;font-weight:700;color:#111827;text-align:center;">{total_contacts}</td>
+          <td style="padding:10px 12px;font-size:0.78rem;font-weight:700;color:#111827;text-align:center;">{total_positive}</td>
+          <td style="padding:10px 12px;font-size:0.78rem;font-weight:700;color:#15803d;text-align:center;">{total_meetings}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>"""
+
+def build_report_html(client, month, stats, notes, history=None):
     firm        = client['firm_name']
     campaign    = client.get('campaign_name', 'Campaign')
     sender_name = client.get('sender_name', 'Vito Resciniti')
@@ -46,6 +104,7 @@ def build_report_html(client, month, stats, notes):
 
     working_items  = ''.join(f'<li style="margin-bottom:8px;color:#374151;">{w}</li>' for w in working)
     changing_items = ''.join(f'<li style="margin-bottom:8px;color:#374151;">{c}</li>' for c in changing)
+    timeline_html  = build_timeline_html(history or [])
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -114,6 +173,8 @@ def build_report_html(client, month, stats, notes):
 
     {f'<div style="margin-top:8px;background:#f9fafb;border-radius:6px;padding:12px 20px;font-size:0.78rem;color:#9ca3af;">{unsubs} unsubscribe(s)</div>' if unsubs > 0 else ''}
   </div>
+
+  {timeline_html}
 
   <!-- What worked -->
   <div style="padding:0 40px 24px;">
@@ -225,7 +286,28 @@ def main():
     print(f"\n📊 Building report for: {client['firm_name']} — {args.month}")
     stats, notes = prompt_stats()
 
-    html = build_report_html(client, args.month, stats, notes)
+    # Load history, append this month, save
+    history = load_history(args.client)
+    is_launch = len(history) == 0
+    # Update existing month entry if re-running, otherwise append
+    existing = next((i for i, e in enumerate(history) if e['month'] == args.month), None)
+    entry = {
+        'month':    args.month,
+        'launch':   is_launch,
+        'contacts': stats['contacts'],
+        'positive': stats['positive'],
+        'not_now':  stats['not_now'],
+        'meetings': stats['meetings'],
+        'unsubs':   stats['unsubs'],
+    }
+    if existing is not None:
+        history[existing] = entry
+    else:
+        history.append(entry)
+    save_history(args.client, history)
+    print(f"📁 History updated ({len(history)} month{'s' if len(history) != 1 else ''})")
+
+    html = build_report_html(client, args.month, stats, notes, history=history)
 
     # Save copy
     safe_month = args.month.replace(' ', '-')
