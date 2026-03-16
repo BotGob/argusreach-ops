@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You — ArgusReach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+    .container { max-width: 480px; text-align: center; }
+    .icon { font-size: 52px; margin-bottom: 24px; }
+    .logo { font-size: 16px; font-weight: 700; color: #60a5fa; margin-bottom: 24px; letter-spacing: -0.5px; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+    p { color: #64748b; font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+    .highlight { color: #e2e8f0; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">ArgusReach</div>
+  <div class="icon">✅</div>
+  <h1>You're all set{% if name %}, {{ name.split()[0] }}{% endif %}.</h1>
+  <p>We received your onboarding information and will review it within 1 business day.</p>
+  <p>Once we've confirmed everything on our end, <span class="highlight">Vito will reach out directly</span> to walk you through next steps and confirm your campaign launch date.</p>
+  <p style="margin-top: 24px; font-size: 12px;">Questions? <a href="mailto:vito@argusreach.com" style="color:#3b82f6">vito@argusreach.com</a></p>
+</div>
+</body>
+</html>

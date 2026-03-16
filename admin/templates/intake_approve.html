@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Review Intake — ArgusReach Admin{% endblock %}
+{% block content %}
+
+<h1>Review Intake — {{ intake.firm_name }}</h1>
+<p class="subtitle">Submitted {{ intake.submitted_at[:16]|replace('T',' ') }} UTC · {{ intake.contact_name }} · {{ intake.contact_email }}</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+
+  <!-- What the client submitted (read-only) -->
+  <div class="section">
+    <div class="section-title">📋 Client Submission</div>
+    {% set fields = [
+      ('Firm Name', intake.firm_name),
+      ('Website', intake.website),
+      ('Business Address', intake.business_address),
+      ('Vertical', intake.vertical),
+      ('Contact', intake.contact_name ~ ' · ' ~ intake.contact_email ~ (' · ' ~ intake.contact_phone if intake.contact_phone else '')),
+      ('Target Geography', intake.target_geography),
+      ('Target Titles', intake.target_titles),
+      ('Ideal Prospect', intake.icp_summary),
+      ('Value Proposition', intake.value_prop),
+      ('Tone', intake.tone),
+      ('Calendly Link', intake.calendly_link),
+      ('Compliance Note', intake.compliance_note),
+      ('How They Heard', intake.how_heard),
+      ('Notes', intake.notes),
+    ] %}
+    {% for label, val in fields %}
+    {% if val %}
+    <div style="margin-bottom:12px">
+      <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">{{ label }}</div>
+      <div style="font-size:13px;color:#e2e8f0;line-height:1.5">{{ val }}</div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Internal fields to fill in -->
+  <div class="section">
+    <div class="section-title">🔧 Internal Setup (your fields)</div>
+    <form method="POST" action="{{ url_for('intake_approve', intake_id=intake.id) }}">
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Client ID (system identifier) *</label>
+        <input name="id" value="{{ form.get('id', intake.firm_name|lower|replace(' ','_')|replace('-','_') ) }}" required placeholder="e.g. gulf_coast_pt" style="font-family:monospace;font-size:12px">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Plan *</label>
+        <select name="plan">
+          <option value="starter">Starter — $750/mo</option>
+          <option value="growth">Growth — $1,500/mo</option>
+          <option value="scale">Scale — $2,500/mo</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email (ArgusReach Gmail) *</label>
+        <input name="outreach_email" value="vito@argusreach.com" required>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Gmail App Password *</label>
+        <input name="app_password" type="password" placeholder="xxxx xxxx xxxx xxxx">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Name *</label>
+        <input name="sender_name" value="Vito Resciniti" required>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Title</label>
+        <input name="title" value="Founder">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Contacts Per Month</label>
+        <input name="contacts_per_month" type="number" value="200">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Positioning Note (internal AI context)</label>
+        <textarea name="positioning_note" style="min-height:70px" placeholder="How ArgusReach should frame itself in outreach for this client..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">✅ Create Client from Intake</button>
+    </form>
+  </div>
+
+</div>
+
+<a href="{{ url_for('intakes_list') }}" style="font-size:13px;color:#64748b">← Back to intakes</a>
+
+{% endblock %}

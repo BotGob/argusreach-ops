@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Intakes — ArgusReach Admin{% endblock %}
+{% block content %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+  <div>
+    <h1>Client Intakes</h1>
+    <p class="subtitle">Submissions from the public onboarding form at /intake</p>
+  </div>
+  <div style="font-size:12px;color:#64748b;background:#0f1623;border:1px solid #1e2535;padding:8px 14px;border-radius:6px">
+    Public link: <span style="color:#60a5fa;font-family:monospace">https://admin.argusreach.com/intake</span>
+  </div>
+</div>
+
+{% if intakes %}
+<div class="section" style="margin-bottom:20px">
+  <div class="section-title" style="color:#f59e0b">⏳ Pending Review ({{ intakes|length }})</div>
+  <table>
+    <thead><tr>
+      <th>Submitted</th>
+      <th>Firm</th>
+      <th>Contact</th>
+      <th>Vertical</th>
+      <th>Geography</th>
+      <th>Action</th>
+    </tr></thead>
+    <tbody>
+    {% for intake in intakes %}
+    <tr>
+      <td style="font-size:11px;color:#64748b">{{ intake.submitted_at[:16]|replace('T',' ') }}</td>
+      <td><strong>{{ intake.firm_name }}</strong><br><span style="font-size:11px;color:#64748b">{{ intake.website or '' }}</span></td>
+      <td>{{ intake.contact_name }}<br><a href="mailto:{{ intake.contact_email }}" style="font-size:11px;color:#60a5fa">{{ intake.contact_email }}</a></td>
+      <td><span style="font-size:11px;background:#1e2535;padding:2px 8px;border-radius:12px">{{ intake.vertical }}</span></td>
+      <td style="font-size:12px;color:#94a3b8">{{ intake.target_geography[:40] }}{% if intake.target_geography|length > 40 %}…{% endif %}</td>
+      <td>
+        <a href="{{ url_for('intake_approve', intake_id=intake.id) }}" class="btn btn-primary btn-sm">Review & Approve</a>
+        <form method="POST" action="{{ url_for('intake_dismiss', intake_id=intake.id) }}" style="display:inline;margin-left:6px">
+          <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Dismiss this intake?')">Dismiss</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="section" style="text-align:center;padding:48px;color:#64748b">
+  <div style="font-size:32px;margin-bottom:12px">📋</div>
+  No pending intakes.<br>
+  <span style="font-size:12px;margin-top:8px;display:block">Share <strong style="color:#e2e8f0">https://admin.argusreach.com/intake</strong> with new clients during discovery.</span>
+</div>
+{% endif %}
+
+{% if all_intakes|length > intakes|length %}
+<div class="section">
+  <div class="section-title" style="color:#64748b">Previously Processed ({{ all_intakes|length - intakes|length }})</div>
+  <table>
+    <thead><tr><th>Submitted</th><th>Firm</th><th>Contact</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for intake in all_intakes %}
+    {% if intake.status != 'pending' %}
+    <tr>
+      <td style="font-size:11px;color:#64748b">{{ intake.submitted_at[:16]|replace('T',' ') }}</td>
+      <td>{{ intake.firm_name }}</td>
+      <td>{{ intake.contact_name }}</td>
+      <td>
+        {% if intake.status == 'approved' %}
+          <span style="color:#22c55e;font-size:12px">✅ Approved → <a href="{{ url_for('client_detail', client_id=intake.get('client_id','')) }}" style="color:#60a5fa">{{ intake.get('client_id','') }}</a></span>
+        {% else %}
+          <span style="color:#64748b;font-size:12px">Dismissed</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

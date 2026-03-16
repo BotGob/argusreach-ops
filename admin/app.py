@@ -40,6 +40,7 @@ from db.database import get_db, init_db, sync_client_from_config
 CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
 CAMPAIGNS_DIR = BASE_DIR / "campaigns"
 DNC_DIR       = BASE_DIR / "monitor" / "dnc"
+INTAKES_FILE  = BASE_DIR / "monitor" / "intakes" / "pending.json"
 INSTANTLY_KEY = os.environ.get("INSTANTLY_API_KEY", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "argusreach2026")
 
@@ -561,6 +562,151 @@ def view_report(filename):
         flash("Report not found.", "error")
         return redirect(url_for("reports_list"))
     return path.read_text()
+
+
+def load_intakes():
+    if not INTAKES_FILE.exists():
+        return []
+    return json.loads(INTAKES_FILE.read_text())
+
+def save_intakes(data):
+    INTAKES_FILE.write_text(json.dumps(data, indent=2))
+
+# ── PUBLIC CLIENT INTAKE FORM (no login required) ────────────────────────────
+@app.route("/intake", methods=["GET", "POST"])
+def intake():
+    if request.method == "POST":
+        f = request.form
+        submission = {
+            "id": datetime.utcnow().strftime("%Y%m%d%H%M%S"),
+            "submitted_at": datetime.utcnow().isoformat(),
+            "status": "pending",
+            "firm_name":        f.get("firm_name","").strip(),
+            "contact_name":     f.get("contact_name","").strip(),
+            "contact_email":    f.get("contact_email","").strip(),
+            "contact_phone":    f.get("contact_phone","").strip(),
+            "business_address": f.get("business_address","").strip(),
+            "vertical":         f.get("vertical","").strip(),
+            "website":          f.get("website","").strip(),
+            "target_geography": f.get("target_geography","").strip(),
+            "target_titles":    f.get("target_titles","").strip(),
+            "icp_summary":      f.get("icp_summary","").strip(),
+            "value_prop":       f.get("value_prop","").strip(),
+            "calendly_link":    f.get("calendly_link","").strip(),
+            "tone":             f.get("tone","warm-professional").strip(),
+            "compliance_note":  f.get("compliance_note","").strip(),
+            "how_heard":        f.get("how_heard","").strip(),
+            "notes":            f.get("notes","").strip(),
+        }
+        intakes = load_intakes()
+        intakes.append(submission)
+        save_intakes(intakes)
+
+        # Notify Vito via Telegram
+        try:
+            tg_token = os.environ.get("TELEGRAM_BOT_TOKEN","")
+            tg_chat  = os.environ.get("TELEGRAM_CHAT_ID","")
+            if tg_token and tg_chat:
+                msg = (f"📋 *New Client Intake Submitted*\n\n"
+                       f"*{submission['firm_name']}*\n"
+                       f"{submission['contact_name']} · {submission['contact_email']}\n"
+                       f"Vertical: {submission['vertical']}\n\n"
+                       f"Review at: https://admin.argusreach.com/intakes")
+                requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage",
+                    json={"chat_id": tg_chat, "text": msg, "parse_mode": "Markdown"}, timeout=5)
+        except Exception:
+            pass
+
+        return render_template("intake_thanks.html", name=submission["contact_name"])
+
+    return render_template("intake_form.html")
+
+
+@app.route("/intakes")
+@login_required
+def intakes_list():
+    intakes = load_intakes()
+    pending = [i for i in intakes if i.get("status") == "pending"]
+    return render_template("intakes_list.html", intakes=pending, all_intakes=intakes)
+
+
+@app.route("/intakes/<intake_id>/approve", methods=["GET", "POST"])
+@login_required
+def intake_approve(intake_id):
+    intakes = load_intakes()
+    intake = next((i for i in intakes if i["id"] == intake_id), None)
+    if not intake:
+        flash("Intake not found.", "error")
+        return redirect(url_for("intakes_list"))
+
+    if request.method == "POST":
+        f = request.form
+        client_id = re.sub(r'[^a-z0-9_]', '_', f["id"].lower().strip())
+        config = load_clients()
+        existing_ids = [c.get("id") for c in config.get("clients", [])]
+        if client_id in existing_ids:
+            flash(f"Client ID '{client_id}' already exists.", "error")
+            return render_template("intake_approve.html", intake=intake, form=f)
+
+        new_client = {
+            "id":                   client_id,
+            "active":               False,
+            "mode":                 "draft_approval",
+            "firm_name":            intake["firm_name"],
+            "vertical":             intake["vertical"],
+            "plan":                 f.get("plan","starter"),
+            "outreach_email":       f.get("outreach_email","").strip(),
+            "app_password":         f.get("app_password","").strip(),
+            "sender_name":          f.get("sender_name","").strip(),
+            "title":                f.get("title","Founder").strip(),
+            "client_email":         intake["contact_email"],
+            "calendly_link":        intake.get("calendly_link","").strip(),
+            "instantly_campaign_id": "",
+            "campaign_name":        "",
+            "contacts_per_month":   int(f.get("contacts_per_month", 200)),
+            "launch_date":          "",
+            "icp_summary":          intake.get("icp_summary",""),
+            "tone":                 intake.get("tone","warm-professional"),
+            "compliance_note":      intake.get("compliance_note",""),
+            "positioning_note":     f.get("positioning_note",""),
+            "prospects_csv":        f"campaigns/{client_id}/prospects.csv",
+            "_intake_id":           intake_id,
+            "_contact_name":        intake.get("contact_name",""),
+            "_target_geography":    intake.get("target_geography",""),
+            "_target_titles":       intake.get("target_titles",""),
+            "_value_prop":          intake.get("value_prop",""),
+        }
+
+        config["clients"].append(new_client)
+        save_clients(config)
+        (CAMPAIGNS_DIR / client_id).mkdir(parents=True, exist_ok=True)
+        (DNC_DIR / f"{client_id}.txt").touch()
+        init_db()
+        sync_client_from_config(new_client)
+
+        # Mark intake as approved
+        for i in intakes:
+            if i["id"] == intake_id:
+                i["status"] = "approved"
+                i["client_id"] = client_id
+        save_intakes(intakes)
+
+        flash(f"Client '{new_client['firm_name']}' created from intake.", "success")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    return render_template("intake_approve.html", intake=intake, form={})
+
+
+@app.route("/intakes/<intake_id>/dismiss", methods=["POST"])
+@login_required
+def intake_dismiss(intake_id):
+    intakes = load_intakes()
+    for i in intakes:
+        if i["id"] == intake_id:
+            i["status"] = "dismissed"
+    save_intakes(intakes)
+    flash("Intake dismissed.", "success")
+    return redirect(url_for("intakes_list"))
 
 
 @app.route("/health")

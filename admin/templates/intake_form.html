@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Onboarding — ArgusReach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
+    .container { max-width: 680px; margin: 0 auto; }
+    .logo { font-size: 20px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; letter-spacing: -0.5px; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: #64748b; font-size: 14px; margin-bottom: 36px; line-height: 1.6; }
+    .section-header { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #60a5fa; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e2535; }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 500; color: #94a3b8; margin-bottom: 6px; }
+    label span.req { color: #ef4444; margin-left: 2px; }
+    label span.hint { font-weight: 400; color: #475569; font-size: 11px; display: block; margin-top: 2px; }
+    input, select, textarea {
+      width: 100%; background: #0f1623; border: 1px solid #1e2535; border-radius: 6px;
+      color: #e2e8f0; font-size: 14px; font-family: 'Inter', sans-serif;
+      padding: 10px 14px; outline: none; transition: border 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #3b82f6; }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .btn { background: #3b82f6; color: #fff; border: none; border-radius: 6px; padding: 14px 32px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 32px; }
+    .btn:hover { background: #2563eb; }
+    .footer { text-align: center; margin-top: 32px; font-size: 12px; color: #334155; }
+    @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">ArgusReach</div>
+  <h1>Client Onboarding Form</h1>
+  <p class="subtitle">Fill this out once — we'll handle the rest. Everything you enter goes directly into our system so there's no back-and-forth. Takes about 5 minutes.</p>
+
+  <form method="POST" action="/intake">
+
+    <div class="section-header">Your Business</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Firm / Practice Name <span class="req">*</span></label>
+        <input name="firm_name" required placeholder="Gulf Coast Physical Therapy">
+      </div>
+      <div class="field">
+        <label>Website</label>
+        <input name="website" placeholder="https://yoursite.com">
+      </div>
+    </div>
+    <div class="field">
+      <label>Business Address
+        <span class="hint">City, State is fine — used for geographic targeting and compliance</span>
+      </label>
+      <input name="business_address" placeholder="Tampa, FL">
+    </div>
+    <div class="field">
+      <label>Vertical / Industry <span class="req">*</span></label>
+      <select name="vertical" required>
+        <option value="">— Select —</option>
+        <option value="PhysicalTherapy">Physical Therapy</option>
+        <option value="SoberLiving">Sober Living / Recovery</option>
+        <option value="RIA">Investment Advisor (RIA)</option>
+        <option value="MedSpa">Med Spa</option>
+        <option value="Dental">Dental</option>
+        <option value="Chiropractic">Chiropractic</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="section-header">Your Contact Info</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Your Name <span class="req">*</span></label>
+        <input name="contact_name" required placeholder="Jane Smith">
+      </div>
+      <div class="field">
+        <label>Your Title</label>
+        <input name="contact_title" placeholder="Owner, Practice Manager, etc.">
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Email Address <span class="req">*</span>
+          <span class="hint">Where we'll send reports and updates</span>
+        </label>
+        <input name="contact_email" type="email" required placeholder="jane@yourclinic.com">
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input name="contact_phone" placeholder="(813) 555-0100">
+      </div>
+    </div>
+
+    <div class="section-header">Who We're Targeting For You</div>
+    <div class="field">
+      <label>Target Geography <span class="req">*</span>
+        <span class="hint">City, metro area, radius, or specific zip codes. Be as specific as possible.</span>
+      </label>
+      <input name="target_geography" required placeholder="Tampa Bay area — Hillsborough, Pinellas, Pasco counties">
+    </div>
+    <div class="field">
+      <label>Target Job Titles / Roles <span class="req">*</span>
+        <span class="hint">Who exactly do you want us to contact? List every title that makes sense.</span>
+      </label>
+      <textarea name="target_titles" required placeholder="Primary care physicians (PCPs), orthopedic surgeons, sports medicine doctors, physiatrists, urgent care medical directors"></textarea>
+    </div>
+    <div class="field">
+      <label>Ideal Prospect Description <span class="req">*</span>
+        <span class="hint">Describe the perfect person we'd connect you with. What makes them a fit?</span>
+      </label>
+      <textarea name="icp_summary" required placeholder="Independent or small-group practice physicians in the Tampa Bay area who see patients that would benefit from PT referrals. Ideally sports medicine or ortho with active patient panels. Not hospital-employed systems."></textarea>
+    </div>
+
+    <div class="section-header">Your Message & Positioning</div>
+    <div class="field">
+      <label>Your Value Proposition — in your own words <span class="req">*</span>
+        <span class="hint">Why should a physician refer to YOU specifically? What makes your practice stand out?</span>
+      </label>
+      <textarea name="value_prop" required placeholder="We specialize in post-surgical rehab and sports injuries. Average wait time is under 48 hours. We send referring physicians monthly progress updates on their patients. Outcomes data available on request."></textarea>
+    </div>
+    <div class="field">
+      <label>Tone Preference
+        <span class="hint">How should the outreach sound?</span>
+      </label>
+      <select name="tone">
+        <option value="warm-professional">Warm and professional (recommended)</option>
+        <option value="direct">Direct and concise</option>
+        <option value="formal">Formal / clinical</option>
+        <option value="conversational">Conversational and friendly</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Anything we should NEVER say or claim
+        <span class="hint">Compliance guardrails. Anything the AI should avoid mentioning in your outreach.</span>
+      </label>
+      <textarea name="compliance_note" placeholder="Do not reference specific outcomes or success rates. Do not mention pricing. Do not imply we accept all insurance plans."></textarea>
+    </div>
+
+    <div class="section-header">Meeting Booking</div>
+    <div class="field">
+      <label>Your Calendly Link <span class="req">*</span>
+        <span class="hint">This is where interested prospects will book a call with you directly. Must be a public Calendly link.</span>
+      </label>
+      <input name="calendly_link" required placeholder="https://calendly.com/yourname/30min">
+    </div>
+
+    <div class="section-header">Anything Else</div>
+    <div class="field">
+      <label>How did you hear about ArgusReach?</label>
+      <input name="how_heard" placeholder="Referral, LinkedIn, Google, etc.">
+    </div>
+    <div class="field">
+      <label>Additional notes or context</label>
+      <textarea name="notes" placeholder="Anything else we should know before we start..."></textarea>
+    </div>
+
+    <button type="submit" class="btn">Submit Onboarding Form →</button>
+  </form>
+
+  <p class="footer">Questions? Email <a href="mailto:vito@argusreach.com" style="color:#475569">vito@argusreach.com</a></p>
+</div>
+</body>
+</html>
