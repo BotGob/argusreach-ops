@@ -117,6 +117,14 @@
 
 ## 🚀 Post-MVP Expansion
 
+### Bitcoin Payment Acceptance
+- Build out infrastructure to accept Bitcoin as a payment method from clients
+- Research: BTCPay Server (self-hosted, no fees) vs Strike vs OpenNode vs Coinbase Commerce
+- Determine: invoice flow, confirmation handling, accounting/bookkeeping impact
+- Build when: first client is live and payment infrastructure is being formalized
+
+
+
 ### Voice Calling — Argus Books Meetings by Phone
 - Argus calls positive replies within minutes, books meeting on calendar
 - Tools: Bland.ai, Vapi.ai, Retell.ai
