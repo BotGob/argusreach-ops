@@ -21,6 +21,27 @@ BASE_DIR     = Path(__file__).parent.parent
 CLIENTS_FILE = BASE_DIR / 'monitor' / 'clients.json'
 REPORTS_DIR  = BASE_DIR / 'reports'
 REPORTS_DIR.mkdir(exist_ok=True)
+REPLY_LOG = BASE_DIR / 'monitor' / 'logs' / 'replies.json'
+
+def get_log_stats(client_id, month_str):
+    """Pull real reply counts from monitor reply log for a given client + month."""
+    try:
+        data = json.loads(REPLY_LOG.read_text()) if REPLY_LOG.exists() else []
+    except Exception:
+        return None
+    counts = {'positive': 0, 'not_now': 0, 'ooo': 0, 'negative': 0, 'escalated': 0}
+    for r in data:
+        if r.get('client') != client_id: continue
+        if r.get('test_mode'): continue
+        try:
+            ts = datetime.fromisoformat(r['ts'])
+            if ts.strftime('%B %Y') != month_str: continue
+        except Exception:
+            continue
+        cls = r.get('classification', 'other')
+        if cls in counts:
+            counts[cls] += 1
+    return counts
 
 def history_path(client_id):
     return REPORTS_DIR / f"{client_id}_history.json"
@@ -230,13 +251,26 @@ def send_report(client, to_email, subject, html_body):
 
 
 # ── Prompt for stats ───────────────────────────────────────────────────────────
-def prompt_stats():
+def prompt_stats(client_id=None, month_str=None):
+    log_stats = get_log_stats(client_id, month_str) if client_id and month_str else None
+
     print("\n── Monthly Stats ──────────────────────────────")
-    contacts = int(input("Contacts reached this month: "))
-    positive = int(input("Positive replies: "))
-    not_now  = int(input("Not now / follow later: "))
-    meetings = int(input("Meetings booked: "))
-    unsubs   = int(input("Unsubscribes: "))
+    if log_stats:
+        print(f"  (Pre-filled from monitor log — press Enter to accept, or type to override)")
+
+    def ask(label, log_key=None, default=None):
+        log_val = log_stats.get(log_key, 0) if log_stats and log_key else default
+        hint = f" [{log_val}]" if log_val is not None else ""
+        raw = input(f"{label}{hint}: ").strip()
+        if raw == '' and log_val is not None:
+            return log_val
+        return int(raw) if raw else 0
+
+    contacts = ask("Contacts reached this month")
+    positive = ask("Positive replies", log_key='positive')
+    not_now  = ask("Not now / follow later", log_key='not_now')
+    meetings = ask("Meetings booked (check Calendly manually)")
+    unsubs   = ask("Unsubscribes", log_key='negative')
 
     print("\n── What Worked (enter items one per line, blank line to finish) ──")
     working = []
@@ -284,7 +318,7 @@ def main():
         to_email = input(f"Recipient email for {client['firm_name']}: ").strip()
 
     print(f"\n📊 Building report for: {client['firm_name']} — {args.month}")
-    stats, notes = prompt_stats()
+    stats, notes = prompt_stats(client_id=args.client, month_str=args.month)
 
     # Load history, append this month, save
     history = load_history(args.client)
