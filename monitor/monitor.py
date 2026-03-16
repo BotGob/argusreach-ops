@@ -349,11 +349,97 @@ def notify(text):
 
 def check_telegram_commands():
     """
-    Approval/rejection is handled by Go (OpenClaw) directly via the pending_approvals.json file.
-    Vito tells Go "approve" or "reject" in plain English in the main chat.
-    This function is intentionally a no-op — bot polling removed to avoid conflicts with OpenClaw.
+    Polls Telegram group for bot commands (/status, /pending).
+    Uses a separate offset file so it never conflicts with OpenClaw's polling.
+    APPROVE/REJECT are handled by OpenClaw — this only handles /commands.
     """
-    pass
+    offset_file = LOG_DIR / 'telegram_cmd_offset.json'
+    try:
+        offset = json.loads(offset_file.read_text())['offset'] if offset_file.exists() else 0
+    except Exception:
+        offset = 0
+
+    try:
+        resp = requests.get(
+            f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates',
+            params={'offset': offset, 'timeout': 2, 'allowed_updates': ['message']},
+            timeout=5
+        )
+        updates = resp.json().get('result', [])
+    except Exception:
+        return
+
+    for update in updates:
+        offset = update['update_id'] + 1
+        msg = update.get('message', {})
+        chat_id = str(msg.get('chat', {}).get('id', ''))
+        text = msg.get('text', '').strip().lower()
+
+        # Only respond to messages from our alerts group
+        if chat_id != str(TELEGRAM_CHAT_ID):
+            continue
+
+        if text in ('/status', '/status@argusreach_bot'):
+            _send_status_to_telegram()
+        elif text in ('/pending', '/pending@argusreach_bot'):
+            _send_pending_to_telegram()
+
+    if updates:
+        offset_file.write_text(json.dumps({'offset': offset}))
+
+
+def _send_status_to_telegram():
+    """Format and send client status summary to the Telegram alerts group."""
+    try:
+        clients_data = json.loads(Path(CLIENTS_FILE).read_text())
+        clients = clients_data.get('clients', clients_data) if isinstance(clients_data, dict) else clients_data
+        active = [c for c in clients if c.get('active') and c.get('outreach_email') and not c.get('id','').startswith('_')]
+    except Exception as e:
+        notify(f"⚠️ /status error: `{e}`")
+        return
+
+    if not active:
+        notify("📊 *Status* — No active clients.")
+        return
+
+    pending_all = load_pending()
+    lines = [f"📊 *ArgusReach Status* — {len(active)} active client{'s' if len(active) != 1 else ''}"]
+
+    for c in active:
+        cid       = c['id']
+        firm      = c['firm_name']
+        campaign  = c.get('campaign_name', '—')
+        launch    = c.get('launch_date', '—')
+        pending_n = sum(1 for p in pending_all if p.get('client_id') == cid)
+
+        # Load history
+        h_path = LOG_DIR.parent / 'reports' / f"{cid}_history.json"
+        history = json.loads(h_path.read_text()) if h_path.exists() else []
+        last = history[-1] if history else None
+
+        lines.append(f"\n*{firm}*")
+        lines.append(f"Campaign: {campaign}")
+        lines.append(f"Launch: {launch} · {len(history)} month{'s' if len(history) != 1 else ''} active")
+        if last:
+            lines.append(f"Last month: {last['contacts']} contacts · {last['positive']} positive · {last['meetings']} meetings")
+        if pending_n:
+            lines.append(f"⚠️ {pending_n} pending approval{'s' if pending_n != 1 else ''}")
+
+    notify('\n'.join(lines))
+
+
+def _send_pending_to_telegram():
+    """Send list of pending approvals to Telegram group."""
+    pending = load_pending()
+    if not pending:
+        notify("✅ No pending approvals.")
+        return
+    lines = [f"📋 *Pending Approvals* — {len(pending)} item{'s' if len(pending) != 1 else ''}"]
+    for p in pending:
+        lines.append(f"\n*{p.get('firm_name','?')}* — {p.get('classification','?').upper()}")
+        lines.append(f"From: {p.get('from_name') or p.get('from_email')}")
+        lines.append(f"→ APPROVE `{p['id']}` or REJECT `{p['id']}`")
+    notify('\n'.join(lines))
 
 # ── EMAIL UTILS ───────────────────────────────────────────────────────────────
 def get_body(msg):

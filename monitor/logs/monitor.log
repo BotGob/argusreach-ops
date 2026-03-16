@@ -7227,3 +7227,29 @@ No replies processed today.
 2026-03-16 02:04:23 [ArgusReach] Skipping — not in prospect list: addie.blanco@tehilaim.com
 2026-03-16 02:04:23 Cycle complete. Next check in 10 min.
 
+2026-03-16 02:09:13 ArgusReach Monitor v2 starting
+2026-03-16 02:09:14 [ArgusReach] Checking inbox...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:690: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(days=1)).strftime('%d-%b-%Y')
+2026-03-16 02:09:15 [ArgusReach] 19 message(s) in last 24h.
+2026-03-16 02:09:15 [ArgusReach] Skipping duplicate: j-grabowski@01-machine.top
+2026-03-16 02:09:15 [ArgusReach] Skipping duplicate: autum.winters@cozychics.com
+2026-03-16 02:09:15 [ArgusReach] Skipping duplicate: jude.pedraza@rontervia.com
+2026-03-16 02:09:15 [ArgusReach] Skipping duplicate: breonna.heinrich@greatoutdoorguides.com
+2026-03-16 02:09:16 [ArgusReach] Skipping duplicate: iris.carlberg@talkmore.forum
+2026-03-16 02:09:16 [ArgusReach] Skipping duplicate: h.schott@metroheadlinehub.com
+2026-03-16 02:09:16 [ArgusReach] Skipping duplicate: esahc.bm@emtny.tec-send5.com
+2026-03-16 02:09:16 [ArgusReach] Skipping duplicate: james@en-news0523.com
+2026-03-16 02:09:16 [ArgusReach] Skipping duplicate: nicole.oneill@usetegteam.com
+2026-03-16 02:09:17 [ArgusReach] Skipping duplicate: victoriaevans@nassaustreetfixedincomefundridge.help
+2026-03-16 02:09:17 [ArgusReach] Skipping duplicate: sienna.h@revgenrock.com
+2026-03-16 02:09:17 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-16 02:09:17 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-16 02:09:18 [ArgusReach] Skipping duplicate: vitoresciniti27@yahoo.com
+2026-03-16 02:09:18 [ArgusReach] Skipping duplicate: vresciniti27@gmail.com
+2026-03-16 02:09:18 [ArgusReach] Skipping duplicate: gobbot95@gmail.com
+2026-03-16 02:09:18 [ArgusReach] Skipping duplicate: silvanadantonio1@gmail.com
+2026-03-16 02:09:18 [ArgusReach] Skipping duplicate: david@spectrumstocks.com
+2026-03-16 02:09:19 [ArgusReach] Skipping duplicate: addie.blanco@tehilaim.com
+2026-03-16 02:09:21 Cycle complete. Next check in 10 min.
+
