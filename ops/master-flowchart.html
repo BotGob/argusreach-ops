@@ -262,7 +262,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#555;font-style:italic;">Future: Calendly webhook handles this automatically</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#555;font-style:italic;">Future: Calendly webhook → Airtable + Telegram auto-alert</span>
+          <span style="color:#555;font-style:italic;">Future: Calendly webhook → database auto-log + Telegram alert (webhook server live at hooks.argusreach.com)</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#f59e0b;">●</span> Prospect books via Calendly link in reply<br>
@@ -391,9 +391,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       </div>
       <div class="arrow">↓</div>
       <div class="step">
-        <div class="step-label">Client added to Airtable</div>
+        <div class="step-label">Client registered in database</div>
         <div class="step-detail">Status: Active. Plan, start date, MRR logged.</div>
-        <span class="step-tool t-yellow">Airtable</span>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -481,8 +481,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="auto">
         <div class="step-label">Gob ingests & tags client list</div>
-        <div class="step-detail">Cleaned, validated, loaded to Airtable as source: client-provided. Grouped by connection type. These prospects are PRIORITIZED — outreached first. Warmer openers written using connection context.</div>
-        <span class="step-tool t-yellow">Airtable</span>
+        <div class="step-detail">Cleaned, validated, cross-referenced against DNC, loaded to prospects.csv. Warm leads flagged and prioritized — outreached first with warmer openers using connection context.</div>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
         <span class="step-tool t-blue">Gob (AI)</span>
       </div>
       <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
@@ -490,7 +490,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <div class="step-label">Gob builds cold prospect list</div>
         <div class="step-detail">Apollo.io paid search by title (Owner, Director, Practice Manager), location, company size. Returns verified personal emails — not generic info@ addresses. Free tier (50 exports/mo) insufficient for client campaigns; paid plan ($49-99/mo) required.</div>
         <span class="step-tool t-orange">Apollo.io (paid)</span>
-        <span class="step-tool t-yellow">Airtable</span>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
@@ -547,7 +547,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ NEGATIVE</div>
       <div class="auto">
         <div class="step-label">Polite removal auto-sent</div>
-        <div class="step-detail">Prospect added to DNC. Sequence paused. Logged in Airtable.</div>
+        <div class="step-detail">Prospect added to DNC (client + global). Sequence paused in Instantly. Event logged in database.</div>
       </div>
       <div class="arrow">↓ ESCALATE</div>
       <div class="escalate">
@@ -575,15 +575,15 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">Outcome logged</div>
-        <div class="step-detail">Vito updates Airtable: meeting held, outcome (closed/no fit/follow up needed)</div>
-        <span class="step-tool t-yellow">Airtable</span>
+        <div class="step-detail">Vito logs meeting outcome in admin portal. Database updated automatically.</div>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
         <div class="step-label">Monthly performance report</div>
-        <div class="step-detail">Gob pulls Airtable data → builds report: sent, open rate, replies, meetings booked, outcomes. Emailed to client.</div>
+        <div class="step-detail">Gob pulls database data → builds monthly report: sent, open rate, replies, meetings booked, outcomes. Reviewed by Vito, then emailed to client.</div>
         <span class="step-tool t-blue">Gob (AI)</span>
-        <span class="step-tool t-yellow">Airtable</span>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -631,7 +631,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Calendly</div>
-      <div class="tool-role">Vito's booking link + client booking links. Free Basic plan (1 event type) sufficient for MVP — bookings land on calendar, Calendly confirmation emails go out automatically. Upgrade to $10/mo unlocks webhooks → Airtable auto-log. Not needed until ready to automate. Trial expired Mar 22 → moved to free Basic plan.</div>
+      <div class="tool-role">Vito's booking link + client booking links. Free Basic plan (1 event type) sufficient for MVP — bookings land on calendar, Calendly confirmation emails go out automatically. Upgrade to $10/mo unlocks webhooks → auto-log in database. Not blocking anything. Trial expired Mar 22 → moved to free Basic plan.</div>
       <div class="tool-cost">Free (Basic) · $10/mo for webhooks later</div>
     </div>
     <div class="tool-card">
@@ -655,9 +655,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Airtable</div>
-      <div class="tool-role">CRM. Tracks clients, prospects, campaign metrics, meeting outcomes.</div>
-      <div class="tool-cost">Free</div>
+      <div class="tool-name">SQLite Database</div>
+      <div class="tool-role">Internal analytics and reporting layer. Stores all prospect events, classifications, approvals, meetings, and revenue data. Hosted on the ArgusReach server at argusreach.db. Syncs hourly from Instantly. Powers the admin portal dashboard, pipeline view, and monthly reports. No external dependency — fully owned infrastructure.</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Claude Pro (Anthropic) ✅ ACTIVE</div>
@@ -782,7 +781,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="df-arr">→</div>
     <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">Apollo contact lookup</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable (prospects)</div>
+    <div class="df-node" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;">SQLite DB (prospects)</div>
     <div class="df-note">Lead data flow (RIA/gov entity)</div>
   </div>
 
@@ -798,7 +797,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
   </div>
 
   <div class="df-row">
-    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Airtable metrics</div>
+    <div class="df-node" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;">SQLite DB (metrics)</div>
     <div class="df-arr">→</div>
     <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Gob builds monthly report</div>
     <div class="df-arr">→</div>
@@ -830,7 +829,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;">✅</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Calendly — resolved, staying on free Basic plan</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free tier sufficient for MVP (1 event type, unlimited bookings). Upgrade to $10/mo when ready for webhook → Airtable automation. Not blocking anything.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Calendly — resolved, staying on free Basic plan</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free tier sufficient for MVP (1 event type, unlimited bookings). Upgrade to $10/mo when ready for webhook → database auto-log. Not blocking anything.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
@@ -1057,7 +1056,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="font-size:0.75rem;color:#888;">• Meta title updated: "ArgusReach — Outbound, Powered by Argus"</div>
     <div style="font-size:0.75rem;color:#888;">• "Without/With ArgusReach" columns → "Without/With Argus" + swapped (With Argus now on left)</div>
     <div style="font-size:0.75rem;color:#888;">• Draft Approval Mode copy updated — clarifies it's our team reviewing replies, not the client</div>
-    <div style="font-size:0.75rem;color:#888;">• Data privacy language updated — honest subprocessor framing (Airtable/Instantly are our tools, data never sold)</div>
+    <div style="font-size:0.75rem;color:#888;">• Data privacy language updated — honest subprocessor framing (Instantly is our tool, data never sold)</div>
     <div style="font-size:0.75rem;color:#888;">• Live demo personas replaced with clearly fictional names (Webb/Okafor/Nguyen) — no real companies</div>
     <div style="font-size:0.75rem;color:#888;">• Demo reply/booking timing slowed down; switcher tabs made larger and more visible</div>
     <div style="font-size:0.75rem;color:#888;">• "48hr to first outreach" stat replaced with "~2wk to campaign launch" — accurate</div>
