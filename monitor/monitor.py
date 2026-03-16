@@ -44,6 +44,19 @@ MONITOR_LOG     = LOG_DIR / 'monitor.log'
 LOG_DIR.mkdir(exist_ok=True)
 DNC_DIR.mkdir(exist_ok=True)
 
+# ── DATABASE ──────────────────────────────────────────────────────────────────
+try:
+    sys.path.insert(0, str(BASE_DIR.parent))
+    from db.database import init_db as _init_db, log_event, upsert_prospect, update_prospect_stage, prospect_id as _prospect_id
+    _init_db()
+    _DB_ENABLED = True
+except Exception as _db_err:
+    _DB_ENABLED = False
+    def log_event(*a, **k): pass
+    def upsert_prospect(*a, **k): return None
+    def update_prospect_stage(*a, **k): pass
+    def _prospect_id(c, e): return hashlib.md5(f"{c}:{e}".encode()).hexdigest()
+
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 TELEGRAM_BOT_TOKEN  = os.environ.get('ARGUSREACH_BOT_TOKEN',
                                       '8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk')
@@ -903,6 +916,26 @@ def process_client(client, processed_ids):
             new_processed.add(fingerprint)
             log_reply(cid, from_email, classification, draft, sent,
                       result.get('notify_reason', ''))
+
+            # ── DB: record prospect + events
+            if _DB_ENABLED:
+                try:
+                    _pid = upsert_prospect(
+                        cid,
+                        client.get('instantly_campaign_id', ''),
+                        from_email, '', '', '', 'replied'
+                    )
+                    log_event(cid, _pid, 'classified', {
+                        'classification': classification,
+                        'subject': subject
+                    })
+                    if approval_id:
+                        log_event(cid, _pid, 'draft_queued', {'classification': classification})
+                    if sent:
+                        log_event(cid, _pid, 'reply_sent', {'to': from_email})
+                        update_prospect_stage(_pid, 'replied_by_us')
+                except Exception as _dbe:
+                    log(f"DB write error (non-fatal): {_dbe}")
 
         mail.logout()
 

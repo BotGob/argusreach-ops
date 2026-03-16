@@ -109,6 +109,18 @@ def main():
     save_pending(remaining)
     print(f"✅ Removed from queue. {len(remaining)} pending remaining.")
 
+    # ── DB: log approval event
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+        from argusreach.db.database import log_event, update_prospect_stage, prospect_id as _pid
+        pid = _pid(entry["client_id"], entry["from_email"])
+        log_event(entry["client_id"], pid, "draft_approved", {"approval_id": approval_id})
+        log_event(entry["client_id"], pid, "reply_sent", {"to": entry["from_email"]})
+        update_prospect_stage(pid, "replied_by_us")
+    except Exception as _e:
+        print(f"DB log (non-fatal): {_e}")
+
 
 if __name__ == "__main__":
     main()

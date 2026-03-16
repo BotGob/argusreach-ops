@@ -1,3 +1,7 @@
 monitor/.env
 *.env
 .env
+
+# Database
+db/argusreach.db
+db/dashboard.html
