@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ client.firm_name }} — ArgusReach Admin{% endblock %}
+{% block content %}
+
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+  <h1>{{ client.firm_name }}</h1>
+  {% if client.active %}
+    <span class="badge badge-green">Active</span>
+  {% else %}
+    <span class="badge badge-gray">Paused</span>
+  {% endif %}
+</div>
+<p class="subtitle">{{ client.vertical }} · {{ client.plan }} · {{ client.outreach_email }}</p>
+
+<div class="cards">
+  <div class="card"><div class="card-label">Leads in System</div><div class="card-value">{{ lead_count }}</div></div>
+  <div class="card"><div class="card-label">Emails Sent</div><div class="card-value">{{ stats.get('emails_sent_count',0) }}</div></div>
+  <div class="card"><div class="card-label">Replies</div><div class="card-value">{{ stats.get('reply_count_unique',0) }}</div></div>
+  <div class="card"><div class="card-label">DNC Entries</div><div class="card-value">{{ dnc_count }}</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+  <!-- Upload DNC -->
+  <div class="section">
+    <div class="section-title">📵 Upload DNC List</div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:14px">CSV or plain text. Any email address found will be added to this client's do-not-contact list. Cross-referenced automatically on every lead upload.</p>
+    <form method="POST" action="{{ url_for('upload_dnc', client_id=client.id) }}" enctype="multipart/form-data">
+      <div class="upload-area" style="margin-bottom:12px">
+        <input type="file" name="dnc_file" accept=".csv,.txt" style="width:auto;background:none;border:none;padding:0;color:#94a3b8">
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Import DNC List</button>
+    </form>
+  </div>
+
+  <!-- Upload Leads -->
+  <div class="section">
+    <div class="section-title">📋 Upload Lead List</div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:14px">CSV with columns: email, first_name, last_name, company, title. System will dedupe, cross-ref DNC, validate emails, and append to prospects.csv.</p>
+    <form method="POST" action="{{ url_for('upload_leads', client_id=client.id) }}" enctype="multipart/form-data">
+      <div class="upload-area" style="margin-bottom:12px">
+        <input type="file" name="leads_file" accept=".csv" style="width:auto;background:none;border:none;padding:0;color:#94a3b8">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <input type="checkbox" name="warm" value="yes" id="warm" style="width:auto">
+        <label for="warm" style="text-transform:none;font-size:13px;letter-spacing:0;color:#94a3b8">Mark as warm leads (will be flagged in prospects.csv)</label>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="submit" class="btn btn-primary btn-sm">Upload & Prep Leads</button>
+        {% if lead_count > 0 %}
+        <a href="{{ url_for('download_leads', client_id=client.id) }}" class="btn btn-ghost btn-sm">⬇ Download prospects.csv</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Client Config -->
+<div class="section" style="margin-top:0">
+  <div class="section-title">⚙️ Configuration</div>
+  <table style="border:none;background:none">
+    <tbody>
+      {% for label, val in [
+        ('Client ID', client.id),
+        ('Campaign Name', client.get('campaign_name','—')),
+        ('Campaign ID', client.get('instantly_campaign_id','—')),
+        ('Launch Date', client.get('launch_date','—')),
+        ('Sender', client.sender_name ~ ' <' ~ client.outreach_email ~ '>'),
+        ('Calendly', client.get('calendly_link','—')),
+        ('Contacts/month', client.get('contacts_per_month','—')|string),
+        ('Client Email', client.get('client_email','—')),
+        ('ICP', client.get('icp_summary','—')),
+      ] %}
+      <tr>
+        <td style="color:#64748b;font-size:12px;width:140px;border:none">{{ label }}</td>
+        <td style="font-size:13px;border:none">{{ val }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Recent Events -->
+{% if events %}
+<h2>Recent Events</h2>
+<table>
+  <thead><tr><th>Time</th><th>Event</th><th>Prospect</th><th>Detail</th></tr></thead>
+  <tbody>
+  {% for ev in events %}
+  <tr>
+    <td style="color:#64748b;font-size:12px">{{ (ev.created_at or '')[:16]|replace('T',' ') }}</td>
+    <td>
+      {% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e'} %}
+      {% set c = colors.get(ev.event_type, '#94a3b8') %}
+      <span class="badge" style="background:{{ c }}22;color:{{ c }};border:1px solid {{ c }}44">{{ ev.event_type }}</span>
+    </td>
+    <td style="font-size:12px">{{ ev.email or '—' }}</td>
+    <td style="font-size:12px;color:#64748b">
+      {% if ev.metadata %}
+        {% set m = ev.metadata|tojson %}{{ m[:80] }}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% endblock %}

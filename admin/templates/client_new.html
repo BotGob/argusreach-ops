@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}New Client — ArgusReach Admin{% endblock %}
+{% block content %}
+
+<h1>New Client Intake</h1>
+<p class="subtitle">Fill this out when a client signs. All fields used by the system to run their campaign.</p>
+
+<form method="POST" style="max-width:760px">
+
+  <h2>Identity</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Client ID <span style="color:#ef4444">*</span></label>
+      <input name="id" value="{{ form.get('id','') }}" placeholder="e.g. creekside_recovery" required>
+      <div style="font-size:11px;color:#64748b;margin-top:4px">lowercase, underscores only — used internally</div>
+    </div>
+    <div class="form-group">
+      <label>Firm Name <span style="color:#ef4444">*</span></label>
+      <input name="firm_name" value="{{ form.get('firm_name','') }}" placeholder="e.g. Creekside Recovery Residences" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Vertical <span style="color:#ef4444">*</span></label>
+      <select name="vertical">
+        {% for v in ['PhysicalTherapy','SoberLiving','RIA','DentalPractice','Chiropractic','MentalHealth','Other'] %}
+        <option value="{{ v }}" {{ 'selected' if form.get('vertical')==v }}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Plan <span style="color:#ef4444">*</span></label>
+      <select name="plan">
+        {% for p in ['Starter','Growth','Scale'] %}
+        <option value="{{ p }}" {{ 'selected' if form.get('plan')==p }}>{{ p }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <h2>Contact & Communication</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Client Email (billing/reports)</label>
+      <input name="client_email" type="email" value="{{ form.get('client_email','') }}" placeholder="owner@theirclinic.com">
+    </div>
+    <div class="form-group">
+      <label>Calendly Link</label>
+      <input name="calendly_link" value="{{ form.get('calendly_link','') }}" placeholder="https://calendly.com/...">
+    </div>
+  </div>
+
+  <h2>Outreach Setup</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Outreach Email <span style="color:#ef4444">*</span></label>
+      <input name="outreach_email" value="{{ form.get('outreach_email','') }}" placeholder="vito@argusreach.com" required>
+      <div style="font-size:11px;color:#64748b;margin-top:4px">Gmail address used for sending + IMAP monitoring</div>
+    </div>
+    <div class="form-group">
+      <label>Gmail App Password</label>
+      <input name="app_password" type="password" value="{{ form.get('app_password','') }}" placeholder="xxxx xxxx xxxx xxxx">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Sender Name <span style="color:#ef4444">*</span></label>
+      <input name="sender_name" value="{{ form.get('sender_name','') }}" placeholder="Vito Resciniti" required>
+    </div>
+    <div class="form-group">
+      <label>Sender Title</label>
+      <input name="title" value="{{ form.get('title','Founder') }}" placeholder="Founder">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Contacts Per Month</label>
+      <input name="contacts_per_month" type="number" value="{{ form.get('contacts_per_month','200') }}" placeholder="200">
+    </div>
+    <div class="form-group">
+      <label>Tone</label>
+      <select name="tone">
+        {% for t in ['warm-professional','direct','consultative','friendly'] %}
+        <option value="{{ t }}" {{ 'selected' if form.get('tone')==t }}>{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <h2>Targeting & Compliance</h2>
+  <div class="form-group">
+    <label>ICP Summary <span style="color:#ef4444">*</span></label>
+    <textarea name="icp_summary" placeholder="Who are we targeting? e.g. Independent PT clinic owners in Tampa Bay area. We are reaching out to offer physician referral outreach services...">{{ form.get('icp_summary','') }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Compliance Note</label>
+    <textarea name="compliance_note" placeholder="What must the AI never say? e.g. Do not make clinical claims, do not promise specific referral numbers...">{{ form.get('compliance_note','') }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Positioning Note</label>
+    <textarea name="positioning_note" placeholder="How should ArgusReach be framed? e.g. We amplify their sales efforts, not replace them...">{{ form.get('positioning_note','') }}</textarea>
+  </div>
+
+  <div style="margin-top:28px;display:flex;gap:12px">
+    <button type="submit" class="btn btn-primary">Create Client</button>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">Cancel</a>
+  </div>
+
+</form>
+{% endblock %}

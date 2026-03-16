@@ -1,0 +1,17 @@
+[Unit]
+Description=ArgusReach Admin Portal
+After=network.target
+
+[Service]
+Type=simple
+User=argus
+WorkingDirectory=/home/argus/.openclaw/workspace/argusreach/admin
+EnvironmentFile=/home/argus/.openclaw/workspace/argusreach/monitor/.env
+ExecStart=/usr/bin/python3 app.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

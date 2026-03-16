@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}ArgusReach Admin{% endblock %}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+a{color:#60a5fa;text-decoration:none}a:hover{text-decoration:underline}
+.nav{background:#13161f;border-bottom:1px solid #1e2535;padding:0 32px;display:flex;align-items:center;gap:32px;height:52px}
+.nav-brand{font-weight:700;color:#fff;font-size:15px;letter-spacing:-.02em}
+.nav-brand span{color:#60a5fa}
+.nav a{color:#94a3b8;font-size:13px;font-weight:500}
+.nav a:hover,.nav a.active{color:#fff;text-decoration:none}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.container{max-width:1200px;margin:0 auto;padding:32px}
+h1{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+h2{font-size:15px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin:28px 0 12px}
+.subtitle{color:#64748b;font-size:13px;margin-bottom:28px}
+.cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.card{background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;padding:18px 22px;min-width:160px;flex:1}
+.card-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.card-value{font-size:26px;font-weight:700;color:#fff}
+table{width:100%;border-collapse:collapse;background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;overflow:hidden}
+th{background:#151922;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;border-bottom:1px solid #2d3448}
+td{padding:10px 14px;border-bottom:1px solid #1e2535;font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#1e2535}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+.badge-yellow{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.badge-red{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.badge-gray{background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.2)}
+.btn{display:inline-block;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;text-decoration:none}
+.btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover{background:#2563eb;text-decoration:none}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2d3448}.btn-ghost:hover{color:#fff;text-decoration:none}
+.form-group{margin-bottom:18px}
+label{display:block;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+input,select,textarea{width:100%;background:#13161f;border:1px solid #2d3448;border-radius:6px;padding:9px 12px;color:#e2e8f0;font-size:13px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6}
+textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px}
+.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
+.section{background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;padding:20px;margin-bottom:20px}
+.section-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:14px}
+.upload-area{border:2px dashed #2d3448;border-radius:8px;padding:24px;text-align:center;color:#64748b;font-size:13px}
+.upload-area:hover{border-color:#3b82f6;color:#94a3b8}
+.warn-row td{background:rgba(245,158,11,.05)!important}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-brand">⚡ <span>Argus</span>Reach</div>
+  <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('campaigns') }}" class="{{ 'active' if request.endpoint == 'campaigns' }}">Campaigns</a>
+  <a href="{{ url_for('client_new') }}" class="{{ 'active' if request.endpoint == 'client_new' }}">+ New Client</a>
+  <div class="nav-right">
+    <a href="{{ url_for('logout') }}" style="color:#ef4444;font-size:12px">Logout</a>
+  </div>
+</nav>
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>
