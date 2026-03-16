@@ -924,6 +924,29 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 <!-- RECENT CHANGES LOG -->
 <div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-16 (evening)</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Admin Portal + Infrastructure</div>
+    <div style="font-size:0.75rem;color:#888;">• admin.argusreach.com live — password-protected internal hub (Dashboard, Pipeline, Campaigns, Stats, Flowchart, Backlog, Reports, New Client intake)</div>
+    <div style="font-size:0.75rem;color:#888;">• hooks.argusreach.com live — Stripe + Calendly webhook server with SSL (needs webhook registration in Stripe/Calendly dashboards)</div>
+    <div style="font-size:0.75rem;color:#888;">• nginx + Let&apos;s Encrypt SSL installed on server — both services run as systemd units with auto-restart</div>
+    <div style="font-size:0.75rem;color:#888;">• All internal pages removed from public site: flowchart, dashboard, docs, onboard, report-preview, roi — now served from admin portal only</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Data + Reporting Fixes</div>
+    <div style="font-size:0.75rem;color:#888;">• Instantly sync: fixed wrong API endpoint — now shows real stats (4 leads, 9 sent, 3 replies)</div>
+    <div style="font-size:0.75rem;color:#888;">• monthly_report.py: now pulls from SQLite DB (falls back to replies.json for pre-DB history)</div>
+    <div style="font-size:0.75rem;color:#888;">• Systemd timers added: hourly Instantly sync + hourly dashboard refresh — run setup-timers.sh to install</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Campaign Tools</div>
+    <div style="font-size:0.75rem;color:#888;">• tools/campaign_create.py — full automated campaign setup: create in Instantly, load prospects, register in DB, run validator, all from one command</div>
+    <div style="font-size:0.75rem;color:#888;">• tools/campaign_status.py — live registry: all campaigns, Instantly status, stats, mismatch detection, unregistered campaign flagging</div>
+    <div style="font-size:0.75rem;color:#888;">• tools/validate_campaign.py: fixed status label (status=1=ACTIVE not PAUSED), now accepts client_id or UUID</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Bug Fixes</div>
+    <div style="font-size:0.75rem;color:#888;">• monitor.py: dedup was silently suppressing Telegram alerts on re-queued drafts — fixed, always notifies</div>
+    <div style="font-size:0.75rem;color:#888;">• monitor.py: now writes all classifications + reply outcomes to DB automatically on every cycle</div>
+    <div style="font-size:0.75rem;color:#888;">• Backlog cleaned: completed items removed, active items only</div>
+  </div>
+</div>
+
+<div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-16 (afternoon)</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Data Infrastructure — Full Build</div>
