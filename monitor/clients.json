@@ -11,7 +11,7 @@
       "title": "Founder",
       "app_password": "dsvu rotk mehv qrww",
       "sender_name": "Vito Resciniti",
-      "firm_name": "ArgusReach",
+      "firm_name": "PT Tampa Bay (Test)",
       "vertical": "PhysicalTherapy",
       "calendly_link": "https://calendly.com/vito-argusreach/30min",
       "instantly_campaign_id": "9f7a5ffd-2577-438e-9045-70f4c9f1bf84",
@@ -22,7 +22,8 @@
       "campaign_name": "PT Tampa Bay \u2014 March 2026",
       "launch_date": "2026-03-15",
       "contacts_per_month": 200,
-      "client_email": ""
+      "client_email": "",
+      "plan": "starter"
     }
   ]
 }
