@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated March 2026 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-16 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -126,6 +126,191 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <li class="role-li"><span class="role-dot dot-orange"></span>Grant ArgusReach admin access (or join 30-min screen share)</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Show up to booked meetings</li>
     </ul>
+  </div>
+</div>
+
+<!-- MASTER PROCESS MAP -->
+<div style="margin-bottom:48px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:6px;">Master Process Map</h2>
+  <div style="font-size:0.72rem;color:#555;margin-bottom:24px;">Who does what, when, and how — the complete ArgusReach operating loop</div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:#888;"><span style="width:10px;height:10px;border-radius:50%;background:#60a5fa;display:inline-block;"></span>Vito</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:#888;"><span style="width:10px;height:10px;border-radius:50%;background:#4ade80;display:inline-block;"></span>System (Argus)</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:#888;"><span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;display:inline-block;"></span>Client</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:0.7rem;color:#888;"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>Prospect</div>
+  </div>
+
+  <div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;min-width:700px;">
+    <thead>
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+        <th style="text-align:left;padding:10px 14px;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#555;width:18%;">Phase</th>
+        <th style="text-align:left;padding:10px 14px;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#60a5fa;width:27%;">🧑 Vito</th>
+        <th style="text-align:left;padding:10px 14px;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#4ade80;width:27%;">⚡ System (Argus)</th>
+        <th style="text-align:left;padding:10px 14px;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:#a78bfa;width:28%;">🏢 Client / Prospect</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Phase 1 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">1. Sales &amp; Signing</td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Send website / one-pager to prospect<br>
+          <span style="color:#60a5fa;">●</span> Discovery call (30 min via Calendly)<br>
+          <span style="color:#60a5fa;">●</span> Send proposal + service agreement<br>
+          <span style="color:#60a5fa;">●</span> Collect $500 setup fee at signing
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#555;font-style:italic;">— nothing yet —</span>
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#a78bfa;">●</span> Reviews proposal<br>
+          <span style="color:#a78bfa;">●</span> Signs service agreement (DocuSign)<br>
+          <span style="color:#a78bfa;">●</span> Pays setup fee ($500)<br>
+          <span style="color:#a78bfa;">●</span> Sets up Calendly Basic (free) — required gate
+        </td>
+      </tr>
+
+      <!-- Phase 2 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup</td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> 45-min onboarding call (ICP, voice, targets)<br>
+          <span style="color:#60a5fa;">●</span> Set up client sending domain + Gmail Workspace<br>
+          <span style="color:#60a5fa;">●</span> Configure SPF / DKIM / DMARC DNS records<br>
+          <span style="color:#60a5fa;">●</span> Add client to Instantly + begin warmup<br>
+          <span style="color:#60a5fa;">●</span> Add client block to clients.json (launch_date, client_email, etc.)<br>
+          <span style="color:#60a5fa;">●</span> Build Apollo prospect list → NeverBounce verify<br>
+          <span style="color:#60a5fa;">●</span> Write 3-touch sequence (sequence.md)<br>
+          <span style="color:#60a5fa;">●</span> Create Instantly campaign + load prospects<br>
+          <span style="color:#60a5fa;">●</span> Run validator (validate_campaign.py) — must pass 0 errors
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#4ade80;">●</span> Instantly: email warmup runs automatically (~2 wks)<br>
+          <span style="color:#4ade80;">●</span> DNS propagates (SPF/DKIM/DMARC)<br>
+          <span style="color:#4ade80;">●</span> Monitor begins watching new client inbox (active: true)
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#a78bfa;">●</span> Reviews 3-touch email sequence<br>
+          <span style="color:#a78bfa;">●</span> Approves or requests edits (one round)<br>
+          <span style="color:#a78bfa;">●</span> Provides existing contact list (people to exclude)
+        </td>
+      </tr>
+
+      <!-- Phase 3 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">3. Campaign Live<br><span style="font-weight:400;color:#555;font-size:0.65rem;">Runs continuously</span></td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Activate campaign in Instantly<br>
+          <span style="color:#555;font-style:italic;">— then nothing until replies arrive —</span>
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#4ade80;">●</span> Instantly sends Touch 1 to all contacts<br>
+          <span style="color:#4ade80;">●</span> Touch 2 auto-sends (~Day 5)<br>
+          <span style="color:#4ade80;">●</span> Touch 3 auto-sends (~Day 12)<br>
+          <span style="color:#4ade80;">●</span> Monitor polls inbox every 10 min (24/7)<br>
+          <span style="color:#4ade80;">●</span> Instantly auto-stops sequence on any reply (stop_on_reply)
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#a78bfa;">●</span> Client: nothing — campaign runs fully managed<br>
+          <span style="color:#f59e0b;">●</span> Prospect receives Touch 1 from client's email address
+        </td>
+      </tr>
+
+      <!-- Phase 4 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">4. Reply Handling</td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Receives Telegram alert (argus-alerts group)<br>
+          <span style="color:#60a5fa;">●</span> Reviews draft reply<br>
+          <span style="color:#60a5fa;">●</span> Types APPROVE [id] or REJECT [id] in group<br>
+          <span style="color:#60a5fa;">●</span> For escalations: drafts custom response, tells Gob to send
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#4ade80;">●</span> Monitor detects reply (IMAP, last 24h window)<br>
+          <span style="color:#4ade80;">●</span> Filters: spam, automated senders, non-replies<br>
+          <span style="color:#4ade80;">●</span> Instantly: sequence paused for this prospect<br>
+          <span style="color:#4ade80;">●</span> Claude AI classifies: positive / not_now / OOO / negative / escalate<br>
+          <span style="color:#4ade80;">●</span> AI drafts reply in client voice with Calendly link<br>
+          <span style="color:#4ade80;">●</span> Queues in pending_approvals.json<br>
+          <span style="color:#4ade80;">●</span> Fires Telegram alert: firm, campaign, classification, draft, APPROVE/REJECT command<br>
+          <span style="color:#4ade80;">●</span> On APPROVE: sends reply via Gmail SMTP with In-Reply-To/References threading headers<br>
+          <span style="color:#4ade80;">●</span> Logs to replies.json, clears pending entry
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#f59e0b;">●</span> Prospect replies to email<br>
+          <span style="color:#f59e0b;">●</span> Prospect receives approved reply (appears to come from client)<br>
+          <span style="color:#a78bfa;">●</span> Client: unaware of reply handling — fully managed
+        </td>
+      </tr>
+
+      <!-- Phase 5 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">5. Meeting Booked</td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Receives email from client (vito@argusreach.com) confirming meeting<br>
+          <span style="color:#60a5fa;">●</span> Updates prospect status manually in records<br>
+          <span style="color:#60a5fa;">●</span> Adds prospect to DNC list<br>
+          <span style="color:#555;font-style:italic;">Future: Calendly webhook handles this automatically</span>
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#555;font-style:italic;">Future: Calendly webhook → Airtable + Telegram auto-alert</span>
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#f59e0b;">●</span> Prospect books via Calendly link in reply<br>
+          <span style="color:#a78bfa;">●</span> Client gets Calendly notification<br>
+          <span style="color:#a78bfa;">●</span> Client emails vito@argusreach.com to confirm meeting booked<br>
+          <span style="color:#a78bfa;">●</span> Client shows up and closes the deal
+        </td>
+      </tr>
+
+      <!-- Phase 6 -->
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">6. Monthly Reporting<br><span style="font-weight:400;color:#555;font-size:0.65rem;">1st of each month</span></td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Runs: <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">python3 tools/monthly_report.py --client [id] --month "Month YYYY"</span><br>
+          <span style="color:#60a5fa;">●</span> Confirms pre-filled reply stats (auto from log)<br>
+          <span style="color:#60a5fa;">●</span> Manually enters: contacts reached, meetings booked<br>
+          <span style="color:#60a5fa;">●</span> Enters what worked + what's changing<br>
+          <span style="color:#60a5fa;">●</span> Reviews preview before sending (--preview flag)
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#4ade80;">●</span> Pre-populates positive, not_now, OOO counts from replies.json<br>
+          <span style="color:#4ade80;">●</span> Generates HTML report with campaign history table + running totals<br>
+          <span style="color:#4ade80;">●</span> Sends email to client_email via Gmail SMTP<br>
+          <span style="color:#4ade80;">●</span> Saves HTML copy to reports/[client_id]_[month].html<br>
+          <span style="color:#4ade80;">●</span> Appends entry to reports/[client_id]_history.json
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#a78bfa;">●</span> Receives monthly report email<br>
+          <span style="color:#a78bfa;">●</span> Reviews: contacts, replies, meetings, what's changing<br>
+          <span style="color:#a78bfa;">●</span> Replies to email with any questions
+        </td>
+      </tr>
+
+      <!-- Phase 7 -->
+      <tr>
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">7. Status &amp; Ops<br><span style="font-weight:400;color:#555;font-size:0.65rem;">On-demand</span></td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#60a5fa;">●</span> Types <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">/status</span> in argus-alerts group for live dashboard<br>
+          <span style="color:#60a5fa;">●</span> Types <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">/pending</span> to see all pending approvals<br>
+          <span style="color:#60a5fa;">●</span> Runs <span style="font-family:monospace;font-size:0.68rem;color:#60a5fa;">python3 tools/status.py</span> for full terminal view
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#4ade80;">●</span> Monitor polls for /status command every cycle<br>
+          <span style="color:#4ade80;">●</span> Responds with: active clients, months active, last report, pending count, reply log stats<br>
+          <span style="color:#4ade80;">●</span> Heartbeat checks pending_approvals.json every 10 min, alerts if drafts sitting unreviewed
+        </td>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
+          <span style="color:#555;font-style:italic;">— client-facing: nothing —</span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
   </div>
 </div>
 
@@ -688,6 +873,31 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 </div>
 
 <!-- RECENT CHANGES LOG -->
+<div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-16</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Client Reporting &amp; Status System</div>
+    <div style="font-size:0.75rem;color:#888;">• monthly_report.py — generates HTML email report, auto-pulls reply stats from log, sends via Gmail SMTP, saves archive to reports/</div>
+    <div style="font-size:0.75rem;color:#888;">• Campaign history tracking per client — reports/[client_id]_history.json, shown in report with running totals and LAUNCH flag</div>
+    <div style="font-size:0.75rem;color:#888;">• status.py terminal dashboard — all clients, months active, pending approvals, reply breakdown</div>
+    <div style="font-size:0.75rem;color:#888;">• /status and /pending Telegram bot commands — monitor responds to group with live summary</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">clients.json Schema Hardened</div>
+    <div style="font-size:0.75rem;color:#888;">• New required fields: launch_date (YYYY-MM-DD), client_email, contacts_per_month, campaign_name</div>
+    <div style="font-size:0.75rem;color:#888;">• Example client block updated with all new fields + field notes</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Master Process Map Added</div>
+    <div style="font-size:0.75rem;color:#888;">• Full role-based swimlane added to flowchart: Vito / System (Argus) / Client / Prospect at every phase</div>
+    <div style="font-size:0.75rem;color:#888;">• 7 phases documented: Sales, Onboarding, Campaign Live, Reply Handling, Meeting Booked, Monthly Reporting, Status &amp; Ops</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Website — Final Audit Passes</div>
+    <div style="font-size:0.75rem;color:#888;">• Stats bar rebuilt: Fully Managed / Your Name / Warm Only / You Focus (removed generic 24/7 and ~2wk stats)</div>
+    <div style="font-size:0.75rem;color:#888;">• Messaging reframe: "no salary/overhead" → "closers focus on closing" — sales enablement not hiring replacement</div>
+    <div style="font-size:0.75rem;color:#888;">• Branding: "AI Sales" → "Done-For-You Outreach" across all pages</div>
+    <div style="font-size:0.75rem;color:#888;">• Performance: scroll listeners throttled via rAF, canvas paused off-screen, will-change GPU acceleration on scroll reveals</div>
+    <div style="font-size:0.75rem;color:#888;">• CTA: "Stop Waiting on Referrals" → "Stop Prospecting. Start Closing." — works across all verticals</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">SOUL.md Updated</div>
+    <div style="font-size:0.75rem;color:#888;">• Added COO framing — "You have a job, not just tasks" — owns outcomes, not just requests</div>
+    <div style="font-size:0.75rem;color:#888;">• Backlog: Bitcoin payment acceptance added as post-MVP item</div>
+  </div>
+</div>
 <div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-15</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">

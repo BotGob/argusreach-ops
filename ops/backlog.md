@@ -1,7 +1,7 @@
 # ArgusReach — Ops & Product Backlog
 
 > COO-maintained. Active items only — completed items live in the flowchart.
-> Last updated: 2026-03-15 by Gob
+> Last updated: 2026-03-16 by Gob
 
 ---
 
@@ -23,6 +23,18 @@
 ### 4. LLC filing — ArgusReach LLC
 - sunbiz.org — Florida LLC — $125
 - Do before first client signs
+
+---
+
+## ✅ Completed This Session (2026-03-16) — Moved to Flowchart
+- Monthly client report generator (`tools/monthly_report.py`) — auto-pulls reply stats from log, sends HTML email, saves archive
+- Campaign history tracking per client — `reports/[client_id]_history.json`, shown in report with running totals
+- Client status dashboard (`tools/status.py`) — all clients, months active, pending approvals, reply stats
+- `/status` and `/pending` Telegram bot commands in alerts group — monitor responds with live summary
+- Monitor: UNSEEN → date-based search (survives manual inbox reads), MAX_PER_CLIENT raised to 50, per-prospect dedup in queue_pending
+- Website: 4 audit passes — touch count, open rates, A/B testing, weekly reports, demo sequence, CTA timing, stats bar, messaging reframe, performance lag fixes
+- clients.json schema: `launch_date`, `client_email`, `contacts_per_month`, `campaign_name` now required fields
+- SOUL.md updated: COO role framing added
 
 ---
 
