@@ -386,7 +386,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">$500 setup fee collected</div>
-        <div class="step-detail">Stripe Payment Link sent to client. Paid online instantly. Monthly subscription link sent separately. Live links: Setup buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01 · Starter buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02 · Growth buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00 · Scale buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03</div>
+        <div class="step-detail">Stripe Payment Link sent to client. Paid online instantly. Payment webhook fires → auto-logged to database + Telegram alert to Vito. Monthly subscription link sent separately. Live links: Setup buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01 · Starter buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02 · Growth buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00 · Scale buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03</div>
         <span class="step-tool t-purple">Stripe</span>
       </div>
       <div class="arrow">↓</div>
@@ -689,8 +689,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Stripe ✅ LIVE</div>
-      <div class="tool-role">Payment collection. 4 live payment links: Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. Recurring billing enabled. Invoice PDF on every transaction.</div>
+      <div class="tool-name">Stripe ✅ LIVE + WEBHOOK CONNECTED</div>
+      <div class="tool-role">Payment collection. 4 live payment links: Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. Recurring billing enabled. Invoice PDF on every transaction. Webhook live at hooks.argusreach.com/webhooks/stripe — payments auto-log to database and fire Telegram alert on every successful payment. Connected 2026-03-17.</div>
       <div class="tool-cost">2.9% + $0.30/txn</div>
     </div>
     <div class="tool-card">
@@ -922,6 +922,25 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 </div>
 
 <!-- RECENT CHANGES LOG -->
+<div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-17</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Stripe Webhook Connected</div>
+    <div style="font-size:0.75rem;color:#888;">• Stripe webhook live at hooks.argusreach.com/webhooks/stripe — all successful payments now auto-log to SQLite database and fire Telegram alert</div>
+    <div style="font-size:0.75rem;color:#888;">• STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET added to monitor/.env — webhook server restarted and verified</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Other Infrastructure (2026-03-16 evening)</div>
+    <div style="font-size:0.75rem;color:#888;">• Airtable fully removed — SQLite DB replaces it throughout all flows</div>
+    <div style="font-size:0.75rem;color:#888;">• Global DNC — unsubscribes write to global blocklist, cross-referenced on every lead upload across all clients</div>
+    <div style="font-size:0.75rem;color:#888;">• OOO follow-up scheduling — follow_up_date stored in DB, Telegram alert fires when date arrives</div>
+    <div style="font-size:0.75rem;color:#888;">• Monitor heartbeat + health check timer — Telegram alert if monitor silent 35+ min</div>
+    <div style="font-size:0.75rem;color:#888;">• Auto-restart watcher — admin portal restarts automatically on code changes, no SSH needed</div>
+    <div style="font-size:0.75rem;color:#888;">• Public client intake form at admin.argusreach.com/intake — clients self-serve, submissions land in Intakes tab for Vito review</div>
+    <div style="font-size:0.75rem;color:#888;">• Full end-to-end data flow: approve.py now writes to DB on every approval/rejection</div>
+    <div style="font-size:0.75rem;color:#888;">• Sequence templates created for PT, Sober Living, and RIA verticals</div>
+    <div style="font-size:0.75rem;color:#888;">• Open Graph meta tags added to all public pages — proper social share previews</div>
+  </div>
+</div>
+
 <div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-16 (evening)</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
