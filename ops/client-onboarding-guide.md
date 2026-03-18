@@ -2,15 +2,16 @@
 
 > **For:** New ArgusReach clients  
 > **Send:** Immediately after service agreement is signed and setup fee is paid  
-> **Purpose:** Everything you need to do before we launch your campaign  
+> **Format:** Email body or PDF attachment  
+> **Purpose:** Everything the client needs to do before we launch their campaign  
 
 ---
 
 ## Welcome
 
-Your campaign is coming together. While we handle the heavy lifting — building your prospect list, writing your sequences, and setting up the outreach system — there are a few things only you can do. This guide covers all of it.
+Your campaign is coming together. While we handle the heavy lifting — building your prospect list, writing your email sequences, and running the outreach system — there are a few things only you can handle on your end. This guide walks through all of it.
 
-**Timeline:** From signing to first email sent is typically **3–4 weeks.** Most of that is the warmup period (mandatory, not skippable). Here's what needs to happen on your end.
+**Timeline:** From signing to first email sent is typically **3–4 weeks.** Most of that is the warmup period, which is automatic but can't be skipped. Here's what needs to happen on your side.
 
 ---
 
@@ -22,103 +23,116 @@ Your campaign is coming together. While we handle the heavy lifting — building
 **Time:** ~10 minutes  
 **Do this within 48 hours of signing.**
 
-This form tells us everything about your business and who we're targeting. You'll fill in:
+This tells us everything about your business and who you want to reach. You'll cover:
 - Who your ideal client is (industry, title, company size, geography)
-- Your tone and communication style
-- Any contacts you don't want us to reach out to
-- Your Calendly booking link
+- Your communication tone and style
+- Any contacts you don't want us to reach out to (existing clients, competitors, etc.)
+- Your booking link for prospect calls
 
-> 💡 Don't overthink it. We'll refine everything before anything sends.
-
----
-
-### Step 2 — Add a Google Workspace Seat (~$7–12/month, billed to you)
-
-We need a real email address on your domain to send from — something like `james@outreach.yourfirm.com`. This protects your main inbox and keeps your domain reputation clean.
-
-**What to do:**
-1. Log into your Google Workspace Admin at **admin.google.com**
-2. Go to **Users → Add new user**
-3. Add one additional seat
-
-**Or:** If you're not comfortable doing this, no problem — just give us admin access (instructions below) and we'll handle it.
-
-> 💡 This email address is completely invisible to your prospects. They see your name, your firm name, your real email as the reply-to. The outreach subdomain is just the sending infrastructure.
+> 💡 Don't overthink it. We'll refine everything before a single email sends.
 
 ---
 
-### Step 3 — Grant ArgusReach Admin Access
+### Step 2 — Let Us Know Your Email Setup
 
-We need access to two things to set up your outreach infrastructure:
+We'll be creating a dedicated outreach email address on your domain — something like `james@outreach.yourfirm.com`. This keeps your main inbox clean and protects your domain reputation.
 
-**A) Google Workspace Admin**
-1. Go to **admin.google.com → Account → Admin Roles**
-2. Create or use an existing admin role
-3. Add **vito@argusreach.com** as an admin
+**What email platform do you use?**
 
-**B) Your Domain Registrar (DNS)**  
-We need to add 4–5 DNS records to your domain to make your outreach email work properly.
+- **Google Workspace (Gmail)** — most common. You'll need to add one additional user seat (~$7–12/month, billed to you directly through Google).
+- **Microsoft 365 (Outlook)** — also fully supported. You'll need one additional Microsoft 365 mailbox (~$6–22/month depending on your plan).
+- **Something else** — not a problem. Let us know and we'll figure it out together.
 
-- **GoDaddy:** Login → My Products → DNS → Manage (next to your domain)
+> 💡 This email address is completely invisible to your prospects. They see your name, your firm name, and your real email as the reply-to address. The outreach address is just the sending infrastructure — it never appears anywhere client-facing.
+
+---
+
+### Step 3 — Give Us Access to Your Email Admin
+
+We need to add the outreach address to your email platform. The easiest way is to give us temporary admin access — we get in, set it up, and you can remove our access afterward.
+
+**If you use Google Workspace:**
+- Share your Google Workspace admin login with us (admin.google.com), OR
+- Add **vito@argusreach.com** as an admin under Account → Admin Roles
+
+**If you use Microsoft 365:**
+- Share your Microsoft 365 admin login with us (admin.microsoft.com), OR
+- Add **vito@argusreach.com** as a Global Admin under Users → Active Users
+
+**Not comfortable sharing credentials?** No problem at all — just book a 30-minute screen share with us and we'll walk you through every click. Nothing is complicated once we're looking at it together.
+
+---
+
+### Step 4 — Give Us Access to Your Domain Settings
+
+We need to add a few technical records to your domain (the same place you manage your website URL). This is what makes your outreach email deliverable and trustworthy to inbox providers.
+
+**Where are your domain settings?**
+- **GoDaddy:** Login → My Products → DNS → Manage
 - **Cloudflare:** Login → Select your domain → DNS tab
-- **Other registrar:** Similar — look for "DNS Management" or "DNS Settings"
+- **Namecheap:** Login → Domain List → Manage → Advanced DNS
+- **Other registrar:** Look for "DNS Management" or "DNS Settings"
 
-> **Prefer to keep your own login?** That's fine. Share your screen with us on a 30-minute call and we'll walk you through exactly what to add. Nothing is risky — these are standard email configuration records.
+You can share login credentials with us, or again — 30-minute screen share works fine.
+
+> 💡 We're adding 5 standard DNS records. This is routine setup that every business email account requires. It doesn't change your website, your existing email, or anything else — it only activates the new outreach subdomain.
 
 ---
 
-### Step 4 — Connect Your Calendar to Calendly
+### Step 5 — Connect Your Calendar
 
-We use a dedicated ArgusReach Calendly account to manage prospect bookings. When a prospect books a call through us, it goes directly to your calendar.
+We use a dedicated ArgusReach Calendly account to handle prospect bookings. When an interested prospect books a call, it lands directly on your calendar.
 
 **What to do:**
-1. We'll send you a Calendly invitation to connect your Google or Outlook calendar
-2. Click "Accept" and authorize the calendar connection
-3. That's it — bookings will land on your calendar automatically
+1. We'll send you a short Calendly invitation
+2. Click "Accept" and connect your Google or Outlook calendar
+3. Done — bookings show up on your calendar automatically with all prospect details
 
-> 💡 Your calendar stays yours. Prospects book through a Calendly link we control, and confirmations go to both you and the prospect. You don't need a paid Calendly account.
+> 💡 You don't need a paid Calendly account. Your calendar stays fully yours — we just route the bookings through our system so we can track them.
 
 ---
 
-### Step 5 — Review and Approve Your Email Sequences
+### Step 6 — Review and Approve Your Email Sequences
 
-Before we send a single email under your name, you'll review and approve the full sequence. We'll email you a document with all 3 touches written out.
+Before we send a single email under your name, you'll see everything. We'll email you the full sequence — all 3 messages — written in your voice for your specific audience.
 
 **What to look for:**
 - Does this sound like you?
-- Is the ICP described accurately?
-- Any specific phrases you'd never say?
-- Any compliance concerns for your industry?
+- Is the target audience described accurately?
+- Any specific phrases you'd never use?
+- Any compliance or regulatory concerns for your industry?
 
-You can request as many edits as needed. Nothing goes out without your written sign-off.
+Request as many edits as you need. We'll revise until you're happy. **Nothing sends without your written sign-off.**
 
 ---
 
-## What We Handle (You Don't Touch This)
+## What We Handle From Here
+
+Once your setup steps are complete, everything else is on us:
 
 | Task | Owner |
 |------|-------|
-| Prospect list building (Apollo.io) | ArgusReach |
-| Email verification (bounce protection) | ArgusReach |
-| DNS record setup (once you grant access) | ArgusReach |
-| Instantly.ai campaign configuration | ArgusReach |
-| 2–3 week warmup period | ArgusReach (automatic) |
+| Prospect list building | ArgusReach |
+| Email address verification (bounce protection) | ArgusReach |
+| DNS + email infrastructure setup | ArgusReach |
+| Campaign configuration | ArgusReach |
+| 2–3 week warmup period (automatic) | ArgusReach |
 | Reply monitoring 24/7 | ArgusReach |
-| Drafting responses to interested prospects | ArgusReach → Vito approves |
-| Booking coordination | ArgusReach Calendly |
+| Drafting responses to interested prospects | ArgusReach |
+| Booking coordination | ArgusReach |
 | Monthly performance report | ArgusReach |
 
 ---
 
-## Timeline (What to Expect)
+## Timeline
 
-| Week | What Happens |
-|------|-------------|
-| Week 1 | Intake form → we build client brief, start prospect list, write sequences |
-| Week 1–2 | You review and approve sequences. DNS setup + outreach email created. Warmup begins. |
-| Week 2–3 | Warmup continues. Prospect list finalized, verified, and loaded. |
-| Week 3–4 | Warmup completes (85%+ health score). Final check. Campaign launches. |
-| Week 4+ | Emails going out daily. Reply monitoring active. You get alerts for interested prospects. |
+| Timeframe | What's Happening |
+|-----------|-----------------|
+| Days 1–3 | Intake form submitted → we build your campaign brief and start your prospect list |
+| Week 1–2 | Sequences written → you review and approve → email infrastructure set up → warmup begins |
+| Week 2–3 | Warmup running automatically → prospect list finalized and verified |
+| Week 3–4 | Warmup complete → final pre-launch check → campaign goes live |
+| Week 4+ | Emails going out daily → we monitor replies 24/7 → you hear from us when someone's interested |
 
 ---
 
