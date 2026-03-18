@@ -726,8 +726,8 @@ def intake():
 
         # Notify Vito via Telegram
         try:
-            tg_token = os.environ.get("TELEGRAM_BOT_TOKEN","")
-            tg_chat  = os.environ.get("TELEGRAM_CHAT_ID","")
+            tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN","8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk")
+            tg_chat  = os.environ.get("ARGUSREACH_CHAT_ID","-1003821840813")
             if tg_token and tg_chat:
                 msg = (f"📋 *New Client Intake Submitted*\n\n"
                        f"*{submission['firm_name']}*\n"
