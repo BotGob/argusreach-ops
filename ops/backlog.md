@@ -1,7 +1,7 @@
 # ArgusReach — Ops Backlog
 
 > Active items only. Completed items live in the flowchart changelog.
-> Last updated: 2026-03-16
+> Last updated: 2026-03-18
 
 ---
 
@@ -22,14 +22,8 @@ Free trial expires March 23. Don't wait — upgrade now.
 ### 5. Apollo.io — upgrade to Basic ($49/mo) when first client signs
 Free tier (50 exports/mo) insufficient for client campaigns.
 
-### 6. Stripe webhook secret + Stripe secret key
-Add to monitor/.env so Stripe payments auto-log:
-- `STRIPE_SECRET_KEY=sk_live_...`
-- `STRIPE_WEBHOOK_SECRET=whsec_...`
-Then register: https://hooks.argusreach.com/webhooks/stripe in Stripe Dashboard → Developers → Webhooks
-
-### 7. Calendly webhook registration
-Register: https://hooks.argusreach.com/webhooks/calendly in Calendly → Integrations → Webhooks
+### 6. ✅ Stripe webhook — DONE (2026-03-17)
+### 7. ✅ Calendly webhook — DONE (2026-03-18)
 
 ---
 
@@ -51,8 +45,8 @@ Installs hourly systemd timers for Instantly sync + dashboard refresh.
 ### 10. Campaign creation script (sequence.json → Instantly API)
 Fully automate campaign setup from a sequence.json file. Currently `campaign_create.py` handles leads + structure but sequence must be written manually in Instantly UI first.
 
-### 11. Calendly webhook — client-side limitation
-For client campaigns (their Calendly), bookings go to their calendar — no visibility. Interim: client emails vito@argusreach.com when meeting confirms. Long-term: provide ArgusReach Calendly link and own the webhook.
+### 11. ✅ Calendly client-side limitation — SOLVED (2026-03-18)
+ArgusReach owns the Calendly account with per-client event types. Webhook live. Upgrade to Standard ($10/mo) when first client signs.
 
 ### 12. ArgusReach self-prospecting domain warm-up
 Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client signs.
@@ -122,3 +116,19 @@ Unknown senders currently escalated to Vito (good). Future improvement: fuzzy-ma
 
 ### 30. processed_ids archive cleanup policy
 Archive file grows indefinitely (by design — never delete history). At 2+ years of operation, review and set a hard archive limit (e.g., keep 2 years). Not urgent — file is small, just document the policy.
+
+---
+
+## 🟡 Design / Polish — Added 2026-03-18
+
+### 31. Client-facing material — match website style
+All client-facing pages and forms must mirror argusreach.com's visual identity (dark background, Inter font, color palette, card styling). Currently unstyled or using basic Bootstrap.
+
+**In scope:**
+- `admin.argusreach.com/intake` — the public client onboarding form (currently plain Flask/Bootstrap). Should look like it belongs to the ArgusReach brand, not a generic internal tool.
+- `client-onboarding-guide.md` — when converted to a web page or PDF, should use ArgusReach branding (logo, colors, fonts).
+- Any future client-facing emails (welcome email, monthly report) should use a consistent HTML template matching the brand.
+
+**Reference:** argusreach.com (dark bg #0f0f0f, Inter font, green accent #4ade80, card borders rgba(255,255,255,0.07)).
+
+**Priority:** Before first real client sees the intake form.
