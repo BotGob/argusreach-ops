@@ -24,16 +24,19 @@ Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run eac
 (Short answer — e.g., "James K." — this is how the prospect sees the sender)
 
 **Q6. What email address should outreach come from?**
-(Email — e.g., james@bayharborwealth.com — client provides this, or we use a subdomain)
+(Short answer — e.g., outreach@mail.bayharborwealth.com — this should be a dedicated address on a subdomain, NOT their main business email. If not yet set up, note "pending setup" and coordinate on onboarding call.)
 
-**Q7. Client's Calendly / booking link**
-(URL — where meetings land when a prospect books)
+**Q6b. What email provider do they use?**
+(Multiple choice: Google Workspace / Microsoft 365 / Other — note provider here, needed for sending account setup)
+
+**Q6c. Has the sending account been set up and connected?**
+(Multiple choice: Yes — ready to go / No — schedule screen share / Client handling it themselves)
+
+**Q7. Client's booking/calendar link**
+(URL — where meetings land when a prospect books. This will be connected to our Calendly event for tracking.)
 
 **Q8. Plan**
 (Multiple choice: Starter $750 / Growth $1,500 / Scale $2,500)
-
-**Q8b. Your dedicated outreach email address**
-(Short answer — the new Google Workspace account created for ArgusReach to send from, e.g. james.k@yourdomain.com. If not yet created, leave blank and complete before onboarding call.)
 
 **Q8c. Do you have an existing contact list to prioritize?**
 (Multiple choice: Yes — I'll email it separately / No — start with cold prospecting / I'll have one ready by onboarding call)
