@@ -470,6 +470,23 @@ def check_telegram_commands():
             _send_status_to_telegram()
         elif text in ('/pending', '/pending@argusreach_bot'):
             _send_pending_to_telegram()
+        elif msg.get('text', '').strip().upper().startswith('CYCLE '):
+            # CYCLE <client_id> <Month Year>
+            # e.g. CYCLE argusreach_test April 2026
+            parts     = msg['text'].strip().split(None, 2)
+            if len(parts) >= 3:
+                cycle_client = parts[1]
+                cycle_month  = parts[2]
+                notify(f"⚙️ Starting monthly cycle for *{cycle_client}* — *{cycle_month}*...")
+                try:
+                    import subprocess
+                    script = str(BASE_DIR / 'tools' / 'monthly_cycle.py')
+                    subprocess.Popen(
+                        ['python3', script, '--client', cycle_client, '--month', cycle_month],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                    )
+                except Exception as ce:
+                    notify(f"❌ Cycle launch failed: `{str(ce)[:100]}`")
 
     if updates:
         offset_file.write_text(json.dumps({'offset': offset}))
@@ -1251,6 +1268,61 @@ def check_due_followups():
         log(f"[Follow-up] check failed (non-fatal): {e}")
 
 
+def check_campaign_cycles(clients):
+    """Alert when a client's campaign is >75% complete — time to build next month's batch."""
+    if not _DB_ENABLED:
+        return
+    CYCLE_STATE = BASE_DIR / 'monitor' / 'logs' / 'cycle_state.json'
+
+    def load_state():
+        return json.loads(CYCLE_STATE.read_text()) if CYCLE_STATE.exists() else {}
+
+    def save_state(s):
+        CYCLE_STATE.parent.mkdir(parents=True, exist_ok=True)
+        CYCLE_STATE.write_text(json.dumps(s, indent=2))
+
+    state = load_state()
+
+    for client in clients:
+        cid         = client['id']
+        firm        = client.get('firm_name', cid)
+        campaign_id = client.get('instantly_campaign_id', '')
+        if not campaign_id:
+            continue
+        key = f"{cid}:{campaign_id}"
+        if key in state:
+            continue  # Already alerted for this campaign
+
+        try:
+            conn  = get_db()
+            total = conn.execute(
+                "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=?",
+                (cid, campaign_id)
+            ).fetchone()[0]
+            done  = conn.execute(
+                "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=? AND stage=?",
+                (cid, campaign_id, 'sequence_complete')
+            ).fetchone()[0]
+            conn.close()
+
+            if total < 10:
+                continue  # Not enough data yet
+            pct = done / total * 100
+            if pct >= 75:
+                state[key] = datetime.utcnow().isoformat()
+                save_state(state)
+                log(f"[Cycle] {firm}: {done}/{total} ({pct:.0f}%) complete — alerting")
+                notify(
+                    f"📅 *Campaign Winding Down — {firm}*\n\n"
+                    f"{done}/{total} contacts have completed the sequence ({pct:.0f}%).\n\n"
+                    f"Time to build next month's batch.\n"
+                    f"I'll handle it automatically — just confirm the next month name.\n\n"
+                    f"Reply: *CYCLE {cid} [Month Year]* (e.g. CYCLE {cid} April 2026)"
+                )
+        except Exception as e:
+            log(f"[Cycle] Check failed for {cid} (non-fatal): {e}")
+
+
 def sync_instantly_stages(clients):
     """Pull lead statuses from Instantly and update prospect stages in DB.
     Instantly status codes: 1=active, 2=paused, 3=replied, 4=unsubscribed, 5=bounced, 6=completed
@@ -1403,11 +1475,12 @@ def run():
             maybe_send_digest()
             check_due_followups()
             check_stale_pending()
-            # Sync Instantly lead statuses to DB every hour
+            # Sync Instantly lead statuses to DB every hour + check cycle completion
             if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 3600:
                 pass
             else:
                 sync_instantly_stages(clients if clients else [])
+                check_campaign_cycles(clients if clients else [])
                 run._last_sync = datetime.utcnow()
 
         except Exception as e:
