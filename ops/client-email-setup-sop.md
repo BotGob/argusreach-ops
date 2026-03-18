@@ -72,56 +72,87 @@ These require client action — cannot be done for them without admin credential
 
 > ⚠️ Must be Secondary domain, not User alias domain. Alias domains can't have standalone mailboxes — Instantly requires real credentials.
 
-### Step 2: Verify Domain Ownership in GoDaddy (or wherever DNS is managed)
+### Step 2: Add DNS Records
 
-Google will show a TXT record for verification. Add it in DNS:
-- **Type:** TXT
-- **Name:** `outreach` (or `@` if subdomain-level)
-- **Value:** (provided by Google)
-- **TTL:** lowest available
+Google will provide a TXT verification record first. Then you'll add MX, SPF, DKIM, and DMARC.
 
-Return to Google Workspace and click "Verify."
+**Full DNS records needed (summary — add all 5):**
+
+| Record | Type | Name | Value |
+|--------|------|------|-------|
+| Domain verification | TXT | `outreach` | (Google-provided string) |
+| MX (Gmail routing) | MX | `outreach` | `SMTP.GOOGLE.COM` (priority 1) |
+| SPF | TXT | `outreach` | `v=spf1 include:_spf.google.com ~all` |
+| DMARC | TXT | `_dmarc.outreach` | `v=DMARC1; p=none; rua=mailto:vito@argusreach.com` |
+| DKIM | TXT | `google._domainkey.outreach` | (generated in Step 4 below) |
+
+---
+
+#### Adding DNS records in GoDaddy
+
+1. Login → **My Products** → DNS → **Manage** (next to the domain)
+2. Click **Add** to add each record
+3. For **Name** field: enter just the subdomain part (e.g., `outreach` not `outreach.clientdomain.com`)
+4. For **TTL**: select the lowest available (600 seconds or "1/2 Hour")
+5. Save each record individually
+6. Note: GoDaddy DNS propagates within 5–15 minutes usually
+
+#### Adding DNS records in Cloudflare
+
+1. Login → click the domain → **DNS → Records → Add record**
+2. For each record:
+   - Set **Proxy status to DNS Only (grey cloud)** — NOT proxied. Proxied breaks email.
+   - For MX: set Priority to 1
+   - For DKIM TXT: paste the full long string — Cloudflare may wrap it automatically, that's fine
+3. TTL: set to "Auto" (Cloudflare manages this)
+4. Note: Cloudflare propagates nearly instantly
+
+#### Adding DNS records in Namecheap / other registrars
+
+Similar pattern — look for "Advanced DNS" or "DNS Management." Same record types and values. If stuck, client can share screen.
+
+---
+
+Return to Google Workspace → **Domains → Verify** after adding the TXT verification record.
 
 ### Step 3: Activate Gmail for the Subdomain
 
 1. In Domains list, click **"Activate Gmail"** next to `outreach.[clientdomain].com`
-2. Select the DNS provider (GoDaddy, Cloudflare, etc.)
-3. Add the MX record:
-   - **Type:** MX
-   - **Name:** `outreach`
-   - **Priority:** 1
-   - **Value:** `SMTP.GOOGLE.COM`
-   - **TTL:** lowest available
+2. This requires the MX record to be in place (Step 2 above)
+3. Google will confirm when Gmail is active on the subdomain
 
 ### Step 4: Set Up DKIM
 
 1. In Google Workspace Admin → **Apps → Google Workspace → Gmail → Authenticate email**
 2. Select `outreach.[clientdomain].com` from domain dropdown
 3. Click **"Generate new record"** → leave at 2048 bits → **"Generate"**
-4. Add the TXT record in DNS:
+4. Copy the TXT record value (long string starting with `v=DKIM1;k=rsa;p=...`)
+5. Add it in DNS:
    - **Type:** TXT
    - **Name:** `google._domainkey.outreach`
-   - **Value:** (long string starting with `v=DKIM1;k=rsa;p=...`)
-5. Return to Google Workspace → click **"Start authentication"**
-6. Wait for DKIM status to show "Authenticating email" ✅
+   - **Value:** (the long string — paste in full)
+   - **GoDaddy note:** May need to split into two strings if over 255 chars — GoDaddy handles this automatically in the UI
+   - **Cloudflare note:** Paste as-is, no wrapping needed
+6. Return to Google Workspace → click **"Start authentication"**
+7. Wait up to 24h for DKIM status to show "Authenticating email" ✅
 
 ### Step 5: Add SPF Record
 
-In DNS:
+Already in the summary table above. In DNS:
 - **Type:** TXT
 - **Name:** `outreach`
 - **Value:** `v=spf1 include:_spf.google.com ~all`
-- **TTL:** lowest available
 
 ### Step 6: Add DMARC Record
 
-In DNS:
+Already in the summary table above. In DNS:
 - **Type:** TXT
 - **Name:** `_dmarc.outreach`
 - **Value:** `v=DMARC1; p=none; rua=mailto:vito@argusreach.com`
-- **TTL:** lowest available
 
 > Note: `rua` is where DMARC reports go. Use `vito@argusreach.com` to receive them centrally. After 30 days, consider changing `p=none` to `p=quarantine` once reputation is established.
+
+> **Cloudflare users:** Double-check every record has the grey cloud (DNS only) not the orange cloud (proxied). Proxied breaks email delivery.
 
 ### Step 7: Create the Outreach Mailbox
 
@@ -180,7 +211,7 @@ Run this checklist before any cold email fires:
 - [ ] Instantly account connected and health score > 85% ✅
 - [ ] Warmup running for minimum 2 weeks ✅
 - [ ] Test email sent from outreach address → received in primary inbox (not spam) ✅
-- [ ] Prospect list loaded in Airtable ✅
+- [ ] Prospect list loaded in DB + prospects.csv ✅
 - [ ] Email sequences approved by client ✅
 - [ ] clients.json entry created in monitor ✅
 - [ ] `campaigns/[client_id]/prospects.csv` created with all prospect emails ✅ (required for prospect filter — monitor ignores all replies until this exists)
