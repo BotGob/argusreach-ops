@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated 2026-03-16 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-18 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -259,10 +259,10 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#60a5fa;">●</span> Receives email from client (vito@argusreach.com) confirming meeting<br>
           <span style="color:#60a5fa;">●</span> Updates prospect status manually in records<br>
           <span style="color:#60a5fa;">●</span> Adds prospect to DNC list<br>
-          <span style="color:#555;font-style:italic;">Future: Calendly webhook handles this automatically</span>
+          <span style="color:#4ade80;">●</span> Calendly webhook fires → meeting auto-logged in DB → Telegram alert to Vito (live 2026-03-18)
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#555;font-style:italic;">Future: Calendly webhook → database auto-log + Telegram alert (webhook server live at hooks.argusreach.com)</span>
+          <span style="color:#4ade80;">●</span> Calendly webhook → DB auto-log + Telegram alert ✅ LIVE
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#f59e0b;">●</span> Prospect books via Calendly link in reply<br>
@@ -390,15 +390,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <span class="step-tool t-purple">Stripe</span>
       </div>
       <div class="arrow">↓</div>
-      <div class="step">
-        <div class="step-label">Client registered in database</div>
-        <div class="step-detail">Status: Active. Plan, start date, MRR logged.</div>
-        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
-      </div>
-      <div class="arrow">↓</div>
-      <div class="step">
+      <div class="auto">
         <div class="step-label">Onboarding link sent to client</div>
-        <div class="step-detail">argusreach.com/onboard — client fills intake form</div>
+        <div class="step-detail">Vito sends admin.argusreach.com/intake — client fills out ICP, voice, geography, compliance notes, Google Workspace email. Welcome email auto-fires once Vito approves intake.</div>
       </div>
     </div>
   </div>
@@ -409,14 +403,21 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="phase-body">
       <div class="step">
         <div class="step-label">Client fills intake form</div>
-        <div class="step-detail">argusreach.com/onboard — ICP, voice, tone, targets, compliance notes, booking link</div>
-        <span class="step-tool t-white">Web3Forms</span>
+        <div class="step-detail">admin.argusreach.com/intake — ICP, voice, tone, targets, geography, compliance notes, Google Workspace outreach email, Calendly link. Public form, no login required.</div>
+        <span class="step-tool t-blue">Admin Portal</span>
       </div>
       <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Vito reviews intake in admin portal</div>
+        <div class="step-detail">Intakes tab at admin.argusreach.com → review submitted info → Approve or Reject. Login required.</div>
+        <span class="step-tool t-blue">Admin Portal</span>
+      </div>
+      <div class="arrow">↓ APPROVED</div>
       <div class="auto">
-        <div class="step-label">Form data emails to Vito</div>
-        <div class="step-detail">Vito pastes to Gob in Telegram</div>
-        <span class="step-tool t-blue">Telegram</span>
+        <div class="step-label">Client registered in system</div>
+        <div class="step-detail">Client record created in clients.json + SQLite DB. DNC file created. Welcome email auto-sent to client covering next steps: onboarding call, list build, sequence review, launch timeline.</div>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
+        <span class="step-tool t-blue">Gob (AI)</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
@@ -438,8 +439,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">Client reviews & approves sequences</div>
-        <div class="step-detail">Google Doc shared with client. They comment, edit, approve. Nothing sends without written approval.</div>
-        <span class="step-tool t-green">Google Docs</span>
+        <div class="step-detail">Vito shares sequences via email for client review. Client replies with edits or written approval. Nothing sends without written sign-off.</div>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -514,8 +514,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="phase-body">
       <div class="step">
         <div class="step-label">Emails sent to prospects</div>
-        <div class="step-detail">From client's outreach email. Signed as the client. Touch 1 of 4-5 sequence. MVP: sent manually by Vito. Scale: Instantly.ai.</div>
-        <span class="step-tool t-green">Gmail (client acct)</span>
+        <div class="step-detail">Instantly.ai sends from client's outreach email. Signed as the client. Sequence: 3 touches (Touch 1 day 0, Touch 2 day 5, Touch 3 day 7). Sequence pauses automatically on any reply (stop_on_reply).</div>
+        <span class="step-tool t-orange">Instantly.ai</span>
+        <span class="step-tool t-green">Client outreach email</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
@@ -558,8 +559,10 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ PROSPECT BOOKS</div>
       <div class="auto">
         <div class="step-label">Meeting lands on client's calendar</div>
-        <div class="step-detail">Calendly sends confirmation to both prospect and client automatically. ArgusReach not involved.</div>
-        <span class="step-tool t-purple">Calendly → Client's Google Cal</span>
+        <div class="step-detail">Prospect books via ArgusReach Calendly link (per-client event type). Booking lands on client's connected Google/Outlook calendar. Calendly webhook fires → meeting auto-logged in DB → prospect stage updated to meeting_booked → Telegram alert to Vito.</div>
+        <span class="step-tool t-purple">Calendly (ArgusReach acct)</span>
+        <span class="step-tool t-green">Client's Google Cal</span>
+        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB ✅ auto</span>
       </div>
     </div>
   </div>
@@ -630,9 +633,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">$6/mo</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Calendly</div>
-      <div class="tool-role">Vito's booking link + client booking links. Free Basic plan (1 event type) sufficient for MVP — bookings land on calendar, Calendly confirmation emails go out automatically. Upgrade to $10/mo unlocks webhooks → auto-log in database. Not blocking anything. Trial expired Mar 22 → moved to free Basic plan.</div>
-      <div class="tool-cost">Free (Basic) · $10/mo for webhooks later</div>
+      <div class="tool-name">Calendly ✅ WEBHOOK LIVE</div>
+      <div class="tool-role">ArgusReach-owned account with per-client event types. Each client gets their own Calendly link (calendly.com/argusreach/[client-slug]) — prospect books → lands on client's connected Google/Outlook calendar. Webhook registered 2026-03-18 at hooks.argusreach.com/webhooks/calendly — bookings auto-log to DB + Telegram alert. Free Basic (1 event type) active now. Upgrade to Standard ($10/mo) when first client signs — required for multiple event types.</div>
+      <div class="tool-cost">Free now → $10/mo Standard at first client launch</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Web3Forms</div>
@@ -679,8 +682,13 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">~$0.03–0.30/campaign</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">monitor.py v2</div>
-      <div class="tool-role">24/7 inbox monitor. Claude classifies replies. Automated mode sends instantly. Draft approval mode queues for Vito (APPROVE/REJECT via Telegram). DNC lists, deduplication, daily digest at 6pm. Systemd auto-restart on reboot.</div>
+      <div class="tool-name">Admin Portal ✅ LIVE</div>
+      <div class="tool-role">Internal operations hub at admin.argusreach.com (port 5056, password-protected). Tabs: Dashboard, Clients, Prospects, Meetings, Revenue, Replies, Intakes, Reports, DNC. Intake form at admin.argusreach.com/intake (public, client-facing). Multi-campaign support per client. Meeting logging, DNC management, lead upload, monthly report generation.</div>
+      <div class="tool-cost">Free (self-hosted)</div>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">monitor.py v2 ✅ SYSTEMD</div>
+      <div class="tool-role">24/7 inbox monitor running under systemd (Restart=always). Checks all active client inboxes every 10 min. Claude classifies replies. Draft approval mode queues every reply for Vito (APPROVE/REJECT via Telegram). Per-client error isolation. Stale approval reminder (4hr). Multi-campaign + multi-prospect list support. DNC enforcement. Automated mode alarm. Heartbeat every cycle.</div>
       <div class="tool-cost">Free (server)</div>
     </div>
     <div class="tool-card">
@@ -751,14 +759,16 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
   <h2>Data Flow — Where Information Comes From and Goes</h2>
 
   <div class="df-row">
-    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Website form</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Intake form (admin.argusreach.com/intake)</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">vito@argusreach.com</div>
+    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Admin portal Intakes tab</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Vito pastes to Telegram</div>
+    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Vito approves</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;">Gob builds client brief</div>
-    <div class="df-note">Intake data flow</div>
+    <div class="df-node" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);color:#a78bfa;">clients.json + SQLite DB</div>
+    <div class="df-arr">→</div>
+    <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Welcome email auto-sent</div>
+    <div class="df-note">Client onboarding data flow</div>
   </div>
 
   <div class="df-row">
@@ -860,7 +870,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">NEXT</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">Expose webhook server via public HTTPS URL</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Configure nginx reverse proxy + SSL for port 5055, or use a tunnel. Then register URL in Stripe Dashboard → Webhooks and Calendly → Integrations → Webhooks. Required for auto-logging payments + bookings.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Webhook server live ✅ — Stripe + Calendly connected</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">hooks.argusreach.com live on nginx + SSL. Stripe webhook registered + secret in .env (2026-03-17). Calendly webhook registered (2026-03-18). Payments and bookings auto-log to DB.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
@@ -900,9 +910,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="background:#141209;border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:16px 20px;">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fbbf24;margin-bottom:8px;">🟡 GAPS — System Exists But Chain Is Broken</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Webhook Server — Needs Public URL</span> — Stripe + Calendly webhook handlers are built (webhooks/server.py, port 5055) but need a public HTTPS URL to receive events. Until exposed, Stripe payments and Calendly bookings won't auto-log. Fix: configure nginx reverse proxy + SSL or use a tunnel.</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Meetings Booked — Client-Side Calendly Limitation</span> — Webhook built but only works when Calendly is ours (ArgusReach running its own outreach). For client campaigns, booking goes to the client's calendar — we have no visibility. Interim: client emails vito@argusreach.com when meeting confirms; we log manually. Risk: client forgets → prospect re-contacted.</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">DNC List System</span> — No formal do-not-contact registry across clients. Prospects who book, unsubscribe, or opt out are not centrally tracked. Risk: re-contacting someone who already said no.</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Webhook Server — LIVE</span> — hooks.argusreach.com live on nginx + SSL. Stripe + Calendly both registered and connected (2026-03-17/18). Payments and bookings auto-log to DB.</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Meetings Booked — SOLVED</span> — ArgusReach owns the Calendly account with per-client event types. Each client connects their calendar to their event type. Webhook fires on every booking regardless of client. Upgrade to Standard ($10/mo) when first client signs.</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ DNC List System — LIVE</span> — Global DNC (monitor/dnc/global.txt) + per-client DNC files. Cross-referenced on every lead upload and every unsubscribe. Instantly global blocklist also updated on every negative reply.</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Apollo Paid + NeverBounce</span> — Free Apollo tier gives generic info@ emails only. Paid ($49/mo) required for personal emails by title. NeverBounce required to verify list before loading. Neither is active yet. (Vito action)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Instantly Trial Expiring</span> — Free trial expires March 23, 2026. Growth plan ($47/mo) must be purchased before then or all campaigns pause. (Vito action: upgrade now)</div>
       </div>

@@ -1,198 +1,212 @@
 # ArgusReach — Recovery & Migration Guide
 *Written for Vito. No technical background required.*
-*Last updated: 2026-03-12*
+*Last updated: 2026-03-17*
 
 ---
 
-## What's Backed Up Right Now
+## The One Thing You Need to Know
 
-Everything important lives in GitHub. Even if the server burns down tonight, nothing is lost permanently.
-
-| What | Where on GitHub | How often |
-|------|----------------|-----------|
-| Gob's memory, identity, personality files | BotGob/argusreach-memory | Nightly at 3am + on demand |
-| ArgusReach code, monitor, tools, SOPs | BotGob/argusreach-ops | Every time Gob makes a change |
-| Website | BotGob/argusreach-website | Every time Gob makes a change |
-| API keys (.env) | **NOT on GitHub** (intentional — security) | Stored only on server |
-
-**The only things NOT backed up automatically:**
-- API keys (Anthropic, Airtable, Instantly) — stored in `monitor/.env` on the server only
-- DNC lists per client — stored in `monitor/dnc/` on the server only
-- You need to keep a copy of these somewhere safe (see below)
+**Everything important is on GitHub.** Even if the server burns down, nothing is permanently lost. The only things NOT on GitHub are API keys — keep those in a secure Google Drive note.
 
 ---
 
-## Part 1 — What to Do If Gob Crashes or Goes Silent
+## Current System State (as of 2026-03-17)
 
-### If Gob stops responding in Telegram:
+### Server
+- **IP:** 93.127.197.101
+- **User:** argus (sudo available)
+- **OS:** Ubuntu, standard VPS
 
-**Step 1 — Restart the OpenClaw gateway**
+### Public URLs
+| URL | What it is |
+|-----|-----------|
+| https://argusreach.com | Marketing website (GitHub Pages) |
+| https://admin.argusreach.com | Internal admin portal (port 5056) |
+| https://hooks.argusreach.com | Webhook server for Stripe + Calendly (port 5055) |
+| https://hooks.argusreach.com/health/monitor | Monitor health check |
+
+### GitHub Repos
+| Repo | What it contains |
+|------|-----------------|
+| BotGob/argusreach-ops | All code, monitor, tools, SOPs |
+| BotGob/argusreach-website | Public marketing site |
+| BotGob/argusreach-memory | Gob's memory files (workspace) |
+
+### Active Systemd Services (all 5 should be running)
 ```
-ssh argus@YOUR_SERVER_IP
+argusreach-admin       — admin portal, port 5056
+argusreach-webhooks    — webhook server, port 5055
+argusreach-watcher     — watches admin/ dir, auto-restarts admin on code changes
+argusreach-sync.timer  — hourly Instantly API sync → SQLite DB
+argusreach-dashboard.timer — hourly dashboard HTML refresh
+argusreach-healthcheck.timer — checks monitor heartbeat every 30 min, Telegrams Vito if silent
+```
+
+Check status: `sudo systemctl status argusreach-admin argusreach-webhooks argusreach-watcher`
+
+### Data Layer
+- **Database:** SQLite at `argusreach/db/argusreach.db` (NOT on GitHub — gitignored)
+- **Clients config:** `argusreach/monitor/clients.json`
+- **Environment/keys:** `argusreach/monitor/.env`
+- **DNC lists:** `argusreach/monitor/dnc/` (global.txt + per-client files)
+- **Processed email IDs:** `argusreach/monitor/logs/processed_ids.json`
+
+### Admin Portal Login
+- URL: https://admin.argusreach.com
+- Password: set in `monitor/.env` as `ADMIN_PASSWORD` (default: argusreach2026)
+
+---
+
+## Part 1 — If Gob Goes Silent
+
+### Quick fix (try this first):
+```
+ssh argus@93.127.197.101
 openclaw gateway restart
 ```
+Send a Telegram message. If Gob responds, done.
 
-**Step 2 — Check if it came back**
-Send any message in Telegram. If Gob responds, you're done.
-
-**Step 3 — If still not responding, restart the server process**
-```
+### If still silent:
+```bash
 sudo systemctl restart openclaw
 ```
 
-**Step 4 — Check monitor is still running**
-```
+### Check that the monitor is still running:
+```bash
 sudo systemctl status argusreach-monitor
-```
-If it says "inactive" or "failed":
-```
+# If failed:
 sudo systemctl restart argusreach-monitor
 ```
 
-That's it. Gob's memory and personality are loaded from files on startup — nothing is lost when it crashes.
+**Gob's memory is in files, not RAM.** A crash or restart loses nothing — Gob reads the files on startup and picks up where it left off.
 
 ---
 
-## Part 2 — Full Rebuild From Scratch (Worst Case)
+## Part 2 — Full Rebuild From Scratch (Worst Case: Server Gone)
 
-If the entire server is gone and you need to start fresh on a new machine:
+**Time required: ~2 hours**
 
-### Step 1 — Set up a new VPS
-- Any Ubuntu 22.04+ VPS works (DigitalOcean, Linode, Vultr, etc.)
-- Minimum: 2GB RAM, 2 CPU, 40GB disk
-- Recommended: 4GB RAM, 2 CPU, 80GB disk (~$24/month on DigitalOcean)
+### Step 1 — New VPS
+Any Ubuntu 22.04+ VPS. Minimum 2GB RAM. DigitalOcean, Linode, Vultr all work.
 
 ### Step 2 — Install OpenClaw
-Follow the OpenClaw setup guide at docs.openclaw.ai. Connect your Telegram bot token during setup.
+Follow docs.openclaw.ai. Connect your Telegram bot token during setup.
 
-### Step 3 — Restore Gob's memory and workspace
+### Step 3 — Restore Gob's workspace
 ```bash
-cd ~
-mkdir -p .openclaw/workspace
-cd .openclaw/workspace
-git clone https://github.com/BotGob/argusreach-memory.git .
-git clone https://github.com/BotGob/argusreach-ops.git argusreach/monitor_restore
+cd ~/.openclaw
+git clone https://github.com/BotGob/argusreach-memory.git workspace
 ```
 
-### Step 4 — Restore API keys
-You need to recreate `argusreach/monitor/.env` manually. Keep this list somewhere safe (password manager, Google Drive secure note):
-
-```
-INSTANTLY_API_KEY=     ← from Instantly dashboard → Settings → API
-AIRTABLE_TOKEN=        ← from Airtable → Account → API
-AIRTABLE_BASE_ID=      ← from Airtable → your CRM base → Help → API docs (starts with "app...")
-ANTHROPIC_API_KEY=     ← from console.anthropic.com → API Keys
-ARGUSREACH_BOT_TOKEN=  ← from BotFather in Telegram → your bot → API Token
-ARGUSREACH_CHAT_ID=    ← your Telegram user ID (check via @userinfobot in Telegram)
-```
-
-> ⚠️ Keep all real values in a **secure Google Drive note** — never store live credentials in this document.
-
-### Step 5 — Reinstall monitor service
+### Step 4 — Restore ArgusReach code
 ```bash
+cd ~/.openclaw/workspace
+git clone https://github.com/BotGob/argusreach-ops.git argusreach
+```
+
+### Step 5 — Recreate API keys
+Create `argusreach/monitor/.env` with these values (get from your Google Drive secure note):
+```
+INSTANTLY_API_KEY=
+ANTHROPIC_API_KEY=
+ARGUSREACH_BOT_TOKEN=
+ARGUSREACH_CHAT_ID=
+ADMIN_PASSWORD=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+```
+
+### Step 6 — Reinstall services
+```bash
+# Copy service files
+sudo cp argusreach/ops/*.service /etc/systemd/system/
 sudo cp argusreach/monitor/argusreach-monitor.service /etc/systemd/system/
+
+# Install timers
+sudo bash argusreach/ops/setup-timers.sh
+
+# Enable and start
 sudo systemctl daemon-reload
-sudo systemctl enable --now argusreach-monitor
+sudo systemctl enable --now argusreach-monitor argusreach-admin argusreach-webhooks argusreach-watcher
 ```
 
-### Step 6 — Restore DNC lists
-If you have any active clients, the DNC lists (do-not-contact) live in `monitor/dnc/`. These are small text files. If you backed them up (see below), restore them here. If not, they can be rebuilt from reply logs.
+### Step 7 — Set up nginx + SSL
+```bash
+sudo bash argusreach/ops/setup-nginx.sh
+```
+Point DNS for admin.argusreach.com and hooks.argusreach.com to the new server IP, then run certbot.
 
-### Step 7 — Restore prospect lists
-Each active campaign has a prospects CSV at `campaigns/[client_id]/prospects.csv`. The monitor's prospect filter requires this file to exist before activating a client — without it, all replies will be ignored. Restore from backup or re-export from Apollo/Airtable.
-
-**Time to full recovery: approximately 2 hours** (mostly waiting for installs)
+### Step 8 — Restore database
+The SQLite DB is not on GitHub. If you have a backup, restore it. If not, the system will recreate an empty DB on first run — you'll lose historical stats but the monitor will work immediately.
 
 ---
 
-## Part 3 — Migrating to a Bigger/Faster Machine
+## Part 3 — Moving to a Bigger Server (No Urgency)
 
-Same process as Part 2, but you have the luxury of doing it without urgency.
+1. Spin up new server, follow Part 2
+2. Test: `python3 argusreach/monitor/monitor.py --test`
+3. Stop old monitor: `sudo systemctl stop argusreach-monitor`
+4. Start new monitor: `sudo systemctl start argusreach-monitor`
+5. Update DNS if server IP changed
+6. Run old server for 24h as backup, then decommission
 
-### Recommended approach: clone, test, then switch
-
-**Step 1 — Spin up the new server** (keep old one running)
-
-**Step 2 — Set up OpenClaw and restore everything** (follow Part 2)
-
-**Step 3 — Run the monitor in test mode on the new server**
-```bash
-cd argusreach/monitor
-python3 monitor.py --test
-```
-Confirm it connects to Gmail inboxes and AI is working.
-
-**Step 4 — Stop the monitor on the old server**
-```bash
-sudo systemctl stop argusreach-monitor
-```
-
-**Step 5 — Start it on the new server**
-```bash
-sudo systemctl start argusreach-monitor
-```
-
-**Step 6 — Point Telegram to the new server** (if needed)
-Nothing changes in Telegram — the bot token stays the same. OpenClaw just needs to be running on the new machine.
-
-**Step 7 — Decommission old server** once you've confirmed everything works for 24 hours.
-
-**Downtime during migration: under 5 minutes** (the gap between stopping old and starting new)
+**Downtime: under 5 minutes**
 
 ---
 
-## Part 4 — What Gob Keeps in Memory
-
-Gob's "brain" is these files on the server (all backed up to GitHub nightly):
+## Part 4 — What Gob Remembers (and Where)
 
 | File | What it contains |
 |------|-----------------|
-| `MEMORY.md` | Long-term memory — key decisions, context, lessons |
-| `SOUL.md` | Personality, values, how Gob thinks |
-| `USER.md` | Everything about you — your goals, working style, preferences |
-| `AGENTS.md` | Operating rules — how Gob handles memory, group chats, tools |
-| `HEARTBEAT.md` | What Gob checks proactively between conversations |
-| `IDENTITY.md` | Gob's name, emoji, avatar |
-| `memory/YYYY-MM-DD.md` | Daily session notes — raw log of what happened each day |
+| `MEMORY.md` | Long-term memory — key decisions, current state, lessons |
+| `SOUL.md` | Personality and values |
+| `USER.md` | Everything about Vito |
+| `AGENTS.md` | Operating rules |
+| `HEARTBEAT.md` | What Gob checks proactively |
+| `memory/YYYY-MM-DD.md` | Daily session notes |
+| `argusreach/ops/backlog.md` | Open items only (no completed tasks) |
 
-When Gob restarts (crash, reboot, new session), it reads these files and picks up exactly where it left off. **Nothing is lost between sessions as long as these files are on GitHub.**
-
----
-
-## Part 5 — Things to Store in Your Google Drive
-
-Save these in a secure Google Drive folder called "ArgusReach — Private":
-
-1. **API Keys doc** — a text file with all the keys from Step 4 above (keep this updated when keys change)
-2. **A copy of this document** — so you have it even if the server is gone
-3. **clients.json** — the active client config file. Export a copy after each new client is added.
-4. **DNC lists** — export `monitor/dnc/*.txt` files periodically (monthly is fine)
+All of these are backed up to GitHub (BotGob/argusreach-memory) nightly at 3am UTC via systemd timer.
 
 ---
 
-## Part 6 — Recommended Backup Schedule (What Gob Will Do)
+## Part 5 — What to Keep in Google Drive
 
-Currently running:
-- ✅ Nightly memory backup at 3am UTC (SOUL, USER, MEMORY, daily notes → GitHub)
-- ✅ Code changes pushed to GitHub on every update
+Create a folder: **"ArgusReach — Private"**
 
-**To add (Gob will set this up):**
-- [ ] Weekly DNC list backup — copy client DNC files to a dated archive
-- [ ] Monthly `.env` reminder — alert Vito to verify API keys are still saved in Drive
+1. **API Keys** — a text file with all keys from Step 5 above. Update when keys change.
+2. **A copy of this document**
+3. **clients.json** — export a copy after each new client is added
+4. **DNC lists** — export `monitor/dnc/*.txt` monthly
 
 ---
 
-## Quick Reference Card
+## Part 6 — Handing This Off to a New AI (If Not Gob)
 
-| Situation | What to do |
-|-----------|-----------|
-| Gob not responding | `openclaw gateway restart` on the server |
+If you ever need to start fresh with a different AI assistant, give them these files in this order:
+1. `SOUL.md` — who Gob is
+2. `USER.md` — who you are
+3. `MEMORY.md` — current state of the business
+4. `argusreach/ops/RECOVERY-AND-MIGRATION-GUIDE.md` — this file
+5. `argusreach/ops/backlog.md` — what's open
+
+That's enough to get any capable AI up to speed in one session.
+
+---
+
+## Quick Reference
+
+| Problem | Fix |
+|---------|-----|
+| Gob not responding | `openclaw gateway restart` |
 | Monitor stopped | `sudo systemctl restart argusreach-monitor` |
-| Entire server gone | Follow Part 2 (2 hours to full recovery) |
-| Moving to bigger server | Follow Part 3 (~5 min downtime) |
-| Lost API keys | Recover from Google Drive secure note |
+| Admin portal down | `sudo systemctl restart argusreach-admin` |
+| Server gone | Follow Part 2 (~2 hrs) |
+| Moving servers | Follow Part 3 (~5 min downtime) |
+| Lost API keys | Google Drive → ArgusReach Private |
 | Lost DNC list | Rebuild from `logs/replies.json` |
+| Lost DB | Empty DB recreates on startup — historical stats lost |
 
 ---
 
-*Save this document to Google Drive. It has everything you need to get back up and running without Gob's help.*
+*Last updated by Gob after every major system change. Keep a copy in Google Drive.*

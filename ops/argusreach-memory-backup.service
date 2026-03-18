@@ -1,0 +1,11 @@
+[Unit]
+Description=ArgusReach Memory Backup — push workspace to GitHub
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=argus
+WorkingDirectory=/home/argus/.openclaw/workspace
+ExecStart=/bin/bash -c 'git add -A && git diff --cached --quiet || git commit -m "memory backup $(date +%%Y-%%m-%%d)" && git push origin main'
+StandardOutput=journal
+StandardError=journal

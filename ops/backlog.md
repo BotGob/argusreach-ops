@@ -80,14 +80,14 @@ Bland.ai / Vapi.ai — call positive replies within minutes, book meeting on cal
 
 ## 🟡 Backlog — Added 2026-03-16
 
-### 18. Monthly report auto-send
-`tools/monthly_report.py` works and sends to client. Needs a systemd timer to run on the 1st of each month. Holding at MVP — Vito wants to review before sending.
+### 18. Monthly report auto-generate ✅ DONE
+Cron runs 1st of each month at 9am ET. Generates reports for all active clients, saves to reports/, alerts Vito to review before sending manually.
 
 ### 19. Campaign completion notification
 When Instantly finishes all prospects in a campaign (status → completed), send Vito a Telegram alert to renew the lead list or close it out. No current hook.
 
-### 20. Welcome email to new client on onboarding
-When intake is approved and client is created, auto-send a welcome/onboarding email to the client. Currently nothing is sent.
+### 20. Welcome email to new client on onboarding ✅ DONE
+Auto-sends on intake approval. Covers next steps: onboarding call, prospect list build, sequence review, launch timeline.
 
 ### 21. Service agreement / DocuSign
 No signed contract flow in the system. Client signs → record stored. Free tier HelloSign or DocuSign. Required before first paid client.
@@ -98,5 +98,27 @@ Admin portal Reports tab exists but empty — no reports have ever been generate
 ### 23. Cross-client warm lead tracking ✅ DONE
 Global DNC now protects against re-contacting unsubscribes across all clients.
 
-### 24. Monitor health check timer
-Needs `sudo bash ops/setup-timers.sh` re-run to install the new healthcheck timer.
+### 24. Monitor health check timer ✅ DONE
+Healthcheck timer installed and running.
+
+---
+
+## 🟢 Scale Features — Added 2026-03-17
+
+### 25. Monitor async processing (10+ clients)
+Currently single-threaded — processes client inboxes sequentially. At 10+ active clients with busy campaigns, one cycle could take 3-5+ minutes. Fix: run each client inbox check in a thread pool. Trigger: when we hit 8 active clients.
+
+### 26. PostgreSQL migration (10+ clients)
+SQLite handles concurrent reads/writes fine up to ~8 clients. Beyond that, lock contention will cause errors. Migration path: swap connection string in database.py, migrate schema + data with one-time script. Already designed for this — 2 hours of work when needed. Trigger: 8 active clients.
+
+### 27. Apollo paid API + automated lead sourcing script
+Upgrade to Apollo Basic ($49/mo) when first client signs. Build sourcing script that takes ICP parameters (title, geography, company size) and auto-exports a contact list directly into the campaign folder. Eliminates manual CSV exports entirely. Walk Vito through API key setup when ready.
+
+### 28. Admin portal — multi-campaign UI ✅ DONE
+client_detail.html now shows all campaigns in a table, Add Campaign form (collapsible), and Pause/Activate toggles per campaign. Legacy single-campaign clients display correctly.
+
+### 29. Reply from alternate email address — smarter matching
+Unknown senders currently escalated to Vito (good). Future improvement: fuzzy-match on name or domain against the prospect list to suggest likely matches. Reduces manual lookup burden at scale.
+
+### 30. processed_ids archive cleanup policy
+Archive file grows indefinitely (by design — never delete history). At 2+ years of operation, review and set a hard archive limit (e.g., keep 2 years). Not urgent — file is small, just document the policy.

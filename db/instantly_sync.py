@@ -98,17 +98,25 @@ def sync_all_campaigns():
         sync_client_from_config(client)
 
     for client in active:
-        campaign_id = client.get("instantly_campaign_id", "")
-        if not campaign_id:
-            print(f"  ⚠️  {client['id']} — no campaign ID, skipping")
+        # Support both multi-campaign array and legacy single-campaign fields
+        campaigns = client.get("campaigns") or [{
+            "instantly_campaign_id": client.get("instantly_campaign_id", ""),
+            "campaign_name":         client.get("campaign_name", ""),
+            "launch_date":           client.get("launch_date", ""),
+            "active":                True,
+        }]
+        active_campaigns = [c for c in campaigns if c.get("active", True) and c.get("instantly_campaign_id")]
+        if not active_campaigns:
+            print(f"  ⚠️  {client['id']} — no active campaign IDs, skipping")
             continue
-        print(f"\n→ {client['id']} ({client.get('firm_name', '')})")
-        sync_campaign_stats(
-            campaign_id=campaign_id,
-            client_id=client["id"],
-            campaign_name=client.get("campaign_name", ""),
-            launch_date=client.get("launch_date", "")
-        )
+        print(f"\n→ {client['id']} ({client.get('firm_name', '')}) — {len(active_campaigns)} campaign(s)")
+        for campaign in active_campaigns:
+            sync_campaign_stats(
+                campaign_id=campaign["instantly_campaign_id"],
+                client_id=client["id"],
+                campaign_name=campaign.get("campaign_name", ""),
+                launch_date=campaign.get("launch_date", "")
+            )
 
     print("\n✅ Sync complete.")
 

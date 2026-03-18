@@ -19,45 +19,123 @@
   <div class="card"><div class="card-label">DNC Entries</div><div class="card-value">{{ dnc_count }}</div></div>
 </div>
 
-<!-- Campaign Setup Panel -->
+<!-- Campaign Connection Panel -->
 <div class="section" style="margin-bottom:20px;border:1px solid {% if client.instantly_campaign_id %}rgba(34,197,94,0.3){% else %}rgba(239,68,68,0.3){% endif %}">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <div class="section-title">🔗 Campaign Connection</div>
-    {% if client.instantly_campaign_id %}
-      <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:3px 10px;border-radius:20px">Connected</span>
-    {% else %}
-      <span style="font-size:11px;background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:3px 10px;border-radius:20px">⚠️ Not connected — monitor will not run</span>
-    {% endif %}
-  </div>
-  <form method="POST" action="{{ url_for('client_update', client_id=client.id) }}">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div>
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID</label>
-        <input name="instantly_campaign_id" value="{{ client.instantly_campaign_id or '' }}" placeholder="UUID from Instantly" style="width:100%;font-family:monospace;font-size:12px">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label>
-        <input name="campaign_name" value="{{ client.campaign_name or '' }}" placeholder="ArgusReach — Firm — Month Year" style="width:100%;font-size:12px">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label>
-        <input name="launch_date" value="{{ client.launch_date or '' }}" placeholder="YYYY-MM-DD" style="width:100%;font-size:12px">
-      </div>
-      <div>
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Monitor Status</label>
-        <select name="active" style="width:100%;font-size:12px">
-          <option value="true" {% if client.active %}selected{% endif %}>🟢 Active — monitor running</option>
-          <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused — monitor skipping</option>
-        </select>
-      </div>
+    <div class="section-title">🔗 Campaigns</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      {% set campaign_count = client.campaigns|length if client.campaigns else (1 if client.instantly_campaign_id else 0) %}
+      {% if campaign_count > 0 %}
+        <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:3px 10px;border-radius:20px">{{ campaign_count }} campaign{{ 's' if campaign_count != 1 }}</span>
+      {% else %}
+        <span style="font-size:11px;background:#ef444422;color:#ef4444;border:1px solid #ef444444;padding:3px 10px;border-radius:20px">⚠️ No campaign — monitor will not run</span>
+      {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary btn-sm">Save Campaign Settings</button>
-    {% if not client.instantly_campaign_id %}
-    <p style="font-size:11px;color:#64748b;margin-top:10px">
-      Run <code style="background:#1a2030;padding:2px 6px;border-radius:3px">python3 tools/campaign_create.py --client {{ client.id }}</code> on the server to create the Instantly campaign, then paste the campaign ID above.
-    </p>
-    {% endif %}
-  </form>
+  </div>
+
+  <!-- Existing campaigns list -->
+  {% if client.campaigns %}
+    <table style="width:100%;font-size:12px;border-collapse:collapse;margin-bottom:16px">
+      <thead>
+        <tr style="color:#64748b;border-bottom:1px solid #1e293b">
+          <th style="text-align:left;padding:6px 8px">Campaign</th>
+          <th style="text-align:left;padding:6px 8px">ID</th>
+          <th style="text-align:left;padding:6px 8px">Launch</th>
+          <th style="text-align:left;padding:6px 8px">Prospects CSV</th>
+          <th style="text-align:left;padding:6px 8px">Status</th>
+          <th style="padding:6px 8px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in client.campaigns %}
+        <tr style="border-bottom:1px solid #0f172a">
+          <td style="padding:6px 8px;font-weight:600">{{ c.campaign_name or '—' }}</td>
+          <td style="padding:6px 8px;font-family:monospace;color:#94a3b8;font-size:11px">{{ c.instantly_campaign_id[:16] }}…</td>
+          <td style="padding:6px 8px;color:#94a3b8">{{ c.launch_date or '—' }}</td>
+          <td style="padding:6px 8px;color:#94a3b8;font-size:11px">{{ c.prospects_csv or '—' }}</td>
+          <td style="padding:6px 8px">
+            {% if c.active %}<span style="color:#22c55e">● Active</span>{% else %}<span style="color:#64748b">⏸ Paused</span>{% endif %}
+          </td>
+          <td style="padding:6px 8px">
+            <form method="POST" action="{{ url_for('campaign_toggle', client_id=client.id, campaign_id=c.instantly_campaign_id) }}" style="display:inline">
+              <button type="submit" style="font-size:11px;background:none;border:1px solid #334155;color:#94a3b8;padding:2px 8px;border-radius:4px;cursor:pointer">
+                {{ 'Pause' if c.active else 'Activate' }}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif client.instantly_campaign_id %}
+    <!-- Legacy single-campaign display -->
+    <div style="background:#0f172a;border-radius:6px;padding:12px;margin-bottom:16px;font-size:12px">
+      <div style="font-weight:600;margin-bottom:4px">{{ client.campaign_name or 'Unnamed Campaign' }}</div>
+      <div style="font-family:monospace;color:#64748b;font-size:11px">{{ client.instantly_campaign_id }}</div>
+      {% if client.launch_date %}<div style="color:#64748b;margin-top:4px">Launched {{ client.launch_date }}</div>{% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Add new campaign -->
+  <details style="margin-bottom:12px">
+    <summary style="font-size:12px;color:#3b82f6;cursor:pointer;padding:6px 0">+ Add Campaign</summary>
+    <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID *</label>
+          <input name="instantly_campaign_id" placeholder="UUID from Instantly" required style="width:100%;font-family:monospace;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label>
+          <input name="campaign_name" placeholder="ArgusReach — Firm — Month Year" style="width:100%;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label>
+          <input name="launch_date" placeholder="YYYY-MM-DD" style="width:100%;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospects CSV path</label>
+          <input name="prospects_csv" placeholder="campaigns/client_id/month/prospects.csv" style="width:100%;font-size:12px">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Add Campaign</button>
+    </form>
+  </details>
+
+  <!-- Legacy settings update -->
+  <details>
+    <summary style="font-size:12px;color:#64748b;cursor:pointer;padding:6px 0">⚙ Monitor & Client Settings</summary>
+    <form method="POST" action="{{ url_for('client_update', client_id=client.id) }}" style="margin-top:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Primary Campaign ID</label>
+          <input name="instantly_campaign_id" value="{{ client.instantly_campaign_id or '' }}" placeholder="UUID" style="width:100%;font-family:monospace;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Primary Campaign Name</label>
+          <input name="campaign_name" value="{{ client.campaign_name or '' }}" style="width:100%;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label>
+          <input name="launch_date" value="{{ client.launch_date or '' }}" placeholder="YYYY-MM-DD" style="width:100%;font-size:12px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Monitor Status</label>
+          <select name="active" style="width:100%;font-size:12px">
+            <option value="true" {% if client.active %}selected{% endif %}>🟢 Active</option>
+            <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused</option>
+          </select>
+        </div>
+      </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Event Slug</label>
+          <input name="calendly_event_slug" value="{{ client.get('calendly_event_slug','') }}" placeholder="e.g. pt-tampa-bay-intro" style="width:100%;font-size:12px">
+          <div style="font-size:10px;color:#475569;margin-top:3px">From your Calendly URL: calendly.com/argusreach/<b>slug</b></div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
+    </form>
+  </details>
 </div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
@@ -108,7 +186,8 @@
         ('Campaign ID', client.get('instantly_campaign_id','—')),
         ('Launch Date', client.get('launch_date','—')),
         ('Sender', client.sender_name ~ ' <' ~ client.outreach_email ~ '>'),
-        ('Calendly', client.get('calendly_link','—')),
+        ('Calendly Link', client.get('calendly_link','—')),
+        ('Calendly Event Slug', client.get('calendly_event_slug','— not set (meetings won\'t auto-log)')),
         ('Contacts/month', client.get('contacts_per_month','—')|string),
         ('Client Email', client.get('client_email','—')),
         ('ICP', client.get('icp_summary','—')),

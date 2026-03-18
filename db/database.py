@@ -82,12 +82,16 @@ def init_db():
 
     CREATE TABLE IF NOT EXISTS meetings (
         id TEXT PRIMARY KEY,
-        prospect_id TEXT,
         client_id TEXT,
+        prospect_id TEXT,
+        prospect_email TEXT,
+        prospect_name TEXT,
+        meeting_date TEXT,
         scheduled_at TEXT,
-        status TEXT DEFAULT 'scheduled',
-        source TEXT DEFAULT 'calendly',
+        status TEXT DEFAULT 'confirmed',
+        source TEXT DEFAULT 'manual',
         invitee_email TEXT,
+        notes TEXT,
         created_at TEXT DEFAULT (datetime('now'))
     );
 

@@ -98,21 +98,33 @@ def db_write_approval(entry, approved: bool):
                               from_name.split()[-1] if from_name and ' ' in from_name else '',
                               '', 'replied')
 
+        # Stage map: classification → prospect stage after approval
+        stage_map = {
+            'positive':  'meeting_booking',
+            'question':  'engaged',
+            'not_now':   'not_now',
+            'negative':  'dnc',
+            'ooo':       'ooo',
+            'other':     'replied_by_us',
+        }
+
         if approved:
+            stage = stage_map.get(classification, 'replied_by_us')
             log_event(cid, pid, 'draft_approved', {
                 'classification': classification,
                 'approved_by': 'vito',
                 'approved_at': datetime.utcnow().isoformat(),
             })
-            update_prospect_stage(pid, 'replied_by_us')
-            log(f"[DB] logged draft_approved for {from_email} → stage: replied_by_us")
+            update_prospect_stage(pid, stage)
+            log(f"[DB] logged draft_approved for {from_email} → stage: {stage}")
         else:
             log_event(cid, pid, 'draft_rejected', {
                 'classification': classification,
                 'rejected_by': 'vito',
                 'rejected_at': datetime.utcnow().isoformat(),
             })
-            log(f"[DB] logged draft_rejected for {from_email}")
+            # On rejection, keep whatever stage they're at — don't advance
+            log(f"[DB] logged draft_rejected for {from_email} (stage unchanged)")
     except Exception as e:
         log(f"[DB] write failed (non-fatal): {e}")
 

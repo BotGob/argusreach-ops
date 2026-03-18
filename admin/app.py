@@ -35,6 +35,9 @@ BASE_DIR = Path(__file__).parent.parent
 load_dotenv(BASE_DIR / "monitor" / ".env")
 sys.path.insert(0, str(BASE_DIR))
 
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from db.database import get_db, init_db, sync_client_from_config
 
 CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
@@ -46,6 +49,56 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "argusreach2026")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
+
+
+# ── WELCOME EMAIL ─────────────────────────────────────────────────────────────
+
+def _send_welcome_email(client: dict):
+    """Send a welcome/next-steps email to a newly approved client."""
+    to_email = client.get("client_email", "")
+    if not to_email:
+        app.logger.info("Welcome email skipped — no client_email set")
+        return
+
+    contact_name = client.get("_contact_name") or client.get("firm_name", "")
+    firm_name    = client.get("firm_name", "")
+    outreach_email = client.get("outreach_email", "")
+    app_password   = client.get("app_password", "")
+    sender_name    = "Vito Resciniti | ArgusReach"
+
+    body = f"""Hi {contact_name.split()[0] if contact_name else 'there'},
+
+Welcome to ArgusReach — excited to get started with {firm_name}.
+
+Here's what happens next:
+
+1. We'll schedule a 45-minute onboarding call to define your ideal referral targets and review your outreach voice. I'll send a Calendly link shortly.
+
+2. While we're setting up, we'll begin building your prospect list — physicians in your market matching the profile we discussed.
+
+3. Before anything sends, you'll review and approve the full email sequence. Nothing goes out without your sign-off.
+
+4. Once launched, you'll hear from me whenever a physician responds positively. I'll handle the rest.
+
+Timeline: campaigns typically launch within 10–14 business days of onboarding. First replies start coming in around weeks 3–4.
+
+Any questions before we get started, just reply here.
+
+— Vito Resciniti
+Founder, ArgusReach
+"""
+
+    msg = MIMEMultipart("alternative")
+    msg["From"]    = f"{sender_name} <{outreach_email}>"
+    msg["To"]      = to_email
+    msg["Subject"] = f"Welcome to ArgusReach — next steps for {firm_name}"
+    msg.attach(MIMEText(body, "plain"))
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+        smtp.login(outreach_email, app_password)
+        smtp.send_message(msg)
+
+    app.logger.info(f"Welcome email sent to {to_email} for client {client.get('id')}")
 
 
 # ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -326,10 +379,70 @@ def client_update(client_id):
         client["launch_date"] = f["launch_date"].strip()
     if "active" in f:
         client["active"] = f["active"] == "true"
+    if "calendly_event_slug" in f:
+        client["calendly_event_slug"] = f["calendly_event_slug"].strip()
 
     save_clients(config)
     sync_client_from_config(client)
     flash("Client updated.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
+@app.route("/clients/<client_id>/campaigns/add", methods=["POST"])
+@login_required
+def campaign_add(client_id):
+    """Add a new campaign to a client's campaigns array."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    f = request.form
+    new_campaign = {
+        "instantly_campaign_id": f.get("instantly_campaign_id", "").strip(),
+        "campaign_name":         f.get("campaign_name", "").strip(),
+        "prospects_csv":         f.get("prospects_csv", "").strip(),
+        "launch_date":           f.get("launch_date", "").strip(),
+        "active":                True,
+    }
+    if not new_campaign["instantly_campaign_id"]:
+        flash("Campaign ID required.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    if "campaigns" not in client:
+        client["campaigns"] = []
+    client["campaigns"].append(new_campaign)
+
+    # Also update legacy fields to match most recent campaign
+    client["instantly_campaign_id"] = new_campaign["instantly_campaign_id"]
+    client["campaign_name"]         = new_campaign["campaign_name"]
+    client["launch_date"]           = new_campaign["launch_date"]
+
+    save_clients(config)
+    sync_client_from_config(client)
+    flash(f"Campaign '{new_campaign['campaign_name'] or new_campaign['instantly_campaign_id']}' added.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
+@app.route("/clients/<client_id>/campaigns/<campaign_id>/toggle", methods=["POST"])
+@login_required
+def campaign_toggle(client_id, campaign_id):
+    """Activate or pause a specific campaign for a client."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client or "campaigns" not in client:
+        flash("Client or campaigns not found.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    for c in client["campaigns"]:
+        if c.get("instantly_campaign_id") == campaign_id:
+            c["active"] = not c.get("active", True)
+            status = "activated" if c["active"] else "paused"
+            flash(f"Campaign {status}.", "success")
+            break
+
+    save_clients(config)
     return redirect(url_for("client_detail", client_id=client_id))
 
 
@@ -701,6 +814,12 @@ def intake_approve(intake_id):
                 i["client_id"] = client_id
         save_intakes(intakes)
 
+        # Send welcome email to new client
+        try:
+            _send_welcome_email(new_client)
+        except Exception as _we:
+            app.logger.warning(f"Welcome email failed (non-fatal): {_we}")
+
         flash(f"Client '{new_client['firm_name']}' created from intake.", "success")
         return redirect(url_for("client_detail", client_id=client_id))
 
@@ -722,11 +841,13 @@ def log_meeting():
         flash("Client and prospect email required.", "error")
         return redirect(url_for("dashboard"))
 
+    import hashlib
+    meeting_id = hashlib.md5(f"{client_id}:{prospect_email}:{meeting_date}".encode()).hexdigest()[:16]
     conn = get_db()
     conn.execute("""
-        INSERT INTO meetings (client_id, prospect_email, prospect_name, meeting_date, status, source, notes, created_at)
-        VALUES (?,?,?,?,?,?,?,?)
-    """, (client_id, prospect_email, prospect_name, meeting_date, 'confirmed', 'manual', notes, datetime.utcnow().isoformat()))
+        INSERT OR REPLACE INTO meetings (id, client_id, prospect_email, prospect_name, meeting_date, status, source, notes, created_at)
+        VALUES (?,?,?,?,?,?,?,?,?)
+    """, (meeting_id, client_id, prospect_email, prospect_name, meeting_date, 'confirmed', 'manual', notes, datetime.utcnow().isoformat()))
     conn.commit()
 
     # Update prospect stage

@@ -311,18 +311,62 @@ def _airtable_log_touch(client_id: str, prospect_email: str,
 
 
 # ── PROCESSED ID DEDUPLICATION ────────────────────────────────────────────────
+PROCESSED_ARCHIVE_FILE = LOG_DIR / 'processed_ids_archive.json'
+PROCESSED_MAX_AGE_DAYS = 45  # keep 45 days in active file; archive the rest
+
 def load_processed():
     if PROCESSED_FILE.exists():
         try:
-            return set(json.loads(PROCESSED_FILE.read_text()))
+            data = json.loads(PROCESSED_FILE.read_text())
+            # Support both old format (list of strings) and new format (dict of {hash: timestamp})
+            if isinstance(data, list):
+                return set(data)
+            elif isinstance(data, dict):
+                return set(data.keys())
         except Exception:
             return set()
     return set()
 
-def save_processed(ids: set):
-    # Keep only last 10k to prevent unbounded growth
-    trimmed = list(ids)[-10000:]
-    PROCESSED_FILE.write_text(json.dumps(trimmed))
+def save_processed(ids: set, timestamps: dict = None):
+    """
+    Save processed IDs with timestamps.
+    Active file: last 45 days. Older entries moved to archive (never deleted — preserves history).
+    Monthly reporting uses replies.json + DB, NOT processed_ids, so rotation is safe.
+    """
+    now = datetime.utcnow()
+    cutoff = now - timedelta(days=PROCESSED_MAX_AGE_DAYS)
+
+    # Load existing timestamped data
+    existing = {}
+    if PROCESSED_FILE.exists():
+        try:
+            data = json.loads(PROCESSED_FILE.read_text())
+            if isinstance(data, dict):
+                existing = data
+        except Exception:
+            pass
+
+    # Add new IDs with current timestamp
+    for id_ in ids:
+        if id_ not in existing:
+            existing[id_] = now.isoformat()
+
+    # Split: active (recent) vs archive (old)
+    active  = {k: v for k, v in existing.items() if v >= cutoff.isoformat()}
+    archive = {k: v for k, v in existing.items() if v < cutoff.isoformat()}
+
+    # Append old entries to archive
+    if archive:
+        existing_archive = {}
+        if PROCESSED_ARCHIVE_FILE.exists():
+            try:
+                existing_archive = json.loads(PROCESSED_ARCHIVE_FILE.read_text())
+            except Exception:
+                pass
+        existing_archive.update(archive)
+        PROCESSED_ARCHIVE_FILE.write_text(json.dumps(existing_archive))
+
+    PROCESSED_FILE.write_text(json.dumps(active))
 
 def msg_fingerprint(from_email, subject, date_str, message_id=''):
     """Stable ID for a message to prevent double-processing.
@@ -512,30 +556,64 @@ def is_genuine_reply(msg):
     """Real replies have In-Reply-To or References headers. Spam doesn't."""
     return bool(msg.get('In-Reply-To') or msg.get('References'))
 
+def get_client_campaigns(client):
+    """
+    Return a list of campaign dicts for this client.
+    Supports both legacy single-campaign fields and new multi-campaign 'campaigns' array.
+    Each campaign dict has: instantly_campaign_id, campaign_name, prospects_csv, launch_date, active
+    """
+    # New format: explicit campaigns array
+    if client.get('campaigns'):
+        return [c for c in client['campaigns'] if c.get('active', True)]
+    # Legacy format: single campaign fields
+    return [{
+        'instantly_campaign_id': client.get('instantly_campaign_id', ''),
+        'campaign_name':         client.get('campaign_name', ''),
+        'prospects_csv':         client.get('prospects_csv', ''),
+        'launch_date':           client.get('launch_date', ''),
+        'active':                True,
+    }]
+
+
 def load_prospect_emails(client):
     """
-    Return a set of lowercase email addresses from the client's prospects CSV.
-    Returns None if no prospects_csv is configured (disables the check).
+    Return a combined set of lowercase email addresses from ALL active campaigns for this client.
+    Also returns a dict mapping email → campaign_id for accurate tracking.
+    Returns (None, {}) if no prospect lists configured (disables the filter — processes all replies).
     """
-    csv_path = client.get('prospects_csv')
-    if not csv_path:
-        return None
-    p = Path(csv_path)
-    if not p.is_absolute():
-        p = BASE_DIR.parent / csv_path  # relative to argusreach/ root
-    if not p.exists():
-        log(f"[ProspectFilter] prospects_csv not found: {p}")
-        return None
     import csv as _csv
-    emails = set()
-    with open(p, newline='', encoding='utf-8') as f:
-        reader = _csv.DictReader(f)
-        for row in reader:
-            # Accept columns named 'email', 'Email', 'EMAIL', or 'e-mail'
-            for col in row:
-                if col.strip().lower() in ('email', 'e-mail'):
-                    emails.add(row[col].strip().lower())
-    return emails
+    all_emails = set()
+    email_to_campaign = {}
+    campaigns = get_client_campaigns(client)
+    any_csv_found = False
+
+    for campaign in campaigns:
+        csv_path = campaign.get('prospects_csv')
+        if not csv_path:
+            continue
+        p = Path(csv_path)
+        if not p.is_absolute():
+            p = BASE_DIR.parent / csv_path
+        if not p.exists():
+            log(f"[ProspectFilter] prospects_csv not found: {p}")
+            continue
+        any_csv_found = True
+        cid = campaign.get('instantly_campaign_id', '')
+        try:
+            with open(p, newline='', encoding='utf-8') as f:
+                reader = _csv.DictReader(f)
+                for row in reader:
+                    for col in row:
+                        if col.strip().lower() in ('email', 'e-mail'):
+                            email = row[col].strip().lower()
+                            all_emails.add(email)
+                            email_to_campaign[email] = cid
+        except Exception as e:
+            log(f"[ProspectFilter] Error reading {p}: {e}")
+
+    if not any_csv_found:
+        return None, {}
+    return all_emails, email_to_campaign
 
 def is_spam(msg, body):
     subject = msg.get('Subject', '').lower()
@@ -794,9 +872,23 @@ def process_client(client, processed_ids):
                 continue
 
             # Filter: prospect list — only respond to people we actually emailed
-            prospect_emails = load_prospect_emails(client)
+            prospect_emails, email_to_campaign = load_prospect_emails(client)
             if prospect_emails is not None and from_email.lower() not in prospect_emails:
-                log(f"{label} Skipping — not in prospect list: {from_email}")
+                # Only escalate if it looks like a genuine reply to our outreach (subject starts with Re:)
+                # Warming emails, spam, and cold outreach have their own subject lines — skip silently
+                decoded_subject = subject.strip()
+                is_reply_subject = decoded_subject.lower().startswith('re:')
+                if is_reply_subject:
+                    log(f"{label} Unknown sender replied (Re: subject, not in prospect list): {from_email} — escalating")
+                    notify(
+                        f"⚠️ *{client['firm_name']}* — Unknown sender replied\n"
+                        f"👤 {from_name or from_email} `<{from_email}>`\n"
+                        f"📋 Subject: _{subject}_\n"
+                        f"Not in prospect list — may be a prospect replying from a different email address. "
+                        f"Check manually and add to DNC or prospect list as needed."
+                    )
+                else:
+                    log(f"{label} Skipping — not in prospect list (non-reply subject): {from_email}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 new_processed.add(fingerprint)
                 continue
@@ -859,7 +951,8 @@ def process_client(client, processed_ids):
             # ── DATABASE: log classification event
             if _DB_ENABLED:
                 try:
-                    _pid = _upsert_prospect(cid, client.get('instantly_campaign_id',''),
+                    _campaign_id = email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id',''))
+                    _pid = _upsert_prospect(cid, _campaign_id,
                                             from_email, '', '', '', 'replied')
                     _log_event(cid, _pid, 'classified', {
                         'classification': classification,
@@ -873,14 +966,8 @@ def process_client(client, processed_ids):
             if classification not in ('ooo',) and not escalate:
                 instantly_pause_contact(
                     from_email,
-                    campaign_id=client.get('instantly_campaign_id')
+                    campaign_id=email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id'))
                 )
-
-            # ── AIRTABLE: sync reply classification
-            airtable_sync_reply(
-                cid, from_email, classification, body[:500],
-                follow_up_date=result.get('follow_up_date')
-            )
 
             # ── HANDLE RESPONSE
             if should_respond and draft:
@@ -1003,7 +1090,7 @@ def process_client(client, processed_ids):
                 try:
                     _pid = upsert_prospect(
                         cid,
-                        client.get('instantly_campaign_id', ''),
+                        email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id', '')),
                         from_email, '', '', '', 'replied'
                     )
                     log_event(cid, _pid, 'classified', {
@@ -1039,6 +1126,40 @@ def process_client(client, processed_ids):
 
 # ── DAILY DIGEST ──────────────────────────────────────────────────────────────
 _last_digest_day = None
+
+def check_stale_pending():
+    """Re-alert if any pending approvals have been sitting unreviewed for 4+ hours."""
+    try:
+        pending = load_pending()
+        if not pending:
+            return
+        now = datetime.utcnow()
+        stale = []
+        for entry in pending:
+            queued_at = entry.get('queued_at', '')
+            if not queued_at:
+                continue
+            try:
+                queued_dt = datetime.fromisoformat(queued_at)
+                age_hours = (now - queued_dt).total_seconds() / 3600
+                if age_hours >= 4:
+                    stale.append((entry, age_hours))
+            except Exception:
+                continue
+        if stale:
+            lines = [f"⏳ *{len(stale)} approval(s) waiting 4+ hours — action needed:*\n"]
+            for entry, age in stale:
+                h = int(age)
+                lines.append(
+                    f"• *{entry.get('firm_name','?')}* — {entry.get('classification','?').upper()} "
+                    f"from {entry.get('from_name') or entry.get('from_email','?')} "
+                    f"({h}h ago)\n  → APPROVE {entry['id']} or REJECT {entry['id']}"
+                )
+            notify('\n'.join(lines))
+            log(f"Stale pending reminder sent: {len(stale)} item(s)")
+    except Exception as e:
+        log(f"[Stale pending check] error (non-fatal): {e}")
+
 
 def check_due_followups():
     """Alert when OOO or not-now prospects have hit their follow-up date."""
@@ -1085,7 +1206,7 @@ def maybe_send_digest():
     today_entries = [r for r in data if r.get('ts', '').startswith(today_str)]
 
     if not today_entries:
-        notify(f"📊 *Daily Digest — {today_str}*\nNo replies processed today.")
+        log(f"Daily digest: no replies processed today. Skipping notification.")
         return
 
     counts = {}
@@ -1094,6 +1215,13 @@ def maybe_send_digest():
         counts[c] = counts.get(c, 0) + 1
 
     pending = load_pending()
+    actionable = counts.get('positive', 0) + counts.get('escalated', 0) + len(pending)
+
+    # Only notify if there's something requiring action
+    if actionable == 0:
+        log(f"Daily digest: {len(today_entries)} replies processed, none requiring action. Skipping notification.")
+        return
+
     lines = [
         f"📊 *Daily Digest — {today_str}*",
         f"Total replies processed: {len(today_entries)}",
@@ -1114,13 +1242,19 @@ def maybe_send_digest():
 # ── LOAD CLIENTS ──────────────────────────────────────────────────────────────
 def load_clients():
     data = json.loads(CLIENTS_FILE.read_text())
-    return [c for c in data['clients'] if c.get('active', False)]
+    clients = [c for c in data['clients'] if c.get('active', False)]
+    # Safety: warn loudly if any client is in automated mode
+    for c in clients:
+        if c.get('mode') == 'automated':
+            log(f"⚠️  WARNING: {c.get('firm_name', c['id'])} is in AUTOMATED mode — emails will send without approval")
+            notify(f"⚠️ *WARNING:* `{c.get('firm_name', c['id'])}` is in *AUTOMATED mode*. Emails will send without your approval. Set mode to `draft_approval` in clients.json to require approval.")
+    return clients
 
 # ── MAIN LOOP ─────────────────────────────────────────────────────────────────
 def run():
     mode_tag = " [TEST MODE]" if TEST_MODE else ""
     log(f"ArgusReach Monitor v2 starting{mode_tag}")
-    notify(f"✅ *ArgusReach Monitor v2* started{mode_tag}\nWatching all active client inboxes · checking every {POLL_INTERVAL//60} min")
+    log(f"ArgusReach Monitor v2 started. Watching all active client inboxes, checking every {POLL_INTERVAL//60} min.")
 
     processed_ids = load_processed()
 
@@ -1131,13 +1265,19 @@ def run():
                 log("No active clients. Waiting...")
             else:
                 for client in clients:
-                    new_ids = process_client(client, processed_ids)
-                    processed_ids.update(new_ids)
+                    try:
+                        new_ids = process_client(client, processed_ids)
+                        processed_ids.update(new_ids)
+                    except Exception as client_err:
+                        firm = client.get('firm_name', client.get('id', '?'))
+                        log(f"[{firm}] ⚠️ Client processing error (skipping, others unaffected): {client_err}")
+                        notify(f"⚠️ *{firm}* — Monitor error this cycle: `{str(client_err)[:150]}`\nOther clients unaffected. Will retry next cycle.")
                 save_processed(processed_ids)
 
             check_telegram_commands()
             maybe_send_digest()
             check_due_followups()
+            check_stale_pending()
 
         except Exception as e:
             log(f"Main loop error: {e}")
