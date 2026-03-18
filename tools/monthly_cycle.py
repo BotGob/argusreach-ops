@@ -284,20 +284,58 @@ def verify_emails(contacts):
         print(f"❌ NeverBounce error: {e}")
         return contacts, []
 
-# ── Load sequence template ─────────────────────────────────────────────────────
-def load_sequence_template(client_id):
-    """Load sequence template from campaigns/<client_id>/sequence_template.json"""
-    path = CAMPAIGNS_DIR / client_id / "sequence_template.json"
+# ── Load sequence from Instantly (live) or local template (fallback) ──────────
+def get_sequence_for_new_campaign(client):
+    """
+    Pull sequence steps from the client's current Instantly campaign.
+    This ensures Month 2+ uses the exact same (approved) sequence as Month 1.
+    Falls back to local template file if API fails.
+    Enforces minimum 7-day delay between steps.
+    """
+    campaign_id = client.get("instantly_campaign_id", "")
+
+    # Try pulling from existing Instantly campaign
+    if campaign_id and INSTANTLY_API_KEY:
+        try:
+            resp = requests.get(
+                f"https://api.instantly.ai/api/v2/campaigns/{campaign_id}",
+                headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}"},
+                timeout=15
+            )
+            if resp.status_code == 200:
+                sequences = resp.json().get("sequences", [])
+                if sequences:
+                    steps = sequences[0].get("steps", [])
+                    if steps:
+                        # Enforce minimum 7-day delays (prevent accidental short delays)
+                        for i, step in enumerate(steps):
+                            if i > 0 and step.get("delay", 0) < 7:
+                                old_delay = step["delay"]
+                                step["delay"] = 7
+                                print(f"   ⚠️  Step {i+1}: delay was {old_delay}d → enforced 7d minimum")
+                        print(f"✅ Sequence pulled from Instantly ({len(steps)} steps)")
+                        # Save as local backup
+                        _save_sequence_template(client["id"], steps)
+                        return steps
+        except Exception as e:
+            print(f"⚠️  Could not pull sequence from Instantly: {e}")
+
+    # Fallback: local template file
+    path = CAMPAIGNS_DIR / client["id"] / "sequence_template.json"
     if path.exists():
-        return json.loads(path.read_text())
+        data = json.loads(path.read_text())
+        print(f"📂 Using local sequence template ({path})")
+        return data.get("steps", [])
+
+    print("⚠️  No sequence found — campaign will be created without steps. Add sequence manually in Instantly.")
     return None
 
-def save_sequence_template(client_id, steps):
-    """Save sequence template for future months."""
+
+def _save_sequence_template(client_id, steps):
+    """Save a local backup of the sequence template."""
     path = CAMPAIGNS_DIR / client_id / "sequence_template.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"steps": steps}, indent=2))
-    print(f"💾 Sequence template saved to {path}")
 
 # ── Create Instantly campaign ──────────────────────────────────────────────────
 def create_instantly_campaign(client, month_name, sequence_steps=None):
@@ -512,12 +550,12 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
     # Step 5: Write CSV
     write_csv(contacts, client_id, month_name)
 
-    # Step 6: Create new Instantly campaign
-    sequence = load_sequence_template(client_id)
+    # Step 6: Get sequence (from existing Instantly campaign or local template)
+    sequence = get_sequence_for_new_campaign(client)
     if not sequence:
-        print("⚠️  No sequence template found — campaign will be created without sequence steps.")
-        print(f"   Add template to: campaigns/{client_id}/sequence_template.json")
-        print("   You can add the sequence manually in Instantly after campaign creation.")
+        print("⚠️  No sequence found — campaign will be created without steps.")
+        print("   Write the sequence in Instantly after campaign creation, then it will be")
+        print("   pulled automatically for all future months.")
 
     if not dry_run:
         campaign_id, campaign_name = create_instantly_campaign(
@@ -540,12 +578,13 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             f"✅ *{firm} — {month_name} Campaign Ready*\n\n"
             f"*{len(contacts)} fresh contacts loaded*\n"
             f"Campaign: `{campaign_name}`\n\n"
-            f"*Before hitting GO in Instantly, review:*\n"
-            f"• Sequence copy and tone\n"
-            f"• Email delays between steps (should be 7+ days)\n"
-            f"• Sending schedule and account\n\n"
-            f"When ready: activate campaign in Instantly → "
-            f"monitor will resume automatically.\n\n"
+            f"*Pre-launch checklist (review in Instantly before hitting GO):*\n"
+            f"☐ Sequence copy reads correctly for this client\n"
+            f"☐ Step delays: Step 1 = Day 0, Step 2 = 7+ days, Step 3 = 7+ days\n"
+            f"☐ Sending account is linked\n"
+            f"☐ Sending schedule: Mon-Fri, business hours\n"
+            f"☐ Stop on reply: ON\n\n"
+            f"When ready: activate in Instantly → monitor auto-detects and starts watching.\n\n"
             f"Admin portal: https://admin.argusreach.com/clients/{client_id}"
         )
         notify(msg)

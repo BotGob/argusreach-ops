@@ -1323,12 +1323,59 @@ def check_campaign_cycles(clients):
             log(f"[Cycle] Check failed for {cid} (non-fatal): {e}")
 
 
+def _auto_activate_client(client_id, campaign_id, firm_name):
+    """If Instantly campaign is live but clients.json says inactive, auto-activate."""
+    try:
+        data = json.loads(CLIENTS_FILE.read_text())
+        for c in data.get('clients', []):
+            if c['id'] == client_id and not c.get('active'):
+                c['active']      = True
+                c['launch_date'] = c.get('launch_date') or datetime.utcnow().strftime('%Y-%m-%d')
+                CLIENTS_FILE.write_text(json.dumps(data, indent=2))
+                log(f"[AutoActivate] {firm_name} is live in Instantly — auto-activated in clients.json")
+                notify(
+                    f"✅ *{firm_name}* campaign detected as live in Instantly.\n"
+                    f"Monitor is now watching for replies."
+                )
+                break
+    except Exception as e:
+        log(f"[AutoActivate] Failed for {client_id}: {e}")
+
+
 def sync_instantly_stages(clients):
     """Pull lead statuses from Instantly and update prospect stages in DB.
-    Instantly status codes: 1=active, 2=paused, 3=replied, 4=unsubscribed, 5=bounced, 6=completed
+    Also auto-activates clients when their Instantly campaign goes live.
+    Instantly campaign status: 0=draft, 1=active, 2=paused, 3=completed
+    Instantly lead status codes: 1=active, 2=paused, 3=replied, 4=unsubscribed, 5=bounced, 6=completed
     """
     if not _DB_ENABLED:
         return
+
+    # Also check ALL clients (not just active) for auto-activation
+    try:
+        all_clients_data = json.loads(CLIENTS_FILE.read_text())
+        all_clients      = all_clients_data.get('clients', [])
+    except Exception:
+        all_clients = []
+
+    for c in all_clients:
+        cid         = c['id']
+        campaign_id = c.get('instantly_campaign_id', '')
+        if not campaign_id or c.get('active'):
+            continue  # Skip active clients and those without a campaign
+        try:
+            resp = requests.get(
+                f'https://api.instantly.ai/api/v2/campaigns/{campaign_id}',
+                headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
+                timeout=10
+            )
+            if resp.status_code == 200:
+                campaign_status = resp.json().get('status', 0)
+                if campaign_status == 1:  # Active in Instantly
+                    _auto_activate_client(cid, campaign_id, c.get('firm_name', cid))
+        except Exception as e:
+            log(f"[AutoActivate] Check failed for {cid}: {e}")
+
     STAGE_MAP = {
         6: 'sequence_complete',
         4: 'unsubscribed',
