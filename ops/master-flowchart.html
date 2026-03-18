@@ -443,23 +443,22 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       </div>
       <div class="arrow">↓</div>
       <div class="step">
-        <div class="step-label">Client adds Google Workspace seat</div>
-        <div class="step-detail">~$7–12/mo billed to client. Required for standalone outreach mailbox. Must be Secondary Domain (not User Alias). Grant ArgusReach admin access or schedule 30-min screen share.</div>
-        <span class="step-tool t-green">Google Workspace</span>
+        <div class="step-label">Client sets up dedicated sending account</div>
+        <div class="step-detail">~$6–7/mo billed to client. Required for isolated outreach mailbox — keeps main business email completely separate. Subdomain approach: outreach.[clientdomain].com. Supports Google Workspace OR Microsoft 365 — confirm provider during onboarding call. Gob handles all technical configuration (DNS, SPF/DKIM/DMARC, Instantly connection) via screen share or temporary admin access.</div>
+        <span class="step-tool t-green">Google Workspace or Microsoft 365</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
-        <div class="step-label">Gob sets up outreach subdomain</div>
-        <div class="step-detail">Add outreach.[clientdomain].com as Secondary Domain. DNS records: MX (SMTP.GOOGLE.COM), SPF (include:_spf.google.com), DKIM (2048-bit, generated in Workspace), DMARC (p=none, rua to vito@argusreach.com). Full SOP: ops/client-email-setup-sop.md</div>
+        <div class="step-label">Gob configures outreach subdomain</div>
+        <div class="step-detail">Add outreach.[clientdomain].com as sending subdomain. DNS records: MX, SPF, DKIM (2048-bit), DMARC (p=none, rua to vito@argusreach.com). Works for Google or Microsoft — provider-agnostic setup. Full SOP: ops/client-email-setup-sop.md</div>
         <span class="step-tool t-green">GoDaddy / Cloudflare</span>
         <span class="step-tool t-blue">Gob (COO)</span>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
-        <div class="step-label">Outreach mailbox created &amp; connected to Instantly</div>
-        <div class="step-detail">Create [name]@outreach.[clientdomain].com as real Workspace user. Approve Instantly as trusted app in Workspace Admin. Connect via Google OAuth. Set reply-to = client's main email. Enable warmup: 20/day, 30% reply rate.</div>
+        <div class="step-label">Outreach mailbox connected to Instantly</div>
+        <div class="step-detail">Create [name]@outreach.[clientdomain].com. Connect to Instantly via OAuth (Google) or SMTP/IMAP (Microsoft). Set reply-to = client's main email. Enable warmup: 20/day, 30% reply rate. 2–3 weeks before campaign launch.</div>
         <span class="step-tool t-orange">Instantly.ai</span>
-        <span class="step-tool t-green">Google Workspace</span>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -487,23 +486,24 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       </div>
       <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
       <div class="auto">
-        <div class="step-label">Gob builds cold prospect list</div>
-        <div class="step-detail">Apollo.io paid search by title (Owner, Director, Practice Manager), location, company size. Returns verified personal emails — not generic info@ addresses. Free tier (50 exports/mo) insufficient for client campaigns; paid plan ($49-99/mo) required.</div>
-        <span class="step-tool t-orange">Apollo.io (paid)</span>
-        <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
-      </div>
-      <div class="arrow">↓</div>
-      <div class="auto">
-        <div class="step-label">Email list verified before sending</div>
-        <div class="step-detail">Every prospect list run through NeverBounce or ZeroBounce before loading into Instantly. Target: &lt;2% bounce rate. Invalid/risky emails removed. Cost: ~$3 per 1,000. Protects sender domain reputation. Non-negotiable gate before campaign launch.</div>
+        <div class="step-label">Gob runs monthly_cycle.py — full automated pipeline</div>
+        <div class="step-detail">Single command: python3 tools/monthly_cycle.py --client [id] --month "Month YYYY". Pipeline: (1) Pull all previously contacted emails from DB → exclusion list. (2) Apollo API search by ICP titles + geography, auto-refill pages until target count met — never contacts same prospect twice. (3) NeverBounce email verification — bad/risky emails auto-added to DNC. (4) DNC filter applied (global + client-specific). (5) New Instantly campaign created automatically with naming convention: "ArgusReach — [Firm] — [Month YYYY]". (6) Sequence pulled from previous campaign in Instantly (7-day minimum delays enforced). (7) Contacts loaded to campaign. (8) Pre-launch checklist sent to Vito via Telegram.</div>
+        <span class="step-tool t-orange">Apollo.io (paid for emails)</span>
         <span class="step-tool t-red">NeverBounce</span>
         <span class="step-tool t-orange">Instantly.ai</span>
+        <span class="step-tool t-blue">monthly_cycle.py</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="step">
+        <div class="step-label">Vito reviews pre-launch checklist in Instantly</div>
+        <div class="step-detail">Before hitting GO: (1) Sequence copy correct for this client. (2) Step delays: Day 0 → 7+ days → 7+ days. (3) Sending account linked. (4) Mon–Fri business hours schedule. (5) Stop on reply: ON. Nothing launches until Vito manually activates in Instantly.</div>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
-        <div class="step-label">Gob adds client to monitor</div>
-        <div class="step-detail">clients.json entry created. Mode set (automated or draft_approval). DNC file created at dnc/[client_id].txt. Monitor activated. Per-client compliance note added to AI prompt.</div>
-        <span class="step-tool t-blue">monitor.py v2</span>
+        <div class="step-label">Vito hits GO → monitor auto-activates</div>
+        <div class="step-detail">When Vito activates campaign in Instantly (status → live), monitor detects this within 1 hour via API polling and automatically sets active=true + launch_date in clients.json. No manual config change needed. Telegram confirmation fires: "[Firm] campaign detected live — monitor now watching for replies."</div>
+        <span class="step-tool t-blue">monitor.py</span>
+        <span class="step-tool t-orange">Instantly.ai</span>
       </div>
     </div>
   </div>
@@ -584,9 +584,17 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="auto">
         <div class="step-label">Monthly performance report</div>
-        <div class="step-detail">Gob pulls database data → builds monthly report: sent, open rate, replies, meetings booked, outcomes. Reviewed by Vito, then emailed to client.</div>
-        <span class="step-tool t-blue">Gob (AI)</span>
+        <div class="step-detail">Run: python3 tools/monthly_report.py --client [id] --month "Month YYYY". Auto-pulls from Instantly API: contacts reached, emails sent, open rate, completed sequences, bounced, unsubscribed. Auto-pulls reply classifications from SQLite DB: positive, not_now, negative, escalated. Meetings from DB. Vito reviews, then emailed to client. Never auto-sent.</div>
+        <span class="step-tool t-blue">monthly_report.py</span>
         <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
+        <span class="step-tool t-orange">Instantly.ai API</span>
+      </div>
+      <div class="arrow">↓</div>
+      <div class="auto">
+        <div class="step-label">Campaign cycle detection → next month batch auto-built</div>
+        <div class="step-detail">Monitor checks hourly: when 75%+ of contacts reach sequence_complete stage, Telegram alert fires once: "Campaign winding down — reply CYCLE [client] [Month Year] to build next batch." Vito replies → monthly_cycle.py runs automatically: excludes all previously contacted emails (from DB), auto-refills Apollo until target met, NeverBounce verifies, creates new Instantly campaign, loads contacts, sends pre-launch checklist. Vito reviews and hits GO. Cycle repeats indefinitely.</div>
+        <span class="step-tool t-blue">monthly_cycle.py</span>
+        <span class="step-tool t-orange">Instantly.ai</span>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -601,7 +609,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ RENEW</div>
       <div class="auto">
         <div class="step-label">Continue month-to-month</div>
-        <div class="step-detail">New prospect list built. Sequences refreshed. Scale plan upsell conversation.</div>
+        <div class="step-detail">Monthly cycle automation handles ongoing list builds. Sequences refreshed. Scale plan upsell conversation.</div>
       </div>
       <div class="arrow">↓ UPGRADE</div>
       <div class="step">
@@ -933,6 +941,19 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 <!-- RECENT CHANGES LOG -->
 <div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-18</h2>
+  <div style="font-size:0.75rem;color:#888;margin-bottom:32px;display:flex;flex-direction:column;gap:6px;">
+    <div>• <span style="color:#4ade80;font-weight:600;">monthly_cycle.py</span> — Full automated monthly campaign pipeline: Apollo search with auto-refill (never short of target), DB-driven exclusion list (never re-contacts same prospect), NeverBounce verify, DNC filter, new Instantly campaign created automatically, sequence pulled from live campaign (7-day minimum delays enforced), contacts loaded, pre-launch checklist sent to Vito</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Auto-activation</span> — Monitor detects when Vito hits GO in Instantly (campaign status → live) and automatically sets active=true + launch_date in clients.json. No manual config change needed.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Campaign cycle detection</span> — Monitor alerts when 75%+ of contacts complete sequence. Vito replies "CYCLE [client] [month]" → monthly_cycle.py triggered automatically from Telegram.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Not-now re-engagement</span> — When follow-up date arrives, Claude drafts a warm re-engagement email automatically and queues it for Vito approval (APPROVE/REJECT via Telegram). Previously just an alert.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Instantly stats in monthly report</span> — monthly_report.py now auto-pulls contacts reached, emails sent, open rate, completed, bounced, unsubscribed from Instantly API. No more manual entry.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Prospect stage sync</span> — Monitor syncs lead statuses from Instantly hourly: sequence_complete, unsubscribed, bounced. Bad emails auto-added to DNC.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Sending account — provider-agnostic</span> — Flowchart and welcome email updated. No longer Google-specific. Supports Google Workspace or Microsoft 365. Subdomain approach documented.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">Intake Telegram bug fixed</span> — Admin portal was using wrong env var name (TELEGRAM_BOT_TOKEN vs ARGUSREACH_BOT_TOKEN). New intake submissions now alert Vito correctly.</div>
+    <div>• <span style="color:#4ade80;font-weight:600;">AMF one-pager</span> — argusreach.com/amf — personalized sales page for Advanced Medical of Florida pitch to Dr. Brett (CGO). Accurate, consistent with what we actually deliver.</div>
+  </div>
+
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-17</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Stripe Webhook Connected</div>
