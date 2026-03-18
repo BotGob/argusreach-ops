@@ -1161,29 +1161,154 @@ def check_stale_pending():
         log(f"[Stale pending check] error (non-fatal): {e}")
 
 
+def _draft_reengagement(client, prospect_email, prospect_first_name):
+    """Use Claude to draft a brief re-engagement email for a not-now/OOO prospect."""
+    if not ai:
+        return None
+    try:
+        fname = prospect_first_name or prospect_email
+        prompt = f"""You are drafting a brief, warm re-engagement email for {client['sender_name']} at {client['firm_name']}.
+
+This prospect ({fname}, {prospect_email}) previously replied saying they were busy or not ready. Their follow-up date has now arrived.
+
+Write a short, friendly re-engagement email (2-3 sentences max before signature). 
+- Reference that some time has passed since you last connected
+- Keep it low-pressure — no pushy language
+- End with the booking link on its own line
+- Tone: {client.get('tone', 'warm-professional')}
+
+FORMATTING RULES:
+- Plain text, double line breaks between paragraphs
+- Signature on its own line: "{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Booking link on its own line: {client['calendly_link']}
+- No em dashes
+
+Return ONLY the email body text, no subject line, no commentary."""
+
+        resp = ai.messages.create(
+            model='claude-haiku-4-5',
+            max_tokens=300,
+            messages=[{'role': 'user', 'content': prompt}]
+        )
+        return resp.content[0].text.strip()
+    except Exception as e:
+        log(f"[Follow-up] Draft generation failed: {e}")
+        return None
+
+
 def check_due_followups():
-    """Alert when OOO or not-now prospects have hit their follow-up date."""
+    """Alert when OOO or not-now prospects have hit their follow-up date.
+    Generates a re-engagement draft and queues it for approval."""
     if not _DB_ENABLED:
         return
     try:
         due = _get_due_followups()
         if not due:
             return
+
+        # Load all clients for lookup
+        all_clients_data = json.loads(CLIENTS_FILE.read_text())
+        client_map = {c['id']: c for c in all_clients_data.get('clients', [])}
+
         for prospect in due:
             cid   = prospect['client_id']
             email = prospect['email']
             fname = prospect.get('first_name', '') or email
             stage = prospect.get('stage', '')
             log(f"[Follow-up] {email} ({cid}) is due for follow-up (was: {stage})")
-            notify(
-                f"📅 *Follow-up Due* — {cid}\n"
-                f"👤 {fname} `{email}`\n"
-                f"They previously replied OOO or not-now. Follow-up date has arrived.\n"
-                f"Check their thread and re-engage if appropriate."
-            )
+
+            client = client_map.get(cid)
+            draft  = None
+
+            if client and ai_budget_ok():
+                draft = _draft_reengagement(client, email, fname)
+                ai_tick()
+
+            if client and draft:
+                # Queue draft for Vito's approval
+                approval_id, is_new = queue_pending(
+                    client, email, fname,
+                    f"Re: follow-up — {fname}",
+                    draft, 'not_now'
+                )
+                notify(
+                    f"📅 *Follow-up Due* — {client.get('firm_name', cid)}\n"
+                    f"👤 {fname} `{email}`\n"
+                    f"Previously replied not-now or OOO. Draft re-engagement ready:\n\n"
+                    f"```\n{draft[:400]}\n```\n"
+                    f"→ Reply *APPROVE {approval_id}* or *REJECT {approval_id}*"
+                )
+            else:
+                # Fallback: plain alert if no client config or AI unavailable
+                notify(
+                    f"📅 *Follow-up Due* — {cid}\n"
+                    f"👤 {fname} `{email}`\n"
+                    f"Previously replied OOO or not-now. No draft available — re-engage manually."
+                )
+
             _mark_follow_up_sent(prospect['id'])
     except Exception as e:
         log(f"[Follow-up] check failed (non-fatal): {e}")
+
+
+def sync_instantly_stages(clients):
+    """Pull lead statuses from Instantly and update prospect stages in DB.
+    Instantly status codes: 1=active, 2=paused, 3=replied, 4=unsubscribed, 5=bounced, 6=completed
+    """
+    if not _DB_ENABLED:
+        return
+    STAGE_MAP = {
+        6: 'sequence_complete',
+        4: 'unsubscribed',
+        5: 'bounced',
+    }
+    for client in clients:
+        cid         = client['id']
+        campaign_id = client.get('instantly_campaign_id', '')
+        if not campaign_id:
+            continue
+        try:
+            page_cursor = None
+            processed   = 0
+            while True:
+                payload = {'campaign': campaign_id, 'limit': 100}
+                if page_cursor:
+                    payload['starting_after'] = page_cursor
+                resp = requests.post(
+                    'https://api.instantly.ai/api/v2/leads/list',
+                    headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}', 'Content-Type': 'application/json'},
+                    json=payload, timeout=20
+                )
+                if resp.status_code != 200:
+                    break
+                data  = resp.json()
+                leads = data.get('items', [])
+                if not leads:
+                    break
+                for lead in leads:
+                    status = lead.get('status')
+                    email  = lead.get('email', '').lower().strip()
+                    if not email or status not in STAGE_MAP:
+                        continue
+                    new_stage = STAGE_MAP[status]
+                    pid = _prospect_id(cid, email)
+                    try:
+                        update_prospect_stage(pid, new_stage)
+                    except Exception:
+                        pass
+                    # Add bounced/unsubscribed to DNC
+                    if status in (4, 5):
+                        add_dnc(cid, email)
+                    processed += 1
+                # Pagination
+                if not data.get('next_starting_after'):
+                    break
+                page_cursor = data['next_starting_after']
+
+            if processed:
+                log(f"[Sync] {cid}: updated {processed} prospect stages from Instantly")
+        except Exception as e:
+            log(f"[Sync] Stage sync failed for {cid} (non-fatal): {e}")
 
 
 def maybe_send_digest():
@@ -1278,6 +1403,12 @@ def run():
             maybe_send_digest()
             check_due_followups()
             check_stale_pending()
+            # Sync Instantly lead statuses to DB every hour
+            if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 3600:
+                pass
+            else:
+                sync_instantly_stages(clients if clients else [])
+                run._last_sync = datetime.utcnow()
 
         except Exception as e:
             log(f"Main loop error: {e}")

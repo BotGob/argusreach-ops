@@ -17,11 +17,81 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
+import requests
+
 BASE_DIR     = Path(__file__).parent.parent
 CLIENTS_FILE = BASE_DIR / 'monitor' / 'clients.json'
 REPORTS_DIR  = BASE_DIR / 'reports'
 REPORTS_DIR.mkdir(exist_ok=True)
 REPLY_LOG = BASE_DIR / 'monitor' / 'logs' / 'replies.json'
+ENV_FILE  = BASE_DIR / 'monitor' / '.env'
+
+def _load_env():
+    if ENV_FILE.exists():
+        for line in ENV_FILE.read_text().splitlines():
+            if '=' in line and not line.startswith('#'):
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+_load_env()
+
+INSTANTLY_API_KEY = os.environ.get('INSTANTLY_API_KEY', '')
+
+
+def get_instantly_stats(campaign_id):
+    """Pull campaign stats from Instantly API by aggregating lead-level data."""
+    if not INSTANTLY_API_KEY or not campaign_id:
+        return {}
+    stats = {
+        'contacts_total': 0,
+        'emails_sent':    0,
+        'opens':          0,
+        'clicks':         0,
+        'replies':        0,
+        'completed':      0,
+        'unsubscribed':   0,
+        'bounced':        0,
+    }
+    try:
+        cursor = None
+        while True:
+            payload = {'campaign': campaign_id, 'limit': 100}
+            if cursor:
+                payload['starting_after'] = cursor
+            resp = requests.post(
+                'https://api.instantly.ai/api/v2/leads/list',
+                headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}', 'Content-Type': 'application/json'},
+                json=payload, timeout=20
+            )
+            if resp.status_code != 200:
+                break
+            data  = resp.json()
+            leads = data.get('items', [])
+            if not leads:
+                break
+            for lead in leads:
+                stats['contacts_total'] += 1
+                stats['opens']   += lead.get('email_open_count', 0)
+                stats['clicks']  += lead.get('email_click_count', 0)
+                stats['replies'] += lead.get('email_reply_count', 0)
+                status = lead.get('status')
+                if status == 6: stats['completed']    += 1
+                if status == 4: stats['unsubscribed'] += 1
+                if status == 5: stats['bounced']      += 1
+                # Estimate emails sent: step index from lastStep
+                last_step = lead.get('status_summary', {}).get('lastStep', {})
+                step_str  = last_step.get('stepID', '')  # e.g. "0_2_0" = step index 2
+                if step_str:
+                    try:
+                        step_num = int(step_str.split('_')[1]) + 1
+                        stats['emails_sent'] += step_num
+                    except Exception:
+                        stats['emails_sent'] += 1
+            if not data.get('next_starting_after'):
+                break
+            cursor = data['next_starting_after']
+    except Exception as e:
+        print(f"  (Instantly stats error: {e})")
+    return stats
 
 def get_log_stats(client_id, month_str):
     """Pull reply counts from DB (primary) with replies.json fallback."""
@@ -279,22 +349,41 @@ def prompt_stats(client_id=None, month_str=None):
     log_stats = get_log_stats(client_id, month_str) if client_id and month_str else None
 
     print("\n── Monthly Stats ──────────────────────────────")
+
+    # Pull Instantly stats automatically
+    instantly_stats = {}
+    campaign_id = client.get('instantly_campaign_id', '')
+    if campaign_id:
+        print("  Pulling stats from Instantly API...")
+        instantly_stats = get_instantly_stats(campaign_id)
+        if instantly_stats:
+            print(f"  ✅ Instantly: {instantly_stats['contacts_total']} contacts | "
+                  f"{instantly_stats['emails_sent']} emails sent | "
+                  f"{instantly_stats['opens']} opens | "
+                  f"{instantly_stats['replies']} replies | "
+                  f"{instantly_stats['completed']} completed sequence | "
+                  f"{instantly_stats['bounced']} bounced")
+
     if log_stats:
         print(f"  (Pre-filled from monitor log — press Enter to accept, or type to override)")
 
-    def ask(label, log_key=None, default=None):
-        log_val = log_stats.get(log_key, 0) if log_stats and log_key else default
-        hint = f" [{log_val}]" if log_val is not None else ""
-        raw = input(f"{label}{hint}: ").strip()
-        if raw == '' and log_val is not None:
-            return log_val
+    def ask(label, instantly_key=None, log_key=None, default=None):
+        # Prefer Instantly API data, fall back to monitor log, then default
+        inst_val = instantly_stats.get(instantly_key) if instantly_key else None
+        log_val  = log_stats.get(log_key, 0) if log_stats and log_key else default
+        val      = inst_val if inst_val is not None else log_val
+        src      = " [Instantly]" if inst_val is not None else (" [monitor log]" if log_val else "")
+        hint     = f" [{val}{src}]" if val is not None else ""
+        raw      = input(f"{label}{hint}: ").strip()
+        if raw == '' and val is not None:
+            return val
         return int(raw) if raw else 0
 
-    contacts = ask("Contacts reached this month")
-    positive = ask("Positive replies", log_key='positive')
-    not_now  = ask("Not now / follow later", log_key='not_now')
-    meetings = ask("Meetings booked (check Calendly manually)")
-    unsubs   = ask("Unsubscribes", log_key='negative')
+    contacts = ask("Contacts reached this month", instantly_key='contacts_total')
+    positive = ask("Positive replies",            log_key='positive')
+    not_now  = ask("Not now / follow later",      log_key='not_now')
+    meetings = ask("Meetings booked (check Calendly)")
+    unsubs   = ask("Unsubscribes",               instantly_key='unsubscribed', log_key='negative')
 
     print("\n── What Worked (enter items one per line, blank line to finish) ──")
     working = []
