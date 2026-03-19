@@ -93,6 +93,15 @@ def db_write_approval(entry, approved: bool):
         classification = entry.get('classification', 'other')
         campaign_id  = entry.get('instantly_campaign_id', '')
 
+        # Don't write warmup emails to DB — they're not real prospects
+        import re as _re
+        subject = entry.get('subject', '')
+        is_warmup = ('warmup' in subject.lower() or
+                     bool(_re.search(r'\b[A-Z0-9]{7}\b', subject)))
+        if is_warmup:
+            log(f"[DB] Skipping DB write for warmup email: {from_email}")
+            return
+
         pid = upsert_prospect(cid, campaign_id, from_email,
                               from_name.split()[0] if from_name else '',
                               from_name.split()[-1] if from_name and ' ' in from_name else '',

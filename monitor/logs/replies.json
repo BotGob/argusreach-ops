@@ -607,5 +607,14 @@
     "sent": false,
     "notes": "Qualified prospect ready to book call.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T16:33:45.088813",
+    "client": "argus_reach___test_1",
+    "prospect": "tonyn@popitmarketing.com",
+    "classification": "positive",
+    "draft_preview": "Tony,\n\nGreat to hear - let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]
