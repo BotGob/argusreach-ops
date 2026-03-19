@@ -707,7 +707,7 @@ def intake():
             "contact_email":    f.get("contact_email","").strip(),
             "contact_phone":    f.get("contact_phone","").strip(),
             "business_address": f.get("business_address","").strip(),
-            "vertical":         f.get("vertical","").strip(),
+            "vertical":         (f.get("vertical_other","").strip() if f.get("vertical","").strip() == "Other" else f.get("vertical","").strip()),
             "website":          f.get("website","").strip(),
             "target_geography": f.get("target_geography","").strip(),
             "target_radius":    f.get("target_radius","").strip(),

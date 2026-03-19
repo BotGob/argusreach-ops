@@ -80,7 +80,13 @@ Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run eac
 (Multiple choice: 1-10 / 10-50 / 50-200 / 200-500 / 500+)
 
 **Q17. Target industries**
-(Short answer — e.g., "manufacturing, professional services, healthcare")
+(Multiple choice + Other free text:)
+- Healthcare / Medical
+- Professional Services (legal, finance, accounting)
+- B2B Services
+- Technology / SaaS
+- Real Estate
+- Other: ___
 
 **Q18. Geographic focus**
 (Short answer — e.g., "Tampa, St. Pete, Clearwater — 30-mile radius")

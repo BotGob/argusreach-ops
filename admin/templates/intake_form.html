@@ -58,16 +58,19 @@
     </div>
     <div class="field">
       <label>Vertical / Industry <span class="req">*</span></label>
-      <select name="vertical" required>
+      <select name="vertical" required onchange="document.getElementById('vertical_other_wrap').style.display=this.value==='Other'?'block':'none'">
         <option value="">— Select —</option>
-        <option value="PhysicalTherapy">Physical Therapy</option>
-        <option value="SoberLiving">Sober Living / Recovery</option>
-        <option value="RIA">Investment Advisor (RIA)</option>
-        <option value="MedSpa">Med Spa</option>
-        <option value="Dental">Dental</option>
-        <option value="Chiropractic">Chiropractic</option>
+        <option value="Healthcare">Healthcare / Medical</option>
+        <option value="ProfessionalServices">Professional Services (legal, finance, accounting)</option>
+        <option value="B2BServices">B2B Services</option>
+        <option value="Technology">Technology / SaaS</option>
+        <option value="RealEstate">Real Estate</option>
         <option value="Other">Other</option>
       </select>
+    </div>
+    <div class="field" id="vertical_other_wrap" style="display:none;">
+      <label>Please describe your industry <span class="req">*</span></label>
+      <input name="vertical_other" placeholder="e.g. Physical Therapy, Med Spa, Insurance...">
     </div>
 
     <div class="section-header">Your Contact Info</div>
