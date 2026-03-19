@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Dashboard</h1>
-<p class="subtitle">{{ generated }}</p>
+<p class="subtitle">{{ generated }} · 🔄 Stats sync from Instantly hourly · Status auto-activates when campaign goes live</p>
 
 <div class="cards">
   <div class="card"><div class="card-label">Active Clients</div><div class="card-value">{{ clients|selectattr('active')|list|length }}</div></div>
