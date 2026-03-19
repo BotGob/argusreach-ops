@@ -1522,8 +1522,8 @@ def run():
             maybe_send_digest()
             check_due_followups()
             check_stale_pending()
-            # Sync Instantly lead statuses to DB every hour + check cycle completion
-            if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 3600:
+            # Sync Instantly lead statuses to DB every 15 min + check cycle completion
+            if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
                 pass
             else:
                 sync_instantly_stages(clients if clients else [])
