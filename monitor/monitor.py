@@ -642,6 +642,19 @@ def is_spam(msg, body):
         return True
     return False
 
+def is_warmup(msg, from_email):
+    """Detect Instantly warmup emails — should be silently skipped, never queued."""
+    subject = msg.get('Subject', '')
+    # Instantly warmup subjects contain "Micro Warmup" or "Warmup" tags
+    if 'micro warmup' in subject.lower() or 'warmup' in subject.lower():
+        return True
+    # Instantly injects a short alphanumeric tracking code at the end of warmup subjects
+    # Pattern: ends with something like "3WXDVXJ" or "F4989W1 3WXDVXJ" (7-char uppercase hex codes)
+    import re
+    if re.search(r'\b[A-Z0-9]{7}\b', subject):
+        return True
+    return False
+
 def _send_email(outreach_email, app_password, sender_name, to_email, subject, body, retry=1,
                 in_reply_to=None, references=None):
     """Send via Gmail SMTP with one retry. Pass in_reply_to/references for proper threading."""
@@ -877,6 +890,13 @@ def process_client(client, processed_ids):
             # Filter: must be a genuine reply to our outreach
             if not is_genuine_reply(msg):
                 log(f"{label} Skipping — not a reply to our outreach: {from_email}")
+                mail.store(msg_id, '+FLAGS', '\\Seen')
+                new_processed.add(fingerprint)
+                continue
+
+            # Filter: Instantly warmup emails — never queue these
+            if is_warmup(msg, from_email):
+                log(f"{label} Skipping warmup email from: {from_email} — {subject[:60]}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 new_processed.add(fingerprint)
                 continue
