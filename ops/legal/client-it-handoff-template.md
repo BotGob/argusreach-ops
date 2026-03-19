@@ -15,6 +15,20 @@ I need you to add 5 DNS records and create one new email mailbox. Everything is 
 
 ---
 
+## Why We Do This
+
+Modern email providers (Gmail, Outlook) actively filter cold outreach. Without proper authentication, emails land in spam — even legitimate ones. Here's what each piece does:
+
+- **Dedicated subdomain** (`outreach.[clientdomain].com`) — keeps your main company email domain completely clean. If cold outreach ever gets flagged, it doesn't affect `@[clientdomain].com` at all.
+- **SPF** — tells Gmail and Outlook "ArgusReach is authorized to send on behalf of this domain." Without it, emails are automatically flagged as suspicious.
+- **DKIM** — a cryptographic signature on every email proving it wasn't spoofed or tampered with. Required by Google and Microsoft for any bulk sender as of 2024.
+- **DMARC** — tells receiving mail servers what to do if SPF or DKIM fail. Without it, you fail Google's bulk sender requirements outright.
+- **MX record** — so replies actually reach the mailbox. Without it, responses bounce.
+
+Skipping any of these means cold outreach emails go to spam. All of them together means they land in the inbox. This is industry standard — every legitimate outreach platform requires it.
+
+---
+
 ## What We're Setting Up
 
 A new email address: **[name]@outreach.[clientdomain].com**
