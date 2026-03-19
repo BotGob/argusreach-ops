@@ -976,6 +976,13 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div>• <span style="color:#4ade80;font-weight:600;">Sending account — provider-agnostic</span> — Flowchart and welcome email updated. No longer Google-specific. Supports Google Workspace or Microsoft 365. Subdomain approach documented.</div>
     <div>• <span style="color:#4ade80;font-weight:600;">Intake Telegram bug fixed</span> — Admin portal was using wrong env var name (TELEGRAM_BOT_TOKEN vs ARGUSREACH_BOT_TOKEN). New intake submissions now alert Vito correctly.</div>
     <div>• <span style="color:#4ade80;font-weight:600;">AMF one-pager</span> — argusreach.com/amf — personalized sales page for Advanced Medical of Florida pitch to Dr. Brett (CGO). Accurate, consistent with what we actually deliver.</div>
+    <div style="margin-top:10px;font-size:0.72rem;color:#f59e0b;font-family:'JetBrains Mono',monospace;margin-bottom:6px;">⚠️ Known Gaps (open backlog items)</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#f59e0b;">Month 1 sequence loading</span> — monthly_cycle.py creates Month 1 campaign empty if no existing Instantly campaign to pull from. Fix: save finalized sequence as sequence_template.json before launch so portal pre-loads it. Not yet built.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#f59e0b;">Warmup health gate</span> — portal Launch button does not verify sending account warmup score (must be 85%+) before creating campaign. Manual check required for now.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:6px;">Onboarding fixes (2026-03-19 evening)</div>
+    <div style="font-size:0.75rem;color:#888;">• Intake form: added email_provider (Google Workspace vs Microsoft 365) and dns_provider fields to Section 6 — required for subdomain DNS setup on new client onboarding.</div>
+    <div style="font-size:0.75rem;color:#888;">• Service agreement v1 drafted — ops/legal/service-agreement.md. Month-to-month, no outcome guarantee, liability capped at 30 days fees, client indemnifies for industry compliance.</div>
+    <div style="font-size:0.75rem;color:#888;">• Warmup filter fix: MIME-encoded subjects now decoded before regex matching. Known warmup domain blocklist added (successfactorconsulting.com, arcmailnetworkpro.com, etc.).</div>
   </div>
 
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-17</h2>

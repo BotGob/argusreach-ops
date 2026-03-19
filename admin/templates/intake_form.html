@@ -244,6 +244,25 @@
       </select>
     </div>
 
+    <!-- ── SECTION 6b: EMAIL INFRASTRUCTURE ─────────────────────────── -->
+    <div class="section-header">Outreach Email Setup</div>
+    <div class="field">
+      <label>What email platform does your business use?
+        <span class="hint">We'll set up a dedicated outreach email account on a subdomain (e.g. outreach.yourdomain.com) to keep your main email completely separate. We handle all setup — just need to know your provider.</span>
+      </label>
+      <select name="email_provider">
+        <option value="google">Google Workspace (Gmail for business)</option>
+        <option value="microsoft">Microsoft 365 (Outlook)</option>
+        <option value="other">Other / Not sure</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Who manages your domain / DNS?
+        <span class="hint">Usually GoDaddy, Cloudflare, Namecheap, or your web hosting company. We'll need temporary DNS access to add email authentication records (SPF, DKIM, DMARC). This protects your domain reputation.</span>
+      </label>
+      <input name="dns_provider" placeholder="GoDaddy, Cloudflare, Namecheap, etc.">
+    </div>
+
     <!-- ── SECTION 7: ANYTHING ELSE ─────────────────────────────────── -->
     <div class="section-header">Anything Else</div>
     <div class="field">

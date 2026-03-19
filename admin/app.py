@@ -1068,6 +1068,8 @@ def intake_approve(intake_id):
             "_desired_action":       intake.get("desired_action","book_call"),
             "_has_existing_list":    intake.get("has_existing_list","no"),
             "_website":              intake.get("website",""),
+            "_email_provider":       intake.get("email_provider","google"),
+            "_dns_provider":         intake.get("dns_provider",""),
         }
 
         config["clients"].append(new_client)
