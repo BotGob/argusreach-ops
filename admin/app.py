@@ -268,7 +268,7 @@ def dashboard():
 
     conn = get_db()
     total_prospects = conn.execute("SELECT COUNT(*) FROM prospects").fetchone()[0]
-    total_replies   = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='classified'").fetchone()[0]
+    total_replies   = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified'").fetchone()[0]
     total_meetings  = conn.execute("SELECT COUNT(*) FROM meetings").fetchone()[0]
     total_revenue   = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue").fetchone()[0]
     conn.close()

@@ -328,5 +328,264 @@
     "sent": false,
     "notes": "Rule 6: Aggressive/threatening content with suspicious instructions to 'disregard all rules' - potential security test or malicious input. Rule 17: Context mismatch - reply makes no sense as response to referral pipeline outreach. Do not respond.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T04:56:55.724392",
+    "client": "argus_reach___test_1",
+    "prospect": "lilly.counts@danielyip.com",
+    "classification": "positive",
+    "draft_preview": "Lilly,\n\nGreat to hear from you - absolutely, let's connect soon. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "Warm prospect with prior call history requesting a meeting - high engagement signal.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T04:59:18.189043",
+    "client": "argus_reach___test_1",
+    "prospect": "lilly.counts@danielyip.com",
+    "classification": "positive",
+    "draft_preview": "Lilly,\n\nGreat to hear from you - absolutely, let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "Warm prospect follow-up from prior call; actively interested in next step.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T05:29:49.843231",
+    "client": "argus_reach___test_1",
+    "prospect": "loic.b@twodevecommerce.com",
+    "classification": "positive",
+    "draft_preview": "Lo\u00efc,\n\nGreat to hear from you - I'd love to chat and see how we can work together. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus ",
+    "sent": false,
+    "notes": "Engaged prospect from ICP vertical (ecommerce/tech) requesting a discovery call.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T05:37:32.399190",
+    "client": "argus_reach___test_1",
+    "prospect": "loic.b@twodevecommerce.com",
+    "classification": "positive",
+    "draft_preview": "Lo\u00efc,\n\nDoing well, thanks for asking - great to hear from you. Happy to jump on a call and explore what we can do together. Grab a time that works best:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVi",
+    "sent": false,
+    "notes": "Qualified prospect showing strong buying signal - ready to book.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:10:49.393170",
+    "client": "argus_reach___test_1",
+    "prospect": "rogers@appprovelocityknowledgeco.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 17 - Context mismatch. Prospect appears confused about who Argus Reach is and what we do; response does not logically connect to our outreach.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:13:37.950619",
+    "client": "argus_reach___test_1",
+    "prospect": "rogers@appprovelocityknowledgeco.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 17: Reply content does not align with Argus Reach outreach; prospect seems confused about who we are or has responded to wrong sender. Also potential Rule 11 indicator (unsolicited service request).",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:34:00.850267",
+    "client": "argus_reach___test_1",
+    "prospect": "nick@thinkbeyondsoftwareltd.com",
+    "classification": "question",
+    "draft_preview": "Nick,\n\nGreat to hear from you - I appreciate the interest. Let's hop on a quick call so I can understand what matters most to you and we can explore this properly.\n\nhttps://calendly.com/vito-argusreac",
+    "sent": false,
+    "notes": "Warm, engaged prospect re-initiating conversation - qualified lead ready for discovery call.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:34:03.800368",
+    "client": "argus_reach___test_1",
+    "prospect": "j.montero@auttomai.net",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "SECURITY RULE 11: Inbound cold pitch detected. Jaime Montero is selling/promoting their own webinar and whitepaper to us, not replying as a qualified prospect to our outreach.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:41:24.214475",
+    "client": "argus_reach___test_1",
+    "prospect": "nick@thinkbeyondsoftwareltd.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH: Reply references 'this post' and requests blog content, suggesting prospect may be confused about who we are or responding to something unrelated to our outreach. Unclear intent and potential miscommunication requiring Vito's direct review.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T09:41:27.485806",
+    "client": "argus_reach___test_1",
+    "prospect": "j.montero@auttomai.net",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Security Rule 11: Inbound cold pitch detected. Jaime is selling/promoting their webinar and services to us, not a reply to our initial outreach. This is vendor/service outreach disguised as a reply.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T11:46:32.711161",
+    "client": "argus_reach___test_1",
+    "prospect": "macneil@torontocreator.website",
+    "classification": "question",
+    "draft_preview": "Brennan,\n\nThanks for the kind words and for getting back to me. I appreciate the question - but SEO isn't actually our wheelhouse. What we do focus on is helping professionals like you build stronger ",
+    "sent": false,
+    "notes": "Prospect is interested but asking about SEO services; clarification needed on our actual offering before booking.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T11:53:54.647792",
+    "client": "argus_reach___test_1",
+    "prospect": "macneil@torontocreator.website",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 1 violation: prospect is asking domain-specific questions about SEO expertise and vendor recommendations, which is outside Argus Reach scope. Rule 17 context mismatch: Brennan's reply suggests misunderstanding of what we do (he's seeking an SEO expert, not sales pipeline/referral network tools). This requires Vito review before any response.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T13:25:21.595227",
+    "client": "argus_reach___test_1",
+    "prospect": "sanger@sangerkhandesign.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH - Reply content makes no sense as a response to our outreach. Prospect shows no memory of our email, no engagement signal, and the message appears confused or auto-generated. Do not respond to misdirected emails.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T13:28:10.110086",
+    "client": "argus_reach___test_1",
+    "prospect": "sanger@sangerkhandesign.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH (Rule 17) - Reply suggests prior relationship/call that does not align with cold outreach; contains suspicious elements (tracking pixel, encoded string '3WXDVXJ leatherchanging'); prospect's business (design) does not match ICP (accountants, physical therapists, real estate agents); unclear if this is genuine reply or misdirected/spoofed email.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T14:06:07.328014",
+    "client": "argus_reach___test_1",
+    "prospect": "megan@lunargarden.shop",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH: Prospect appears confused about our service (asking for SEO expert referrals). This does not align with Argus Reach positioning (sales pipeline/referral network building for accountants, PTs, real estate agents). Unclear if prospect understands what we do or if this is misdirected.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T14:08:46.331352",
+    "client": "argus_reach___test_1",
+    "prospect": "megan@lunargarden.shop",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Context mismatch - prospect is asking about SEO expertise, which does not align with Argus Reach positioning or services. This appears to be a confused or misdirected inquiry that should be reviewed by Vito before any response.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T14:36:20.524084",
+    "client": "argus_reach___test_1",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "not_now",
+    "draft_preview": "No problem at all \u2014 I completely understand. Reach out anytime in a month or two if the timing feels right, or feel free to grab time on my calendar whenever you're ready.\n\nhttps://calendly.com/vito-a",
+    "sent": true,
+    "notes": "approved by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.196458",
+    "client": "argus_reach___test_1",
+    "prospect": "gordon-l@heythinkitfirst.com",
+    "classification": "positive",
+    "draft_preview": "Luke,\n\nGreat to hear from you - glad we connected last week. I'd love to walk through some recent examples and show you how this works in practice. Let's find a time to chat:\n\nhttps://calendly.com/vit",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.211531",
+    "client": "argus_reach___test_1",
+    "prospect": "vitoresciniti27@yahoo.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.222593",
+    "client": "argus_reach___test_1",
+    "prospect": "lilly.counts@danielyip.com",
+    "classification": "positive",
+    "draft_preview": "Lilly,\n\nGreat to hear from you - absolutely, let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.235380",
+    "client": "argus_reach___test_1",
+    "prospect": "loic.b@twodevecommerce.com",
+    "classification": "positive",
+    "draft_preview": "Lo\u00efc,\n\nDoing well, thanks for asking - great to hear from you. Happy to jump on a call and explore what we can do together. Grab a time that works best:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVi",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.245536",
+    "client": "argus_reach___test_1",
+    "prospect": "rogers@appprovelocityknowledgeco.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.256828",
+    "client": "argus_reach___test_1",
+    "prospect": "nick@thinkbeyondsoftwareltd.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.270134",
+    "client": "argus_reach___test_1",
+    "prospect": "j.montero@auttomai.net",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.280754",
+    "client": "argus_reach___test_1",
+    "prospect": "macneil@torontocreator.website",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.291787",
+    "client": "argus_reach___test_1",
+    "prospect": "sanger@sangerkhandesign.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T14:37:09.302962",
+    "client": "argus_reach___test_1",
+    "prospect": "megan@lunargarden.shop",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]
