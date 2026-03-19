@@ -304,34 +304,80 @@ def dashboard():
 
     conn = get_db()
     total_prospects = conn.execute("SELECT COUNT(*) FROM prospects").fetchone()[0]
-    total_replies   = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified'").fetchone()[0]
     total_meetings  = conn.execute("SELECT COUNT(*) FROM meetings").fetchone()[0]
     total_revenue   = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue").fetchone()[0]
+
+    # Reply breakdown by classification
+    reply_rows = conn.execute("""
+        SELECT json_extract(metadata,'$.classification') as cls, COUNT(DISTINCT prospect_id) as cnt
+        FROM events WHERE event_type='classified'
+        GROUP BY cls
+    """).fetchall()
+    reply_breakdown = {r[0]: r[1] for r in reply_rows}
+    total_replies = sum(reply_breakdown.values())
+
+    # Replies we sent back (approved drafts that went out)
+    replies_sent_db = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='reply_sent'").fetchone()[0]
+
+    # Drafts rejected (we chose not to respond)
+    drafts_rejected = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='draft_rejected'").fetchone()[0]
     conn.close()
 
     client_stats = []
     for c in clients:
         cid = c.get("instantly_campaign_id","")
         a = analytics.get(cid, {})
+        instantly_sent = a.get("emails_sent_count", 0)
+
+        # Per-client reply breakdown from DB
+        conn2 = get_db()
+        c_reply_rows = conn2.execute("""
+            SELECT json_extract(e.metadata,'$.classification') as cls, COUNT(DISTINCT e.prospect_id) as cnt
+            FROM events e WHERE e.event_type='classified' AND e.client_id=?
+            GROUP BY cls
+        """, (c["id"],)).fetchall()
+        c_replies_sent = conn2.execute(
+            "SELECT COUNT(*) FROM events WHERE event_type='reply_sent' AND client_id=?", (c["id"],)
+        ).fetchone()[0]
+        conn2.close()
+
+        c_reply_breakdown = {r[0]: r[1] for r in c_reply_rows}
+        c_total_replies = sum(c_reply_breakdown.values())
+        c_total_sent = instantly_sent + c_replies_sent
+
         client_stats.append({
-            "id": c["id"],
-            "name": c.get("firm_name", c["id"]),
-            "vertical": c.get("vertical",""),
-            "plan": c.get("plan",""),
-            "active": c.get("active", False),
-            "leads": a.get("leads_count", 0),
-            "sent": a.get("emails_sent_count", 0),
-            "replies": a.get("reply_count_unique", 0),
-            "campaign_name": c.get("campaign_name","—"),
+            "id":              c["id"],
+            "name":            c.get("firm_name", c["id"]),
+            "vertical":        c.get("vertical",""),
+            "plan":            c.get("plan",""),
+            "active":          c.get("active", False),
+            "leads":           a.get("leads_count", 0),
+            "instantly_sent":  instantly_sent,
+            "replies_sent":    c_replies_sent,
+            "total_sent":      c_total_sent,
+            "replies_received":c_total_replies,
+            "reply_positive":  c_reply_breakdown.get("positive", 0),
+            "reply_not_now":   c_reply_breakdown.get("not_now", 0),
+            "reply_negative":  c_reply_breakdown.get("negative", 0),
+            "reply_escalated": c_reply_breakdown.get("escalated", 0),
+            "campaign_name":   c.get("campaign_name","—"),
         })
+
+    # Eastern time for display
+    import zoneinfo
+    eastern = zoneinfo.ZoneInfo("America/New_York")
+    generated_et = datetime.now(eastern).strftime("%Y-%m-%d %I:%M %p ET")
 
     return render_template("dashboard.html",
         clients=client_stats,
         total_prospects=total_prospects,
         total_replies=total_replies,
+        reply_breakdown=reply_breakdown,
+        replies_sent_db=replies_sent_db,
+        drafts_rejected=drafts_rejected,
         total_meetings=total_meetings,
         total_revenue=f"${total_revenue/100:,.2f}",
-        generated=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+        generated=generated_et,
     )
 
 

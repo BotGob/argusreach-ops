@@ -85,7 +85,8 @@ def fetch_stats():
 
 
 def render(stats):
-    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    import zoneinfo
+    ts = datetime.now(zoneinfo.ZoneInfo("America/New_York")).strftime("%Y-%m-%d %I:%M %p ET")
     rev = f"${stats['total_revenue_cents']/100:,.2f}"
 
     # Summary cards

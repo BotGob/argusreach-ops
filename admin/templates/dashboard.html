@@ -3,21 +3,39 @@
 {% block content %}
 
 <h1>Dashboard</h1>
-<p class="subtitle">{{ generated }} · 🔄 Stats sync from Instantly hourly · Status auto-activates when campaign goes live</p>
+<p class="subtitle">{{ generated }} · Stats sync from Instantly every 15 min</p>
 
 <div class="cards">
   <div class="card"><div class="card-label">Active Clients</div><div class="card-value">{{ clients|selectattr('active')|list|length }}</div></div>
   <div class="card"><div class="card-label">Prospects Tracked</div><div class="card-value">{{ total_prospects }}</div></div>
   <div class="card"><div class="card-label">Replies Received</div><div class="card-value">{{ total_replies }}</div></div>
+  <div class="card"><div class="card-label">Replies Sent</div><div class="card-value">{{ replies_sent_db }}</div></div>
   <div class="card"><div class="card-label">Meetings Booked</div><div class="card-value">{{ total_meetings }}</div></div>
   <div class="card"><div class="card-label">Revenue</div><div class="card-value">{{ total_revenue }}</div></div>
 </div>
+
+{% if reply_breakdown %}
+<div style="margin:16px 0 24px;padding:14px 20px;background:#1e293b;border-radius:8px;font-size:13px;color:#94a3b8;display:flex;gap:28px;flex-wrap:wrap;align-items:center">
+  <span style="color:#e2e8f0;font-weight:600">Reply Breakdown:</span>
+  <span>✅ Positive: <b style="color:#4ade80">{{ reply_breakdown.get('positive',0) }}</b></span>
+  <span>🕐 Not Now: <b style="color:#facc15">{{ reply_breakdown.get('not_now',0) }}</b></span>
+  <span>❌ Negative: <b style="color:#f87171">{{ reply_breakdown.get('negative',0) }}</b></span>
+  <span>🚨 Escalated: <b style="color:#fb923c">{{ reply_breakdown.get('escalated',0) }}</b></span>
+  <span>📤 We Replied: <b style="color:#60a5fa">{{ replies_sent_db }}</b></span>
+  <span>🚫 Ignored: <b style="color:#64748b">{{ drafts_rejected }}</b></span>
+</div>
+{% endif %}
 
 <h2>Clients</h2>
 <table>
   <thead><tr>
     <th>Client</th><th>Vertical</th><th>Plan</th><th>Status</th>
-    <th>Campaign</th><th>Leads</th><th>Sent</th><th>Replies</th><th></th>
+    <th>Campaign</th><th>Leads</th>
+    <th title="Emails sent by Instantly sequence">Sequence Sent</th>
+    <th title="Reply emails sent by ArgusReach on client's behalf">Replies Sent</th>
+    <th title="Total emails sent (sequence + replies)">Total Sent</th>
+    <th title="Replies received from prospects">Replies In</th>
+    <th></th>
   </tr></thead>
   <tbody>
   {% for c in clients %}
@@ -34,12 +52,21 @@
     </td>
     <td style="font-size:12px;color:#64748b">{{ c.campaign_name }}</td>
     <td>{{ c.leads }}</td>
-    <td>{{ c.sent }}</td>
-    <td>{{ c.replies }}</td>
+    <td>{{ c.instantly_sent }}</td>
+    <td>{{ c.replies_sent }}</td>
+    <td><b>{{ c.total_sent }}</b></td>
+    <td>
+      {{ c.replies_received }}
+      {% if c.reply_positive or c.reply_not_now or c.reply_negative %}
+      <span style="font-size:11px;color:#64748b;margin-left:4px">
+        (✅{{ c.reply_positive }} 🕐{{ c.reply_not_now }} ❌{{ c.reply_negative }})
+      </span>
+      {% endif %}
+    </td>
     <td><a href="{{ url_for('client_detail', client_id=c.id) }}" class="btn btn-ghost btn-sm">View</a></td>
   </tr>
   {% else %}
-  <tr><td colspan="9" style="text-align:center;color:#64748b;padding:32px">No clients yet — <a href="{{ url_for('client_new') }}">add one</a></td></tr>
+  <tr><td colspan="11" style="text-align:center;color:#64748b;padding:32px">No clients yet — <a href="{{ url_for('client_new') }}">add one</a></td></tr>
   {% endfor %}
   </tbody>
 </table>
