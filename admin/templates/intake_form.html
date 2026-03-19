@@ -8,15 +8,15 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
-    .container { max-width: 680px; margin: 0 auto; }
+    .container { max-width: 700px; margin: 0 auto; }
     .logo { font-size: 20px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; letter-spacing: -0.5px; }
     h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
     .subtitle { color: #64748b; font-size: 14px; margin-bottom: 36px; line-height: 1.6; }
-    .section-header { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #60a5fa; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e2535; }
+    .section-header { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #60a5fa; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e2535; }
     .field { margin-bottom: 18px; }
     label { display: block; font-size: 13px; font-weight: 500; color: #94a3b8; margin-bottom: 6px; }
     label span.req { color: #ef4444; margin-left: 2px; }
-    label span.hint { font-weight: 400; color: #475569; font-size: 11px; display: block; margin-top: 2px; }
+    label span.hint { font-weight: 400; color: #475569; font-size: 11px; display: block; margin-top: 3px; line-height: 1.5; }
     input, select, textarea {
       width: 100%; background: #0f1623; border: 1px solid #1e2535; border-radius: 6px;
       color: #e2e8f0; font-size: 14px; font-family: 'Inter', sans-serif;
@@ -28,6 +28,9 @@
     .btn { background: #3b82f6; color: #fff; border: none; border-radius: 6px; padding: 14px 32px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 32px; }
     .btn:hover { background: #2563eb; }
     .footer { text-align: center; margin-top: 32px; font-size: 12px; color: #334155; }
+    .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+    .checkbox-group label { display: flex; align-items: flex-start; gap: 8px; color: #e2e8f0; font-size: 13px; font-weight: 400; cursor: pointer; }
+    .checkbox-group input[type=checkbox] { width: auto; margin-top: 2px; flex-shrink: 0; }
     @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -35,10 +38,11 @@
 <div class="container">
   <div class="logo">ArgusReach</div>
   <h1>Client Onboarding Form</h1>
-  <p class="subtitle">Fill this out once — we'll handle the rest. Everything you enter goes directly into our system so there's no back-and-forth. Takes about 5 minutes.</p>
+  <p class="subtitle">Fill this out once — we use every answer to build your prospect list, write your outreach emails, and launch your campaign. The more detail you give us, the better your results. Takes about 10 minutes.</p>
 
   <form method="POST" action="/intake">
 
+    <!-- ── SECTION 1: YOUR BUSINESS ──────────────────────────────────── -->
     <div class="section-header">Your Business</div>
     <div class="grid2">
       <div class="field">
@@ -52,12 +56,12 @@
     </div>
     <div class="field">
       <label>Business Address
-        <span class="hint">City, State is fine — used for geographic targeting and compliance</span>
+        <span class="hint">City and state is fine — used for geographic targeting</span>
       </label>
       <input name="business_address" placeholder="Tampa, FL">
     </div>
     <div class="field">
-      <label>Vertical / Industry <span class="req">*</span></label>
+      <label>Industry / Vertical <span class="req">*</span></label>
       <select name="vertical" required onchange="document.getElementById('vertical_other_wrap').style.display=this.value==='Other'?'block':'none'">
         <option value="">— Select —</option>
         <option value="Healthcare">Healthcare / Medical</option>
@@ -73,6 +77,7 @@
       <input name="vertical_other" placeholder="e.g. Physical Therapy, Med Spa, Insurance...">
     </div>
 
+    <!-- ── SECTION 2: CONTACT INFO ───────────────────────────────────── -->
     <div class="section-header">Your Contact Info</div>
     <div class="grid2">
       <div class="field">
@@ -81,7 +86,7 @@
       </div>
       <div class="field">
         <label>Your Title</label>
-        <input name="contact_title" placeholder="Owner, Practice Manager, etc.">
+        <input name="contact_title" placeholder="Owner, Practice Manager, CGO...">
       </div>
     </div>
     <div class="grid2">
@@ -97,17 +102,51 @@
       </div>
     </div>
 
+    <!-- ── SECTION 3: WHAT YOU DO ────────────────────────────────────── -->
+    <div class="section-header">What You Do</div>
+    <div class="field">
+      <label>Describe your practice or business — in your own words <span class="req">*</span>
+        <span class="hint">How would you explain what you do to someone at a dinner party? This is the foundation of your outreach voice.</span>
+      </label>
+      <textarea name="business_description" required placeholder="We're a PT clinic in Tampa Bay specializing in post-surgical rehab and sports injuries. We see about 150 patients a week across two locations. Our average patient is 35-65, active lifestyle, referred by their orthopedic surgeon or PCP after an injury or procedure."></textarea>
+    </div>
+    <div class="field">
+      <label>What makes you different from your competitors? <span class="req">*</span>
+        <span class="hint">What do you do better, faster, or differently? Be specific — generic answers produce generic emails.</span>
+      </label>
+      <textarea name="differentiator" required placeholder="We send referring physicians a brief progress update on their patient at week 2 and week 6. Most PT clinics don't communicate back to the referring doc at all. We also offer same-week appointments — average wait time is 3 days. And we specialize in ACL and rotator cuff post-op, which orthos care a lot about."></textarea>
+    </div>
+    <div class="field">
+      <label>What does a great outcome look like for your clients/patients?
+        <span class="hint">Specific results, timelines, success stories (no names needed). This is what we'll reference in outreach.</span>
+      </label>
+      <textarea name="outcomes" placeholder="Most post-surgical patients are back to full activity within 12-16 weeks. Our ACL patients return to sport at a higher rate than the regional average. Referring physicians tell us their patients come back satisfied and well-informed."></textarea>
+    </div>
+    <div class="field">
+      <label>Describe your 2-3 best current referral relationships
+        <span class="hint">What type of person or practice sends you the most valuable referrals? What do they have in common?</span>
+      </label>
+      <textarea name="best_referral_sources" placeholder="Our best referrers are independent orthopedic surgeons with active surgical practices — they send 10-15 patients a month. Second best: sports medicine PCPs who see a lot of athletes. They appreciate our quick turnaround and the clinical communication back to them."></textarea>
+    </div>
+    <div class="field">
+      <label>Have you tried outreach or marketing before? What worked or didn't?
+        <span class="hint">Helps us avoid repeating approaches that didn't land for your market.</span>
+      </label>
+      <textarea name="prior_outreach" placeholder="We tried a marketing company that sent generic emails — got zero responses. We've had more luck with in-person lunch-and-learns but can't scale that. Never tried direct physician email outreach."></textarea>
+    </div>
+
+    <!-- ── SECTION 4: WHO WE'RE TARGETING ───────────────────────────── -->
     <div class="section-header">Who We're Targeting For You</div>
     <div class="grid2">
       <div class="field">
         <label>Target Geography <span class="req">*</span>
-          <span class="hint">City, metro area, or specific counties/zip codes.</span>
+          <span class="hint">City, metro area, or specific counties/zip codes</span>
         </label>
-        <input name="target_geography" required placeholder="Tampa Bay area — Hillsborough, Pinellas, Pasco counties">
+        <input name="target_geography" required placeholder="Tampa Bay — Hillsborough, Pinellas, Pasco counties">
       </div>
       <div class="field">
-        <label>Target Radius from Your Office <span class="req">*</span>
-          <span class="hint">How far should we look for prospects? Closer = more referral-friendly.</span>
+        <label>Search Radius from Your Office <span class="req">*</span>
+          <span class="hint">Closer = more referral-friendly for most businesses</span>
         </label>
         <select name="target_radius" required>
           <option value="">— Select —</option>
@@ -118,64 +157,110 @@
           <option value="50 miles">50 miles</option>
           <option value="Entire metro area">Entire metro area</option>
           <option value="Statewide">Statewide</option>
-          <option value="No restriction">No restriction — geography doesn't matter</option>
+          <option value="No geographic restriction">No geographic restriction</option>
         </select>
       </div>
     </div>
     <div class="field">
       <label>Target Job Titles / Roles <span class="req">*</span>
-        <span class="hint">Who exactly do you want us to contact? List every title that makes sense.</span>
+        <span class="hint">Who exactly should we be contacting? Be specific — these titles feed our contact search directly. List every title that applies.</span>
       </label>
-      <textarea name="target_titles" required placeholder="Primary care physicians (PCPs), orthopedic surgeons, sports medicine doctors, physiatrists, urgent care medical directors"></textarea>
+      <textarea name="target_titles" required placeholder="Primary care physicians (PCPs), orthopedic surgeons, sports medicine physicians, physiatrists, urgent care medical directors — independent or small-group practices only, not hospital-employed"></textarea>
     </div>
     <div class="field">
-      <label>Ideal Prospect Description <span class="req">*</span>
-        <span class="hint">Describe the perfect person we'd connect you with. What makes them a fit?</span>
+      <label>Target Company / Practice Type
+        <span class="hint">Any specifics about the type of organization? Size, specialty, ownership, etc.</span>
       </label>
-      <textarea name="icp_summary" required placeholder="Independent or small-group practice physicians in the Tampa Bay area who see patients that would benefit from PT referrals. Ideally sports medicine or ortho with active patient panels. Not hospital-employed systems."></textarea>
+      <input name="target_company_type" placeholder="Independent or small-group practices (2-10 physicians). Not large health systems or hospital-employed groups.">
+    </div>
+    <div class="field">
+      <label>How many new clients/patients can you realistically take per month?
+        <span class="hint">This helps us set the right campaign volume and avoid overwhelming your team.</span>
+      </label>
+      <select name="monthly_capacity">
+        <option value="">— Select —</option>
+        <option value="1-5">1–5 new clients/patients</option>
+        <option value="5-15">5–15 new clients/patients</option>
+        <option value="15-30">15–30 new clients/patients</option>
+        <option value="30-50">30–50 new clients/patients</option>
+        <option value="50+">50+ — no meaningful cap</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Who should we NEVER contact? <span class="req">*</span>
+        <span class="hint">Existing referral partners, competitors, specific practices, anyone you have a relationship with. List names, practices, or domains.</span>
+      </label>
+      <textarea name="dnc_notes" required placeholder="Do not contact anyone at Tampa General Hospital system. Do not contact Dr. Sarah Chen at Bayshore Orthopedics — she already refers to us. Do not contact any practice affiliated with BayCare or AdventHealth."></textarea>
     </div>
 
-    <div class="section-header">Your Message & Positioning</div>
+    <!-- ── SECTION 5: YOUR MESSAGE & VOICE ──────────────────────────── -->
+    <div class="section-header">Your Message & Voice</div>
     <div class="field">
-      <label>Your Value Proposition — in your own words <span class="req">*</span>
-        <span class="hint">Why should a physician refer to YOU specifically? What makes your practice stand out?</span>
+      <label>Your value proposition — what's the hook for a busy physician? <span class="req">*</span>
+        <span class="hint">Why should they refer to YOU specifically? What's the one thing that would make a physician change their referral behavior?</span>
       </label>
-      <textarea name="value_prop" required placeholder="We specialize in post-surgical rehab and sports injuries. Average wait time is under 48 hours. We send referring physicians monthly progress updates on their patients. Outcomes data available on request."></textarea>
+      <textarea name="value_prop" required placeholder="We make their patients happy and keep them informed. Physicians hate when PT clinics are a black hole — patient goes in, nothing comes back. We solve that. Same-week availability means their patients aren't waiting 3 weeks and getting frustrated. And our outcomes for post-surgical patients are strong."></textarea>
     </div>
     <div class="field">
-      <label>Tone Preference
-        <span class="hint">How should the outreach sound?</span>
+      <label>Paste a sample of your writing — a bio, email, LinkedIn post, anything
+        <span class="hint">This is the single most useful thing you can give us. We use it to match your voice exactly so the outreach sounds like you, not a robot.</span>
       </label>
+      <textarea name="voice_sample" placeholder="Paste something you've actually written — an email to a colleague, a bio from your website, a LinkedIn post. Doesn't need to be polished."></textarea>
+    </div>
+    <div class="field">
+      <label>Tone Preference</label>
       <select name="tone">
-        <option value="warm-professional">Warm and professional (recommended)</option>
-        <option value="direct">Direct and concise</option>
+        <option value="warm-professional">Warm and professional (recommended for most)</option>
+        <option value="direct">Direct and concise — get to the point fast</option>
         <option value="formal">Formal / clinical</option>
         <option value="conversational">Conversational and friendly</option>
       </select>
     </div>
     <div class="field">
-      <label>Anything we should NEVER say or claim
-        <span class="hint">Compliance guardrails. Anything the AI should avoid mentioning in your outreach.</span>
+      <label>Words, phrases, or claims to NEVER use
+        <span class="hint">Compliance constraints, things that don't fit your brand, anything that could create legal risk.</span>
       </label>
-      <textarea name="compliance_note" placeholder="Do not reference specific outcomes or success rates. Do not mention pricing. Do not imply we accept all insurance plans."></textarea>
+      <textarea name="compliance_note" placeholder="Do not reference specific recovery timelines as guarantees. Do not say 'best' or 'top-rated.' Do not mention insurance acceptance — we handle that case-by-case. Do not use the word 'guarantee.'"></textarea>
     </div>
 
-    <div class="section-header">Meeting Booking</div>
+    <!-- ── SECTION 6: BOOKING & CAMPAIGN ────────────────────────────── -->
+    <div class="section-header">Booking & Campaign Setup</div>
     <div class="field">
-      <label>Your Calendly Link <span class="req">*</span>
-        <span class="hint">This is where interested prospects will book a call with you directly. Must be a public Calendly link.</span>
+      <label>Your Calendly or booking link <span class="req">*</span>
+        <span class="hint">Where interested prospects will book a call or meeting with you. Must be a public link.</span>
       </label>
       <input name="calendly_link" required placeholder="https://calendly.com/yourname/30min">
     </div>
+    <div class="field">
+      <label>What do you want prospects to do when they reply?
+        <span class="hint">The action you want them to take — helps us write the right call-to-action.</span>
+      </label>
+      <select name="desired_action">
+        <option value="book_call">Book a 15–30 min intro call</option>
+        <option value="in_person">Schedule an in-person meeting or lunch</option>
+        <option value="phone_call">Call me directly</option>
+        <option value="referral_form">Fill out our referral form</option>
+        <option value="reply_interest">Just reply with interest — we'll follow up</option>
+      </select>
+    </div>
 
+    <!-- ── SECTION 7: ANYTHING ELSE ─────────────────────────────────── -->
     <div class="section-header">Anything Else</div>
+    <div class="field">
+      <label>Do you have an existing contact list you'd like us to prioritize?</label>
+      <select name="has_existing_list">
+        <option value="no">No — start with cold prospecting</option>
+        <option value="yes_will_send">Yes — I'll email it to vito@argusreach.com</option>
+        <option value="yes_later">Yes — I'll have it ready by our onboarding call</option>
+      </select>
+    </div>
     <div class="field">
       <label>How did you hear about ArgusReach?</label>
       <input name="how_heard" placeholder="Referral, LinkedIn, Google, etc.">
     </div>
     <div class="field">
-      <label>Additional notes or context</label>
-      <textarea name="notes" placeholder="Anything else we should know before we start..."></textarea>
+      <label>Anything else we should know before we start</label>
+      <textarea name="notes" placeholder="Seasonal considerations, upcoming events, anything unique about your market or situation..."></textarea>
     </div>
 
     <button type="submit" class="btn">Submit Onboarding Form →</button>

@@ -12,70 +12,90 @@
     <div class="section-title">📋 Client Submission</div>
     {% set fields = [
       ('Firm Name', intake.firm_name),
-      ('Website', intake.website),
-      ('Business Address', intake.business_address),
+      ('Website', intake.get('website','')),
+      ('Business Address', intake.get('business_address','')),
       ('Vertical', intake.vertical),
-      ('Contact', intake.contact_name ~ ' · ' ~ intake.contact_email ~ (' · ' ~ intake.contact_phone if intake.contact_phone else '')),
-      ('Target Geography', intake.target_geography ~ (' · ' ~ intake.target_radius if intake.target_radius else '')),
-      ('Target Titles', intake.target_titles),
-      ('Ideal Prospect', intake.icp_summary),
-      ('Value Proposition', intake.value_prop),
-      ('Tone', intake.tone),
-      ('Calendly Link', intake.calendly_link),
-      ('Compliance Note', intake.compliance_note),
-      ('How They Heard', intake.how_heard),
-      ('Notes', intake.notes),
+      ('Contact', intake.contact_name ~ ' · ' ~ intake.contact_email ~ (' · ' ~ intake.contact_phone if intake.get('contact_phone') else '')),
+      ('Target Geography', intake.get('target_geography','') ~ (' · ' ~ intake.get('target_radius','') if intake.get('target_radius') else '')),
+      ('Target Titles', intake.get('target_titles','')),
+      ('Target Company Type', intake.get('target_company_type','')),
+      ('Monthly Capacity', intake.get('monthly_capacity','')),
+      ('Ideal Prospect', intake.get('icp_summary','')),
+      ('Business Description', intake.get('business_description','')),
+      ('Differentiator', intake.get('differentiator','')),
+      ('Outcomes', intake.get('outcomes','')),
+      ('Best Referral Sources', intake.get('best_referral_sources','')),
+      ('Prior Outreach', intake.get('prior_outreach','')),
+      ('Value Proposition', intake.get('value_prop','')),
+      ('Voice Sample', intake.get('voice_sample','')),
+      ('Tone', intake.get('tone','')),
+      ('DNC Notes', intake.get('dnc_notes','')),
+      ('Compliance Note', intake.get('compliance_note','')),
+      ('Desired Action', intake.get('desired_action','')),
+      ('Calendly Link', intake.get('calendly_link','')),
+      ('Existing List', intake.get('has_existing_list','')),
+      ('How They Heard', intake.get('how_heard','')),
+      ('Notes', intake.get('notes','')),
     ] %}
     {% for label, val in fields %}
     {% if val %}
     <div style="margin-bottom:12px">
       <div style="font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px">{{ label }}</div>
-      <div style="font-size:13px;color:#e2e8f0;line-height:1.5">{{ val }}</div>
+      <div style="font-size:13px;color:#e2e8f0;line-height:1.5;white-space:pre-wrap">{{ val }}</div>
     </div>
     {% endif %}
     {% endfor %}
   </div>
 
-  <!-- Internal fields to fill in -->
+  <!-- Internal fields -->
   <div class="section">
-    <div class="section-title">🔧 Internal Setup (your fields)</div>
+    <div class="section-title">🔧 Internal Setup</div>
     <form method="POST" action="{{ url_for('intake_approve', intake_id=intake.id) }}">
+
       <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Client ID (system identifier) *</label>
         <input name="id" value="{{ form.get('id', intake.firm_name|lower|replace(' ','_')|replace('-','_') ) }}" required placeholder="e.g. gulf_coast_pt" style="font-family:monospace;font-size:12px">
       </div>
+
       <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Plan *</label>
-        <select name="plan">
-          <option value="starter">Starter — $750/mo</option>
-          <option value="growth">Growth — $1,500/mo</option>
-          <option value="scale">Scale — $2,500/mo</option>
+        <select name="plan" id="plan_select" onchange="updateContacts(this.value)" required>
+          <option value="starter" {% if not form.get('plan') or form.get('plan')=='starter' %}selected{% endif %}>Starter — $750/mo (200 contacts)</option>
+          <option value="growth" {% if form.get('plan')=='growth' %}selected{% endif %}>Growth — $1,500/mo (500 contacts)</option>
+          <option value="scale" {% if form.get('plan')=='scale' %}selected{% endif %}>Scale — $2,500/mo (1,000 contacts)</option>
         </select>
       </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email (ArgusReach Gmail) *</label>
-        <input name="outreach_email" value="vito@argusreach.com" required>
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Gmail App Password *</label>
-        <input name="app_password" type="password" placeholder="xxxx xxxx xxxx xxxx">
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Name *</label>
-        <input name="sender_name" value="Vito Resciniti" required>
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Title</label>
-        <input name="title" value="Founder">
-      </div>
+
       <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Contacts Per Month</label>
-        <input name="contacts_per_month" type="number" value="200">
+        <input name="contacts_per_month" id="contacts_per_month" type="number" value="{{ form.get('contacts_per_month', 200) }}">
+        <div style="font-size:10px;color:#475569;margin-top:3px">Auto-set by plan. Edit if custom volume agreed.</div>
       </div>
+
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Positioning Note (internal AI context)</label>
-        <textarea name="positioning_note" style="min-height:70px" placeholder="How ArgusReach should frame itself in outreach for this client..."></textarea>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email Address *
+          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">The dedicated sending address for this client (e.g. brett@outreach.amfhealthcare.com). Leave as vito@argusreach.com if sending account not yet set up.</span>
+        </label>
+        <input name="outreach_email" value="{{ form.get('outreach_email', 'vito@argusreach.com') }}" required>
       </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Name *</label>
+        <input name="sender_name" value="{{ form.get('sender_name', 'Vito Resciniti') }}" required>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Sender Title</label>
+        <input name="title" value="{{ form.get('title', 'Founder') }}">
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Internal Positioning Note
+          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">How ArgusReach should frame itself in outreach for this client. Any context not captured in the intake.</span>
+        </label>
+        <textarea name="positioning_note" style="min-height:70px" placeholder="e.g. Client is in a competitive market with 3 other PT practices on the same block. Lead with speed and communication — those are their real differentiators.">{{ form.get('positioning_note', '') }}</textarea>
+      </div>
+
       <button type="submit" class="btn btn-primary" style="width:100%">✅ Create Client from Intake</button>
     </form>
   </div>
@@ -83,5 +103,14 @@
 </div>
 
 <a href="{{ url_for('intakes_list') }}" style="font-size:13px;color:#64748b">← Back to intakes</a>
+
+<script>
+function updateContacts(plan) {
+  var map = { starter: 200, growth: 500, scale: 1000 };
+  document.getElementById('contacts_per_month').value = map[plan] || 200;
+}
+// Set on page load based on current selection
+updateContacts(document.getElementById('plan_select').value);
+</script>
 
 {% endblock %}

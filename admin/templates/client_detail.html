@@ -156,21 +156,66 @@
   <div class="section">
     <div class="section-title">📋 Upload Lead List</div>
     <p style="font-size:12px;color:#64748b;margin-bottom:14px">CSV with columns: email, first_name, last_name, company, title. System will dedupe, cross-ref DNC, validate emails, and append to prospects.csv.</p>
-    <form method="POST" action="{{ url_for('upload_leads', client_id=client.id) }}" enctype="multipart/form-data">
-      <div class="upload-area" style="margin-bottom:12px">
-        <input type="file" name="leads_file" accept=".csv" style="width:auto;background:none;border:none;padding:0;color:#94a3b8">
+    <form method="POST" action="{{ url_for('upload_leads', client_id=client.id) }}" enctype="multipart/form-data" id="leads-upload-form">
+      <!-- Drag and drop zone -->
+      <div id="drop-zone" onclick="document.getElementById('leads_file_input').click()" style="border:2px dashed #1e2535;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:12px;transition:border-color 0.15s;">
+        <div id="drop-label" style="color:#64748b;font-size:13px;">
+          🗂 Drag & drop a CSV here, or <span style="color:#60a5fa;text-decoration:underline;">click to browse</span>
+        </div>
+        <div id="file-selected" style="color:#4ade80;font-size:13px;margin-top:6px;display:none;"></div>
       </div>
+      <input type="file" name="leads_file" id="leads_file_input" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
+
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
         <input type="checkbox" name="warm" value="yes" id="warm" style="width:auto">
-        <label for="warm" style="text-transform:none;font-size:13px;letter-spacing:0;color:#94a3b8">Mark as warm leads (will be flagged in prospects.csv)</label>
+        <label for="warm" style="text-transform:none;font-size:13px;letter-spacing:0;color:#94a3b8">Mark as warm leads</label>
       </div>
       <div style="display:flex;gap:8px">
-        <button type="submit" class="btn btn-primary btn-sm">Upload & Prep Leads</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="upload-btn" disabled>Upload & Prep Leads</button>
         {% if lead_count > 0 %}
         <a href="{{ url_for('download_leads', client_id=client.id) }}" class="btn btn-ghost btn-sm">⬇ Download prospects.csv</a>
         {% endif %}
       </div>
     </form>
+    <script>
+      var dropZone = document.getElementById('drop-zone');
+      var fileInput = document.getElementById('leads_file_input');
+      var uploadBtn = document.getElementById('upload-btn');
+      var fileSelected = document.getElementById('file-selected');
+      var dropLabel = document.getElementById('drop-label');
+
+      function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+          var name = input.files[0].name;
+          fileSelected.textContent = '✅ ' + name + ' selected — ready to upload';
+          fileSelected.style.display = 'block';
+          dropLabel.style.display = 'none';
+          uploadBtn.disabled = false;
+          dropZone.style.borderColor = '#4ade80';
+        }
+      }
+
+      dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropZone.style.borderColor = '#60a5fa';
+      });
+      dropZone.addEventListener('dragleave', function() {
+        dropZone.style.borderColor = '#1e2535';
+      });
+      dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropZone.style.borderColor = '#1e2535';
+        var dt = e.dataTransfer;
+        if (dt.files && dt.files[0]) {
+          // Transfer file to hidden input
+          var file = dt.files[0];
+          var dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          fileInput.files = dataTransfer.files;
+          handleFileSelect(fileInput);
+        }
+      });
+    </script>
   </div>
 
 </div>

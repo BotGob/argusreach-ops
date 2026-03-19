@@ -54,7 +54,9 @@ app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
 # ── WELCOME EMAIL ─────────────────────────────────────────────────────────────
 
 def _send_welcome_email(client: dict):
-    """Send a welcome/next-steps email to a newly approved client."""
+    """Send a welcome/next-steps email to a newly approved client.
+    Always sends FROM vito@argusreach.com — client sending account not set up yet at this stage.
+    """
     to_email = client.get("client_email", "")
     if not to_email:
         app.logger.info("Welcome email skipped — no client_email set")
@@ -62,43 +64,70 @@ def _send_welcome_email(client: dict):
 
     contact_name = client.get("_contact_name") or client.get("firm_name", "")
     firm_name    = client.get("firm_name", "")
-    outreach_email = client.get("outreach_email", "")
-    app_password   = client.get("app_password", "")
-    sender_name    = "Vito Resciniti | ArgusReach"
 
-    body = f"""Hi {contact_name.split()[0] if contact_name else 'there'},
+    # Always send from vito@argusreach.com — client outreach account not configured yet
+    from_email   = "vito@argusreach.com"
+    app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+    sender_name  = "Vito Resciniti | ArgusReach"
+
+    if not app_password:
+        app.logger.warning(f"Welcome email skipped — ARGUSREACH_GMAIL_APP_PASS not set in .env")
+        _notify_telegram(f"⚠️ Welcome email NOT sent to {to_email} for *{firm_name}* — `ARGUSREACH_GMAIL_APP_PASS` not configured in .env. Send manually.")
+        return
+
+    first_name = contact_name.split()[0] if contact_name else "there"
+
+    body = f"""Hi {first_name},
 
 Welcome to ArgusReach — excited to get started with {firm_name}.
 
 Here's what happens next:
 
-1. We'll schedule a 45-minute onboarding call to define your ideal referral targets and review your outreach voice. I'll send a Calendly link shortly.
+1. We'll schedule a brief onboarding call to walk through your campaign setup, confirm your target audience, and answer any questions. I'll send a calendar link separately.
 
-2. While we're setting up, we'll begin building your prospect list — physicians in your market matching the profile we discussed.
+2. We'll set up a dedicated sending email address for your outreach (outreach.{firm_name.lower().replace(' ','')}.com or similar). This takes about a week to warm up properly — it's what protects your main domain's reputation.
 
-3. Before anything sends, you'll review and approve the full email sequence. Nothing goes out without your sign-off.
+3. While the sending account warms up, we'll build your prospect list and write your outreach sequence. You'll review and approve the sequence before anything sends.
 
-4. Once launched, you'll hear from me whenever a physician responds positively. I'll handle the rest.
+4. Once launched, you'll hear from me whenever a prospect responds with interest. I handle all replies — you just confirm meetings.
 
-Timeline: campaigns typically launch within 10–14 business days of onboarding. First replies start coming in around weeks 3–4.
+Timeline: campaigns typically launch 2–3 weeks after onboarding. First responses start coming in during weeks 3–4.
 
 Any questions before we get started, just reply here.
 
 — Vito Resciniti
 Founder, ArgusReach
+vito@argusreach.com
 """
 
-    msg = MIMEMultipart("alternative")
-    msg["From"]    = f"{sender_name} <{outreach_email}>"
-    msg["To"]      = to_email
-    msg["Subject"] = f"Welcome to ArgusReach — next steps for {firm_name}"
-    msg.attach(MIMEText(body, "plain"))
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["From"]    = f"{sender_name} <{from_email}>"
+        msg["To"]      = to_email
+        msg["Subject"] = f"Welcome to ArgusReach — next steps for {firm_name}"
+        msg.attach(MIMEText(body, "plain"))
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
-        smtp.login(outreach_email, app_password)
-        smtp.send_message(msg)
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+            smtp.login(from_email, app_password)
+            smtp.send_message(msg)
 
-    app.logger.info(f"Welcome email sent to {to_email} for client {client.get('id')}")
+        app.logger.info(f"Welcome email sent to {to_email} for client {client.get('id')}")
+        _notify_telegram(f"📧 Welcome email sent to *{to_email}* for *{firm_name}*")
+
+    except Exception as e:
+        app.logger.error(f"Welcome email FAILED for {firm_name}: {e}")
+        _notify_telegram(f"⚠️ Welcome email FAILED for *{firm_name}* → {to_email}\nError: `{str(e)[:120]}`\nPlease send manually.")
+
+
+def _notify_telegram(msg: str):
+    """Send a Telegram notification to Vito."""
+    try:
+        tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN", "8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk")
+        tg_chat  = os.environ.get("ARGUSREACH_CHAT_ID", "-1003821840813")
+        requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage",
+            json={"chat_id": tg_chat, "text": msg, "parse_mode": "Markdown"}, timeout=5)
+    except Exception:
+        pass
 
 
 # ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -487,13 +516,26 @@ def upload_leads(client_id):
 
     f = request.files.get("leads_file")
     warm = request.form.get("warm") == "yes"
-    if not f:
-        flash("No file uploaded.", "error")
+    if not f or not f.filename:
+        flash("No file selected. Please choose a CSV file before uploading.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
-    content = f.read().decode("utf-8", errors="ignore")
-    reader = csv.DictReader(io.StringIO(content))
-    raw_rows = list(reader)
+    try:
+        content = f.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        flash(f"Could not read file: {e}", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    if not content.strip():
+        flash("File is empty.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    try:
+        reader = csv.DictReader(io.StringIO(content))
+        raw_rows = list(reader)
+    except Exception as e:
+        flash(f"Could not parse CSV: {e}. Make sure it's a valid CSV file.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
 
     clean_rows, stats = prep_leads(client_id, raw_rows, warm=warm)
 
@@ -699,45 +741,57 @@ def intake():
     if request.method == "POST":
         f = request.form
         submission = {
-            "id": datetime.utcnow().strftime("%Y%m%d%H%M%S"),
-            "submitted_at": datetime.utcnow().isoformat(),
-            "status": "pending",
-            "firm_name":        f.get("firm_name","").strip(),
-            "contact_name":     f.get("contact_name","").strip(),
-            "contact_email":    f.get("contact_email","").strip(),
-            "contact_phone":    f.get("contact_phone","").strip(),
-            "business_address": f.get("business_address","").strip(),
-            "vertical":         (f.get("vertical_other","").strip() if f.get("vertical","").strip() == "Other" else f.get("vertical","").strip()),
-            "website":          f.get("website","").strip(),
-            "target_geography": f.get("target_geography","").strip(),
-            "target_radius":    f.get("target_radius","").strip(),
-            "target_titles":    f.get("target_titles","").strip(),
-            "icp_summary":      f.get("icp_summary","").strip(),
-            "value_prop":       f.get("value_prop","").strip(),
-            "calendly_link":    f.get("calendly_link","").strip(),
-            "tone":             f.get("tone","warm-professional").strip(),
-            "compliance_note":  f.get("compliance_note","").strip(),
-            "how_heard":        f.get("how_heard","").strip(),
-            "notes":            f.get("notes","").strip(),
+            "id":                   datetime.utcnow().strftime("%Y%m%d%H%M%S"),
+            "submitted_at":         datetime.utcnow().isoformat(),
+            "status":               "pending",
+            # Identity
+            "firm_name":            f.get("firm_name","").strip(),
+            "contact_name":         f.get("contact_name","").strip(),
+            "contact_title":        f.get("contact_title","").strip(),
+            "contact_email":        f.get("contact_email","").strip(),
+            "contact_phone":        f.get("contact_phone","").strip(),
+            "business_address":     f.get("business_address","").strip(),
+            "website":              f.get("website","").strip(),
+            "vertical":             (f.get("vertical_other","").strip() if f.get("vertical","").strip() == "Other" else f.get("vertical","").strip()),
+            # What they do
+            "business_description": f.get("business_description","").strip(),
+            "differentiator":       f.get("differentiator","").strip(),
+            "outcomes":             f.get("outcomes","").strip(),
+            "best_referral_sources":f.get("best_referral_sources","").strip(),
+            "prior_outreach":       f.get("prior_outreach","").strip(),
+            # Targeting
+            "target_geography":     f.get("target_geography","").strip(),
+            "target_radius":        f.get("target_radius","").strip(),
+            "target_titles":        f.get("target_titles","").strip(),
+            "target_company_type":  f.get("target_company_type","").strip(),
+            "monthly_capacity":     f.get("monthly_capacity","").strip(),
+            "dnc_notes":            f.get("dnc_notes","").strip(),
+            "icp_summary":          f.get("icp_summary","").strip(),
+            # Voice & message
+            "value_prop":           f.get("value_prop","").strip(),
+            "voice_sample":         f.get("voice_sample","").strip(),
+            "tone":                 f.get("tone","warm-professional").strip(),
+            "compliance_note":      f.get("compliance_note","").strip(),
+            # Campaign
+            "calendly_link":        f.get("calendly_link","").strip(),
+            "desired_action":       f.get("desired_action","book_call").strip(),
+            "has_existing_list":    f.get("has_existing_list","no").strip(),
+            # Meta
+            "how_heard":            f.get("how_heard","").strip(),
+            "notes":                f.get("notes","").strip(),
         }
         intakes = load_intakes()
         intakes.append(submission)
         save_intakes(intakes)
 
         # Notify Vito via Telegram
-        try:
-            tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN","8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk")
-            tg_chat  = os.environ.get("ARGUSREACH_CHAT_ID","-1003821840813")
-            if tg_token and tg_chat:
-                msg = (f"📋 *New Client Intake Submitted*\n\n"
-                       f"*{submission['firm_name']}*\n"
-                       f"{submission['contact_name']} · {submission['contact_email']}\n"
-                       f"Vertical: {submission['vertical']}\n\n"
-                       f"Review at: https://admin.argusreach.com/intakes")
-                requests.post(f"https://api.telegram.org/bot{tg_token}/sendMessage",
-                    json={"chat_id": tg_chat, "text": msg, "parse_mode": "Markdown"}, timeout=5)
-        except Exception:
-            pass
+        _notify_telegram(
+            f"📋 *New Client Intake Submitted*\n\n"
+            f"*{submission['firm_name']}*\n"
+            f"{submission['contact_name']} · {submission['contact_email']}\n"
+            f"Vertical: {submission['vertical']}\n\n"
+            f"Review at: https://admin.argusreach.com/intakes"
+        )
 
         return render_template("intake_thanks.html", name=submission["contact_name"])
 
@@ -770,34 +824,49 @@ def intake_approve(intake_id):
             flash(f"Client ID '{client_id}' already exists.", "error")
             return render_template("intake_approve.html", intake=intake, form=f)
 
+        plan = f.get("plan","starter")
+        contacts_map = {"starter": 200, "growth": 500, "scale": 1000}
         new_client = {
-            "id":                   client_id,
-            "active":               False,
-            "mode":                 "draft_approval",
-            "firm_name":            intake["firm_name"],
-            "vertical":             intake["vertical"],
-            "plan":                 f.get("plan","starter"),
-            "outreach_email":       f.get("outreach_email","").strip(),
-            "app_password":         f.get("app_password","").strip(),
-            "sender_name":          f.get("sender_name","").strip(),
-            "title":                f.get("title","Founder").strip(),
-            "client_email":         intake["contact_email"],
-            "calendly_link":        intake.get("calendly_link","").strip(),
+            "id":                    client_id,
+            "active":                False,
+            "mode":                  "draft_approval",
+            "firm_name":             intake["firm_name"],
+            "vertical":              intake["vertical"],
+            "plan":                  plan,
+            "outreach_email":        f.get("outreach_email","vito@argusreach.com").strip(),
+            "sender_name":           f.get("sender_name","Vito Resciniti").strip(),
+            "title":                 f.get("title","Founder").strip(),
+            "client_email":          intake["contact_email"],
+            "calendly_link":         intake.get("calendly_link","").strip(),
             "instantly_campaign_id": "",
-            "campaign_name":        "",
-            "contacts_per_month":   int(f.get("contacts_per_month", 200)),
-            "launch_date":          "",
-            "icp_summary":          intake.get("icp_summary",""),
-            "tone":                 intake.get("tone","warm-professional"),
-            "compliance_note":      intake.get("compliance_note",""),
-            "positioning_note":     f.get("positioning_note",""),
-            "prospects_csv":        f"campaigns/{client_id}/prospects.csv",
-            "_intake_id":           intake_id,
-            "_contact_name":        intake.get("contact_name",""),
-            "_target_geography":    intake.get("target_geography",""),
-            "_target_radius":       intake.get("target_radius",""),
-            "_target_titles":       intake.get("target_titles",""),
-            "_value_prop":          intake.get("value_prop",""),
+            "campaign_name":         "",
+            "contacts_per_month":    int(f.get("contacts_per_month", contacts_map.get(plan, 200))),
+            "launch_date":           "",
+            "icp_summary":           intake.get("icp_summary",""),
+            "tone":                  intake.get("tone","warm-professional"),
+            "compliance_note":       intake.get("compliance_note",""),
+            "positioning_note":      f.get("positioning_note",""),
+            "prospects_csv":         f"campaigns/{client_id}/prospects.csv",
+            # Full intake context — used by monthly_cycle.py for Apollo search + sequence writing
+            "_intake_id":            intake_id,
+            "_contact_name":         intake.get("contact_name",""),
+            "_contact_title":        intake.get("contact_title",""),
+            "_target_geography":     intake.get("target_geography",""),
+            "_target_radius":        intake.get("target_radius",""),
+            "_target_titles":        intake.get("target_titles",""),
+            "_target_company_type":  intake.get("target_company_type",""),
+            "_monthly_capacity":     intake.get("monthly_capacity",""),
+            "_value_prop":           intake.get("value_prop",""),
+            "_differentiator":       intake.get("differentiator",""),
+            "_outcomes":             intake.get("outcomes",""),
+            "_best_referral_sources":intake.get("best_referral_sources",""),
+            "_voice_sample":         intake.get("voice_sample",""),
+            "_business_description": intake.get("business_description",""),
+            "_prior_outreach":       intake.get("prior_outreach",""),
+            "_dnc_notes":            intake.get("dnc_notes",""),
+            "_desired_action":       intake.get("desired_action","book_call"),
+            "_has_existing_list":    intake.get("has_existing_list","no"),
+            "_website":              intake.get("website",""),
         }
 
         config["clients"].append(new_client)
