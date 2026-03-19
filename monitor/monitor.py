@@ -366,7 +366,10 @@ def save_processed(ids: set, timestamps: dict = None):
         existing_archive.update(archive)
         PROCESSED_ARCHIVE_FILE.write_text(json.dumps(existing_archive))
 
-    PROCESSED_FILE.write_text(json.dumps(active))
+    # Atomic write — prevents corruption if monitor crashes mid-write
+    tmp = PROCESSED_FILE.with_suffix('.tmp')
+    tmp.write_text(json.dumps(active))
+    tmp.replace(PROCESSED_FILE)
 
 def msg_fingerprint(from_email, subject, date_str, message_id=''):
     """Stable ID for a message to prevent double-processing.
@@ -389,14 +392,13 @@ def save_pending(pending):
 def queue_pending(client, from_email, from_name, subject, draft, classification,
                   in_reply_to=None, references=None):
     pending = load_pending()
-    # Dedup: if a pending entry already exists for this prospect, replace it but ALWAYS notify
-    # (suppressing was causing silent re-queues with no Telegram alert — fixed 2026-03-16)
+    # Dedup: if entry already exists for this prospect, update silently — do NOT re-notify
     is_new = True
     existing_idx = next((i for i, e in enumerate(pending) if e.get('from_email') == from_email and e.get('client_id') == client['id']), None)
     if existing_idx is not None:
-        log(f"[{client['firm_name']}] Replacing existing pending entry for {from_email} (re-notifying)")
+        log(f"[{client['firm_name']}] Pending entry already exists for {from_email} — updating silently, no duplicate alert")
         pending.pop(existing_idx)
-        is_new = True  # always notify so nothing sits silently
+        is_new = False  # suppress Telegram re-notification
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
         'client_id':             client['id'],
