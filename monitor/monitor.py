@@ -679,14 +679,33 @@ def is_spam(msg, body):
 
 def is_warmup(msg, from_email):
     """Detect Instantly warmup emails — should be silently skipped, never queued."""
-    subject = msg.get('Subject', '')
+    import re, email as _email_lib
+    raw_subject = msg.get('Subject', '')
+    # Decode MIME-encoded subject (e.g. =?utf-8?q?...?=) before pattern matching
+    try:
+        parts = _email_lib.header.decode_header(raw_subject)
+        subject = ''
+        for part, enc in parts:
+            if isinstance(part, bytes):
+                subject += part.decode(enc or 'utf-8', errors='replace')
+            else:
+                subject += part
+    except Exception:
+        subject = raw_subject
+
     # Instantly warmup subjects contain "Micro Warmup" or "Warmup" tags
     if 'micro warmup' in subject.lower() or 'warmup' in subject.lower():
         return True
-    # Instantly injects a short alphanumeric tracking code at the end of warmup subjects
-    # Pattern: ends with something like "3WXDVXJ" or "F4989W1 3WXDVXJ" (7-char uppercase hex codes)
-    import re
+    # Instantly injects 7-char uppercase alphanumeric tracking codes (e.g. 3WXDVXJ, HHPBJHJ)
     if re.search(r'\b[A-Z0-9]{7}\b', subject):
+        return True
+    # Also check known warmup domain patterns
+    warmup_domains = ['arcmailnetworkpro.com', 'popitmarketing.com', 'heythinkitfirst.com',
+                      'danielyip.com', 'twodevecommerce.com', 'marketcommand.cfd',
+                      'briehost.com', 'userservicecenter.online', 'trymooreintelligent-solutions.com',
+                      'fomoaiconnect.cfd', 'acquireleadlabs.online', 'leadspezialist.de',
+                      'ritarikunta.com', 'airbyteflow.com', 'successfactorconsulting.com']
+    if any(d in from_email.lower() for d in warmup_domains):
         return True
     return False
 
