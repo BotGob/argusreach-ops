@@ -8,49 +8,61 @@
 <h2>Registered Campaigns</h2>
 <table>
   <thead><tr>
-    <th>Client</th><th>Campaign Name</th><th>Campaign ID</th>
-    <th>Our Status</th><th>Instantly</th><th>Leads</th><th>Sent</th><th>Replies</th><th>⚠</th>
+    <th>Client</th>
+    <th>Campaign Name</th>
+    <th>Campaign ID</th>
+    <th>Our Status</th>
+    <th>Instantly</th>
+    <th title="Leads uploaded to Instantly">Leads</th>
+    <th title="Emails sent by Instantly sequence">Sequence Sent</th>
+    <th title="Reply emails sent by ArgusReach on client's behalf">Replies Sent</th>
+    <th title="Total emails sent (sequence + replies)"><b>Total Sent</b></th>
+    <th title="Replies received from prospects">Replies In</th>
+    <th title="Reply breakdown: positive / not now / negative">Breakdown</th>
+    <th title="Drafts rejected — no reply sent">Ignored</th>
+    <th>⚠</th>
   </tr></thead>
   <tbody>
   {% for r in rows %}
   <tr class="{{ 'warn-row' if r.mismatch }}">
-    <td><a href="{{ url_for('client_detail', client_id=r.client_id) }}">{{ r.firm }}</a></td>
+    <td><a href="{{ url_for('client_detail', client_id=r.client_id) }}"><b>{{ r.firm }}</b></a></td>
     <td style="font-size:12px">{{ r.campaign_name }}</td>
     <td style="font-family:monospace;font-size:11px;color:#64748b">{{ r.campaign_id[:8] }}…</td>
     <td>
-      {% if r.client_active %}
-        <span class="badge badge-green">Active</span>
-      {% else %}
-        <span class="badge badge-gray">Paused</span>
-      {% endif %}
+      {% if r.client_active %}<span class="badge badge-green">Active</span>
+      {% else %}<span class="badge badge-gray">Paused</span>{% endif %}
     </td>
     <td>
-      {% if r.instantly_status == 'ACTIVE' %}
-        <span class="badge badge-green">Active</span>
-      {% elif r.instantly_status == 'DRAFT' %}
-        <span class="badge badge-gray">Draft</span>
-      {% elif r.instantly_status == 'PAUSED' %}
-        <span class="badge badge-yellow">Paused</span>
-      {% elif r.instantly_status == 'COMPLETED' %}
-        <span class="badge badge-gray">Completed</span>
-      {% else %}
-        <span class="badge badge-gray">{{ r.instantly_status }}</span>
-      {% endif %}
+      {% if r.instantly_status == 'ACTIVE' %}<span class="badge badge-green">Active</span>
+      {% elif r.instantly_status == 'DRAFT' %}<span class="badge badge-gray">Draft</span>
+      {% elif r.instantly_status == 'COMPLETED' %}<span class="badge badge-gray">Completed</span>
+      {% else %}<span class="badge badge-gray">{{ r.instantly_status }}</span>{% endif %}
     </td>
     <td>{{ r.leads }}</td>
-    <td>{{ r.sent }}</td>
-    <td>{{ r.replies }}</td>
+    <td style="color:#94a3b8">{{ r.instantly_sent }}</td>
+    <td style="color:#94a3b8">{{ r.replies_sent }}</td>
+    <td><b>{{ r.total_sent }}</b></td>
+    <td>{{ r.replies_received }}</td>
+    <td style="font-size:12px;white-space:nowrap">
+      {% if r.replies_received %}
+        <span style="color:#4ade80">✅ {{ r.reply_positive }}</span>
+        <span style="color:#facc15;margin-left:6px">🕐 {{ r.reply_not_now }}</span>
+        <span style="color:#f87171;margin-left:6px">❌ {{ r.reply_negative }}</span>
+        {% if r.reply_escalated %}<span style="color:#fb923c;margin-left:6px">🚨 {{ r.reply_escalated }}</span>{% endif %}
+      {% else %}—{% endif %}
+    </td>
+    <td style="color:#64748b">{{ r.replies_ignored }}</td>
     <td>{% if r.id_invalid %}🚨 Invalid Campaign ID{% elif r.mismatch %}⚠️ Status Mismatch{% endif %}</td>
   </tr>
   {% else %}
-  <tr><td colspan="9" style="text-align:center;color:#64748b;padding:32px">No campaigns registered yet</td></tr>
+  <tr><td colspan="13" style="text-align:center;color:#64748b;padding:32px">No campaigns registered yet</td></tr>
   {% endfor %}
   </tbody>
 </table>
 
 {% if unregistered %}
-<h2 style="color:#ef4444">⚠️ Unregistered Campaigns (in Instantly, not in our system)</h2>
-<p style="font-size:13px;color:#64748b;margin-bottom:12px">These campaigns exist in Instantly but are not registered here. Delete them in Instantly if they are old tests or failed launches.</p>
+<h2 style="color:#ef4444;margin-top:36px">⚠️ Unregistered Campaigns (in Instantly, not in our system)</h2>
+<p style="font-size:13px;color:#64748b;margin-bottom:12px">These campaigns exist in Instantly but are not registered here. Delete them in Instantly if they are old tests.</p>
 <table>
   <thead><tr><th>Name</th><th>ID</th><th>Status</th><th>Created</th><th>Action</th></tr></thead>
   <tbody>

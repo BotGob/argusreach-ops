@@ -690,18 +690,43 @@ def campaigns():
         a = analytics.get(cid, {})
         instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"—")
         registered_ids.add(cid)
+        # Pull per-client reply breakdown + replies sent from DB
+        conn2 = get_db()
+        c_reply_rows = conn2.execute("""
+            SELECT json_extract(e.metadata,'$.classification') as cls, COUNT(DISTINCT e.prospect_id) as cnt
+            FROM events e WHERE e.event_type='classified' AND e.client_id=?
+            GROUP BY cls
+        """, (c["id"],)).fetchall()
+        c_replies_sent = conn2.execute(
+            "SELECT COUNT(*) FROM events WHERE event_type='reply_sent' AND client_id=?", (c["id"],)
+        ).fetchone()[0]
+        c_rejected = conn2.execute(
+            "SELECT COUNT(*) FROM events WHERE event_type='draft_rejected' AND client_id=?", (c["id"],)
+        ).fetchone()[0]
+        conn2.close()
+
+        c_reply_breakdown = {r[0]: r[1] for r in c_reply_rows}
+        instantly_sent = a.get("emails_sent_count", 0)
+
         rows.append({
-            "client_id": c["id"],
-            "firm": c.get("firm_name",""),
-            "campaign_id": cid,
-            "campaign_name": c.get("campaign_name","—"),
-            "client_active": c.get("active",False),
+            "client_id":        c["id"],
+            "firm":             c.get("firm_name",""),
+            "campaign_id":      cid,
+            "campaign_name":    c.get("campaign_name","—"),
+            "client_active":    c.get("active",False),
             "instantly_status": instantly_status,
-            "leads": a.get("leads_count",0),
-            "sent": a.get("emails_sent_count",0),
-            "replies": a.get("reply_count_unique",0),
-            "mismatch": (c.get("active") and instantly_status != "ACTIVE") or
-                        (not c.get("active") and instantly_status == "ACTIVE"),
+            "leads":            a.get("leads_count", 0),
+            "instantly_sent":   instantly_sent,
+            "replies_sent":     c_replies_sent,
+            "total_sent":       instantly_sent + c_replies_sent,
+            "replies_received": sum(c_reply_breakdown.values()),
+            "reply_positive":   c_reply_breakdown.get("positive", 0),
+            "reply_not_now":    c_reply_breakdown.get("not_now", 0),
+            "reply_negative":   c_reply_breakdown.get("negative", 0),
+            "reply_escalated":  c_reply_breakdown.get("escalated", 0),
+            "replies_ignored":  c_rejected,
+            "mismatch":         (c.get("active") and instantly_status != "ACTIVE") or
+                                (not c.get("active") and instantly_status == "ACTIVE"),
         })
 
     # Unregistered campaigns — pull live list and cross-reference
