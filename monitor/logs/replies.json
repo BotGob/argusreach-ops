@@ -645,5 +645,14 @@
     "sent": false,
     "notes": "Warm prospect confirming interest and willingness to schedule. High conversion signal.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T20:48:18.338243",
+    "client": "argus_reach___test_1",
+    "prospect": "k.whitmore@successfactorconsulting.com",
+    "classification": "positive",
+    "draft_preview": "Kayla,\n\nGreat to hear from you - I'm excited about this too. Let's lock in a time to discuss next steps:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]
