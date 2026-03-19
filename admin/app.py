@@ -50,6 +50,18 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "argusreach2026")
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
 
+@app.template_filter("to_et")
+def to_et_filter(dt_str):
+    """Convert UTC ISO timestamp to Eastern Time for display."""
+    if not dt_str: return ""
+    try:
+        import zoneinfo
+        dt = datetime.fromisoformat(str(dt_str)[:19])
+        et = dt.replace(tzinfo=zoneinfo.ZoneInfo("UTC")).astimezone(zoneinfo.ZoneInfo("America/New_York"))
+        return et.strftime("%Y-%m-%d %I:%M %p ET")
+    except:
+        return str(dt_str)[:16]
+
 
 # ── WELCOME EMAIL ─────────────────────────────────────────────────────────────
 
@@ -173,6 +185,46 @@ def get_client_by_id(client_id):
         if c.get("id") == client_id:
             return c, config
     return None, config
+
+def get_client_metrics(client_id, instantly_campaign_id=None):
+    """Single source of truth for all client metrics. Use everywhere."""
+    conn = get_db()
+    reply_rows = conn.execute("""
+        SELECT json_extract(metadata,'$.classification') as cls, COUNT(DISTINCT prospect_id) as cnt
+        FROM events WHERE event_type='classified' AND client_id=?
+        GROUP BY cls
+    """, (client_id,)).fetchall()
+    replies_sent      = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='reply_sent' AND client_id=?", (client_id,)).fetchone()[0]
+    rejected          = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='draft_rejected' AND client_id=?", (client_id,)).fetchone()[0]
+    meetings          = conn.execute("SELECT COUNT(*) FROM meetings WHERE client_id=?", (client_id,)).fetchone()[0]
+    revenue           = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue WHERE client_id=?", (client_id,)).fetchone()[0]
+    prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
+    conn.close()
+
+    breakdown     = {r[0]: r[1] for r in reply_rows}
+    total_replies = sum(breakdown.values())
+    analytics     = fetch_instantly_analytics()
+    a             = analytics.get(instantly_campaign_id or "", {})
+    instantly_sent = a.get("emails_sent_count", 0)
+    leads          = a.get("leads_count", 0)
+
+    return {
+        "leads":           leads,
+        "instantly_sent":  instantly_sent,
+        "replies_sent":    replies_sent,
+        "total_sent":      instantly_sent + replies_sent,
+        "replies_received": total_replies,
+        "reply_positive":  breakdown.get("positive", 0),
+        "reply_not_now":   breakdown.get("not_now", 0),
+        "reply_negative":  breakdown.get("negative", 0),
+        "reply_escalated": breakdown.get("escalated", 0),
+        "replies_ignored": rejected,
+        "meetings":        meetings,
+        "revenue_cents":   revenue,
+        "revenue":         f"${revenue/100:,.2f}",
+        "prospects_tracked": prospects_tracked,
+        "reply_rate":      f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
+    }
 
 def fetch_instantly_analytics():
     if not INSTANTLY_KEY:
@@ -325,42 +377,15 @@ def dashboard():
 
     client_stats = []
     for c in clients:
-        cid = c.get("instantly_campaign_id","")
-        a = analytics.get(cid, {})
-        instantly_sent = a.get("emails_sent_count", 0)
-
-        # Per-client reply breakdown from DB
-        conn2 = get_db()
-        c_reply_rows = conn2.execute("""
-            SELECT json_extract(e.metadata,'$.classification') as cls, COUNT(DISTINCT e.prospect_id) as cnt
-            FROM events e WHERE e.event_type='classified' AND e.client_id=?
-            GROUP BY cls
-        """, (c["id"],)).fetchall()
-        c_replies_sent = conn2.execute(
-            "SELECT COUNT(*) FROM events WHERE event_type='reply_sent' AND client_id=?", (c["id"],)
-        ).fetchone()[0]
-        conn2.close()
-
-        c_reply_breakdown = {r[0]: r[1] for r in c_reply_rows}
-        c_total_replies = sum(c_reply_breakdown.values())
-        c_total_sent = instantly_sent + c_replies_sent
-
+        m = get_client_metrics(c["id"], c.get("instantly_campaign_id",""))
         client_stats.append({
-            "id":              c["id"],
-            "name":            c.get("firm_name", c["id"]),
-            "vertical":        c.get("vertical",""),
-            "plan":            c.get("plan",""),
-            "active":          c.get("active", False),
-            "leads":           a.get("leads_count", 0),
-            "instantly_sent":  instantly_sent,
-            "replies_sent":    c_replies_sent,
-            "total_sent":      c_total_sent,
-            "replies_received":c_total_replies,
-            "reply_positive":  c_reply_breakdown.get("positive", 0),
-            "reply_not_now":   c_reply_breakdown.get("not_now", 0),
-            "reply_negative":  c_reply_breakdown.get("negative", 0),
-            "reply_escalated": c_reply_breakdown.get("escalated", 0),
-            "campaign_name":   c.get("campaign_name","—"),
+            "id":               c["id"],
+            "name":             c.get("firm_name", c["id"]),
+            "vertical":         c.get("vertical",""),
+            "plan":             c.get("plan",""),
+            "active":           c.get("active", False),
+            "campaign_name":    c.get("campaign_name","—"),
+            **m,
         })
 
     # Eastern time for display
@@ -458,15 +483,13 @@ def client_detail(client_id):
     """, (client_id,)).fetchall()
     conn.close()
 
-    analytics = fetch_instantly_analytics()
-    cid = client.get("instantly_campaign_id","")
-    stats = analytics.get(cid, {})
+    metrics = get_client_metrics(client_id, client.get("instantly_campaign_id",""))
 
     return render_template("client_detail.html",
         client=client,
         dnc_count=len(dnc),
         lead_count=lead_count,
-        stats=stats,
+        metrics=metrics,
         events=[dict(e) for e in events]
     )
 
@@ -690,43 +713,17 @@ def campaigns():
         a = analytics.get(cid, {})
         instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"—")
         registered_ids.add(cid)
-        # Pull per-client reply breakdown + replies sent from DB
-        conn2 = get_db()
-        c_reply_rows = conn2.execute("""
-            SELECT json_extract(e.metadata,'$.classification') as cls, COUNT(DISTINCT e.prospect_id) as cnt
-            FROM events e WHERE e.event_type='classified' AND e.client_id=?
-            GROUP BY cls
-        """, (c["id"],)).fetchall()
-        c_replies_sent = conn2.execute(
-            "SELECT COUNT(*) FROM events WHERE event_type='reply_sent' AND client_id=?", (c["id"],)
-        ).fetchone()[0]
-        c_rejected = conn2.execute(
-            "SELECT COUNT(*) FROM events WHERE event_type='draft_rejected' AND client_id=?", (c["id"],)
-        ).fetchone()[0]
-        conn2.close()
-
-        c_reply_breakdown = {r[0]: r[1] for r in c_reply_rows}
-        instantly_sent = a.get("emails_sent_count", 0)
-
+        m = get_client_metrics(c["id"], cid)
         rows.append({
             "client_id":        c["id"],
             "firm":             c.get("firm_name",""),
             "campaign_id":      cid,
             "campaign_name":    c.get("campaign_name","—"),
-            "client_active":    c.get("active",False),
+            "client_active":    c.get("active", False),
             "instantly_status": instantly_status,
-            "leads":            a.get("leads_count", 0),
-            "instantly_sent":   instantly_sent,
-            "replies_sent":     c_replies_sent,
-            "total_sent":       instantly_sent + c_replies_sent,
-            "replies_received": sum(c_reply_breakdown.values()),
-            "reply_positive":   c_reply_breakdown.get("positive", 0),
-            "reply_not_now":    c_reply_breakdown.get("not_now", 0),
-            "reply_negative":   c_reply_breakdown.get("negative", 0),
-            "reply_escalated":  c_reply_breakdown.get("escalated", 0),
-            "replies_ignored":  c_rejected,
             "mismatch":         (c.get("active") and instantly_status != "ACTIVE") or
                                 (not c.get("active") and instantly_status == "ACTIVE"),
+            **m,
         })
 
     # Unregistered campaigns — pull live list and cross-reference

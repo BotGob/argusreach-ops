@@ -14,10 +14,25 @@
 <p style="font-size:11px;color:#334155;margin-bottom:16px;">🔄 Stats sync from Instantly hourly · Status auto-activates when campaign goes live in Instantly · Dashboard regenerates hourly</p>
 
 <div class="cards">
-  <div class="card"><div class="card-label">Leads in System</div><div class="card-value">{{ lead_count }}</div></div>
-  <div class="card"><div class="card-label">Emails Sent</div><div class="card-value">{{ stats.get('emails_sent_count',0) }}</div></div>
-  <div class="card"><div class="card-label">Replies</div><div class="card-value">{{ stats.get('reply_count_unique',0) }}</div></div>
+  <div class="card"><div class="card-label">Leads Uploaded</div><div class="card-value">{{ metrics.leads }}</div></div>
+  <div class="card"><div class="card-label">Sequence Sent</div><div class="card-value">{{ metrics.instantly_sent }}</div></div>
+  <div class="card"><div class="card-label">Replies Sent</div><div class="card-value">{{ metrics.replies_sent }}</div></div>
+  <div class="card" style="border:1px solid #334155"><div class="card-label">Total Sent</div><div class="card-value" style="color:#60a5fa">{{ metrics.total_sent }}</div></div>
   <div class="card"><div class="card-label">DNC Entries</div><div class="card-value">{{ dnc_count }}</div></div>
+</div>
+<div class="cards" style="margin-top:12px">
+  <div class="card"><div class="card-label">Replies Received</div><div class="card-value">{{ metrics.replies_received }}</div></div>
+  <div class="card"><div class="card-label">✅ Positive</div><div class="card-value" style="color:#4ade80">{{ metrics.reply_positive }}</div></div>
+  <div class="card"><div class="card-label">🕐 Not Now</div><div class="card-value" style="color:#facc15">{{ metrics.reply_not_now }}</div></div>
+  <div class="card"><div class="card-label">❌ Negative</div><div class="card-value" style="color:#f87171">{{ metrics.reply_negative }}</div></div>
+  <div class="card"><div class="card-label">🚨 Escalated</div><div class="card-value" style="color:#fb923c">{{ metrics.reply_escalated }}</div></div>
+  <div class="card"><div class="card-label">🚫 Ignored</div><div class="card-value" style="color:#64748b">{{ metrics.replies_ignored }}</div></div>
+</div>
+<div class="cards" style="margin-top:12px">
+  <div class="card"><div class="card-label">Meetings Booked</div><div class="card-value">{{ metrics.meetings }}</div></div>
+  <div class="card"><div class="card-label">Revenue</div><div class="card-value">{{ metrics.revenue }}</div></div>
+  <div class="card"><div class="card-label">Reply Rate</div><div class="card-value">{{ metrics.reply_rate }}</div></div>
+  <div class="card"><div class="card-label">Prospects Tracked</div><div class="card-value">{{ metrics.prospects_tracked }}</div></div>
 </div>
 
 <!-- Campaign Connection Panel -->
@@ -281,7 +296,7 @@
   <tbody>
   {% for ev in events %}
   <tr>
-    <td style="color:#64748b;font-size:12px">{{ (ev.created_at or '')[:16]|replace('T',' ') }}</td>
+    <td style="color:#64748b;font-size:12px">{{ ev.created_at | to_et }}</td>
     <td>
       {% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e'} %}
       {% set c = colors.get(ev.event_type, '#94a3b8') %}

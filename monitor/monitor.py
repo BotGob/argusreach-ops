@@ -1016,6 +1016,18 @@ def process_client(client, processed_ids):
                         f"→ Tell Gob to draft a response, then approve/send manually."
                     )
                 log_reply(cid, from_email, 'escalated', '', False, result.get('escalate_reason', ''))
+                # DB: log classified event for escalations too — required for accurate metrics
+                if _DB_ENABLED:
+                    try:
+                        _campaign_id = email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id',''))
+                        _pid = _upsert_prospect(cid, _campaign_id, from_email, '', '', '', 'replied')
+                        _log_event(cid, _pid, 'classified', {
+                            'classification': 'escalated',
+                            'subject': subject,
+                            'from_name': from_name
+                        })
+                    except Exception as _e:
+                        log(f"[DB] escalation classify log failed: {_e}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 new_processed.add(fingerprint)
                 continue
