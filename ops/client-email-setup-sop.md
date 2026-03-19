@@ -1,8 +1,21 @@
 # ArgusReach — Client Email Infrastructure SOP
 
 > **Owner:** Gob (COO)
-> **Last updated:** 2026-03-14
+> **Last updated:** 2026-03-19
 > **Purpose:** Step-by-step process to set up a client's outreach email infrastructure before any campaign goes live. This happens during onboarding, after contract is signed and setup fee is paid.
+
+## How This Actually Works (Vito's Role)
+
+**You do not touch DNS. You do not need admin access to anything.**
+
+1. I generate a copy-paste IT handoff document (`ops/legal/client-it-handoff-template.md`) pre-filled for the client
+2. You email it to their IT contact (or the person who manages their website/domain)
+3. IT adds the records — takes them 20-30 min
+4. They email you when done
+5. I verify everything remotely in 2 minutes (DNS records are publicly visible — no access needed)
+6. If their IT has questions, you offer a quick call and I'm in your ear
+
+**That's it. The DNS setup is their IT's job, not yours.**
 
 ---
 
