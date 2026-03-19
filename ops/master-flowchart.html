@@ -941,6 +941,30 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 <!-- RECENT CHANGES LOG -->
 <div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-19 (Go-Live Test + Full System Hardening)</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Data Integrity</div>
+    <div style="font-size:0.75rem;color:#888;">• Campaign ID validation: portal and monitor now verify campaign ID against Instantly API before saving. Bad IDs rejected at save time. Monitor halts cycle + alerts Vito if mismatch detected at runtime.</div>
+    <div style="font-size:0.75rem;color:#888;">• Campaigns page: shows 🚨 Invalid Campaign ID vs ⚠️ Status Mismatch — clear distinction.</div>
+    <div style="font-size:0.75rem;color:#888;">• Warmup filter: Instantly warmup emails now silently skipped before they reach the approval queue or DB. Pattern: 7-char uppercase code in subject (e.g. 3WXDVXJ). No queue entry, no alert, no DB write.</div>
+    <div style="font-size:0.75rem;color:#888;">• Escalation classified events: escalated replies now correctly write a classified event to DB — previously missing, causing reply counts to undercount.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Metrics — Single Source of Truth</div>
+    <div style="font-size:0.75rem;color:#888;">• get_client_metrics() — unified helper function used by all three views (dashboard, client detail, campaigns page). Change it once, correct everywhere.</div>
+    <div style="font-size:0.75rem;color:#888;">• Metric definitions locked: Sequence Sent (Instantly API) + Replies Sent (our DB reply_sent events) = Total Sent. Verified: 8 + 1 = 9 for test campaign.</div>
+    <div style="font-size:0.75rem;color:#888;">• Reply breakdown visible at all levels: ✅ positive / 🕐 not_now / ❌ negative / 🚨 escalated / 🚫 ignored.</div>
+    <div style="font-size:0.75rem;color:#888;">• reply_sent event now logged to DB on every approved draft send (was missing — approve.py fixed).</div>
+    <div style="font-size:0.75rem;color:#888;">• Dashboard, Client Detail, Campaigns page all show: Leads / Sequence Sent / Replies Sent / Total Sent / Reply Breakdown / Meetings / Revenue / Reply Rate.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Campaign Launch Flow (Portal)</div>
+    <div style="font-size:0.75rem;color:#888;">• 🚀 Launch New Campaign section added to Client Detail page. Pre-launch checklist (4 required checkboxes), month + lead limit inputs, Launch button disabled until all boxes checked.</div>
+    <div style="font-size:0.75rem;color:#888;">• On launch: Apollo pull → DNC cross-ref → NeverBounce (when key configured) → create Instantly campaign as DRAFT → load leads → register campaign ID → Telegram alert to Vito. Live progress log streams in portal.</div>
+    <div style="font-size:0.75rem;color:#888;">• Vito reviews sequence and leads in Instantly UI, then manually activates. Monitor auto-detects within 10 min.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">UX + Timestamps</div>
+    <div style="font-size:0.75rem;color:#888;">• All timestamps across portal now display in Eastern Time (was UTC). Jinja to_et filter applied to event logs, intake page, dashboard generated time.</div>
+    <div style="font-size:0.75rem;color:#888;">• Heartbeat alert dedup: Gob now tracks alerted approval IDs — alerts once per new item, not every hourly cycle.</div>
+  </div>
+</div>
+
+<div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-18</h2>
   <div style="font-size:0.75rem;color:#888;margin-bottom:32px;display:flex;flex-direction:column;gap:6px;">
     <div>• <span style="color:#4ade80;font-weight:600;">monthly_cycle.py</span> — Full automated monthly campaign pipeline: Apollo search with auto-refill (never short of target), DB-driven exclusion list (never re-contacts same prospect), NeverBounce verify, DNC filter, new Instantly campaign created automatically, sequence pulled from live campaign (7-day minimum delays enforced), contacts loaded, pre-launch checklist sent to Vito</div>
