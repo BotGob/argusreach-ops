@@ -1539,6 +1539,44 @@ def maybe_send_digest():
     log("Daily digest sent.")
 
 # ── LOAD CLIENTS ──────────────────────────────────────────────────────────────
+def validate_all_campaign_ids(clients: list) -> list[str]:
+    """
+    Validate every active client's campaign ID against the Instantly API.
+    Returns list of error strings (empty = all good).
+    Called on startup and each cycle. Any mismatch blocks processing and alerts Vito.
+    """
+    if not INSTANTLY_API_KEY:
+        return []
+    errors = []
+    try:
+        r = requests.get(
+            "https://api.instantly.ai/api/v2/campaigns",
+            headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}"},
+            params={"limit": 100},
+            timeout=15
+        )
+        if not r.ok:
+            log(f"[CampaignValidation] Instantly API unavailable ({r.status_code}) — skipping validation this cycle")
+            return []
+        live_ids = {c["id"]: c["name"] for c in r.json().get("items", [])}
+    except Exception as e:
+        log(f"[CampaignValidation] Could not fetch campaigns from Instantly: {e}")
+        return []
+
+    for c in clients:
+        cid = c.get("instantly_campaign_id", "")
+        firm = c.get("firm_name", c.get("id", "?"))
+        if not cid:
+            errors.append(f"{firm}: no campaign ID set")
+        elif cid not in live_ids:
+            errors.append(
+                f"{firm}: campaign ID '{cid}' NOT FOUND in Instantly. "
+                f"Valid IDs: {list(live_ids.keys())}"
+            )
+        else:
+            log(f"[CampaignValidation] ✓ {firm} → '{live_ids[cid]}' ({cid})")
+    return errors
+
 def load_clients():
     data = json.loads(CLIENTS_FILE.read_text())
     clients = [c for c in data['clients'] if c.get('active', False)]
@@ -1563,14 +1601,26 @@ def run():
             if not clients:
                 log("No active clients. Waiting...")
             else:
-                for client in clients:
-                    try:
-                        new_ids = process_client(client, processed_ids)
-                        processed_ids.update(new_ids)
-                    except Exception as client_err:
-                        firm = client.get('firm_name', client.get('id', '?'))
-                        log(f"[{firm}] ⚠️ Client processing error (skipping, others unaffected): {client_err}")
-                        notify(f"⚠️ *{firm}* — Monitor error this cycle: `{str(client_err)[:150]}`\nOther clients unaffected. Will retry next cycle.")
+                # ── CAMPAIGN ID VALIDATION — block processing on mismatch ──
+                id_errors = validate_all_campaign_ids(clients)
+                if id_errors:
+                    for err in id_errors:
+                        log(f"[CampaignValidation] ❌ {err}")
+                    notify(
+                        "🚨 *CAMPAIGN ID MISMATCH — Monitor halted this cycle*\n\n"
+                        + "\n".join(f"• {e}" for e in id_errors)
+                        + "\n\nFix clients.json or the admin portal before next cycle."
+                    )
+                    # Skip all processing this cycle — do not touch real data with wrong IDs
+                else:
+                    for client in clients:
+                        try:
+                            new_ids = process_client(client, processed_ids)
+                            processed_ids.update(new_ids)
+                        except Exception as client_err:
+                            firm = client.get('firm_name', client.get('id', '?'))
+                            log(f"[{firm}] ⚠️ Client processing error (skipping, others unaffected): {client_err}")
+                            notify(f"⚠️ *{firm}* — Monitor error this cycle: `{str(client_err)[:150]}`\nOther clients unaffected. Will retry next cycle.")
                 save_processed(processed_ids)
 
             check_telegram_commands()

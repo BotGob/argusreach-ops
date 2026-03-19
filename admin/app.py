@@ -184,6 +184,42 @@ def fetch_instantly_analytics():
     except:
         return {}
 
+def validate_campaign_id(campaign_id: str) -> tuple[bool, str]:
+    """
+    Validate a campaign ID against the Instantly API.
+    Returns (is_valid, message).
+    MUST be called before saving any campaign ID to clients.json.
+    """
+    if not campaign_id:
+        return False, "Campaign ID is empty."
+    if not INSTANTLY_KEY:
+        return False, "No Instantly API key configured."
+    try:
+        r = requests.get(
+            "https://api.instantly.ai/api/v2/campaigns/analytics",
+            headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
+            params={"id": campaign_id},
+            timeout=10
+        )
+        if not r.ok:
+            return False, f"Instantly API error: {r.status_code}"
+        data = r.json()
+        if not data:
+            # ID not found in analytics — double-check via campaign list
+            r2 = requests.get(
+                "https://api.instantly.ai/api/v2/campaigns",
+                headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
+                params={"limit": 100},
+                timeout=10
+            )
+            if r2.ok:
+                ids = [c["id"] for c in r2.json().get("items", [])]
+                if campaign_id not in ids:
+                    return False, f"Campaign ID '{campaign_id}' not found in Instantly. Valid IDs: {ids}"
+        return True, "OK"
+    except Exception as e:
+        return False, f"Validation error: {e}"
+
 def load_global_dnc():
     """Load the global DNC — anyone who unsubscribed from any ArgusReach campaign ever."""
     p = DNC_DIR / "global.txt"
@@ -401,7 +437,13 @@ def client_update(client_id):
 
     f = request.form
     if "instantly_campaign_id" in f:
-        client["instantly_campaign_id"] = f["instantly_campaign_id"].strip()
+        new_cid = f["instantly_campaign_id"].strip()
+        if new_cid and new_cid != client.get("instantly_campaign_id", ""):
+            valid, msg = validate_campaign_id(new_cid)
+            if not valid:
+                flash(f"❌ Campaign ID rejected — {msg}", "error")
+                return redirect(url_for("client_detail", client_id=client_id))
+        client["instantly_campaign_id"] = new_cid
     if "campaign_name" in f:
         client["campaign_name"] = f["campaign_name"].strip()
     if "launch_date" in f:
@@ -437,6 +479,11 @@ def campaign_add(client_id):
     }
     if not new_campaign["instantly_campaign_id"]:
         flash("Campaign ID required.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    valid, msg = validate_campaign_id(new_campaign["instantly_campaign_id"])
+    if not valid:
+        flash(f"❌ Campaign ID rejected — {msg}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     if "campaigns" not in client:
@@ -611,14 +658,17 @@ def campaigns():
                         (not c.get("active") and instantly_status == "ACTIVE"),
         })
 
-    # Unregistered campaigns
+    # Unregistered campaigns — pull live list and cross-reference
     unregistered = []
+    live_campaign_ids = set()
     try:
         r = requests.get("https://api.instantly.ai/api/v2/campaigns",
-                         headers={"Authorization": f"Bearer {INSTANTLY_KEY}"}, timeout=10)
+                         headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
+                         params={"limit": 100}, timeout=10)
         if r.ok:
-            all_camps = r.json() if isinstance(r.json(), list) else []
-            for camp in all_camps:
+            live_campaigns = r.json().get("items", [])
+            live_campaign_ids = {c["id"] for c in live_campaigns}
+            for camp in live_campaigns:
                 if camp.get("id") not in registered_ids:
                     unregistered.append({
                         "id": camp.get("id",""),
@@ -628,6 +678,14 @@ def campaigns():
                     })
     except:
         pass
+
+    # Flag any rows where campaign ID doesn't exist in Instantly at all
+    for row in rows:
+        if row["campaign_id"] and live_campaign_ids and row["campaign_id"] not in live_campaign_ids:
+            row["id_invalid"] = True
+            row["mismatch"] = True
+        else:
+            row["id_invalid"] = False
 
     return render_template("campaigns.html", rows=rows, unregistered=unregistered)
 

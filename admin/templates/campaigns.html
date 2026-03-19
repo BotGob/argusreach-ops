@@ -40,7 +40,7 @@
     <td>{{ r.leads }}</td>
     <td>{{ r.sent }}</td>
     <td>{{ r.replies }}</td>
-    <td>{{ '⚠️ Mismatch' if r.mismatch else '' }}</td>
+    <td>{% if r.id_invalid %}🚨 Invalid Campaign ID{% elif r.mismatch %}⚠️ Status Mismatch{% endif %}</td>
   </tr>
   {% else %}
   <tr><td colspan="9" style="text-align:center;color:#64748b;padding:32px">No campaigns registered yet</td></tr>
