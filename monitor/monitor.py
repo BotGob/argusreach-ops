@@ -595,41 +595,74 @@ def get_client_campaigns(client):
 def load_prospect_emails(client):
     """
     Return a combined set of lowercase email addresses from ALL active campaigns for this client.
-    Also returns a dict mapping email → campaign_id for accurate tracking.
-    Returns (None, {}) if no prospect lists configured (disables the filter — processes all replies).
+    Sources (in order): local prospects.csv → Instantly API leads.
+    Returns (set, dict) always — empty set if nothing found (filter still enforced).
+    Never returns None — filter is ALWAYS active when a campaign_id exists.
     """
     import csv as _csv
     all_emails = set()
     email_to_campaign = {}
     campaigns = get_client_campaigns(client)
-    any_csv_found = False
 
     for campaign in campaigns:
-        csv_path = campaign.get('prospects_csv')
-        if not csv_path:
-            continue
-        p = Path(csv_path)
-        if not p.is_absolute():
-            p = BASE_DIR.parent / csv_path
-        if not p.exists():
-            log(f"[ProspectFilter] prospects_csv not found: {p}")
-            continue
-        any_csv_found = True
         cid = campaign.get('instantly_campaign_id', '')
-        try:
-            with open(p, newline='', encoding='utf-8') as f:
-                reader = _csv.DictReader(f)
-                for row in reader:
-                    for col in row:
-                        if col.strip().lower() in ('email', 'e-mail'):
-                            email = row[col].strip().lower()
-                            all_emails.add(email)
-                            email_to_campaign[email] = cid
-        except Exception as e:
-            log(f"[ProspectFilter] Error reading {p}: {e}")
 
-    if not any_csv_found:
-        return None, {}
+        # Source 1: local CSV
+        csv_path = campaign.get('prospects_csv')
+        if csv_path:
+            p = Path(csv_path)
+            if not p.is_absolute():
+                p = BASE_DIR.parent / csv_path
+            if p.exists():
+                try:
+                    with open(p, newline='', encoding='utf-8') as f:
+                        reader = _csv.DictReader(f)
+                        for row in reader:
+                            for col in row:
+                                if col.strip().lower() in ('email', 'e-mail'):
+                                    e = row[col].strip().lower()
+                                    if e:
+                                        all_emails.add(e)
+                                        email_to_campaign[e] = cid
+                except Exception as ex:
+                    log(f"[ProspectFilter] Error reading CSV {p}: {ex}")
+
+        # Source 2: Instantly API — pull live lead list (authoritative)
+        if cid and INSTANTLY_API_KEY:
+            try:
+                page_size = 100
+                starting_after = None
+                while True:
+                    params = {"campaign": cid, "limit": page_size}
+                    if starting_after:
+                        params["starting_after"] = starting_after
+                    resp = requests.get(
+                        "https://api.instantly.ai/api/v2/leads",
+                        headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}"},
+                        params=params,
+                        timeout=15
+                    )
+                    if resp.status_code != 200:
+                        break
+                    items = resp.json().get("items", [])
+                    for item in items:
+                        e = item.get("email", "").strip().lower()
+                        if e:
+                            all_emails.add(e)
+                            email_to_campaign[e] = cid
+                    if len(items) < page_size:
+                        break
+                    starting_after = items[-1].get("id")
+            except Exception as ex:
+                log(f"[ProspectFilter] Instantly API fetch failed for {cid}: {ex}")
+
+    if all_emails:
+        log(f"[ProspectFilter] {client.get('firm_name')} — {len(all_emails)} known prospects loaded")
+    else:
+        # No prospects found anywhere — if campaign exists, still enforce filter (empty = block all unknown)
+        if any(c.get('instantly_campaign_id') for c in campaigns):
+            log(f"[ProspectFilter] WARNING: No prospects found for {client.get('firm_name')} but campaign exists — all unknown senders will be skipped")
+
     return all_emails, email_to_campaign
 
 def is_spam(msg, body):
@@ -908,24 +941,24 @@ def process_client(client, processed_ids):
                 new_processed.add(fingerprint)
                 continue
 
-            # Filter: prospect list — only respond to people we actually emailed
+            # Filter: prospect list — ONLY process emails from known prospects
+            # Pulls from local CSV + Instantly API leads. Filter is ALWAYS enforced.
             prospect_emails, email_to_campaign = load_prospect_emails(client)
-            if prospect_emails is not None and from_email.lower() not in prospect_emails:
-                # Only escalate if it looks like a genuine reply to our outreach (subject starts with Re:)
-                # Warming emails, spam, and cold outreach have their own subject lines — skip silently
+            if from_email.lower() not in prospect_emails:
                 decoded_subject = subject.strip()
                 is_reply_subject = decoded_subject.lower().startswith('re:')
-                if is_reply_subject:
-                    log(f"{label} Unknown sender replied (Re: subject, not in prospect list): {from_email} — escalating")
+                if is_reply_subject and not is_warmup(msg, from_email):
+                    # Genuine-looking reply from unknown sender — flag for manual review
+                    log(f"{label} Unknown sender replied (not in prospect list): {from_email} — flagging")
                     notify(
                         f"⚠️ *{client['firm_name']}* — Unknown sender replied\n"
                         f"👤 {from_name or from_email} `<{from_email}>`\n"
                         f"📋 Subject: _{subject}_\n"
-                        f"Not in prospect list — may be a prospect replying from a different email address. "
-                        f"Check manually and add to DNC or prospect list as needed."
+                        f"Not in our prospect list. May be replying from a different address. "
+                        f"Check manually."
                     )
                 else:
-                    log(f"{label} Skipping — not in prospect list (non-reply subject): {from_email}")
+                    log(f"{label} Skipping — not a known prospect: {from_email} | {subject[:60]}")
                 mail.store(msg_id, '+FLAGS', '\\Seen')
                 new_processed.add(fingerprint)
                 continue
