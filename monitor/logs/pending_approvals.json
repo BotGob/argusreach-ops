@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "argus_reach___test_1:tonyn@popitmarketing.com:1773937231",
+    "client_id": "argus_reach___test_1",
+    "firm_name": "Argus Reach - Test 1",
+    "campaign_name": "",
+    "instantly_campaign_id": "d7e0b311-313b-4741-a870-95fe7d04a9d3",
+    "client_email": "Vito@argusreach.com",
+    "outreach_email": "vito@argusreach.com",
+    "app_password": "zpct kbsl naeb uahu",
+    "sender_name": "Vito Resciniti",
+    "from_email": "tonyn@popitmarketing.com",
+    "from_name": "Tony N",
+    "subject": "Vito, are you ready to get started? | HHPBJHJ 3WXDVXJ",
+    "draft": "Tony,\n\nGreat to hear - let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "classification": "positive",
+    "queued_at": "2026-03-19T16:20:31.523623",
+    "in_reply_to": "<0f50Wem978264c08bb01966bed98b6f0@popitmarketing.com>",
+    "references": "<0f50Wem978264c08bb01966bed98b6f0@popitmarketing.com>"
+  }
+]

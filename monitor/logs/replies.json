@@ -587,5 +587,25 @@
     "draft_preview": "",
     "sent": false,
     "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T16:17:54.530417",
+    "client": "argus_reach___test_1",
+    "prospect": "tonyn@popitmarketing.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CAN-SPAM compliance signal detected. The opt-out instruction and tracking code indicate this may be a compliance test, list verification, or non-organic reply. Do not respond to avoid creating compliance liability.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T16:20:32.192502",
+    "client": "argus_reach___test_1",
+    "prospect": "tonyn@popitmarketing.com",
+    "classification": "positive",
+    "draft_preview": "Tony,\n\nGreat to hear - let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "Qualified prospect ready to book call.",
+    "test_mode": false
   }
 ]
