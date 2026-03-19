@@ -591,6 +591,81 @@ def campaign_toggle(client_id, campaign_id):
     return redirect(url_for("client_detail", client_id=client_id))
 
 
+@app.route("/clients/<client_id>/launch", methods=["POST"])
+@login_required
+def campaign_launch(client_id):
+    """
+    Launch a new campaign for a client.
+    Runs: Apollo → DNC filter → NeverBounce (if key exists) → create Instantly campaign (DRAFT) → load leads → notify Vito.
+    Runs in background thread so the portal stays responsive. Progress streamed via /clients/<id>/launch/status.
+    """
+    import threading, io, sys
+    from datetime import datetime
+    import zoneinfo
+
+    client, _ = get_client_by_id(client_id)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    month = request.form.get("month", "").strip()
+    limit = int(request.form.get("limit", 200))
+    skip_verify = not bool(os.environ.get("NEVERBOUNCE_API_KEY", ""))
+
+    if not month:
+        flash("Month is required.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    # Store log in a file so we can stream it
+    log_path = BASE_DIR / "monitor" / "logs" / f"launch_{client_id}.log"
+    log_path.write_text(f"[{datetime.now(zoneinfo.ZoneInfo('America/New_York')).strftime('%I:%M %p ET')}] Starting campaign launch for {client.get('firm_name')} — {month}\n")
+
+    def run_in_background():
+        try:
+            sys.path.insert(0, str(BASE_DIR / "tools"))
+            import monthly_cycle as mc
+            import importlib
+            importlib.reload(mc)  # ensure fresh state
+
+            # Patch notify to write to log instead of Telegram (Telegram still fires from within mc)
+            orig_stdout = sys.stdout
+            sys.stdout = open(log_path, "a")
+
+            mc.run_cycle(
+                client_id=client_id,
+                month_name=month,
+                dry_run=False,
+                skip_apollo=False,
+                skip_verify=skip_verify,
+            )
+            sys.stdout.close()
+            sys.stdout = orig_stdout
+
+            with open(log_path, "a") as f:
+                f.write(f"\n✅ DONE — Campaign created as DRAFT in Instantly. Review sequence and leads, then activate.\n")
+                f.write("__COMPLETE__\n")
+        except Exception as e:
+            with open(log_path, "a") as f:
+                f.write(f"\n❌ ERROR: {e}\n")
+                f.write("__COMPLETE__\n")
+
+    t = threading.Thread(target=run_in_background, daemon=True)
+    t.start()
+
+    flash(f"Campaign launch started for {month}. Building leads and creating campaign now — check progress below.", "success")
+    return redirect(url_for("client_detail", client_id=client_id) + "?launch=1")
+
+
+@app.route("/clients/<client_id>/launch/log")
+@login_required
+def campaign_launch_log(client_id):
+    """Return current launch log as plain text for live polling."""
+    log_path = BASE_DIR / "monitor" / "logs" / f"launch_{client_id}.log"
+    if not log_path.exists():
+        return "No launch in progress.", 200
+    return log_path.read_text(), 200, {"Content-Type": "text/plain"}
+
+
 @app.route("/clients/<client_id>/dnc", methods=["POST"])
 @login_required
 def upload_dnc(client_id):

@@ -154,6 +154,87 @@
   </details>
 </div>
 
+<!-- ── LAUNCH NEW CAMPAIGN ─────────────────────────────────────────────── -->
+<div class="section" style="margin-bottom:24px;border:1px solid #1e3a5f;background:rgba(30,58,95,0.15)">
+  <div class="section-title">🚀 Launch New Campaign</div>
+  <p style="font-size:13px;color:#94a3b8;margin-bottom:16px">
+    Runs the full pipeline: Apollo lead pull → DNC filter → create campaign in Instantly as <b>DRAFT</b> → load leads → notify you to review and activate.
+  </p>
+
+  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Pre-Launch Checklist — confirm before clicking Launch</div>
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        Client ICP is configured (target titles, geography, industry in client settings)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        Sequence is written and ready to load (I'll paste it into Instantly after campaign is created)
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        Sending account ({{ client.outreach_email }}) is warmed up
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        I will review leads and sequence in Instantly before activating — campaign will be created as DRAFT
+      </label>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Campaign Month</label>
+        <input type="text" name="month" placeholder="April 2026" required
+               style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:140px">
+      </div>
+      <div>
+        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Lead Limit</label>
+        <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="10" max="500"
+               style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:90px">
+      </div>
+      <button type="submit" id="launch-btn" class="btn btn-primary" style="background:#4ade80;color:#0f172a;font-weight:700" disabled>
+        🚀 Build &amp; Create Campaign
+      </button>
+    </div>
+  </form>
+
+  <!-- Live progress log (shown after launch) -->
+  <div id="launch-log" style="display:none;margin-top:16px">
+    <div style="font-size:12px;color:#64748b;margin-bottom:6px">Launch Progress</div>
+    <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:200px;overflow-y:auto;white-space:pre-wrap"></pre>
+  </div>
+</div>
+
+<script>
+// Enable launch button only when all boxes checked
+document.querySelectorAll('.launch-check').forEach(cb => {
+  cb.addEventListener('change', () => {
+    const allChecked = [...document.querySelectorAll('.launch-check')].every(c => c.checked);
+    document.getElementById('launch-btn').disabled = !allChecked;
+  });
+});
+
+// Auto-show progress if redirected back with ?launch=1
+{% if request.args.get('launch') %}
+(function() {
+  const logDiv = document.getElementById('launch-log');
+  const logText = document.getElementById('launch-log-text');
+  logDiv.style.display = 'block';
+  function poll() {
+    fetch('{{ url_for("campaign_launch_log", client_id=client.id) }}')
+      .then(r => r.text()).then(txt => {
+        logText.textContent = txt;
+        logText.scrollTop = logText.scrollHeight;
+        if (!txt.includes('__COMPLETE__')) setTimeout(poll, 2000);
+        else logText.textContent = txt.replace('__COMPLETE__', '').trim();
+      });
+  }
+  poll();
+})();
+{% endif %}
+</script>
+
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
   <!-- Upload DNC -->

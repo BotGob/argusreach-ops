@@ -616,5 +616,24 @@
     "draft_preview": "Tony,\n\nGreat to hear - let's connect. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
     "sent": false,
     "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-19T16:48:23.952707",
+    "client": "argus_reach___test_1",
+    "prospect": "h-amaryllis@arcmailnetworkpro.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 17 - Context mismatch. Email content (graphic designer inquiry) does not align with Argus Reach positioning (sales pipeline/referral network building for accountants, PTs, real estate agents). Prospect appears confused about our service.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-19T17:05:12.598203",
+    "client": "argus_reach___test_1",
+    "prospect": "h-amaryllis@arcmailnetworkpro.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]
