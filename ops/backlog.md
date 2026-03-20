@@ -130,14 +130,9 @@ Archive file grows indefinitely (by design — never delete history). At 2+ year
 
 ## 🟡 Design / Polish — Added 2026-03-18
 
-### 31. Client-facing material — match website style
-All client-facing pages and forms must mirror argusreach.com's visual identity (dark background, Inter font, color palette, card styling). Currently unstyled or using basic Bootstrap.
+### 31. Update intake form to match argusreach.com style
+The public intake form at admin.argusreach.com/intake should look like it belongs to the ArgusReach brand — not a generic internal tool. First impression matters.
 
-**In scope:**
-- `admin.argusreach.com/intake` — the public client onboarding form (currently plain Flask/Bootstrap). Should look like it belongs to the ArgusReach brand, not a generic internal tool.
-- `client-onboarding-guide.md` — when converted to a web page or PDF, should use ArgusReach branding (logo, colors, fonts).
-- Any future client-facing emails (welcome email, monthly report) should use a consistent HTML template matching the brand.
+**Reference:** argusreach.com — dark bg #0f0f0f, Inter font, green accent #4ade80, card borders rgba(255,255,255,0.07), clean section headers, minimal spacing.
 
-**Reference:** argusreach.com (dark bg #0f0f0f, Inter font, green accent #4ade80, card borders rgba(255,255,255,0.07)).
-
-**Priority:** Before first real client sees the intake form.
+**Priority:** Before first real client sees the form. Currently functional but visually inconsistent with the brand.
