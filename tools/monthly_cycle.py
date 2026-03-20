@@ -160,23 +160,38 @@ def search_apollo(client, target, exclude_emails):
 
     titles     = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
     geography  = client.get("_target_geography", "")
+    company_size = client.get("_target_company_size", "")
     contacts   = []
     seen_emails = set(exclude_emails)  # start with full exclusion list
     page        = 1
     max_pages   = 20  # safety limit
 
+    # Map intake company size to Apollo employee_ranges
+    SIZE_MAP = {
+        "1-10":    ["1,10"],
+        "11-50":   ["11,50"],
+        "51-200":  ["51,200"],
+        "201-500": ["201,500"],
+        "any":     [],
+    }
+    employee_ranges = SIZE_MAP.get(company_size, [])
+
     print(f"🔍 Apollo search — need {target} fresh contacts (excluding {len(exclude_emails)} already contacted)")
+    if employee_ranges:
+        print(f"   Company size filter: {company_size} employees")
 
     while len(contacts) < target and page <= max_pages:
         payload = {
             "api_key":    APOLLO_API_KEY,
             "per_page":   100,
             "page":       page,
-            "person_titles": titles or ["Doctor", "Physician"],
+            "person_titles": titles or [],
             "contact_email_status": ["verified", "likely to engage"],
         }
         if geography:
             payload["person_locations"] = [geography]
+        if employee_ranges:
+            payload["organization_num_employees_ranges"] = employee_ranges
 
         try:
             resp = requests.post(

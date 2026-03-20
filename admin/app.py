@@ -91,21 +91,21 @@ def _send_welcome_email(client: dict):
 
     body = f"""Hi {first_name},
 
-Welcome to ArgusReach — excited to get started with {firm_name}.
+Welcome to ArgusReach — we've received your intake and we're already on it.
 
-Here's what happens next:
+Here's exactly what happens from here:
 
-1. We'll schedule a brief onboarding call to walk through your campaign setup, confirm your target audience, and answer any questions. I'll send a calendar link separately.
+1. We build your prospect list. Based on what you told us — your target titles, geography, and ideal client profile — we source and verify a list of contacts for your campaign. No action needed from you.
 
-2. We'll set up a dedicated sending email address for your outreach (outreach.{firm_name.lower().replace(' ','')}.com or similar). This takes about a week to warm up properly — it's what protects your main domain's reputation.
+2. We write your outreach sequence. Every message is written specifically for your business, your voice, and your ideal client. You'll receive it for review before a single email goes out.
 
-3. While the sending account warms up, we'll build your prospect list and write your outreach sequence. You'll review and approve the sequence before anything sends.
+3. You review and approve. You'll get a notification to review the sequence and confirm everything looks right. You have full control — nothing launches without your sign-off.
 
-4. Once launched, you'll hear from me whenever a prospect responds with interest. I handle all replies — you just confirm meetings.
+4. Campaign goes live. Once you activate, ArgusReach runs in the background. Outreach goes out on your behalf, automatically, every business day.
 
-Timeline: campaigns typically launch 2–3 weeks after onboarding. First responses start coming in during weeks 3–4.
+5. You hear from us when it matters. Whenever a prospect responds with genuine interest, you'll get an alert. Review the draft reply in your portal, approve it, and the conversation moves forward. You show up for the meetings — we handle everything else.
 
-Any questions before we get started, just reply here.
+Questions before we get started? Just reply here.
 
 — Vito Resciniti
 Founder, ArgusReach
@@ -965,8 +965,10 @@ def intake():
             "target_radius":        f.get("target_radius","").strip(),
             "target_titles":        f.get("target_titles","").strip(),
             "target_company_type":  f.get("target_company_type","").strip(),
+            "target_company_size":  f.get("target_company_size","").strip(),
             "monthly_capacity":     f.get("monthly_capacity","").strip(),
             "dnc_notes":            f.get("dnc_notes","").strip(),
+            "dnc_emails":           f.get("dnc_emails","").strip(),
             "icp_summary":          f.get("icp_summary","").strip(),
             # Voice & message
             "value_prop":           f.get("value_prop","").strip(),
@@ -1065,6 +1067,8 @@ def intake_approve(intake_id):
             "_business_description": intake.get("business_description",""),
             "_prior_outreach":       intake.get("prior_outreach",""),
             "_dnc_notes":            intake.get("dnc_notes",""),
+            "_dnc_emails":           intake.get("dnc_emails",""),
+            "_target_company_size":  intake.get("target_company_size",""),
             "_desired_action":       intake.get("desired_action","book_call"),
             "_has_existing_list":    intake.get("has_existing_list","no"),
             "_website":              intake.get("website",""),
@@ -1078,6 +1082,18 @@ def intake_approve(intake_id):
         (DNC_DIR / f"{client_id}.txt").touch()
         init_db()
         sync_client_from_config(new_client)
+
+        # Auto-load structured DNC emails/domains from intake into client DNC file
+        dnc_raw = intake.get("dnc_emails", "")
+        if dnc_raw.strip():
+            dnc_entries = [
+                line.strip().lower()
+                for line in dnc_raw.splitlines()
+                if line.strip() and not line.strip().startswith("#")
+            ]
+            if dnc_entries:
+                append_dnc(client_id, dnc_entries)
+                app.logger.info(f"Auto-loaded {len(dnc_entries)} DNC entries from intake for {client_id}")
 
         # Mark intake as approved
         for i in intakes:

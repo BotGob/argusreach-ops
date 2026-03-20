@@ -169,9 +169,22 @@
     </div>
     <div class="field">
       <label>Target Company / Practice Type
-        <span class="hint">Any specifics about the type of organization? Size, specialty, ownership, etc.</span>
+        <span class="hint">Any specifics about the type of organization? Specialty, ownership, stage, etc.</span>
       </label>
-      <input name="target_company_type" placeholder="Independent firms and practices — not national chains or corporate-owned. Prefer locally owned businesses with 1-10 employees.">
+      <input name="target_company_type" placeholder="Independent firms and practices — not national chains or corporate-owned. Locally owned, growing.">
+    </div>
+    <div class="field">
+      <label>Target Company Size <span class="req">*</span>
+        <span class="hint">Employee count of the companies you want to reach. This is used to filter your prospect search.</span>
+      </label>
+      <select name="target_company_size" required>
+        <option value="">— Select —</option>
+        <option value="1-10">1–10 employees (solo practitioners, micro firms)</option>
+        <option value="11-50">11–50 employees (small practices / firms)</option>
+        <option value="51-200">51–200 employees (mid-size)</option>
+        <option value="201-500">201–500 employees</option>
+        <option value="any">Any size</option>
+      </select>
     </div>
     <div class="field">
       <label>How many new clients/patients can you realistically take per month?
@@ -188,9 +201,15 @@
     </div>
     <div class="field">
       <label>Who should we NEVER contact? <span class="req">*</span>
-        <span class="hint">Existing referral partners, competitors, specific practices, anyone you have a relationship with. List names, practices, or domains.</span>
+        <span class="hint">Existing partners, competitors, anyone you already have a relationship with. Describe them below — names, companies, or whole domains.</span>
       </label>
-      <textarea name="dnc_notes" required placeholder="Do not contact anyone at First National Bank — we already have a relationship there. Do not contact Smith & Jones Law — they refer to a competitor. Do not contact anyone I've worked with personally at Regions Bank."></textarea>
+      <textarea name="dnc_notes" required placeholder="Do not contact anyone at First National Bank — we already have a relationship there. Do not contact Smith & Jones Law — they refer to a competitor."></textarea>
+    </div>
+    <div class="field">
+      <label>Do-Not-Contact email addresses or domains
+        <span class="hint">If you have specific emails or domains to block, list them here — one per line. Example: john@smithlaw.com or smithlaw.com (blocks entire domain). These are loaded directly into our system.</span>
+      </label>
+      <textarea name="dnc_emails" rows="4" placeholder="john@smithlaw.com&#10;smithlaw.com&#10;firstnationalbank.com"></textarea>
     </div>
 
     <!-- ── SECTION 5: YOUR MESSAGE & VOICE ──────────────────────────── -->
