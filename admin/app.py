@@ -91,21 +91,25 @@ def _send_welcome_email(client: dict):
 
     body = f"""Hi {first_name},
 
-Welcome to ArgusReach — we've received your intake and we're already on it.
+Welcome to ArgusReach — we've received your intake and we're already building your prospect list and outreach sequence. We'll send you the draft sequence shortly for your review before anything goes out.
 
-Here's exactly what happens from here:
+In the meantime, there are a few things we need from you to get everything ready:
 
-1. We build your prospect list. Based on what you told us — your target titles, geography, and ideal client profile — we source and verify a list of contacts for your campaign. No action needed from you.
+1. Email authentication setup (DNS)
 
-2. We write your outreach sequence. Every message is written specifically for your business, your voice, and your ideal client. You'll receive it for review before a single email goes out.
+To make sure your outreach lands in inboxes — not spam folders — we need a few technical records added to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that protects your domain's reputation. Your IT person or whoever manages your website domain (GoDaddy, Cloudflare, Namecheap, etc.) can handle this in about 10 minutes. We'll send you the exact records to add — no guesswork on your end.
 
-3. We send you the sequence for review. You'll receive the outreach emails we've written on your behalf. Reply with any edits or feedback, or let us know you're good to go. Nothing launches without your sign-off.
+If you don't have an IT person, just let us know and we'll walk you through it.
 
-4. Campaign goes live. Once you activate, ArgusReach runs in the background. Outreach goes out on your behalf, automatically, every business day.
+2. Do-not-contact list (if you have one)
 
-5. You hear from us when it matters. Whenever a prospect responds with genuine interest, you'll get an alert. Review the draft reply in your portal, approve it, and the conversation moves forward. You show up for the meetings — we handle everything else.
+If there are specific people, companies, or domains you never want us to contact — existing clients, partners, competitors — reply with that list and we'll make sure they're excluded before a single email goes out. Emails, names, or company domains all work.
 
-Questions before we get started? Just reply here.
+3. Warm leads (optional)
+
+If there are people you already have a relationship with — or anyone you'd like us to prioritize reaching out to first — send those over and we'll move them to the front of the list.
+
+Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with your sequence draft.
 
 — Vito Resciniti
 Founder, ArgusReach
