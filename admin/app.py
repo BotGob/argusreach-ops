@@ -99,9 +99,11 @@ In the meantime, there are a few things we need from you to get everything ready
 
 We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account for this — something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.
 
+Important: this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work — we need a full account with its own login credentials.
+
 What you need to do:
-- Create the email address through your existing Google Workspace or Microsoft 365 account (usually $6–$8/mo for an additional user)
-- Generate an app password for that account so we can send on your behalf (we'll send you step-by-step instructions for your provider)
+- Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6–$8/mo for an additional user)
+- Once it's created, we'll send you instructions to generate an app password so we can send on your behalf
 - Send us the email address and app password and we'll handle the rest
 
 If you don't have Google Workspace or Microsoft 365 yet, let us know and we'll point you in the right direction.
