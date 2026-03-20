@@ -713,6 +713,9 @@ WARMUP_DOMAINS = [
     'fomoaiconnect.cfd', 'acquireleadlabs.online', 'leadspezialist.de',
     'ritarikunta.com', 'airbyteflow.com', 'successfactorconsulting.com',
     'structuredsolutionshelp.help',
+    # Added 2026-03-20 — confirmed warmup senders from Instantly test campaign
+    'powersquareshift.com', 'torontocreator.website', 'draventarflowstep.com',
+    'appprovelocityknowledgeco.com', 'dotfaf.com',
     # TLD patterns common in warmup networks
 ]
 
@@ -1245,12 +1248,31 @@ def process_client(client, processed_ids):
 _last_digest_day = None
 
 def check_stale_pending():
-    """Re-alert if any pending approvals have been sitting unreviewed for 4+ hours."""
+    """Re-alert if any pending approvals have been sitting unreviewed for 4+ hours.
+    Rate-limited to once per 24 hours to prevent alert flooding."""
+    STALE_STATE_FILE = LOG_DIR / 'stale_reminder_state.json'
+    STALE_COOLDOWN_HOURS = 24
     try:
         pending = load_pending()
         if not pending:
+            # Clear state when queue is empty
+            if STALE_STATE_FILE.exists():
+                STALE_STATE_FILE.unlink()
             return
+
         now = datetime.utcnow()
+
+        # Check cooldown — only fire once per 24h
+        if STALE_STATE_FILE.exists():
+            try:
+                state = json.loads(STALE_STATE_FILE.read_text())
+                last_sent = datetime.fromisoformat(state.get('last_sent', '2000-01-01'))
+                hours_since = (now - last_sent).total_seconds() / 3600
+                if hours_since < STALE_COOLDOWN_HOURS:
+                    return  # Too soon — skip
+            except Exception:
+                pass  # Corrupt state, proceed
+
         stale = []
         for entry in pending:
             queued_at = entry.get('queued_at', '')
@@ -1274,6 +1296,8 @@ def check_stale_pending():
                 )
             notify('\n'.join(lines))
             log(f"Stale pending reminder sent: {len(stale)} item(s)")
+            # Save cooldown state
+            STALE_STATE_FILE.write_text(json.dumps({'last_sent': now.isoformat()}))
     except Exception as e:
         log(f"[Stale pending check] error (non-fatal): {e}")
 
