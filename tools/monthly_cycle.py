@@ -374,12 +374,13 @@ def create_instantly_campaign(client, month_name, sequence_steps=None):
 
 # ── Add sending account to campaign ───────────────────────────────────────────
 def add_sending_account(campaign_id, outreach_email):
-    """Link the client's outreach email to the new campaign."""
+    """Link the client's outreach email to the new campaign via PATCH email_list.
+    NOTE: POST /campaigns/{id}/mailaccounts is 404 — correct method is PATCH with email_list."""
     try:
-        resp = requests.post(
-            f"https://api.instantly.ai/api/v2/campaigns/{campaign_id}/mailaccounts",
+        resp = requests.patch(
+            f"https://api.instantly.ai/api/v2/campaigns/{campaign_id}",
             headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}", "Content-Type": "application/json"},
-            json={"email": outreach_email}, timeout=15
+            json={"email_list": [outreach_email]}, timeout=15
         )
         if resp.status_code == 200:
             print(f"✅ Sending account {outreach_email} linked to campaign")
@@ -395,32 +396,43 @@ def load_to_instantly(contacts, campaign_id, dry_run=False):
         return
     print(f"🚀 Loading {len(contacts)} contacts to Instantly...")
     loaded = 0
-    for i in range(0, len(contacts), 50):
-        batch = contacts[i:i+50]
-        leads = [{
+    errors = 0
+    # NOTE: /api/v2/leads/batch is 404. Use individual POST per lead.
+    for c in contacts:
+        payload = {
             "campaign":             campaign_id,
             "email":                c["email"],
             "first_name":           c.get("first_name", ""),
             "last_name":            c.get("last_name", ""),
             "company_name":         c.get("company", ""),
-            "skip_if_in_workspace": True,
-        } for c in batch]
+            "skip_if_in_workspace": False,
+        }
         try:
             resp = requests.post(
-                "https://api.instantly.ai/api/v2/leads/batch",
+                "https://api.instantly.ai/api/v2/leads",
                 headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}", "Content-Type": "application/json"},
-                json={"leads": leads}, timeout=30
+                json=payload, timeout=15
             )
             if resp.status_code == 429:
+                print("   Rate limited — waiting 30s...")
                 time.sleep(30)
-                continue
-            resp.raise_for_status()
-            loaded += len(batch)
-            print(f"   {loaded}/{len(contacts)} loaded...")
-            time.sleep(1)
+                resp = requests.post(
+                    "https://api.instantly.ai/api/v2/leads",
+                    headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}", "Content-Type": "application/json"},
+                    json=payload, timeout=15
+                )
+            if resp.ok:
+                loaded += 1
+            else:
+                errors += 1
+                print(f"   ⚠️  Failed {c['email']}: {resp.status_code} {resp.text[:100]}")
+            if loaded % 25 == 0 and loaded > 0:
+                print(f"   {loaded}/{len(contacts)} loaded...")
+            time.sleep(0.3)  # avoid rate limits
         except Exception as e:
-            print(f"❌ Batch load error: {e}")
-    print(f"✅ {loaded} contacts loaded to Instantly")
+            errors += 1
+            print(f"❌ Lead load error ({c['email']}): {e}")
+    print(f"✅ {loaded} contacts loaded to Instantly ({errors} errors)")
 
 # ── Write prospects CSV ────────────────────────────────────────────────────────
 def write_csv(contacts, client_id, month_name):
