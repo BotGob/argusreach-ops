@@ -11,6 +11,8 @@
 
 Your campaign is coming together. While we handle the heavy lifting — building your prospect list, writing your email sequences, and running the outreach system — there are a few things only you can handle on your end. This guide walks through all of it.
 
+**Your plan:** [STARTER / GROWTH / SCALE] — [200 / 500 / 1,000] new prospects reached per month.
+
 **Timeline:** From signing to first email sent is typically **3–4 weeks.** Most of that is the warmup period, which is automatic but can't be skipped. Here's what needs to happen on your side.
 
 ---
