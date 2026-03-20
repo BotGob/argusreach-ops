@@ -982,6 +982,7 @@ def intake():
             "prior_outreach":       f.get("prior_outreach","").strip(),
             # Targeting
             "meeting_format":       f.get("meeting_format","any").strip(),
+            "office_address":       f.get("office_address","").strip(),
             "success_story":        f.get("success_story","").strip(),
             "prospect_objection":   f.get("prospect_objection","").strip(),
             "target_locations":     f.get("target_locations","").strip(),
@@ -1079,6 +1080,7 @@ def intake_approve(intake_id):
             "_contact_name":         intake.get("contact_name",""),
             "_contact_title":        intake.get("contact_title",""),
             "_meeting_format":        intake.get("meeting_format","any"),
+            "_office_address":        intake.get("office_address",""),
             "_success_story":        intake.get("success_story",""),
             "_prospect_objection":   intake.get("prospect_objection",""),
             "_target_locations":     intake.get("target_locations",""),

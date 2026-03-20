@@ -36,6 +36,20 @@
   .cb { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; cursor: pointer; }
   .cb input[type="checkbox"] { accent-color: #4ade80; width: 15px; height: 15px; cursor: pointer; }
   </style>
+  <script>
+  function toggleOfficeAddress() {
+    var fmt = document.getElementById('meeting_format').value;
+    var field = document.getElementById('office_address_field');
+    var input = document.getElementById('office_address');
+    if (fmt === 'in_person') {
+      field.style.display = 'block';
+      input.required = true;
+    } else {
+      field.style.display = 'none';
+      input.required = false;
+    }
+  }
+  </script>
 </head>
 <body>
 <div class="container">
@@ -246,13 +260,19 @@
       <label>When a prospect says yes — how do you prefer to meet? <span class="req">*</span>
         <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
       </label>
-      <select name="meeting_format" required>
+      <select name="meeting_format" required id="meeting_format" onchange="toggleOfficeAddress()">
         <option value="">— Select —</option>
         <option value="in_person">In-person — I go to them (or they come to me)</option>
         <option value="phone">Phone call</option>
         <option value="zoom">Video call (Zoom / Teams / Google Meet)</option>
         <option value="any">Flexible — prospect's preference</option>
       </select>
+    </div>
+    <div class="field" id="office_address_field" style="display:none;">
+      <label>Your office address <span class="req">*</span>
+        <span class="hint">Shown on the booking confirmation so prospects know where to show up. Include suite number if applicable.</span>
+      </label>
+      <input name="office_address" id="office_address" placeholder="1234 Bay Harbor Blvd, Suite 200, Tampa, FL 33601">
     </div>
 
     <!-- ── SECTION 5: YOUR MESSAGE & VOICE ──────────────────────────── -->
