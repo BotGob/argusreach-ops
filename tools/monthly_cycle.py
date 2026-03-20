@@ -158,13 +158,15 @@ def search_apollo(client, target, exclude_emails):
         print("⚠️  No APOLLO_API_KEY — skipping Apollo search")
         return []
 
-    titles     = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
-    geography  = client.get("_target_geography", "")
+    titles       = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
+    geography    = client.get("_target_geography", "")
     company_size = client.get("_target_company_size", "")
-    contacts   = []
-    seen_emails = set(exclude_emails)  # start with full exclusion list
-    page        = 1
-    max_pages   = 20  # safety limit
+    industry     = client.get("_target_industry", "")
+    seniority    = client.get("_target_seniority", "")
+    contacts     = []
+    seen_emails  = set(exclude_emails)
+    page         = 1
+    max_pages    = 20
 
     # Map intake company size to Apollo employee_ranges
     SIZE_MAP = {
@@ -176,9 +178,39 @@ def search_apollo(client, target, exclude_emails):
     }
     employee_ranges = SIZE_MAP.get(company_size, [])
 
+    # Map intake industry to Apollo industry tags
+    INDUSTRY_MAP = {
+        "healthcare":         ["hospital & health care", "medical practice", "health, wellness and fitness"],
+        "physical_therapy":   ["health, wellness and fitness", "medical practice"],
+        "accounting":         ["accounting"],
+        "legal":              ["law practice", "legal services"],
+        "real_estate":        ["real estate"],
+        "financial_services": ["financial services", "investment management", "wealth management"],
+        "insurance":          ["insurance"],
+        "banking":            ["banking", "financial services"],
+        "construction":       ["construction", "building materials"],
+        "technology":         ["computer software", "information technology and services"],
+        "marketing":          ["marketing and advertising", "public relations and communications"],
+        "retail":             ["retail"],
+        "hospitality":        ["hospitality", "restaurants", "food & beverages"],
+        "nonprofit":          ["nonprofit organization management"],
+    }
+    industry_tags = INDUSTRY_MAP.get(industry, [])
+
+    # Map intake seniority to Apollo person_seniorities
+    SENIORITY_MAP = {
+        "owner_founder": ["owner", "founder", "partner", "c_suite"],
+        "c_suite":       ["c_suite", "founder"],
+        "vp_director":   ["vp", "director"],
+        "manager":       ["manager", "senior"],
+        "any":           [],
+    }
+    seniority_levels = SENIORITY_MAP.get(seniority, [])
+
     print(f"🔍 Apollo search — need {target} fresh contacts (excluding {len(exclude_emails)} already contacted)")
-    if employee_ranges:
-        print(f"   Company size filter: {company_size} employees")
+    if industry_tags:    print(f"   Industry: {industry}")
+    if seniority_levels: print(f"   Seniority: {seniority}")
+    if employee_ranges:  print(f"   Company size: {company_size}")
 
     while len(contacts) < target and page <= max_pages:
         payload = {
@@ -192,6 +224,10 @@ def search_apollo(client, target, exclude_emails):
             payload["person_locations"] = [geography]
         if employee_ranges:
             payload["organization_num_employees_ranges"] = employee_ranges
+        if industry_tags:
+            payload["organization_industry_tag_ids"] = industry_tags
+        if seniority_levels:
+            payload["person_seniorities"] = seniority_levels
 
         try:
             resp = requests.post(

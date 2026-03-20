@@ -162,10 +162,46 @@
       </div>
     </div>
     <div class="field">
+      <label>Target Industry <span class="req">*</span>
+        <span class="hint">What industry are the companies you want to reach in? This narrows your prospect search to the right type of business — without it we may pull contacts from the wrong sector entirely.</span>
+      </label>
+      <select name="target_industry" required>
+        <option value="">— Select —</option>
+        <option value="healthcare">Healthcare (hospitals, clinics, medical practices)</option>
+        <option value="physical_therapy">Physical Therapy / Rehab</option>
+        <option value="accounting">Accounting / Bookkeeping / CPA</option>
+        <option value="legal">Legal / Law Firms</option>
+        <option value="real_estate">Real Estate</option>
+        <option value="financial_services">Financial Services / Wealth Management</option>
+        <option value="insurance">Insurance</option>
+        <option value="banking">Banking / Lending</option>
+        <option value="construction">Construction / Contracting</option>
+        <option value="technology">Technology / SaaS</option>
+        <option value="marketing">Marketing / Advertising / PR</option>
+        <option value="retail">Retail</option>
+        <option value="hospitality">Hospitality / Food &amp; Beverage</option>
+        <option value="nonprofit">Nonprofit</option>
+        <option value="other">Other — I'll describe below</option>
+      </select>
+    </div>
+    <div class="field">
       <label>Target Job Titles / Roles <span class="req">*</span>
         <span class="hint">Who exactly should we be contacting? Be specific — these titles feed our contact search directly. List every title that applies.</span>
       </label>
       <textarea name="target_titles" required placeholder="Commercial bankers, business attorneys, financial advisors, insurance brokers, commercial real estate agents — anyone who regularly works with small business owners"></textarea>
+    </div>
+    <div class="field">
+      <label>Who is the decision-maker at these companies? <span class="req">*</span>
+        <span class="hint">Helps us find the right person, not just anyone with the right title. At small firms the owner is usually the right contact. At larger firms it may be a director or department head.</span>
+      </label>
+      <select name="target_seniority" required>
+        <option value="">— Select —</option>
+        <option value="owner_founder">Owner / Founder / Partner (decision maker at small firms)</option>
+        <option value="c_suite">C-Suite (CEO, COO, CMO, etc.)</option>
+        <option value="vp_director">VP / Director</option>
+        <option value="manager">Manager / Team Lead</option>
+        <option value="any">Anyone with the right title — seniority doesn't matter</option>
+      </select>
     </div>
     <div class="field">
       <label>Target Company / Practice Type
