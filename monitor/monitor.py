@@ -623,7 +623,7 @@ def load_prospect_emails(client):
                             for col in row:
                                 if col.strip().lower() in ('email', 'e-mail'):
                                     e = row[col].strip().lower()
-                                    if e:
+                                    if e and not is_warmup_domain(e):
                                         all_emails.add(e)
                                         email_to_campaign[e] = cid
                 except Exception as ex:
@@ -649,7 +649,7 @@ def load_prospect_emails(client):
                     items = resp.json().get("items", [])
                     for item in items:
                         e = item.get("email", "").strip().lower()
-                        if e:
+                        if e and not is_warmup_domain(e):
                             all_emails.add(e)
                             email_to_campaign[e] = cid
                     if len(items) < page_size:
@@ -699,14 +699,34 @@ def is_warmup(msg, from_email):
     # Instantly injects 7-char uppercase alphanumeric tracking codes (e.g. 3WXDVXJ, HHPBJHJ)
     if re.search(r'\b[A-Z0-9]{7}\b', subject):
         return True
-    # Also check known warmup domain patterns
-    warmup_domains = ['arcmailnetworkpro.com', 'popitmarketing.com', 'heythinkitfirst.com',
-                      'mandategewinnen.de',
-                      'danielyip.com', 'twodevecommerce.com', 'marketcommand.cfd',
-                      'briehost.com', 'userservicecenter.online', 'trymooreintelligent-solutions.com',
-                      'fomoaiconnect.cfd', 'acquireleadlabs.online', 'leadspezialist.de',
-                      'ritarikunta.com', 'airbyteflow.com', 'successfactorconsulting.com']
-    if any(d in from_email.lower() for d in warmup_domains):
+    # Known warmup network domains — updated as new ones are seen
+    if is_warmup_domain(from_email):
+        return True
+    return False
+
+
+# Centralized warmup domain list — used by is_warmup AND load_prospect_emails
+WARMUP_DOMAINS = [
+    'arcmailnetworkpro.com', 'popitmarketing.com', 'heythinkitfirst.com',
+    'mandategewinnen.de', 'danielyip.com', 'twodevecommerce.com', 'marketcommand.cfd',
+    'briehost.com', 'userservicecenter.online', 'trymooreintelligent-solutions.com',
+    'fomoaiconnect.cfd', 'acquireleadlabs.online', 'leadspezialist.de',
+    'ritarikunta.com', 'airbyteflow.com', 'successfactorconsulting.com',
+    'structuredsolutionshelp.help',
+    # TLD patterns common in warmup networks
+]
+
+# Also block suspicious TLDs used heavily by warmup networks
+WARMUP_TLDS = ['.help', '.cfd', '.online', '.sbs', '.xyz', '.buzz', '.top']
+
+
+def is_warmup_domain(email_addr: str) -> bool:
+    """Check if an email address belongs to a known warmup network domain or suspicious TLD."""
+    addr = email_addr.strip().lower()
+    domain = addr.split('@')[-1] if '@' in addr else addr
+    if any(d in domain for d in WARMUP_DOMAINS):
+        return True
+    if any(domain.endswith(tld) for tld in WARMUP_TLDS):
         return True
     return False
 

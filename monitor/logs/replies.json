@@ -692,5 +692,24 @@
     "draft_preview": "",
     "sent": false,
     "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T01:25:50.040437",
+    "client": "argus_reach___test_1",
+    "prospect": "aurorabell@structuredsolutionshelp.help",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "INBOUND COLD PITCH (Rule 11): Aurora is pitching recruitment/hiring services to us, not engaging with our prospect outreach. This is vendor/recruiter outreach, not a qualified reply.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T01:43:04.125983",
+    "client": "argus_reach___test_1",
+    "prospect": "aurorabell@structuredsolutionshelp.help",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]
