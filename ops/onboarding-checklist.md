@@ -1,11 +1,10 @@
 # ArgusReach — Client Onboarding Checklist
 
 ## Pre-Intake (internal)
-- [ ] Proposal signed and setup fee received
-- [ ] Welcome email sent with intake form link + IT handoff doc
+- [ ] Post-call email sent (service agreement link + $500 Stripe link + intake form link)
+- [ ] Confirm payment cleared + agreement signed before approving intake
+- [ ] Approve intake in portal → welcome email auto-fires
 - [ ] Research client's firm: website, LinkedIn, recent news, reviews
-- [ ] Draft ICP hypothesis based on what they told us on the strategy call
-- [ ] Prepare 3 sample prospect names that fit our hypothesis (show ICP accuracy)
 
 ---
 
@@ -33,12 +32,10 @@
 
 ### 4. Logistics (10 min)
 - Sending identity: Name, email, firm name that will appear on outreach
-- **Calendly setup (required before launch):**
-  - Client creates free Calendly account at calendly.com
-  - Connects their Google Calendar (or Outlook)
-  - Sets up a meeting type (30-min discovery call recommended)
-  - Shares their booking link with Vito — e.g. `calendly.com/their-name/discovery`
-  - When prospects book, meeting lands directly on client's calendar. ArgusReach sends the link; Calendly handles the rest.
+- **Calendly setup (Gob handles — required before launch):**
+  - Gob creates event type in ArgusReach Calendly: `calendly.com/argusreach/[client-slug]`
+  - Client connects their Google or Outlook calendar to it (~2 min — sent in follow-up email)
+  - When prospects book, meeting lands directly on client's calendar. ArgusReach owns the link; Calendly handles the rest.
 - Communication preference: how do they want to receive hot replies?
   - [ ] Email forward
   - [ ] Telegram/text notification
@@ -96,9 +93,9 @@
 - [ ] Confirm `{{custom_opening}}` is mapped correctly in the email sequence template
 
 ### Infrastructure
-- [ ] Set up sending domain (subdomain of client's domain OR ArgusReach subdomain)
-- [ ] Warm-up domain via Instantly.ai (2-week warm-up for new domains)
-- [ ] Configure DKIM, DMARC, SPF records for deliverability
+- [ ] Client sends outreach email address + app password → Gob links to client record in clients.json
+- [ ] Gob generates DNS records (SPF, DKIM, DMARC) for client's domain
+- [ ] DNS records sent to client in follow-up email alongside sequence + Calendly link
 - [ ] Set up tracking (open/click) in Instantly
 - [ ] Load enriched CSV (with custom_opening) into Instantly campaign
 

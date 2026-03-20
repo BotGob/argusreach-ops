@@ -30,8 +30,8 @@
 ### New client (first campaign):
 1. Create new workspace in Instantly for client
 2. Add sending email account:
-   - Preferred: subdomain of client's domain (e.g., `outreach.bayharborwealth.com`)
-   - Alternative: ArgusReach subdomain (e.g., `[clientname].mail.argusreach.com`)
+   - Real mailbox on client's main domain (Google Workspace or M365, e.g., `outreach@bayharborwealth.com`)
+   - NOT a subdomain, NOT an alias — must be a real mailbox with app password
 3. Configure DNS records:
    - SPF: `v=spf1 include:_spf.google.com ~all` (if using Gmail/Workspace)
    - DKIM: follow Instantly's domain authentication guide
@@ -152,13 +152,13 @@ Before considering the campaign live:
 
 ## Meeting Booking Tracking
 
-### Client Requirement — Calendly Setup (Onboarding Gate)
-Every client must have a free Calendly Basic account before launch:
-- One event type: "15-Minute Intro Call" (or equivalent)
-- Connected to their calendar
-- Link provided to ArgusReach for use in all sequences
+### Calendly Setup (Gob handles — required before launch)
+ArgusReach owns the Calendly account. Gob creates a per-client event type before launch:
+- Event type URL: `calendly.com/argusreach/[client-slug]`
+- Client connects their Google or Outlook calendar (~2 min — sent in follow-up email with DNS + sequence)
+- ArgusReach sends the link in sequences — client never needs their own Calendly account
 
-Free Calendly Basic is sufficient for campaigns to function. Paid ($10/mo) is only needed for automated webhook tracking.
+Calendly Standard ($10/mo) required for webhook tracking. Upgrade when first client signs.
 
 ### Tracking Meetings Booked (Current Process)
 
