@@ -1251,7 +1251,7 @@ def check_stale_pending():
     """Re-alert if any pending approvals have been sitting unreviewed for 4+ hours.
     Rate-limited to once per 24 hours to prevent alert flooding."""
     STALE_STATE_FILE = LOG_DIR / 'stale_reminder_state.json'
-    STALE_COOLDOWN_HOURS = 24
+    STALE_COOLDOWN_HOURS = 6
     try:
         pending = load_pending()
         if not pending:
