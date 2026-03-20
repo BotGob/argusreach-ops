@@ -140,29 +140,11 @@
 
     <!-- ── SECTION 4: WHO WE'RE TARGETING ───────────────────────────── -->
     <div class="section-header">Who We're Targeting For You</div>
-    <div class="grid2">
-      <div class="field">
-        <label>Target Geography <span class="req">*</span>
-          <span class="hint">City, metro area, or specific counties/zip codes</span>
-        </label>
-        <input name="target_geography" required placeholder="Tampa Bay — Hillsborough, Pinellas, Pasco counties">
-      </div>
-      <div class="field">
-        <label>Search Radius from Your Office <span class="req">*</span>
-          <span class="hint">Closer = more referral-friendly for most businesses</span>
-        </label>
-        <select name="target_radius" required>
-          <option value="">— Select —</option>
-          <option value="5 miles">5 miles — very local</option>
-          <option value="10 miles">10 miles</option>
-          <option value="15 miles">15 miles</option>
-          <option value="25 miles">25 miles</option>
-          <option value="50 miles">50 miles</option>
-          <option value="Entire metro area">Entire metro area</option>
-          <option value="Statewide">Statewide</option>
-          <option value="No geographic restriction">No geographic restriction</option>
-        </select>
-      </div>
+    <div class="field">
+      <label>Target Locations <span class="req">*</span>
+        <span class="hint">Enter one location per line. Can be a city, metro area, county, state, or "Nationwide." These feed directly into your prospect search — the more specific, the better the targeting.</span>
+      </label>
+      <textarea name="target_locations" required rows="4" placeholder="Tampa, FL&#10;St. Petersburg, FL&#10;Clearwater, FL&#10;(or: Florida statewide / Southeast US / Nationwide)"></textarea>
     </div>
     <div class="field">
       <label>Target Industry <span class="req">*</span>

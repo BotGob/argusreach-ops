@@ -159,7 +159,7 @@ def search_apollo(client, target, exclude_emails):
         return []
 
     titles         = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
-    geography      = client.get("_target_geography", "")
+    locations      = [l.strip() for l in client.get("_target_locations", "").splitlines() if l.strip()]
     company_sizes  = [s.strip() for s in client.get("_target_company_size", "").split(",") if s.strip()]
     industries     = [i.strip() for i in client.get("_target_industry", "").split(",") if i.strip()]
     seniorities    = [s.strip() for s in client.get("_target_seniority", "").split(",") if s.strip()]
@@ -231,8 +231,8 @@ def search_apollo(client, target, exclude_emails):
             "person_titles": titles or [],
             "contact_email_status": ["verified", "likely to engage"],
         }
-        if geography:
-            payload["person_locations"] = [geography]
+        if locations:
+            payload["person_locations"] = locations
         if employee_ranges:
             payload["organization_num_employees_ranges"] = employee_ranges
         if industry_tags:
