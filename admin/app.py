@@ -110,7 +110,7 @@ If you don't have Google Workspace or Microsoft 365 yet, let us know and we'll p
 
 2. Email authentication setup (DNS)
 
-Once your outreach email is created, we'll need a few technical records added to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain (GoDaddy, Cloudflare, Namecheap, etc.) can do this in about 10 minutes. We'll send the exact records — no guesswork on your end.
+We can't move forward to this step until step 1 is complete. Once we have your outreach email address, we'll send you the exact DNS records to add to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain (GoDaddy, Cloudflare, Namecheap, etc.) can handle it in about 10 minutes.
 
 If you don't have an IT person, just let us know and we'll walk you through it.
 
