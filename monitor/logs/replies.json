@@ -759,5 +759,143 @@
     "sent": false,
     "notes": "SECURITY RULE 11: Unsolicited vendor/software sales pitch. This is inbound cold outreach, not a reply to Vito's message. Emma references a LinkedIn connection suggestion from their CEO but is pitching their service.",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T03:20:32.427702",
+    "client": "argus_reach___test_1",
+    "prospect": "emma@elelem-verify.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T03:27:09.980751",
+    "client": "argus_reach___test_1",
+    "prospect": "isabella.martinez80@marketcommand.cfd",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "INBOUND COLD PITCH (Rule 11): Blinkiers Flanes is using a reply format to pitch their newsletter and content services to us. This is vendor/media outreach, not a prospect reply. Escalate for manual review.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T03:28:12.148350",
+    "client": "argus_reach___test_1",
+    "prospect": "isabella.martinez80@marketcommand.cfd",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T04:37:41.252865",
+    "client": "argus_reach___test_1",
+    "prospect": "gordon-l@heythinkitfirst.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH: Prospect is asking about social media management services. Argus Reach serves referral-based professionals (accountants, PTs, real estate agents) to build sales pipelines and networks. This request doesn't align with our positioning or ICP. Requires Vito's judgment on whether to clarify positioning or pass.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T06:38:40.025406",
+    "client": "argus_reach___test_1",
+    "prospect": "lilly.counts@danielyip.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 11 (inbound cold pitch) + Rule 17 (context mismatch): Email references 'you need content for your blog post' which suggests Lilly may be pitching services rather than responding as a prospect. Unclear if this is genuine interest in our service or unsolicited vendor outreach. Requires human review before response.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T08:19:31.282953",
+    "client": "argus_reach___test_1",
+    "prospect": "loic.b@twodevecommerce.com",
+    "classification": "positive",
+    "draft_preview": "Lo\u00efc,\n\nThanks for getting back to me - glad the video resonated. I'd love to hear what you've found. Let's grab a time to chat:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Arg",
+    "sent": false,
+    "notes": "Engaged prospect with research insights requesting conversation - high intent signal.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T09:30:10.978798",
+    "client": "argus_reach___test_1",
+    "prospect": "kandha@powersquareshift.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Classification failed: AI returned invalid JSON",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T10:10:36.424516",
+    "client": "argus_reach___test_1",
+    "prospect": "macneil@torontocreator.website",
+    "classification": "positive",
+    "draft_preview": "Brennan,\n\nLove it - let's connect soon. Grab a time that works best for you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "Warm, engaged reply from prospect matching ICP profile - high intent to book.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T10:51:02.671796",
+    "client": "argus_reach___test_1",
+    "prospect": "nn@draventarflowstep.com",
+    "classification": "positive",
+    "draft_preview": "Nick,\n\nThanks for the kind words and for being open to a conversation. I'd love to connect and explore how we can work together.\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Ar",
+    "sent": false,
+    "notes": "Qualified positive response from prospect ready to book a call.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T11:11:18.239834",
+    "client": "argus_reach___test_1",
+    "prospect": "rogers@appprovelocityknowledgeco.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH - The reply reads as a generic company auto-response or template (offering to hear about 'our interest in their company'), not a genuine reply to personalized outreach. Prospect may be confused about who contacted whom, or this was forwarded/auto-routed incorrectly.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T11:51:46.281654",
+    "client": "argus_reach___test_1",
+    "prospect": "robinson@dotfaf.com",
+    "classification": "question",
+    "draft_preview": "Kathrine,\n\nGreat to hear from you - and thanks for sending that over. Happy to walk through exactly how we work and explore what might make sense for your situation. Let me grab some time with you:\n\nh",
+    "sent": false,
+    "notes": "Engaged prospect asking about services - qualified reply warrants immediate attention.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T12:42:22.326013",
+    "client": "argus_reach___test_1",
+    "prospect": "megan@lunargarden.shop",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Rule 17 - Reply content makes no sense as a response to our outreach; prospect appears confused about who we are and what we offer.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T13:22:53.603493",
+    "client": "argus_reach___test_1",
+    "prospect": "sanger@sangerkhandesign.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH + SECURITY RED FLAG: Reply contains tracking pixel (img src with external domain), unexplained reference codes ('3WXDVXJ leatherchanging'), generic pitch language, and no genuine engagement with our original outreach. Likely mass email, phishing attempt, or misdirected reply. Do not respond.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T15:03:58.205916",
+    "client": "argus_reach___test_1",
+    "prospect": "winter.leslie.j@newswirejetlaunching.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Classification failed: AI returned invalid JSON",
+    "test_mode": false
   }
 ]

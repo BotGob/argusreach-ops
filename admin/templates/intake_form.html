@@ -245,10 +245,16 @@
     <!-- ── SECTION 6: BOOKING & CAMPAIGN ────────────────────────────── -->
     <div class="section-header">Booking & Campaign Setup</div>
     <div class="field">
-      <label>Your Calendly or booking link <span class="req">*</span>
-        <span class="hint">Where interested prospects will book a call or meeting with you. Must be a public link.</span>
+      <label>What calendar do you use? <span class="req">*</span>
+        <span class="hint">We set up a booking link for you — prospects click it to schedule directly on your calendar. We just need to know which calendar system you use so we can connect it.</span>
       </label>
-      <input name="calendly_link" required placeholder="https://calendly.com/yourname/30min">
+      <select name="calendar_type" required>
+        <option value="">— Select —</option>
+        <option value="google">Google Calendar (Gmail / Google Workspace)</option>
+        <option value="outlook">Outlook / Microsoft 365</option>
+        <option value="apple">Apple Calendar (iCloud)</option>
+        <option value="other">Other — I'll describe in notes</option>
+      </select>
     </div>
     <div class="field">
       <label>What do you want prospects to do when they reply?

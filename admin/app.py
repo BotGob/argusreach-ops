@@ -993,7 +993,7 @@ def intake():
             "tone":                 f.get("tone","warm-professional").strip(),
             "compliance_note":      f.get("compliance_note","").strip(),
             # Campaign
-            "calendly_link":        f.get("calendly_link","").strip(),
+            "calendar_type":        f.get("calendar_type","google").strip(),
             "desired_action":       f.get("desired_action","book_call").strip(),
             "has_existing_list":    f.get("has_existing_list","no").strip(),
             # Meta

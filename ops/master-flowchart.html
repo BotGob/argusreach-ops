@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated 2026-03-18 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-20 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -159,49 +159,47 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">1. Sales &amp; Signing</td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#60a5fa;">●</span> Send website / one-pager to prospect<br>
-          <span style="color:#60a5fa;">●</span> Discovery call (30 min via Calendly)<br>
-          <span style="color:#60a5fa;">●</span> Send proposal + service agreement<br>
-          <span style="color:#60a5fa;">●</span> Collect $500 setup fee via Stripe payment link
+          <span style="color:#60a5fa;">●</span> Discovery call (30 min)<br>
+          <span style="color:#60a5fa;">●</span> Send post-call email: service agreement + $500 Stripe link + intake form link<br>
+          <span style="color:#60a5fa;">●</span> Verify payment cleared + agreement signed before approving intake<br>
+          <span style="color:#555;font-size:0.65rem;">Template: ops/templates/post-call-email.md</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#555;font-style:italic;">— nothing yet —</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#a78bfa;">●</span> Reviews proposal<br>
-          <span style="color:#a78bfa;">●</span> Signs service agreement (DocuSign)<br>
-          <span style="color:#a78bfa;">●</span> Pays setup fee ($500)<br>
-          <span style="color:#a78bfa;">●</span> Sets up Calendly Basic (free) — required gate
+          <span style="color:#a78bfa;">●</span> Signs service agreement (HelloSign/DocuSign)<br>
+          <span style="color:#a78bfa;">●</span> Pays setup fee ($500 via Stripe)<br>
+          <span style="color:#a78bfa;">●</span> Fills out intake form (admin.argusreach.com/intake)
         </td>
       </tr>
 
       <!-- Phase 2 -->
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup<br><span style="font-weight:400;color:#555;font-size:0.65rem;">~2 weeks</span></td>
+        <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup</td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#60a5fa;">●</span> Intake form (ICP, voice, targets, DNC list — 10 min, async)<br>
-          <span style="color:#60a5fa;">●</span> Send IT handoff doc — IT adds DNS records (we verify remotely, no access needed)<br>
-          <span style="color:#60a5fa;">●</span> Configure SPF / DKIM / DMARC DNS records<br>
-          <span style="color:#60a5fa;">●</span> Create Gmail app password on client's sending account<br>
-          <span style="color:#60a5fa;">●</span> Add sending email to Instantly + begin warmup<br>
-          <span style="color:#60a5fa;">●</span> Add client block to clients.json (all required fields)<br>
-          <span style="color:#60a5fa;">●</span> Build Apollo prospect list → NeverBounce verify → dedupe.py vs DNC + relationships<br>
-          <span style="color:#60a5fa;">●</span> Write 3-touch sequence → send to client for approval<br>
-          <span style="color:#fbbf24;">⚠️ Create Instantly campaign manually</span> <span style="color:#555;font-size:0.65rem;">(campaign creation script not built yet)</span><br>
-          <span style="color:#60a5fa;">●</span> Run validator (validate_campaign.py) — must pass 0 errors<br>
-          <span style="color:#60a5fa;">●</span> Set active: true in clients.json once approved + warmed
+          <span style="color:#60a5fa;">●</span> Verify payment cleared + agreement signed → approve intake in portal<br>
+          <span style="color:#60a5fa;">●</span> Welcome email auto-fires on approval<br>
+          <span style="color:#60a5fa;">●</span> Client replies with outreach email address + app password → Gob links to client record<br>
+          <span style="color:#60a5fa;">●</span> Gob generates DNS records → Vito sends to client in follow-up email alongside sequence draft<br>
+          <span style="color:#60a5fa;">●</span> Client feedback forwarded to Gob → edits applied in Instantly if needed<br>
+          <span style="color:#60a5fa;">●</span> Vito activates campaign in Instantly → set active: true in clients.json<br>
+          <span style="color:#555;font-size:0.65rem;">Post-call template: ops/templates/post-call-email.md</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#4ade80;">●</span> Instantly: email warmup runs automatically (~2 wks)<br>
-          <span style="color:#4ade80;">●</span> DNS propagates (SPF/DKIM/DMARC)<br>
-          <span style="color:#4ade80;">●</span> Monitor automatically begins watching new inbox when active: true
+          <span style="color:#4ade80;">●</span> Intake approval auto-creates client record (clients.json + DB + DNC file)<br>
+          <span style="color:#4ade80;">●</span> Welcome email auto-sent on approval<br>
+          <span style="color:#4ade80;">●</span> Apollo pull → DNC filter → NeverBounce → replacement loop until target count hit<br>
+          <span style="color:#4ade80;">●</span> Gob writes 3-touch sequence → loads leads + sequence into Instantly as DRAFT via API<br>
+          <span style="color:#4ade80;">●</span> Monitor auto-watches inbox once active: true set
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#a78bfa;">●</span> Purchases secondary sending domain (e.g. outreach.theirfirm.com) — NOT their main domain<br>
-          <span style="color:#a78bfa;">●</span> Purchases Google Workspace on that domain (~$7/mo)<br>
-          <span style="color:#a78bfa;">●</span> Forwards IT handoff doc to their IT team — IT adds 5 DNS records (~20 min)<br>
-          <span style="color:#a78bfa;">●</span> Provides existing contact / relationship list (DNC cross-reference)<br>
-          <span style="color:#a78bfa;">●</span> Reviews 3-touch email sequence — approves or requests one round of edits<br>
-          <span style="color:#a78bfa;">●</span> Written approval to launch (email confirmation)
+          <span style="color:#a78bfa;">●</span> Creates outreach email (real mailbox, NOT alias — Google Workspace or M365, ~$6-8/mo)<br>
+          <span style="color:#a78bfa;">●</span> Generates app password → sends email address + app password to vito@argusreach.com<br>
+          <span style="color:#a78bfa;">●</span> Forwards DNS records to IT — IT adds SPF/DKIM/DMARC (~10 min)<br>
+          <span style="color:#a78bfa;">●</span> Sends DNC list (emails/domains) and warm leads if applicable<br>
+          <span style="color:#a78bfa;">●</span> Reviews sequence draft → replies with approval or edits (one round max)<br>
+          <span style="color:#a78bfa;">●</span> Written approval to launch
         </td>
       </tr>
 
@@ -940,6 +938,28 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 </div>
 
 <!-- RECENT CHANGES LOG -->
+<div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-20 (Process Hardening + Client Funnel)</h2>
+  <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Client Funnel — Fully Defined</div>
+    <div style="font-size:0.75rem;color:#888;">• Post-call email process: Vito sends service agreement + $500 Stripe link + intake form link after discovery call. Intake not approved until payment cleared + agreement signed. Template: ops/templates/post-call-email.md</div>
+    <div style="font-size:0.75rem;color:#888;">• Welcome email rewritten: no onboarding call, no subdomain references. Now instructs client on outreach email setup (real mailbox, NOT alias), DNS (blocked until email created), DNC list, warm leads.</div>
+    <div style="font-size:0.75rem;color:#888;">• Sequence review flow: Gob writes + loads sequence into Instantly as DRAFT. Vito pulls sequence → emails to client. Client replies with approval or edits. Vito activates in Instantly.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Campaign Pipeline — Gaps Closed</div>
+    <div style="font-size:0.75rem;color:#888;">• DNC replacement loop: after removing DNC hits, system loops back to Apollo for exact replacements. Same for NeverBounce. Correct order: Apollo → DNC → NeverBounce → refill if needed (up to 5 rounds).</div>
+    <div style="font-size:0.75rem;color:#888;">• Personalization fields: every lead now loaded with city, state, title as custom variables in Instantly. Sequences can use {{city}}, {{title}}, {{state}} alongside {{first_name}} and {{company}}.</div>
+    <div style="font-size:0.75rem;color:#888;">• Company size filter: new required field in intake form. Fed into Apollo employee_ranges filter for precise ICP targeting.</div>
+    <div style="font-size:0.75rem;color:#888;">• DNC structured field: new email/domain input in intake form (one per line). Auto-loaded into client DNC file on approval. Free-text notes field retained for relationship descriptions.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Instantly API — Endpoint Fixes</div>
+    <div style="font-size:0.75rem;color:#888;">• Sending account: POST /campaigns/{id}/mailaccounts is 404. Correct method: PATCH /campaigns/{id} with email_list array.</div>
+    <div style="font-size:0.75rem;color:#888;">• Lead loading: POST /leads/batch is 404. Use individual POST /leads per contact. Replacement loop handles rate limiting.</div>
+    <div style="font-size:0.75rem;color:#888;">• Timezone: America/New_York rejected. Use America/Detroit (functionally identical for Eastern).</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Monitor — Alert Hardening</div>
+    <div style="font-size:0.75rem;color:#888;">• Stale pending reminder: was firing every 10 minutes per item. Now max once per 6 hours.</div>
+    <div style="font-size:0.75rem;color:#888;">• Warmup domain blocklist: 7 new domains added (powersquareshift.com, torontocreator.website, draventarflowstep.com, appprovelocityknowledgeco.com, dotfaf.com, lunargarden.shop, sangerkhandesign.com).</div>
+    <div style="font-size:0.75rem;color:#888;">• LGIP scraper: FLCLASS now parses by label (not position). Corrected 3/19 daily yield to 3.7029%.</div>
+  </div>
+</div>
 <div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-19 (Go-Live Test + Full System Hardening)</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
