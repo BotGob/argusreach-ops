@@ -964,6 +964,12 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="font-size:0.75rem;color:#888;">• Personalization fields: every lead now loaded with city, state, title as custom variables in Instantly. Sequences can use {{city}}, {{title}}, {{state}} alongside {{first_name}} and {{company}}.</div>
     <div style="font-size:0.75rem;color:#888;">• Company size filter: new required field in intake form. Fed into Apollo employee_ranges filter for precise ICP targeting.</div>
     <div style="font-size:0.75rem;color:#888;">• DNC structured field: new email/domain input in intake form (one per line). Auto-loaded into client DNC file on approval. Free-text notes field retained for relationship descriptions.</div>
+    <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Intake Form — Apollo Fields (all added/fixed 2026-03-20)</div>
+    <div style="font-size:0.75rem;color:#888;">• Target Industry: multi-select checkboxes → Apollo industry_tag_ids. Critical — without it searches pull from wrong sectors.</div>
+    <div style="font-size:0.75rem;color:#888;">• Decision-maker seniority: multi-select checkboxes → Apollo person_seniorities. Ensures right person at each firm.</div>
+    <div style="font-size:0.75rem;color:#888;">• Company size: converted to multi-select (select multiple ranges, e.g. 1-10 AND 11-50).</div>
+    <div style="font-size:0.75rem;color:#888;">• Target Locations: replaced geography+radius with free-text textarea (one location per line) → Apollo person_locations[]. Works local, regional, or national.</div>
+    <div style="font-size:0.75rem;color:#888;">• Success story (optional) + Biggest objection (optional): used for sequence copy quality.</div>
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Instantly API — Endpoint Fixes</div>
     <div style="font-size:0.75rem;color:#888;">• Sending account: POST /campaigns/{id}/mailaccounts is 404. Correct method: PATCH /campaigns/{id} with email_list array.</div>
     <div style="font-size:0.75rem;color:#888;">• Lead loading: POST /leads/batch is 404. Use individual POST /leads per contact. Replacement loop handles rate limiting.</div>

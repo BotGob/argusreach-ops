@@ -1,6 +1,6 @@
 # ArgusReach — Recovery & Migration Guide
 *Written for Vito. No technical background required.*
-*Last updated: 2026-03-17*
+*Last updated: 2026-03-20*
 
 ---
 
@@ -10,7 +10,7 @@
 
 ---
 
-## Current System State (as of 2026-03-17)
+## Current System State (as of 2026-03-20)
 
 ### Server
 - **IP:** 93.127.197.101
@@ -114,6 +114,10 @@ ARGUSREACH_CHAT_ID=
 ADMIN_PASSWORD=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
+APOLLO_API_KEY=
+NEVERBOUNCE_API_KEY=
+CALENDLY_API_TOKEN=
+CALENDLY_WEBHOOK_SIGNING_KEY=
 ```
 
 ### Step 6 — Reinstall services
@@ -189,8 +193,46 @@ If you ever need to start fresh with a different AI assistant, give them these f
 3. `MEMORY.md` — current state of the business
 4. `argusreach/ops/RECOVERY-AND-MIGRATION-GUIDE.md` — this file
 5. `argusreach/ops/backlog.md` — what's open
+6. `argusreach/ops/master-flowchart.html` — full system flowchart (open in browser)
 
 That's enough to get any capable AI up to speed in one session.
+
+## Part 7 — Full Client Funnel (as of 2026-03-20)
+
+If Gob is new or confused, this is the complete client flow:
+
+1. **Discovery call** → Vito sends post-call email (service agreement + $500 Stripe + intake form link)
+   - Template: `argusreach/ops/templates/post-call-email.md`
+2. **Client signs + pays + submits intake form** at admin.argusreach.com/intake
+3. **Vito verifies** payment cleared + agreement signed → **approves intake in portal**
+4. **Welcome email auto-fires** — client sets up outreach email (real mailbox, NOT alias), sends DNC list + warm leads
+5. **Client sends email address + app password** to vito@argusreach.com → Vito forwards to Gob with client ID
+6. **Gob**: links email to client, generates DNS records, creates Calendly event type, builds prospect list via Apollo, writes 3-touch sequence, loads into Instantly as DRAFT
+7. **Vito sends follow-up email** (DNS records + sequence draft + Calendly link) — template: `argusreach/ops/templates/followup-dns-sequence-calendly.md`
+8. **Client**: IT adds DNS records, connects calendar, approves/edits sequence
+9. **Vito activates campaign in Instantly** → tells Gob → Gob sets `active: true` in clients.json
+10. **Monitor takes over** — alerts Vito on every reply via Telegram → approve draft in portal → email sent
+
+## Part 8 — Key Technical Facts for Gob
+
+### Intake Form Fields → Apollo Filters
+- `_target_locations` — one per line → `person_locations[]` (city/state/metro)
+- `_target_titles` — comma-separated → `person_titles[]`
+- `_target_industry` — comma-separated values → `organization_industry_tag_ids[]`
+- `_target_seniority` — comma-separated values → `person_seniorities[]`
+- `_target_company_size` — comma-separated ranges (e.g. "1-10,11-50") → `organization_num_employees_ranges[]`
+- `_success_story` — optional, used in sequence copy
+- `_prospect_objection` — optional, used in sequence copy
+
+### Instantly API (correct endpoints as of 2026-03-20)
+- Create campaign: `POST /api/v2/campaigns` (status=0 for DRAFT)
+- Link sending account: `PATCH /api/v2/campaigns/{id}` with `{"email_list": ["email@domain.com"]}`
+- Load lead: `POST /api/v2/leads` individually (NOT batch)
+- Timezone: `"America/Detroit"` (NOT `"America/New_York"` — rejected)
+- Delete campaign: `DELETE /api/v2/campaigns/{id}` (no Content-Type header)
+
+### Campaign Pipeline Order
+Apollo → DNC filter → NeverBounce → refill if under target (up to 5 rounds)
 
 ---
 
