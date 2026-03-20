@@ -123,3 +123,46 @@ To the prospect, this is a personal outreach from you. To the outside world, you
 "That's exactly what the Starter plan is for — $750 a month, 200 contacts, one sequence. It's designed to validate the model before you scale.
 
 The only thing I'd say is: give it the full 3 months. The first 4–6 weeks is calibration — we're learning what resonates with your specific audience. Month 2 and 3 is when the compounding kicks in. Agencies that judge it at 30 days underestimate how outbound actually works."
+
+---
+
+## "What's this email setup you mentioned — that sounds complicated."
+
+**What they mean:** They're not technical and don't want to deal with something confusing.
+
+**Response:**
+"It's simpler than it sounds. We set up a dedicated sending email address on your domain — something like `james@outreach.yourfirm.com`. That keeps your main inbox completely separate and clean.
+
+To make email deliverable, there are 5 standard records that need to be added to your domain — the same place you manage your website URL. Think of it like telling Gmail and Outlook 'this email is legitimate, please deliver it.' Without those records, cold outreach lands in spam. With them, it lands in the inbox.
+
+Your IT person adds those records — takes them about 20 minutes, and I send them exact copy-paste instructions so there's nothing to figure out. If they have questions, I'm happy to be on a quick call with them.
+
+You don't touch any of this. I handle everything after they add the records."
+
+---
+
+## "Why do you need a subdomain? Can't you just use our regular email?"
+
+**What they mean:** They don't want the hassle of setting up something new.
+
+**Response:**
+"We could, but we won't — because it would put your main domain at risk.
+
+Cold outreach at volume, even when done properly, gets occasional spam complaints. If that happens on your primary domain — `@yourfirm.com` — it affects every email your whole team sends. That's a real business problem.
+
+The subdomain is a firewall. `outreach.yourfirm.com` is completely isolated. If anything ever went sideways, your main email is untouched. It's the same reason legitimate outreach platforms all do this — it's just how it's done correctly.
+
+And to be clear — your prospects never see the subdomain. Emails come from your name, and replies go to your real inbox."
+
+---
+
+## "What does this actually do to our existing email or website?"
+
+**What they mean:** They're worried we're changing something they depend on.
+
+**Response:**
+"Nothing. Zero.
+
+DNS has two separate jobs — one for your website, one for your email. We only touch the email side, and only for the new subdomain. Your website stays exactly the same. Your existing email stays exactly the same. Your team's inboxes, your current email setup — all untouched.
+
+We're adding 5 lines to your DNS settings that only affect `outreach.yourfirm.com`. That's it."
