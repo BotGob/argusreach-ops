@@ -1,23 +1,23 @@
 # Warmup Kickoff Email Template
-> Send manually from vito@argusreach.com after outreach email is linked and warmup starts in Instantly.
-> Sets timeline expectations — prevents client from wondering what's happening.
+> Send manually from vito@argusreach.com after the follow-up email (DNS + sequence + Calendly) once client confirms they received everything.
+> Purpose: set launch timeline expectations so there are no surprises.
 
 ---
 
-**Subject:** Your campaign is in motion — here's what happens next
+**Subject:** Timeline update — here's when we launch
 
 Hi [First Name],
 
-Quick update — everything is set on our end. Your outreach email is connected, DNS records are authenticated, and your sending address is now warming up. This is a standard process that takes about 2–3 weeks and ensures your emails land in inboxes, not spam folders.
+You should have everything you need from our last email — DNS records for IT, your sequence draft, and your booking link.
 
-While that runs in the background, we're building your prospect list and finalizing your outreach sequence. You'll receive both for review before anything sends.
+While you're handling those, your sending address is warming up on our end. That process takes about 2–3 weeks and is what ensures your emails reach inboxes reliably once we're live.
 
-**What to expect from here:**
-- In the next few days: your sequence draft arrives for review
-- In ~2–3 weeks: warmup completes and we're cleared to launch
-- Before launch: you'll receive a confirmation email with your subscription payment link
+**What the rest of the timeline looks like:**
+- Once DNS is added and sequence is approved — you're done on your end
+- ~2–3 weeks from now: warmup completes
+- Before launch: you'll receive a subscription payment link to kick things off
 
-No action needed from you right now. We'll be in touch.
+We'll reach out as soon as we're ready to go live.
 
 — Vito Resciniti
 Founder, ArgusReach
