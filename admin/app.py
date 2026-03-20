@@ -99,7 +99,7 @@ Here's exactly what happens from here:
 
 2. We write your outreach sequence. Every message is written specifically for your business, your voice, and your ideal client. You'll receive it for review before a single email goes out.
 
-3. You review and approve. You'll get a notification to review the sequence and confirm everything looks right. You have full control — nothing launches without your sign-off.
+3. We send you the sequence for review. You'll receive the outreach emails we've written on your behalf. Reply with any edits or feedback, or let us know you're good to go. Nothing launches without your sign-off.
 
 4. Campaign goes live. Once you activate, ArgusReach runs in the background. Outreach goes out on your behalf, automatically, every business day.
 
