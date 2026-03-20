@@ -716,6 +716,7 @@ WARMUP_DOMAINS = [
     # Added 2026-03-20 — confirmed warmup senders from Instantly test campaign
     'powersquareshift.com', 'torontocreator.website', 'draventarflowstep.com',
     'appprovelocityknowledgeco.com', 'dotfaf.com', 'lunargarden.shop',
+    'sangerkhandesign.com',
     # TLD patterns common in warmup networks
 ]
 
