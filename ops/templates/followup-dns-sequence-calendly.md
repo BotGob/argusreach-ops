@@ -1,6 +1,7 @@
-# Follow-Up Email Template: DNS + Sequence + Calendly
-> Send manually from vito@argusreach.com after client confirms outreach email is created and app password is ready.
+# Setup Email Template: DNS + Sequence + Calendly + Timeline
+> Send manually from vito@argusreach.com after client sends outreach email + app password.
 > Customize [brackets]. DNS records and Calendly link come from Gob — ask before sending.
+> This is the last email before the ready-to-launch email. Everything the client needs to action is in here.
 
 ---
 
@@ -46,7 +47,7 @@ We've set up your booking page: [https://calendly.com/argusreach/[client-slug]]
 
 Click the link and connect your [Google / Outlook] calendar — takes about 2 minutes. Once connected, prospects will see your available meeting options ([phone / video / in-person]) and book directly onto your calendar. You'll get a confirmation with their name, company, and meeting details.
 
-Once IT has the DNS records, you've approved the sequence, and your calendar is connected — we're live.
+Once all three are done on your end, we handle the rest. Your sending address is already warming up in the background — that process takes about 2–3 weeks and is what ensures your emails land in inboxes reliably. When warmup is complete and everything checks out, I'll send you a final email with your subscription payment link to kick off the campaign.
 
 Any questions, just reply here.
 

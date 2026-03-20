@@ -49,7 +49,7 @@
 ## After Email + App Password Received (Gob's work)
 - [ ] Link outreach email + app password to client record in clients.json
 - [ ] Link sending account in Instantly → enable warmup immediately
-- [ ] Send Vito warmup kickoff email text to forward to client (template: ops/templates/warmup-kickoff-email.md)
+- [ ] Enable warmup on sending account in Instantly immediately
 - [ ] Generate DNS records for client domain
 - [ ] Run Apollo → DNC → NeverBounce → load leads into Instantly DRAFT
 - [ ] Write 3-touch sequence → load into Instantly DRAFT
