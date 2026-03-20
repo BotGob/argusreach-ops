@@ -981,7 +981,7 @@ def intake():
             "best_referral_sources":f.get("best_referral_sources","").strip(),
             "prior_outreach":       f.get("prior_outreach","").strip(),
             # Targeting
-            "meeting_format":       f.get("meeting_format","any").strip(),
+            "meeting_format":       ",".join(request.form.getlist("meeting_format")),
             "office_address":       f.get("office_address","").strip(),
             "success_story":        f.get("success_story","").strip(),
             "prospect_objection":   f.get("prospect_objection","").strip(),

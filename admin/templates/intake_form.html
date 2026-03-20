@@ -38,10 +38,10 @@
   </style>
   <script>
   function toggleOfficeAddress() {
-    var fmt = document.getElementById('meeting_format').value;
+    var checked = Array.from(document.querySelectorAll('input[name="meeting_format"]:checked')).map(function(el){ return el.value; });
     var field = document.getElementById('office_address_field');
     var input = document.getElementById('office_address');
-    if (fmt === 'in_person') {
+    if (checked.indexOf('in_person_my_office') !== -1) {
       field.style.display = 'block';
       input.required = true;
     } else {
@@ -260,17 +260,17 @@
       <label>When a prospect says yes — how do you prefer to meet? <span class="req">*</span>
         <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
       </label>
-      <select name="meeting_format" required id="meeting_format" onchange="toggleOfficeAddress()">
-        <option value="">— Select —</option>
-        <option value="in_person">In-person — I go to them (or they come to me)</option>
-        <option value="phone">Phone call</option>
-        <option value="zoom">Video call (Zoom / Teams / Google Meet)</option>
-        <option value="any">Flexible — prospect's preference</option>
-      </select>
+      <div class="checkbox-grid" id="meeting_format_group">
+        <label class="cb"><input type="checkbox" name="meeting_format" value="phone" onchange="toggleOfficeAddress()"> Phone call</label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="zoom" onchange="toggleOfficeAddress()"> Video call (Zoom / Teams / Google Meet)</label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_their_office" onchange="toggleOfficeAddress()"> In-person — I go to their office</label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_my_office" onchange="toggleOfficeAddress()"> In-person — they come to my office</label>
+      </div>
+      <div style="font-size:0.72rem;color:#666;margin-top:6px;">Select all that apply — prospects will choose from these options when they book.</div>
     </div>
     <div class="field" id="office_address_field" style="display:none;">
       <label>Your office address <span class="req">*</span>
-        <span class="hint">Shown on the booking confirmation so prospects know where to show up. Include suite number if applicable.</span>
+        <span class="hint">Required when "they come to my office" is selected. Shown on booking confirmations.</span>
       </label>
       <input name="office_address" id="office_address" placeholder="1234 Bay Harbor Blvd, Suite 200, Tampa, FL 33601">
     </div>
