@@ -153,12 +153,21 @@ Before considering the campaign live:
 ## Meeting Booking Tracking
 
 ### Calendly Setup (Gob handles — required before launch)
-ArgusReach owns the Calendly account. Gob creates a per-client event type before launch:
-- Event type URL: `calendly.com/argusreach/[client-slug]`
-- Client connects their Google or Outlook calendar (~2 min — sent in follow-up email with DNS + sequence)
-- ArgusReach sends the link in sequences — client never needs their own Calendly account
+ArgusReach owns the Calendly account. Gob creates per-client event types based on meeting formats selected in intake:
 
-Calendly Standard ($10/mo) required for webhook tracking. Upgrade when first client signs.
+| Meeting format selected | Calendly event type created |
+|---|---|
+| Phone call | Phone — Calendly collects prospect's number |
+| Video call | Video — Calendly generates Zoom/Meet link |
+| In-person — I go to them | In-person — prospect enters their office address at booking |
+| In-person — they come to me | In-person — shows client's office address on confirmation |
+
+- All selected event types live under one booking page: `calendly.com/argusreach/[client-slug]`
+- Prospect sees all options, picks one, picks a time from live calendar
+- Client connects their Google or Outlook calendar (~2 min — sent in follow-up email with DNS + sequence)
+- ArgusReach sends the booking page link in sequences — client never needs their own Calendly account
+
+Calendly Standard ($10/mo) required for multiple event types + webhook tracking. Upgrade when first client signs.
 
 ### Tracking Meetings Booked (Current Process)
 

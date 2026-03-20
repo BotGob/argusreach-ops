@@ -33,9 +33,10 @@
 ### 4. Logistics (10 min)
 - Sending identity: Name, email, firm name that will appear on outreach
 - **Calendly setup (Gob handles — required before launch):**
-  - Gob creates event type in ArgusReach Calendly: `calendly.com/argusreach/[client-slug]`
-  - Client connects their Google or Outlook calendar to it (~2 min — sent in follow-up email)
-  - When prospects book, meeting lands directly on client's calendar. ArgusReach owns the link; Calendly handles the rest.
+  - Gob creates event types based on meeting formats from intake (phone / video / in-person their office / in-person my office)
+  - All types live under one booking page: `calendly.com/argusreach/[client-slug]`
+  - Client connects their Google or Outlook calendar (~2 min — sent in follow-up email)
+  - Prospect picks meeting type + time. Booking lands on client's calendar with full context.
 - Communication preference: how do they want to receive hot replies?
   - [ ] Email forward
   - [ ] Telegram/text notification

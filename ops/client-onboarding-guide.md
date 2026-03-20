@@ -81,14 +81,14 @@ You can share login credentials with us, or again — 30-minute screen share wor
 
 ### Step 5 — Connect Your Calendar
 
-We use a dedicated ArgusReach Calendly account to handle prospect bookings. When an interested prospect books a call, it lands directly on your calendar.
+We use a dedicated ArgusReach Calendly account to handle prospect bookings. When an interested prospect clicks the booking link in your outreach email, they see your available meeting options — phone, video, in-person at your office, or in-person at their office — and pick a time from your live calendar. No back-and-forth scheduling.
 
 **What to do:**
-1. We'll send you a short Calendly invitation
-2. Click "Accept" and connect your Google or Outlook calendar
-3. Done — bookings show up on your calendar automatically with all prospect details
+1. We'll send you your booking link in the setup email (alongside your DNS records and sequence draft)
+2. Click the link and connect your Google or Outlook calendar (~2 minutes)
+3. Done — bookings land on your calendar automatically with the prospect's name, company, and meeting type
 
-> 💡 You don't need a paid Calendly account. Your calendar stays fully yours — we just route the bookings through our system so we can track them.
+> 💡 You don't need your own Calendly account. We set everything up for you — you just connect your calendar. Prospects book themselves in based on your real availability.
 
 ---
 

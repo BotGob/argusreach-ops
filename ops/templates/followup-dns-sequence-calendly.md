@@ -42,9 +42,9 @@ Subject: [subject]
 
 **3. Connect your calendar**
 
-We've set up your booking link: [https://calendly.com/argusreach/[client-slug]]
+We've set up your booking page: [https://calendly.com/argusreach/[client-slug]]
 
-Click the link and connect your [Google / Outlook] calendar — Calendly will walk you through it in about 2 minutes. Once connected, any prospect who wants to meet will land directly on your calendar.
+Click the link and connect your [Google / Outlook] calendar — takes about 2 minutes. Once connected, prospects will see your available meeting options ([phone / video / in-person]) and book directly onto your calendar. You'll get a confirmation with their name, company, and meeting details.
 
 Once IT has the DNS records, you've approved the sequence, and your calendar is connected — we're live.
 
