@@ -174,11 +174,19 @@
       </label>
       <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
         <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Sending account ({{ client.outreach_email }}) is warmed up
+        DNS records verified — SPF, DKIM, DMARC passing for {{ client.get('outreach_email','sending domain') }}
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        Sending account ({{ client.get('outreach_email','—') }}) warmup complete — score ≥ 85% in Instantly
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
+        Subscription payment confirmed — first month received in Stripe
       </label>
       <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
         <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        I will review leads and sequence in Instantly before activating — campaign will be created as DRAFT
+        Sequence approved by client — I will review in Instantly and activate manually
       </label>
     </div>
 

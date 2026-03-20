@@ -128,11 +128,12 @@ Once your setup steps are complete, everything else is on us:
 
 | Timeframe | What's Happening |
 |-----------|-----------------|
-| Days 1–3 | Intake form submitted → we build your campaign brief and start your prospect list |
-| Week 1–2 | Sequences written → you review and approve → email infrastructure set up → warmup begins |
-| Week 2–3 | Warmup running automatically → prospect list finalized and verified |
-| Week 3–4 | Warmup complete → final pre-launch check → campaign goes live |
-| Week 4+ | Emails going out daily → we monitor replies 24/7 → you hear from us when someone's interested |
+| Days 1–3 | Intake approved → outreach email set up → warmup starts immediately |
+| Days 3–7 | Sequence draft + DNS records + booking link sent to you for review |
+| Week 1–2 | You: IT adds DNS records, connect calendar, approve sequence |
+| Week 2–3 | Warmup running automatically → prospect list built and verified |
+| Week 3–4 | Warmup complete → you receive subscription payment link → payment confirms launch |
+| Week 4+ | Campaign live → emails going out daily → we monitor replies 24/7 → you hear from us when someone's interested |
 
 ---
 

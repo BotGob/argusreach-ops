@@ -46,6 +46,25 @@
 
 ---
 
+## After Email + App Password Received (Gob's work)
+- [ ] Link outreach email + app password to client record in clients.json
+- [ ] Link sending account in Instantly → enable warmup immediately
+- [ ] Send Vito warmup kickoff email text to forward to client (template: ops/templates/warmup-kickoff-email.md)
+- [ ] Generate DNS records for client domain
+- [ ] Run Apollo → DNC → NeverBounce → load leads into Instantly DRAFT
+- [ ] Write 3-touch sequence → load into Instantly DRAFT
+- [ ] Create Calendly event types based on meeting formats from intake
+- [ ] Vito sends follow-up email: DNS records + sequence draft + Calendly link
+
+## Pre-Launch Gates (Vito confirms all before activating)
+- [ ] DNS propagated and verified (SPF/DKIM/DMARC passing)
+- [ ] Warmup score ≥ 85% in Instantly (~2-3 weeks)
+- [ ] Sequence approved by client
+- [ ] Calendar connected by client
+- [ ] Subscription payment received → Vito sends ready-to-launch email (template: ops/templates/ready-to-launch-email.md)
+- [ ] Payment confirmed in Stripe → Vito checks all boxes in portal pre-launch checklist → activates in Instantly
+- [ ] Tells Gob → Gob sets active: true in clients.json
+
 ## Post-Call (internal, within 24 hours)
 
 ### Relationships & DNC Collection
