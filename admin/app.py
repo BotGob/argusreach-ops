@@ -95,17 +95,28 @@ Welcome to ArgusReach — we've received your intake and we're already building 
 
 In the meantime, there are a few things we need from you to get everything ready:
 
-1. Email authentication setup (DNS)
+1. Set up your outreach email address
 
-To make sure your outreach lands in inboxes — not spam folders — we need a few technical records added to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that protects your domain's reputation. Your IT person or whoever manages your website domain (GoDaddy, Cloudflare, Namecheap, etc.) can handle this in about 10 minutes. We'll send you the exact records to add — no guesswork on your end.
+We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account for this — something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.
+
+What you need to do:
+- Create the email address through your existing Google Workspace or Microsoft 365 account (usually $6–$8/mo for an additional user)
+- Generate an app password for that account so we can send on your behalf (we'll send you step-by-step instructions for your provider)
+- Send us the email address and app password and we'll handle the rest
+
+If you don't have Google Workspace or Microsoft 365 yet, let us know and we'll point you in the right direction.
+
+2. Email authentication setup (DNS)
+
+Once your outreach email is created, we'll need a few technical records added to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain (GoDaddy, Cloudflare, Namecheap, etc.) can do this in about 10 minutes. We'll send the exact records — no guesswork on your end.
 
 If you don't have an IT person, just let us know and we'll walk you through it.
 
-2. Do-not-contact list (if you have one)
+3. Do-not-contact list (if you have one)
 
 If there are specific people, companies, or domains you never want us to contact — existing clients, partners, competitors — reply with that list and we'll make sure they're excluded before a single email goes out. Emails, names, or company domains all work.
 
-3. Warm leads (optional)
+4. Warm leads (optional)
 
 If there are people you already have a relationship with — or anyone you'd like us to prioritize reaching out to first — send those over and we'll move them to the front of the list.
 
