@@ -26,7 +26,6 @@ All flags except --prospects and --output are optional.
 Run with just --prospects and --output to validate format only.
 
 Output files:
-  [output].csv       — clean prospect list, ready for personalize.py
   [output]-log.csv   — every removed contact with reason + matched list
 """
 
@@ -325,7 +324,6 @@ def main():
             print(f"    ✗  {name} @ {co}  [{r['_removed_list']}]  — {r['_removed_reason']}")
         print()
 
-    print("  Done. Pass exports/prospects-clean.csv to personalize.py.\n")
 
 
 if __name__ == "__main__":
