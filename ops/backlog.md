@@ -55,6 +55,15 @@ Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client
 
 ## 🟢 Scale Features (3+ Clients)
 
+### Clay.com — LinkedIn activity personalization
+$149/mo. Enriches each prospect with LinkedIn activity, recent posts, company news, job changes.
+Enables true 1:1 personalization in sequences (e.g. "I saw your post about X last week").
+Currently we use name/company/title/city from Apollo — good but not 1:1.
+Clay sits between Apollo and Instantly: Apollo exports → Clay enriches → Instantly loads.
+**Trigger:** First paying client signed. This is a differentiator worth paying for early.
+
+
+
 ### 13. Client-facing dashboard
 Per-client read-only view: campaign stats, reply breakdown, meetings booked. Internal portal exists — client version needs auth + filtering.
 

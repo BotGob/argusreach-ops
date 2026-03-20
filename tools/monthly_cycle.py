@@ -404,8 +404,16 @@ def load_to_instantly(contacts, campaign_id, dry_run=False):
             "email":                c["email"],
             "first_name":           c.get("first_name", ""),
             "last_name":            c.get("last_name", ""),
-            "company_name":         c.get("company", ""),
+            "company_name":         c.get("company") or c.get("company_name", ""),
             "skip_if_in_workspace": False,
+            # Personalization fields — available in sequences as {{city}}, {{title}}, {{state}}
+            "city":                 c.get("city", ""),
+            "state":                c.get("state", ""),
+            "custom_variables": {
+                "title":   c.get("title", ""),
+                "city":    c.get("city", ""),
+                "state":   c.get("state", ""),
+            },
         }
         try:
             resp = requests.post(
@@ -501,6 +509,16 @@ def check_all_clients():
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_verify=False):
+    """
+    Full campaign cycle. Correct order:
+      1. Load exclusion list (already contacted)
+      2. Apollo pull → DNC filter → NeverBounce verify (loop until target met or Apollo exhausted)
+      3. Create Instantly campaign (DRAFT) with sequence
+      4. Link sending account
+      5. Load contacts with personalization fields
+      6. Update clients.json
+      7. Alert Vito
+    """
     client = get_client(client_id)
     if not client:
         print(f"❌ Client '{client_id}' not found")
@@ -513,99 +531,139 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
     print(f"ArgusReach Monthly Cycle — {firm} — {month_name}")
     print(f"{'='*60}\n")
 
-    # Step 1: Load exclusion list from DB
-    print("📋 Loading previously contacted emails from database...")
+    # ── Step 1: Exclusion list ────────────────────────────────────────────────
+    print("📋 Loading previously contacted emails...")
     already_contacted = get_contacted_emails(client_id)
     print(f"   {len(already_contacted)} emails to exclude")
 
-    # Step 2: Apollo search (with auto-refill, exclusion)
+    # ── Step 2: Build clean list (with replacement loop) ─────────────────────
     if skip_apollo:
-        # Use existing CSV
-        slug    = month_name.lower().replace(" ", "_")
+        slug     = month_name.lower().replace(" ", "_")
         csv_path = CAMPAIGNS_DIR / client_id / f"prospects_{slug}.csv"
         if not csv_path.exists():
-            print(f"❌ No prospects CSV found at {csv_path}")
+            # Also check the generic prospects.csv
+            csv_path = CAMPAIGNS_DIR / client_id / "prospects.csv"
+        if not csv_path.exists():
+            print(f"❌ No prospects CSV found")
             sys.exit(1)
         with open(csv_path) as f:
             contacts = list(csv.DictReader(f))
-        print(f"📂 Loaded {len(contacts)} contacts from {csv_path}")
+        print(f"📂 Loaded {len(contacts)} contacts from CSV (skip_apollo mode)")
+        # Still apply DNC filter
+        dnc = load_dnc(client_id)
+        before = len(contacts)
+        contacts = [c for c in contacts if c.get("email","").lower() not in dnc]
+        if before - len(contacts):
+            print(f"🚫 DNC filter removed {before - len(contacts)} contacts")
     else:
-        contacts = search_apollo(client, target, already_contacted)
+        # Pull from Apollo with replacement loop:
+        # Apollo → DNC filter → NeverBounce → if still under target, pull more
+        dnc          = load_dnc(client_id)
+        contacts     = []
+        excluded     = set(already_contacted)
+        max_rounds   = 5   # safety: max 5 refill rounds
+        round_num    = 0
+
+        while len(contacts) < target and round_num < max_rounds:
+            needed = target - len(contacts)
+            round_num += 1
+            print(f"\n🔄 Round {round_num} — need {needed} more contacts")
+
+            # Pull from Apollo (exclude everything we've already seen or added)
+            exclude_now = excluded | {c["email"] for c in contacts}
+            batch = search_apollo(client, needed, exclude_now)
+            if not batch:
+                print("⚠️  Apollo exhausted — no more contacts available")
+                break
+
+            # DNC filter
+            before_dnc = len(batch)
+            batch = [c for c in batch if c["email"].lower() not in dnc]
+            dnc_removed = before_dnc - len(batch)
+            if dnc_removed:
+                print(f"🚫 DNC removed {dnc_removed} contacts in round {round_num}")
+
+            if not batch:
+                print("⚠️  All contacts in this batch were on DNC — trying another round")
+                # Mark these as excluded so Apollo doesn't return them again
+                excluded.update(c["email"] for c in batch)
+                continue
+
+            # NeverBounce verify
+            if not skip_verify:
+                batch, bad = verify_emails(batch)
+                if bad:
+                    bad_emails = [c["email"] for c in bad]
+                    add_to_dnc(bad_emails, client_id)
+                    dnc.update(bad_emails)  # update local set
+                    print(f"🚫 NeverBounce removed {len(bad)} contacts — added to DNC")
+            else:
+                print("⏭️  Skipping NeverBounce (test mode)")
+
+            contacts.extend(batch)
+            print(f"   Round {round_num} complete: +{len(batch)} clean contacts ({len(contacts)}/{target} total)")
+
+            if len(contacts) >= target:
+                break
+
+        contacts = contacts[:target]
+
         if not contacts:
-            print("⚠️  Apollo returned no contacts. Check API key, plan, and ICP configuration.")
+            print("⚠️  No clean contacts after all filtering rounds.")
             sys.exit(0)
 
-    # Step 3: NeverBounce verify
-    if skip_verify:
-        print("⏭️  Skipping email verification (test mode)")
-        bad = []
-    else:
-        contacts, bad = verify_emails(contacts)
-        if bad:
-            add_to_dnc([c["email"] for c in bad], client_id)
-            print(f"🚫 {len(bad)} bad emails added to DNC")
-
-    # Step 4: DNC filter
-    dnc    = load_dnc(client_id)
-    before = len(contacts)
-    contacts = [c for c in contacts if c["email"] not in dnc]
-    removed  = before - len(contacts)
-    if removed:
-        print(f"🚫 DNC filter removed {removed} contacts")
-
-    if not contacts:
-        print("⚠️  No contacts remaining after filtering.")
-        sys.exit(0)
+        if len(contacts) < target:
+            print(f"⚠️  Could only source {len(contacts)}/{target} contacts after {round_num} rounds — proceeding with what we have")
 
     print(f"\n✅ {len(contacts)} clean contacts ready for {month_name}")
 
-    # Step 5: Write CSV
+    # ── Step 3: Write CSV ─────────────────────────────────────────────────────
     write_csv(contacts, client_id, month_name)
 
-    # Step 6: Get sequence (from existing Instantly campaign or local template)
+    # ── Step 4: Get sequence ──────────────────────────────────────────────────
     sequence = get_sequence_for_new_campaign(client)
     if not sequence:
         print("⚠️  No sequence found — campaign will be created without steps.")
-        print("   Write the sequence in Instantly after campaign creation, then it will be")
-        print("   pulled automatically for all future months.")
+        print("   Write sequence in Instantly after campaign creation.")
 
     if not dry_run:
+        # ── Step 5: Create campaign ───────────────────────────────────────────
         campaign_id, campaign_name = create_instantly_campaign(
             client, month_name,
             sequence_steps=sequence.get("steps") if sequence else None
         )
 
-        # Link sending account
+        # ── Step 6: Link sending account ─────────────────────────────────────
         if client.get("outreach_email"):
             add_sending_account(campaign_id, client["outreach_email"])
 
-        # Step 7: Load contacts
+        # ── Step 7: Load contacts with personalization fields ─────────────────
         load_to_instantly(contacts, campaign_id, dry_run=dry_run)
 
-        # Step 8: Update clients.json with new campaign
+        # ── Step 8: Update clients.json ───────────────────────────────────────
         save_client_campaign(client_id, campaign_id, campaign_name)
 
-        # Step 9: Alert Vito
+        # ── Step 9: Alert Vito ────────────────────────────────────────────────
         msg = (
             f"✅ *{firm} — {month_name} Campaign Ready*\n\n"
             f"*{len(contacts)} fresh contacts loaded*\n"
             f"Campaign: `{campaign_name}`\n\n"
             f"*Pre-launch checklist (review in Instantly before hitting GO):*\n"
-            f"☐ Sequence copy reads correctly for this client\n"
-            f"☐ Step delays: Step 1 = Day 0, Step 2 = 7+ days, Step 3 = 7+ days\n"
-            f"☐ Sending account is linked\n"
-            f"☐ Sending schedule: Mon-Fri, business hours\n"
+            f"☐ Sequence copy — reads correctly for this client\n"
+            f"☐ Step delays — Day 0 / Day 3 / Day 7 (not minutes)\n"
+            f"☐ Sending account linked\n"
+            f"☐ Schedule: Mon–Fri, business hours\n"
             f"☐ Stop on reply: ON\n\n"
-            f"When ready: activate in Instantly → monitor auto-detects and starts watching.\n\n"
-            f"Admin portal: https://admin.argusreach.com/clients/{client_id}"
+            f"Activate in Instantly → monitor starts watching automatically.\n\n"
+            f"Admin: https://admin.argusreach.com/clients/{client_id}"
         )
         notify(msg)
-        print(f"\n🔔 Vito notified via Telegram")
+        print(f"\n🔔 Vito notified")
         print(f"\n{'='*60}")
         print(f"✅ CYCLE COMPLETE — {month_name}")
         print(f"   Campaign ID: {campaign_id}")
         print(f"   Contacts:    {len(contacts)}")
-        print(f"   Next step:   Review sequence in Instantly, then hit GO")
+        print(f"   Next step:   Review sequence in Instantly → activate")
         print(f"{'='*60}\n")
     else:
         print(f"\n[DRY RUN] Would create campaign '{firm} — {month_name}' with {len(contacts)} contacts")
