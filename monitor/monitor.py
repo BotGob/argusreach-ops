@@ -799,6 +799,7 @@ CLIENT CONTEXT:
 - Compliance notes: {client.get('compliance_note', 'none')}
 - Positioning: {client.get('positioning_note', 'We help clients build sales pipelines and networks - we amplify their efforts, not replace them.')}
 - Booking link: {client['calendly_link']}
+- Meeting format: {client.get('_meeting_format', 'any')}
 - ICP: {client.get('icp_summary', '')}
 
 PROSPECT: {from_name or from_email} ({from_email})
@@ -842,8 +843,12 @@ FORMATTING RULES (mandatory):
 - 2-4 sentences max before signature
 
 RESPONSE TONE EXAMPLES (adapt — never copy verbatim):
-- Positive: "[name],\n\nThanks for getting back to me. Happy to connect - grab any time here:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
-- Question: "[name],\n\nGreat question - that is exactly what I would want to cover on a quick call. Here is my calendar:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Positive (in-person): "[name],\n\nThanks for getting back to me. Happy to connect - grab a time here and I will come to you:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Positive (phone): "[name],\n\nThanks for getting back to me. Happy to connect - grab a time here and I will give you a call:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Positive (zoom/any): "[name],\n\nThanks for getting back to me. Happy to connect - grab any time here:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Question (in-person): "[name],\n\nGreat question - that is exactly what I would want to cover when we meet. Grab a time and I will come to you:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+- Question (phone/zoom/any): "[name],\n\nGreat question - that is exactly what I would want to cover on a quick call. Here is my calendar:\n\n{client['calendly_link']}\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
+Use the meeting format context above to pick the right tone. Never write "video call" or "Zoom" unless meeting_format is zoom.
 - Not now: "[name],\n\nNo problem at all - I will leave it with you. Reach out anytime when the timing is better.\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
 - Negative/remove: "[name],\n\nUnderstood, removing you now - sorry for the interruption.\n\n{client['sender_name']}\n{client.get('title', 'Founder')}, {client['firm_name']}"
 
