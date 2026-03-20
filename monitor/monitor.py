@@ -716,19 +716,12 @@ WARMUP_DOMAINS = [
     # TLD patterns common in warmup networks
 ]
 
-# Also block suspicious TLDs used heavily by warmup networks
-WARMUP_TLDS = ['.help', '.cfd', '.online', '.sbs', '.xyz', '.buzz', '.top']
-
-
 def is_warmup_domain(email_addr: str) -> bool:
-    """Check if an email address belongs to a known warmup network domain or suspicious TLD."""
+    """Check if an email address belongs to a known warmup network domain.
+    Only blocks specific known domains — never TLD patterns (too broad, risks blocking real prospects)."""
     addr = email_addr.strip().lower()
     domain = addr.split('@')[-1] if '@' in addr else addr
-    if any(d in domain for d in WARMUP_DOMAINS):
-        return True
-    if any(domain.endswith(tld) for tld in WARMUP_TLDS):
-        return True
-    return False
+    return any(d in domain for d in WARMUP_DOMAINS)
 
 def _send_email(outreach_email, app_password, sender_name, to_email, subject, body, retry=1,
                 in_reply_to=None, references=None):
