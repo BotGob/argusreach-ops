@@ -177,29 +177,43 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <!-- Phase 2 -->
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
         <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup</td>
-        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#60a5fa;">●</span> Verify payment cleared + agreement signed → approve intake in portal<br>
-          <span style="color:#60a5fa;">●</span> Welcome email auto-fires on approval<br>
-          <span style="color:#60a5fa;">●</span> Client replies with outreach email address + app password → Gob links to client record<br>
-          <span style="color:#60a5fa;">●</span> Gob generates DNS records → Vito sends to client in follow-up email alongside sequence draft<br>
-          <span style="color:#60a5fa;">●</span> Client feedback forwarded to Gob → edits applied in Instantly if needed<br>
-          <span style="color:#60a5fa;">●</span> Vito activates campaign in Instantly → set active: true in clients.json<br>
-          <span style="color:#555;font-size:0.65rem;">Post-call template: ops/templates/post-call-email.md</span>
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.9;">
+          <span style="color:#fbbf24;font-weight:600;">VITO CHECKLIST — in order:</span><br>
+          <span style="color:#60a5fa;">☐</span> Confirm payment cleared (Stripe alert) + agreement signed<br>
+          <span style="color:#60a5fa;">☐</span> Approve intake in portal → welcome email auto-fires<br>
+          <span style="color:#60a5fa;">☐</span> Wait for client to reply with outreach email + app password<br>
+          <span style="color:#60a5fa;">☐</span> Forward email + app password here with client ID → Gob links to client<br>
+          <span style="color:#60a5fa;">☐</span> Ask Gob: "ready for follow-up email?" → Gob provides DNS records + Calendly link + confirms sequence is in Instantly<br>
+          <span style="color:#60a5fa;">☐</span> Send follow-up email to client (DNS + sequence draft + Calendly link)<br>
+          <span style="color:#60a5fa;">☐</span> Wait for client: IT adds DNS / sequence approved / calendar connected<br>
+          <span style="color:#60a5fa;">☐</span> Forward any sequence edits here → Gob updates Instantly<br>
+          <span style="color:#60a5fa;">☐</span> Activate campaign in Instantly<br>
+          <span style="color:#60a5fa;">☐</span> Tell Gob campaign is live → Gob sets active: true in clients.json<br>
+          <span style="color:#555;font-size:0.65rem;">Templates: ops/templates/post-call-email.md · ops/templates/followup-dns-sequence-calendly.md</span>
         </td>
-        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#4ade80;">●</span> Intake approval auto-creates client record (clients.json + DB + DNC file)<br>
-          <span style="color:#4ade80;">●</span> Welcome email auto-sent on approval<br>
-          <span style="color:#4ade80;">●</span> Apollo pull → DNC filter → NeverBounce → replacement loop until target count hit<br>
-          <span style="color:#4ade80;">●</span> Gob writes 3-touch sequence → loads leads + sequence into Instantly as DRAFT via API<br>
-          <span style="color:#4ade80;">●</span> Monitor auto-watches inbox once active: true set
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.9;">
+          <span style="color:#4ade80;font-weight:600;">AUTO (on intake approval):</span><br>
+          <span style="color:#4ade80;">●</span> Client record created (clients.json + DB + DNC file)<br>
+          <span style="color:#4ade80;">●</span> Welcome email auto-sent<br>
+          <span style="color:#4ade80;font-weight:600;">AUTO (after Vito confirms email + app password):</span><br>
+          <span style="color:#4ade80;">●</span> Apollo → DNC filter → NeverBounce → replacement loop → target count hit<br>
+          <span style="color:#4ade80;">●</span> 3-touch sequence written + loaded into Instantly DRAFT via API<br>
+          <span style="color:#4ade80;">●</span> Leads loaded with personalization fields (city, title, state)<br>
+          <span style="color:#4ade80;">●</span> DNS records generated for client domain<br>
+          <span style="color:#4ade80;">●</span> Calendly event type created for client<br>
+          <span style="color:#4ade80;font-weight:600;">AUTO (on active: true):</span><br>
+          <span style="color:#4ade80;">●</span> Monitor starts watching client inbox every 10 min
         </td>
-        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#a78bfa;">●</span> Creates outreach email (real mailbox, NOT alias — Google Workspace or M365, ~$6-8/mo)<br>
-          <span style="color:#a78bfa;">●</span> Generates app password → sends email address + app password to vito@argusreach.com<br>
-          <span style="color:#a78bfa;">●</span> Forwards DNS records to IT — IT adds SPF/DKIM/DMARC (~10 min)<br>
-          <span style="color:#a78bfa;">●</span> Sends DNC list (emails/domains) and warm leads if applicable<br>
-          <span style="color:#a78bfa;">●</span> Reviews sequence draft → replies with approval or edits (one round max)<br>
-          <span style="color:#a78bfa;">●</span> Written approval to launch
+        <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.9;">
+          <span style="color:#a78bfa;font-weight:600;">CLIENT CHECKLIST:</span><br>
+          <span style="color:#a78bfa;">☐</span> Creates outreach email (real mailbox, NOT alias — Google Workspace or M365, ~$6-8/mo)<br>
+          <span style="color:#a78bfa;">☐</span> Generates app password → emails address + password to vito@argusreach.com<br>
+          <span style="color:#a78bfa;">☐</span> Sends DNC list (emails/domains) if applicable<br>
+          <span style="color:#a78bfa;">☐</span> Sends warm leads if applicable<br>
+          <span style="color:#a78bfa;">☐</span> Forwards DNS records to IT → IT adds SPF/DKIM/DMARC (~10 min)<br>
+          <span style="color:#a78bfa;">☐</span> Connects calendar to their Calendly booking link (~2 min)<br>
+          <span style="color:#a78bfa;">☐</span> Reviews sequence draft → replies approved or with edits (one round max)<br>
+          <span style="color:#a78bfa;">☐</span> Confirms ready to launch
         </td>
       </tr>
 

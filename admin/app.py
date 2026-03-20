@@ -122,7 +122,10 @@ If there are specific people, companies, or domains you never want us to contact
 
 If there are people you already have a relationship with — or anyone you'd like us to prioritize reaching out to first — send those over and we'll move them to the front of the list.
 
-Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with your sequence draft.
+Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with:
+- Your outreach sequence draft for review
+- DNS records for your IT person
+- Your booking link to connect to your calendar (so prospects can schedule directly with you)
 
 — Vito Resciniti
 Founder, ArgusReach
