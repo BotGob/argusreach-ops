@@ -711,5 +711,53 @@
     "draft_preview": "",
     "sent": false,
     "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T02:06:19.735330",
+    "client": "argus_reach___test_1",
+    "prospect": "elsa@userservicecenter.online",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "CONTEXT MISMATCH (Rule 17) - Elsa is asking Vito for a vendor referral rather than responding to outreach about Argus Reach. This suggests she either misunderstood the initial message or is treating this as a networking contact, not a prospect interaction.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T02:46:40.297538",
+    "client": "argus_reach___test_1",
+    "prospect": "elsa@userservicecenter.online",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T03:06:55.231648",
+    "client": "argus_reach___test_1",
+    "prospect": "harlow.sinnet@smartaicontacts.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Context mismatch - prospect's response doesn't align coherently with outreach flow. Unclear if they're confirming availability, acknowledging receipt, or referencing a prior call. Requires Vito to clarify conversation state before routing.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T03:07:31.210362",
+    "client": "argus_reach___test_1",
+    "prospect": "harlow.sinnet@smartaicontacts.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T03:17:02.530488",
+    "client": "argus_reach___test_1",
+    "prospect": "emma@elelem-verify.com",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "SECURITY RULE 11: Unsolicited vendor/software sales pitch. This is inbound cold outreach, not a reply to Vito's message. Emma references a LinkedIn connection suggestion from their CEO but is pitching their service.",
+    "test_mode": false
   }
 ]

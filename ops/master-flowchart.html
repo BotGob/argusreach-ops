@@ -123,7 +123,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <li class="role-li"><span class="role-dot dot-orange"></span>Fill intake form after signing</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Review & approve email sequences</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Purchase Google Workspace seat for outreach (~$7–12/mo)</li>
-      <li class="role-li"><span class="role-dot dot-orange"></span>Grant ArgusReach admin access (or join 30-min screen share)</li>
+      <li class="role-li"><span class="role-dot dot-orange"></span>Forward IT handoff instructions to IT team</li>
       <li class="role-li"><span class="role-dot dot-orange"></span>Show up to booked meetings</li>
     </ul>
   </div>
@@ -178,8 +178,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
         <td style="padding:14px;font-size:0.7rem;font-weight:700;color:#fff;vertical-align:top;">2. Onboarding &amp; Setup<br><span style="font-weight:400;color:#555;font-size:0.65rem;">~2 weeks</span></td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#60a5fa;">●</span> 45-min onboarding call (ICP, voice, targets, DNC list)<br>
-          <span style="color:#60a5fa;">●</span> Access client's domain registrar (screen share or login)<br>
+          <span style="color:#60a5fa;">●</span> Intake form (ICP, voice, targets, DNC list — 10 min, async)<br>
+          <span style="color:#60a5fa;">●</span> Send IT handoff doc — IT adds DNS records (we verify remotely, no access needed)<br>
           <span style="color:#60a5fa;">●</span> Configure SPF / DKIM / DMARC DNS records<br>
           <span style="color:#60a5fa;">●</span> Create Gmail app password on client's sending account<br>
           <span style="color:#60a5fa;">●</span> Add sending email to Instantly + begin warmup<br>
@@ -198,7 +198,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
           <span style="color:#a78bfa;">●</span> Purchases secondary sending domain (e.g. outreach.theirfirm.com) — NOT their main domain<br>
           <span style="color:#a78bfa;">●</span> Purchases Google Workspace on that domain (~$7/mo)<br>
-          <span style="color:#a78bfa;">●</span> Provides domain registrar access OR joins 30-min screen share for DNS setup<br>
+          <span style="color:#a78bfa;">●</span> Forwards IT handoff doc to their IT team — IT adds 5 DNS records (~20 min)<br>
           <span style="color:#a78bfa;">●</span> Provides existing contact / relationship list (DNC cross-reference)<br>
           <span style="color:#a78bfa;">●</span> Reviews 3-touch email sequence — approves or requests one round of edits<br>
           <span style="color:#a78bfa;">●</span> Written approval to launch (email confirmation)
@@ -415,7 +415,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ APPROVED</div>
       <div class="auto">
         <div class="step-label">Client registered in system</div>
-        <div class="step-detail">Client record created in clients.json + SQLite DB. DNC file created. Welcome email auto-sent to client covering next steps: onboarding call, list build, sequence review, launch timeline.</div>
+        <div class="step-detail">Client record created in clients.json + SQLite DB. DNC file created. Welcome email auto-sent: intake form link, IT setup instructions, timeline overview. No onboarding call — intake form captures everything.</div>
         <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
         <span class="step-tool t-blue">Gob (AI)</span>
       </div>
@@ -444,7 +444,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">Client sets up dedicated sending account</div>
-        <div class="step-detail">~$6–7/mo billed to client. Required for isolated outreach mailbox — keeps main business email completely separate. Subdomain approach: outreach.[clientdomain].com. Supports Google Workspace OR Microsoft 365 — confirm provider during onboarding call. Gob handles all technical configuration (DNS, SPF/DKIM/DMARC, Instantly connection) via screen share or temporary admin access.</div>
+        <div class="step-detail">~$6–7/mo billed to client. Required for isolated outreach mailbox — keeps main business email completely separate. Subdomain approach: outreach.[clientdomain].com. Supports Google Workspace OR Microsoft 365 — captured in intake form (email_provider field). Gob sends IT handoff doc with copy-paste DNS records. IT adds them, Gob verifies remotely (DNS is public — no access needed).</div>
         <span class="step-tool t-green">Google Workspace or Microsoft 365</span>
       </div>
       <div class="arrow">↓</div>

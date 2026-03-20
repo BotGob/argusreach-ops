@@ -81,7 +81,7 @@ Cron runs 1st of each month at 9am ET. Generates reports for all active clients,
 When Instantly finishes all prospects in a campaign (status → completed), send Vito a Telegram alert to renew the lead list or close it out. No current hook.
 
 ### 20. Welcome email to new client on onboarding ✅ DONE
-Auto-sends on intake approval. Covers next steps: onboarding call, prospect list build, sequence review, launch timeline.
+Auto-sends on intake approval. Covers next steps: intake form, IT email setup, sequence review, launch timeline.
 
 ### 21. Service agreement / DocuSign
 No signed contract flow in the system. Client signs → record stored. Free tier HelloSign or DocuSign. Required before first paid client.

@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "argus_reach___test_1:emma@elelem-verify.com:1773976621",
+    "client_id": "argus_reach___test_1",
+    "firm_name": "Argus Reach - Test 1",
+    "campaign_name": "",
+    "instantly_campaign_id": "d7e0b311-313b-4741-a870-95fe7d04a9d3",
+    "client_email": "Vito@argusreach.com",
+    "outreach_email": "vito@argusreach.com",
+    "app_password": "zpct kbsl naeb uahu",
+    "sender_name": "Vito Resciniti",
+    "from_email": "emma@elelem-verify.com",
+    "from_name": "Emma Pearson",
+    "subject": "TechCXO | ZWY0XK4 3WXDVXJ",
+    "draft": "",
+    "classification": "escalated",
+    "queued_at": "2026-03-20T03:17:01.960434",
+    "in_reply_to": "<9fe7W0me63c64e41bf8753e9cef09f74@elelem-verify.com>",
+    "references": "<9fe7W0me63c64e41bf8753e9cef09f74@elelem-verify.com>",
+    "prospect_message": "Hi Piers,\r\n\r\n\r\n\r\n\r\nTom Salvat, our CEO, saw you are connected on LinkedIn and suggested I reach out as we are seeing a shift in how buyers research vendors.\r\n\r\n\r\n\r\n\r\nDemand generation teams are being asked to drive more qualified pipeline while budgets and headcount remain tight.\r\n\r\n\r\n\r\n\r\nelelem helps by turning your website into an Answer Engine that captures buyer questions, provides instant answers and improves onsite conversion from the traffic you already have.\r\n\r\n\r\n\r\n\r\nWe launch the Answer Engine in week 1, start capturing real buyer questions in week 2, and then optimise for AI search visibility from month 2.\r\n\r\n\r\n\r\n\r\nOpen to seeing how this could work on your site?\r\n\r\n\r\n\r\n\r\nRegards,\r\n\r\n\r\n\r\n\r\nEmma Pearson\r\n\r\nelelem | elelem(.ai)\r\n\r\nSpeedwell Mill Old Coach Road, Tansley, Matlock, DE4 5FY\r\n\r\nJust drop me a message to unsubscribe from further messages.\r\n\r\n\r\n\r\n\r\n\r\n\r\n\u00a0 <#b0ff93/56400/163338/334820400/252591/324534761/1203236285/3644c90f067c814406b34229d36e0eb3>\r\nZWY0XK4 3WXDVXJ\r\n",
+    "escalate_reason": "SECURITY RULE 11: Unsolicited vendor/software sales pitch. This is inbound cold outreach, not a reply to Vito's message. Emma references a LinkedIn connection suggestion from their CEO but is pitching their service."
+  }
+]

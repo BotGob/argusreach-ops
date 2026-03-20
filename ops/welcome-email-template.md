@@ -15,61 +15,46 @@ Here's exactly what happens between now and your first email going out — so yo
 
 ---
 
-## Your Next Steps (3 things)
+## Your Next Steps (2 things)
 
-**Step 1 — Fill out your onboarding form**
-This is how we learn your business, your ideal clients, and how you communicate. Takes about 10 minutes.
+**Step 1 — Fill out your intake form**
+This is how we learn your business, your ideal clients, and how you communicate. Takes about 10–15 minutes. Be as specific as possible — the more detail you give us, the sharper your targeting and the better your outreach reads.
 
-→ **argusreach.com/onboard**
+→ **admin.argusreach.com/intake**
 
-**Step 2 — Set up your dedicated sending account**
-All outreach goes through a dedicated email address on a subdomain of your domain (e.g., `outreach.yourdomain.com`). This keeps your main business email completely separate — if anything ever affects deliverability, it stays isolated and your primary inbox is never touched.
+**Step 2 — Email infrastructure setup**
+We'll set up a dedicated sending address on your domain — something like `james@outreach.yourdomain.com`. This keeps your main inbox completely separate and ensures your emails land in the inbox, not spam.
 
-What this requires:
-- A subdomain added to your domain (we'll walk you through it — takes about 5 minutes with your domain registrar)
-- A dedicated email account on that subdomain through your email provider (~$6–7/mo — you own this account and keep it if you ever leave ArgusReach)
-
-We handle all the technical configuration (DNS records, authentication setup, connecting to our sending platform). You just need to be available for a short screen share or provide temporary admin access.
-
-We'll confirm your email provider and coordinate this on our onboarding call.
-
-**Step 3 — Send us your existing contact list (optional but recommended)**
-If you have leads, referrals, conference contacts, or anyone you've been meaning to reach out to — send them over. We'll prioritize these first with warmer, relationship-aware outreach.
-
-Spreadsheet with: name, email, company, title, and how you know them. Reply to this email or bring it to the onboarding call.
+I'll send you a short instruction sheet for your IT person or whoever manages your website. They add 5 standard records — takes about 20 minutes. You don't need to do anything technical yourself.
 
 ---
 
 ## What Happens After That
 
-- **Onboarding call:** We confirm your targets, review the outreach approach, and set up your sending account together
-- **Days 1–5:** We build your prospect list and write your email sequences
-- **Sequence review:** We send you drafts — you review and approve before anything sends
-- **Warmup period:** Your new sending account runs a 2–3 week warmup automatically. No outreach sends during this period — this is what protects your deliverability long-term.
-- **Campaign launch:** First emails go out once warmup is complete. Monthly billing begins on launch date — not before.
-- **Ongoing:** We monitor replies, handle responses, and route interested prospects to your calendar
+Once your intake form is in and your email infrastructure is set up:
 
-Your only job after launch: show up to the meetings.
+- **We write your sequences** — 3 personalized email touches based on your intake form. You'll see every word before anything sends.
+- **You review and approve** — we send drafts, you reply with feedback or a thumbs up.
+- **Warmup period (2–3 weeks)** — your new sending address builds its reputation automatically. No outreach sends during this window. This is what protects your deliverability long-term.
+- **Campaign launch** — first emails go out once warmup is complete. You'll get a notification before anything fires.
+- **Ongoing** — when a prospect replies, you get a Telegram alert with a draft response. You approve or adjust. That's your only regular involvement.
+
+**Timeline from today: first emails typically go out in 3–4 weeks.** Most of that is warmup — it runs automatically in the background.
 
 ---
 
-## Your Onboarding Call
+## Questions?
 
-Book it here once you've submitted the intake form:
+Reply here anytime. If you'd prefer a quick call to walk through next steps or ask questions, book one here:
 https://calendly.com/vito-argusreach/30min
 
-This covers confirming your targeting, walking through the sending setup, and reviewing how notifications and reporting work.
-
----
-
-Questions before then? Reply here or reach out directly.
+Otherwise, fill out the intake form and we're off.
 
 Looking forward to building your pipeline.
 
 Vito R.
 ArgusReach
 vito@argusreach.com
-[Phone number]
 
 ---
 *ArgusReach · Tampa Bay, FL · argusreach.com*

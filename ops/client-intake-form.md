@@ -1,7 +1,7 @@
 # ArgusReach — Client Intake Form
 ## (Build this as a Google Form → Google Sheet)
 
-This form is filled out BY VITO during or immediately after the onboarding call.
+This form is filled out BY THE CLIENT via admin.argusreach.com/intake after signing. Vito reviews and approves in the admin portal.
 Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run each client's campaign.
 
 ---
@@ -24,13 +24,13 @@ Responses feed a Google Sheet. I (Argus/Go) read this sheet to build and run eac
 (Short answer — e.g., "James K." — this is how the prospect sees the sender)
 
 **Q6. What email address should outreach come from?**
-(Short answer — e.g., outreach@mail.bayharborwealth.com — this should be a dedicated address on a subdomain, NOT their main business email. If not yet set up, note "pending setup" and coordinate on onboarding call.)
+(Short answer — e.g., outreach@mail.bayharborwealth.com — this should be a dedicated address on a subdomain, NOT their main business email. If not yet set up, note "pending setup" and coordinate via email or optional short call.)
 
 **Q6b. What email provider do they use?**
 (Multiple choice: Google Workspace / Microsoft 365 / Other — note provider here, needed for sending account setup)
 
 **Q6c. Has the sending account been set up and connected?**
-(Multiple choice: Yes — ready to go / No — schedule screen share / Client handling it themselves)
+(DNS setup: We send IT handoff doc — no screen share needed)
 
 **Q7. Client's booking/calendar link**
 (URL — where meetings land when a prospect books. This will be connected to our Calendly event for tracking.)

@@ -1,15 +1,15 @@
 # ArgusReach — Client Onboarding Checklist
 
-## Pre-Call (internal, before onboarding call)
+## Pre-Intake (internal)
 - [ ] Proposal signed and setup fee received
-- [ ] Calendly invite sent for onboarding call (45 min)
+- [ ] Welcome email sent with intake form link + IT handoff doc
 - [ ] Research client's firm: website, LinkedIn, recent news, reviews
 - [ ] Draft ICP hypothesis based on what they told us on the strategy call
 - [ ] Prepare 3 sample prospect names that fit our hypothesis (show ICP accuracy)
 
 ---
 
-## Onboarding Call Agenda (45 minutes)
+## Onboarding Process (async — no call required)
 
 ### 1. Business Overview (10 min)
 - What does [CLIENT] do, exactly — services, specialties, differentiators?

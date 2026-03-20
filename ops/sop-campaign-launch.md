@@ -1,6 +1,6 @@
 # SOP: Campaign Launch — ArgusReach
 
-**Trigger:** Client onboarding call complete, ICP approved, sequences approved.
+**Trigger:** Client intake form approved, sequences approved.
 
 ---
 

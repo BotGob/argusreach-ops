@@ -26,7 +26,7 @@ That's exactly what we built this to solve.
 - Log every single touchpoint: who was contacted, when, what they said, and when to follow up. No more guessing.
 - Deliver a monthly report showing exactly what's working
 
-Your team's involvement: one onboarding call and a quick review of the email sequences before anything goes out. That's it.
+Your team's involvement: an intake form and a quick review of the email sequences before anything goes out. That's it.
 
 ---
 
