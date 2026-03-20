@@ -158,11 +158,11 @@ def search_apollo(client, target, exclude_emails):
         print("⚠️  No APOLLO_API_KEY — skipping Apollo search")
         return []
 
-    titles       = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
-    geography    = client.get("_target_geography", "")
-    company_size = client.get("_target_company_size", "")
-    industry     = client.get("_target_industry", "")
-    seniority    = client.get("_target_seniority", "")
+    titles         = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
+    geography      = client.get("_target_geography", "")
+    company_sizes  = [s.strip() for s in client.get("_target_company_size", "").split(",") if s.strip()]
+    industries     = [i.strip() for i in client.get("_target_industry", "").split(",") if i.strip()]
+    seniorities    = [s.strip() for s in client.get("_target_seniority", "").split(",") if s.strip()]
     contacts     = []
     seen_emails  = set(exclude_emails)
     page         = 1
@@ -176,7 +176,10 @@ def search_apollo(client, target, exclude_emails):
         "201-500": ["201,500"],
         "any":     [],
     }
-    employee_ranges = SIZE_MAP.get(company_size, [])
+    # Combine all selected sizes into one list of ranges
+    employee_ranges = []
+    for s in company_sizes:
+        employee_ranges.extend(SIZE_MAP.get(s, []))
 
     # Map intake industry to Apollo industry tags
     INDUSTRY_MAP = {
@@ -195,7 +198,11 @@ def search_apollo(client, target, exclude_emails):
         "hospitality":        ["hospitality", "restaurants", "food & beverages"],
         "nonprofit":          ["nonprofit organization management"],
     }
-    industry_tags = INDUSTRY_MAP.get(industry, [])
+    # Combine all selected industries
+    industry_tags = []
+    for ind in industries:
+        industry_tags.extend(INDUSTRY_MAP.get(ind, []))
+    industry_tags = list(dict.fromkeys(industry_tags))  # dedupe, preserve order
 
     # Map intake seniority to Apollo person_seniorities
     SENIORITY_MAP = {
@@ -205,7 +212,11 @@ def search_apollo(client, target, exclude_emails):
         "manager":       ["manager", "senior"],
         "any":           [],
     }
-    seniority_levels = SENIORITY_MAP.get(seniority, [])
+    # Combine all selected seniorities
+    seniority_levels = []
+    for sen in seniorities:
+        seniority_levels.extend(SENIORITY_MAP.get(sen, []))
+    seniority_levels = list(dict.fromkeys(seniority_levels))  # dedupe
 
     print(f"🔍 Apollo search — need {target} fresh contacts (excluding {len(exclude_emails)} already contacted)")
     if industry_tags:    print(f"   Industry: {industry}")

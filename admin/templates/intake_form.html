@@ -32,6 +32,9 @@
     .checkbox-group label { display: flex; align-items: flex-start; gap: 8px; color: #e2e8f0; font-size: 13px; font-weight: 400; cursor: pointer; }
     .checkbox-group input[type=checkbox] { width: auto; margin-top: 2px; flex-shrink: 0; }
     @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+  .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 6px; }
+  .cb { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; cursor: pointer; }
+  .cb input[type="checkbox"] { accent-color: #4ade80; width: 15px; height: 15px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -163,26 +166,25 @@
     </div>
     <div class="field">
       <label>Target Industry <span class="req">*</span>
-        <span class="hint">What industry are the companies you want to reach in? This narrows your prospect search to the right type of business — without it we may pull contacts from the wrong sector entirely.</span>
+        <span class="hint">Select all that apply. This narrows your prospect search to the right type of business — without it we may pull contacts from the wrong sector entirely.</span>
       </label>
-      <select name="target_industry" required>
-        <option value="">— Select —</option>
-        <option value="healthcare">Healthcare (hospitals, clinics, medical practices)</option>
-        <option value="physical_therapy">Physical Therapy / Rehab</option>
-        <option value="accounting">Accounting / Bookkeeping / CPA</option>
-        <option value="legal">Legal / Law Firms</option>
-        <option value="real_estate">Real Estate</option>
-        <option value="financial_services">Financial Services / Wealth Management</option>
-        <option value="insurance">Insurance</option>
-        <option value="banking">Banking / Lending</option>
-        <option value="construction">Construction / Contracting</option>
-        <option value="technology">Technology / SaaS</option>
-        <option value="marketing">Marketing / Advertising / PR</option>
-        <option value="retail">Retail</option>
-        <option value="hospitality">Hospitality / Food &amp; Beverage</option>
-        <option value="nonprofit">Nonprofit</option>
-        <option value="other">Other — I'll describe below</option>
-      </select>
+      <div class="checkbox-grid">
+        <label class="cb"><input type="checkbox" name="target_industry" value="healthcare"> Healthcare (clinics, medical practices)</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="physical_therapy"> Physical Therapy / Rehab</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="accounting"> Accounting / Bookkeeping / CPA</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="legal"> Legal / Law Firms</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="real_estate"> Real Estate</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="financial_services"> Financial Services / Wealth Management</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="insurance"> Insurance</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="banking"> Banking / Lending</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="construction"> Construction / Contracting</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="technology"> Technology / SaaS</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="marketing"> Marketing / Advertising / PR</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="retail"> Retail</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="hospitality"> Hospitality / Food &amp; Beverage</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="nonprofit"> Nonprofit</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="other"> Other — I'll describe below</label>
+      </div>
     </div>
     <div class="field">
       <label>Target Job Titles / Roles <span class="req">*</span>
@@ -192,16 +194,15 @@
     </div>
     <div class="field">
       <label>Who is the decision-maker at these companies? <span class="req">*</span>
-        <span class="hint">Helps us find the right person, not just anyone with the right title. At small firms the owner is usually the right contact. At larger firms it may be a director or department head.</span>
+        <span class="hint">Select all that apply. Helps us find the right person, not just anyone with the right title.</span>
       </label>
-      <select name="target_seniority" required>
-        <option value="">— Select —</option>
-        <option value="owner_founder">Owner / Founder / Partner (decision maker at small firms)</option>
-        <option value="c_suite">C-Suite (CEO, COO, CMO, etc.)</option>
-        <option value="vp_director">VP / Director</option>
-        <option value="manager">Manager / Team Lead</option>
-        <option value="any">Anyone with the right title — seniority doesn't matter</option>
-      </select>
+      <div class="checkbox-grid">
+        <label class="cb"><input type="checkbox" name="target_seniority" value="owner_founder"> Owner / Founder / Partner</label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="c_suite"> C-Suite (CEO, COO, CMO, etc.)</label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="vp_director"> VP / Director</label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="manager"> Manager / Team Lead</label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="any"> Anyone with the right title</label>
+      </div>
     </div>
     <div class="field">
       <label>Target Company / Practice Type
@@ -211,16 +212,15 @@
     </div>
     <div class="field">
       <label>Target Company Size <span class="req">*</span>
-        <span class="hint">Employee count of the companies you want to reach. This is used to filter your prospect search.</span>
+        <span class="hint">Select all that apply. Employee count of the companies you want to reach.</span>
       </label>
-      <select name="target_company_size" required>
-        <option value="">— Select —</option>
-        <option value="1-10">1–10 employees (solo practitioners, micro firms)</option>
-        <option value="11-50">11–50 employees (small practices / firms)</option>
-        <option value="51-200">51–200 employees (mid-size)</option>
-        <option value="201-500">201–500 employees</option>
-        <option value="any">Any size</option>
-      </select>
+      <div class="checkbox-grid">
+        <label class="cb"><input type="checkbox" name="target_company_size" value="1-10"> 1–10 employees (solo / micro firms)</label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="11-50"> 11–50 employees (small firms)</label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="51-200"> 51–200 employees (mid-size)</label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="201-500"> 201–500 employees</label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="any"> Any size</label>
+      </div>
     </div>
     <div class="field">
       <label>How many new clients/patients can you realistically take per month?
