@@ -654,5 +654,43 @@
     "draft_preview": "Kayla,\n\nGreat to hear from you - I'm excited about this too. Let's lock in a time to discuss next steps:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
     "sent": false,
     "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T00:25:09.934344",
+    "client": "argus_reach___test_1",
+    "prospect": "andreas.koehler@mandategewinnen.de",
+    "classification": "negative",
+    "draft_preview": "Andreas,\n\nNo problem at all - I'll remove you now, sorry for the interruption. Best of luck finding the right SEO partner for your project.\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "Unsubscribe request processed; prospect outside ICP (seeking SEO, not referral-based practice building).",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T00:25:13.157536",
+    "client": "argus_reach___test_1",
+    "prospect": "anna@leadspezialist.de",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "Context mismatch - the reply reads like an automated system message or template rather than a genuine response from Anna Weber to our outreach. The opt-out language and generic phrasing are inconsistent with authentic prospect engagement. Requires manual review to confirm sender legitimacy.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-20T00:46:45.939757",
+    "client": "argus_reach___test_1",
+    "prospect": "andreas.koehler@mandategewinnen.de",
+    "classification": "negative",
+    "draft_preview": "Andreas,\n\nNo problem at all - I'll remove you now, sorry for the interruption. Best of luck finding the right SEO partner for your project.\n\nVito Resciniti\nFounder, Argus Reach - Test 1",
+    "sent": false,
+    "notes": "rejected by Vito"
+  },
+  {
+    "ts": "2026-03-20T00:46:46.036598",
+    "client": "argus_reach___test_1",
+    "prospect": "anna@leadspezialist.de",
+    "classification": "escalated",
+    "draft_preview": "",
+    "sent": false,
+    "notes": "rejected by Vito"
   }
 ]

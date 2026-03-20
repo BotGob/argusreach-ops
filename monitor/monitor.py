@@ -701,6 +701,7 @@ def is_warmup(msg, from_email):
         return True
     # Also check known warmup domain patterns
     warmup_domains = ['arcmailnetworkpro.com', 'popitmarketing.com', 'heythinkitfirst.com',
+                      'mandategewinnen.de',
                       'danielyip.com', 'twodevecommerce.com', 'marketcommand.cfd',
                       'briehost.com', 'userservicecenter.online', 'trymooreintelligent-solutions.com',
                       'fomoaiconnect.cfd', 'acquireleadlabs.online', 'leadspezialist.de',
