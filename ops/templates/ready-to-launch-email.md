@@ -21,9 +21,10 @@ Good news — everything is in place:
 
 We're ready to launch. The only remaining step is your subscription payment to kick off your first month.
 
-**[Starter — $750/mo]** → https://buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02
-**[Growth — $1,500/mo]** → https://buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00
-**[Scale — $2,500/mo]** → https://buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03
+**[INSERT THEIR PLAN LINK — one link only, matches plan selected in intake]**
+- Starter $750/mo → https://buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02
+- Growth $1,500/mo → https://buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00
+- Scale $2,500/mo → https://buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03
 
 Once payment is confirmed we'll activate your campaign and your first emails will go out within 24 hours.
 

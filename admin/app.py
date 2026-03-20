@@ -981,6 +981,7 @@ def intake():
             "best_referral_sources":f.get("best_referral_sources","").strip(),
             "prior_outreach":       f.get("prior_outreach","").strip(),
             # Targeting
+            "plan":                 f.get("plan","starter").strip(),
             "meeting_format":       ",".join(request.form.getlist("meeting_format")),
             "office_address":       f.get("office_address","").strip(),
             "success_story":        f.get("success_story","").strip(),
@@ -1079,6 +1080,7 @@ def intake_approve(intake_id):
             "_intake_id":            intake_id,
             "_contact_name":         intake.get("contact_name",""),
             "_contact_title":        intake.get("contact_title",""),
+            "plan":                   intake.get("plan","starter"),
             "_meeting_format":        intake.get("meeting_format","any"),
             "_office_address":        intake.get("office_address",""),
             "_success_story":        intake.get("success_story",""),

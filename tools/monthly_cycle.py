@@ -587,7 +587,12 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
         sys.exit(1)
 
     firm   = client["firm_name"]
-    target = client.get("contacts_per_month", 200)
+
+    # Derive target from plan if contacts_per_month not explicitly set
+    PLAN_VOLUMES = {"starter": 200, "growth": 500, "scale": 1000}
+    plan   = client.get("plan", "starter")
+    target = client.get("contacts_per_month") or PLAN_VOLUMES.get(plan, 200)
+    print(f"   Plan: {plan} → {target} prospects/month")
 
     print(f"\n{'='*60}")
     print(f"ArgusReach Monthly Cycle — {firm} — {month_name}")

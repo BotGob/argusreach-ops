@@ -59,6 +59,20 @@
 
   <form method="POST" action="/intake">
 
+    <!-- ── SECTION 0: PLAN SELECTION ─────────────────────────────────── -->
+    <div class="section-header">Your Plan</div>
+    <div class="field">
+      <label>Which plan are you starting with? <span class="req">*</span>
+        <span class="hint">This determines your monthly prospect volume. You can upgrade at any time.</span>
+      </label>
+      <select name="plan" required>
+        <option value="">— Select your plan —</option>
+        <option value="starter">Starter — $750/mo · 200 prospects/month</option>
+        <option value="growth">Growth — $1,500/mo · 500 prospects/month</option>
+        <option value="scale">Scale — $2,500/mo · 1,000 prospects/month</option>
+      </select>
+    </div>
+
     <!-- ── SECTION 1: YOUR BUSINESS ──────────────────────────────────── -->
     <div class="section-header">Your Business</div>
     <div class="grid2">
