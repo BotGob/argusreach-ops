@@ -63,6 +63,77 @@ def to_et_filter(dt_str):
         return str(dt_str)[:16]
 
 
+# ── SEQUENCE GENERATOR ────────────────────────────────────────────────────────
+
+def _generate_sequence_from_intake(client: dict) -> list:
+    """Auto-generate a 3-touch email sequence from intake data.
+    Called immediately on intake approval so Vito sees a draft when he opens the client page.
+    Uses the voice_sample as Touch 1 if provided (most authentic), otherwise builds from value_prop.
+    """
+    sender       = client.get("sender_name", "Vito")
+    title_role   = client.get("title", "Founder")
+    firm         = client.get("firm_name", "")
+    value_prop   = client.get("_value_prop", "").strip()
+    differentiator = client.get("_differentiator", "").strip()
+    outcomes     = client.get("_outcomes", "").strip()
+    voice_sample = client.get("_voice_sample", "").strip()
+    calendly     = client.get("calendly_link", "").strip()
+
+    sig = f"{sender}\n{title_role}, {firm}"
+    if calendly:
+        sig += f"\n{calendly}"
+
+    # Touch 1 — use voice sample if present (it's the client's own words, best)
+    if voice_sample and len(voice_sample) > 40:
+        t1_body = (
+            voice_sample
+            .replace("[First Name]", "{{firstName}}")
+            .replace("[Last Name]",  "{{lastName}}")
+            .replace("[Company]",    "{{companyName}}")
+            .replace("[City]",       "{{city}}")
+        )
+        # Append signature if not already there
+        if sender.lower() not in t1_body.lower():
+            t1_body += f"\n\n{sig}"
+    else:
+        vp = value_prop or "help firms like yours build a consistent pipeline of new client meetings"
+        t1_body = (
+            f"Hi {{{{firstName}}}},\n\n"
+            f"I came across {{{{companyName}}}} and wanted to reach out directly.\n\n"
+            f"We {vp} - handling the full process so your team only gets involved when someone is ready to talk.\n\n"
+            f"Would a quick call this week make sense?\n\n"
+            f"{sig}"
+        )
+
+    # Touch 2 — follow-up with differentiator angle
+    if differentiator and len(differentiator) > 20:
+        t2_middle = differentiator
+    else:
+        t2_middle = "Wanted to make sure my last note didn't get buried."
+
+    t2_body = (
+        f"Hi {{{{firstName}}}},\n\n"
+        f"Following up on my last note.\n\n"
+        f"{t2_middle}\n\n"
+        f"Happy to walk you through it in 15 minutes if there's any interest.\n\n"
+        f"{sig}"
+    )
+
+    # Touch 3 — short final
+    t3_body = (
+        f"Hi {{{{firstName}}}},\n\n"
+        f"I'll keep this short - I know your inbox is full.\n\n"
+        f"If this ever becomes a priority, feel free to reach out anytime.\n\n"
+        f"{sig}"
+    )
+
+    return [
+        {"subject": "Quick question, {{firstName}}",        "body": t1_body, "delay_days": 0},
+        {"subject": "Re: Quick question, {{firstName}}",    "body": t2_body, "delay_days": 5},
+        {"subject": "Last note - {{companyName}}",          "body": t3_body, "delay_days": 5},
+    ]
+
+
 # ── WELCOME EMAIL ─────────────────────────────────────────────────────────────
 
 def _send_welcome_email(client: dict):
@@ -1253,6 +1324,9 @@ def intake_approve(intake_id):
                 "calendar_connected": False,
             },
         }
+
+        # Auto-generate sequence from intake data — visible immediately when Vito opens client
+        new_client["sequence"] = _generate_sequence_from_intake(new_client)
 
         config["clients"].append(new_client)
         save_clients(config)

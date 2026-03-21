@@ -55,18 +55,18 @@
       "calendly_event_slug": "",
       "sequence": [
         {
-          "subject": "",
-          "body": "",
+          "subject": "Quick question, {{firstName}}",
+          "body": "Hi {{firstName}}, I came across {{companyName}} and wanted to reach out directly. We work with professional services firms to build a consistent pipeline of new client meetings through targeted outreach - handling everything from list building to managing replies. Most of our clients were relying on referrals alone before working with us. If adding 3-5 qualified conversations per month to your calendar sounds interesting, I'd love to show you how it works. Would a quick call this week make sense?\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 0
         },
         {
-          "subject": "",
-          "body": "",
+          "subject": "Re: Quick question, {{firstName}}",
+          "body": "Hi {{firstName}},\n\nFollowing up on my last note.\n\nWe handle everything - sourcing, writing, sending, and managing replies. Most services hand you a list or a template and walk away. We run the full process under your name, so you only get involved when someone is ready to talk.\n\nHappy to walk you through it in 15 minutes if there's any interest.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         },
         {
-          "subject": "",
-          "body": "",
+          "subject": "Last note - {{companyName}}",
+          "body": "Hi {{firstName}},\n\nI'll keep this short - I know your inbox is full.\n\nIf building a consistent pipeline of new client meetings ever becomes a priority, feel free to reach out anytime.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         }
       ],
