@@ -30,7 +30,10 @@
     .nav-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); }
 
     /* HERO */
-    .hero { padding: 72px 24px 48px; text-align: center; border-bottom: 1px solid var(--border); }
+    .hero { position: relative; padding: 72px 24px 48px; text-align: center; border-bottom: 1px solid var(--border); overflow: hidden; }
+    #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .hero-grad { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 40%, transparent 30%, rgba(15,15,15,0.85) 100%); pointer-events: none; }
+    .hero-inner { position: relative; z-index: 2; }
     .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.18); border-radius: 3px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 28px; }
     .live-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: blink 2.5s ease-in-out infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
@@ -79,6 +82,45 @@
     footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--muted); }
   </style>
   <script>
+  // Animated dot background — matches argusreach.com hero canvas
+  function initCanvas() {
+    var canvas = document.getElementById('hero-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W, H, dots = [];
+    function resize() {
+      var hero = document.querySelector('.hero');
+      W = canvas.width = hero.offsetWidth;
+      H = canvas.height = hero.offsetHeight;
+    }
+    function makeDot() {
+      return {
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.3,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        a: Math.random() * 0.5 + 0.1
+      };
+    }
+    function init() { resize(); dots = []; for (var i = 0; i < 120; i++) dots.push(makeDot()); }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      dots.forEach(function(d) {
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(74,222,128,' + d.a + ')';
+        ctx.fill();
+        d.x += d.vx; d.y += d.vy;
+        if (d.x < 0 || d.x > W) d.vx *= -1;
+        if (d.y < 0 || d.y > H) d.vy *= -1;
+      });
+      requestAnimationFrame(draw);
+    }
+    window.addEventListener('resize', function() { init(); });
+    init(); draw();
+  }
+  window.addEventListener('DOMContentLoaded', initCanvas);
+
   function toggleOfficeAddress() {
     var checked = Array.from(document.querySelectorAll('input[name="meeting_format"]:checked')).map(function(el){ return el.value; });
     var field = document.getElementById('office_address_field');
@@ -104,9 +146,13 @@
 </nav>
 
 <div class="hero">
-  <div class="hero-eyebrow"><div class="live-dot"></div> New Client Setup</div>
-  <h1>Tell us about<br>your business.</h1>
-  <p>Fill this out once — we use every answer to build your prospect list, write your outreach emails, and launch your campaign. The more detail you give us, the better your results.</p>
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grad"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><div class="live-dot"></div> New Client Setup</div>
+    <h1>Tell us about<br>your business.</h1>
+    <p>Fill this out once — we use every answer to build your prospect list, write your outreach emails, and launch your campaign. The more detail you give us, the better your results.</p>
+  </div>
 </div>
 
 <div class="form-wrap">
