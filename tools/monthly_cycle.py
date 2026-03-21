@@ -130,15 +130,33 @@ def get_completion_stats(client_id, campaign_id):
         return {"total": 0, "completed": 0, "pct": 0, "error": str(e)}
 
 # ── DNC helpers ───────────────────────────────────────────────────────────────
+# Public email providers — never block by domain (would nuke all Gmail leads etc.)
+_PUBLIC_DOMAINS = {
+    "gmail.com","yahoo.com","hotmail.com","outlook.com","aol.com","icloud.com",
+    "me.com","msn.com","live.com","ymail.com","protonmail.com","mail.com",
+}
+
 def load_dnc(client_id):
+    """Load client + global DNC as a flat set.
+    Entries are either exact emails (user@domain.com) or domain blocks (@domain.com).
+    Use is_dnc_blocked() to check a lead email against this set."""
     dnc = set()
     for f in [DNC_GLOBAL, BASE_DIR / "monitor" / "dnc" / f"{client_id}.txt"]:
         if f.exists():
             for line in f.read_text().splitlines():
                 e = line.strip().lower()
-                if e:
+                if e and not e.startswith("#"):
                     dnc.add(e)
     return dnc
+
+def is_dnc_blocked(email, dnc_set):
+    """Check if an email is blocked by the DNC set.
+    Handles both exact-match emails and @domain.com domain-level blocks."""
+    email = email.strip().lower()
+    if not email or "@" not in email:
+        return False
+    domain = "@" + email.split("@")[1]
+    return email in dnc_set or domain in dnc_set
 
 def add_to_dnc(emails, client_id):
     targets = [DNC_GLOBAL, BASE_DIR / "monitor" / "dnc" / f"{client_id}.txt"]
@@ -619,7 +637,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
         # Still apply DNC filter
         dnc = load_dnc(client_id)
         before = len(contacts)
-        contacts = [c for c in contacts if c.get("email","").lower() not in dnc]
+        contacts = [c for c in contacts if not is_dnc_blocked(c.get("email",""), dnc)]
         if before - len(contacts):
             print(f"🚫 DNC filter removed {before - len(contacts)} contacts")
     else:
@@ -645,7 +663,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
 
             # DNC filter
             before_dnc = len(batch)
-            batch = [c for c in batch if c["email"].lower() not in dnc]
+            batch = [c for c in batch if not is_dnc_blocked(c["email"], dnc)]
             dnc_removed = before_dnc - len(batch)
             if dnc_removed:
                 print(f"🚫 DNC removed {dnc_removed} contacts in round {round_num}")

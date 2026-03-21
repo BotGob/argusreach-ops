@@ -292,6 +292,12 @@ def validate_campaign_id(campaign_id: str) -> tuple[bool, str]:
     except Exception as e:
         return False, f"Validation error: {e}"
 
+# Public email providers — never block by domain
+_PUBLIC_DOMAINS = {
+    "gmail.com","yahoo.com","hotmail.com","outlook.com","aol.com","icloud.com",
+    "me.com","msn.com","live.com","ymail.com","protonmail.com","mail.com",
+}
+
 def load_global_dnc():
     """Load the global DNC — anyone who unsubscribed from any ArgusReach campaign ever."""
     p = DNC_DIR / "global.txt"
@@ -301,20 +307,61 @@ def load_global_dnc():
             if line.strip() and not line.startswith('#')}
 
 def load_dnc(client_id):
+    """Load client DNC as flat set. Entries are emails or @domain.com blocks."""
     p = DNC_DIR / f"{client_id}.txt"
     if not p.exists():
         return set()
-    return {line.strip().lower() for line in p.read_text().splitlines() if line.strip()}
+    return {line.strip().lower() for line in p.read_text().splitlines()
+            if line.strip() and not line.startswith('#')}
 
-def append_dnc(client_id, emails):
+def is_dnc_blocked(email, dnc_set):
+    """Check exact email match OR @domain.com domain-level block."""
+    email = email.strip().lower()
+    if not email or "@" not in email:
+        return False
+    domain = "@" + email.split("@")[1]
+    return email in dnc_set or domain in dnc_set
+
+def parse_dnc_input(raw_text):
+    """
+    Extract DNC entries from any messy text (CRM paste, CSV, Excel copy-paste).
+    Returns a list of clean entries — either emails or @domain.com domain blocks.
+    Ignores names, phone numbers, and other non-email/domain content.
+    Never adds public email providers as domain blocks.
+    """
+    import re
+    entries = []
+    email_re = re.compile(r'[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}')
+    domain_re = re.compile(r'^@?([a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})$')
+
+    for line in raw_text.splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        # Extract all emails from the line first
+        found_emails = email_re.findall(line)
+        if found_emails:
+            for e in found_emails:
+                entries.append(e.lower())
+        else:
+            # Check if the whole line is a domain entry (@domain.com or domain.com)
+            m = domain_re.match(line)
+            if m:
+                domain = m.group(1).lower()
+                if domain not in _PUBLIC_DOMAINS:
+                    entries.append("@" + domain)
+    return list(dict.fromkeys(entries))  # dedupe, preserve order
+
+def append_dnc(client_id, raw_entries):
+    """Append DNC entries (emails or @domain.com) to client DNC file, deduping."""
     p = DNC_DIR / f"{client_id}.txt"
     DNC_DIR.mkdir(exist_ok=True)
     existing = load_dnc(client_id)
-    new_emails = [e for e in emails if e.lower() not in existing]
+    new_entries = [e.lower() for e in raw_entries if e.lower() not in existing]
     with open(p, "a") as f:
-        for e in new_emails:
-            f.write(e.lower() + "\n")
-    return len(new_emails)
+        for e in new_entries:
+            f.write(e + "\n")
+    return len(new_entries)
 
 def prep_leads(client_id, raw_rows, warm=False):
     """
@@ -344,7 +391,7 @@ def prep_leads(client_id, raw_rows, warm=False):
         if email in seen:
             stats["dupes"] += 1
             continue
-        if email in dnc:
+        if is_dnc_blocked(email, dnc):
             stats["dnc_hit"] += 1
             continue
 
@@ -731,20 +778,10 @@ def upload_dnc(client_id):
         return redirect(url_for("client_detail", client_id=client_id))
 
     content = f.read().decode("utf-8", errors="ignore")
-    emails = []
-    # Support CSV or plain text (one email per line)
-    if "," in content or content.strip().startswith('"'):
-        reader = csv.DictReader(io.StringIO(content))
-        for row in reader:
-            for v in row.values():
-                v = v.strip().lower()
-                if "@" in v:
-                    emails.append(v)
-    else:
-        emails = [line.strip().lower() for line in content.splitlines() if "@" in line]
-
-    added = append_dnc(client_id, emails)
-    flash(f"DNC list imported: {added} new entries added ({len(emails)-added} already on list).", "success")
+    # parse_dnc_input handles CSV, plain text, messy CRM paste, emails, and @domain.com entries
+    entries = parse_dnc_input(content)
+    added = append_dnc(client_id, entries)
+    flash(f"DNC list imported: {added} new entries added ({len(entries)-added} already on list).", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
 
@@ -1147,14 +1184,10 @@ def intake_approve(intake_id):
         init_db()
         sync_client_from_config(new_client)
 
-        # Auto-load structured DNC emails/domains from intake into client DNC file
+        # Auto-load DNC emails/domains from intake using smart parser
         dnc_raw = intake.get("dnc_emails", "")
         if dnc_raw.strip():
-            dnc_entries = [
-                line.strip().lower()
-                for line in dnc_raw.splitlines()
-                if line.strip() and not line.strip().startswith("#")
-            ]
+            dnc_entries = parse_dnc_input(dnc_raw)
             if dnc_entries:
                 append_dnc(client_id, dnc_entries)
                 app.logger.info(f"Auto-loaded {len(dnc_entries)} DNC entries from intake for {client_id}")
