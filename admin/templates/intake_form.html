@@ -45,9 +45,9 @@
     .section-header { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); margin: 48px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
     .section-header:first-child { margin-top: 0; }
     .field { margin-bottom: 20px; }
-    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     label span.req { color: #f87171; margin-left: 2px; }
-    label span.hint { font-weight: 400; color: var(--sub); font-size: 0.72rem; display: block; margin-top: 4px; line-height: 1.6; }
+    label span.hint { font-weight: 400; color: var(--sub); font-size: 0.78rem; display: block; margin-top: 4px; line-height: 1.6; }
     input, select, textarea {
       width: 100%;
       background: var(--bg2);
@@ -62,7 +62,7 @@
     }
     input:focus, select:focus, textarea:focus { border-color: rgba(74,222,128,0.5); background: var(--bg3); }
     select option { background: var(--bg2); }
-    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    textarea { resize: none; min-height: 90px; line-height: 1.6; overflow: hidden; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
 
@@ -120,6 +120,18 @@
     init(); draw();
   }
   window.addEventListener('DOMContentLoaded', initCanvas);
+
+  // Auto-expand textareas as user types
+  window.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('textarea').forEach(function(ta) {
+      function resize() {
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(90, ta.scrollHeight) + 'px';
+      }
+      ta.addEventListener('input', resize);
+      resize();
+    });
+  });
 
   function toggleOfficeAddress() {
     var checked = Array.from(document.querySelectorAll('input[name="meeting_format"]:checked')).map(function(el){ return el.value; });
