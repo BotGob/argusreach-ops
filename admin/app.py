@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ArgusReach — Admin Portal (port 5056)
+ArgusReach - Admin Portal (port 5056)
 Internal-only. Password protected. Vito's control panel.
 
 Routes:
@@ -67,39 +67,39 @@ def to_et_filter(dt_str):
 
 def _send_welcome_email(client: dict):
     """Send a welcome/next-steps email to a newly approved client.
-    Always sends FROM vito@argusreach.com — client sending account not set up yet at this stage.
+    Always sends FROM vito@argusreach.com - client sending account not set up yet at this stage.
     """
     to_email = client.get("client_email", "")
     if not to_email:
-        app.logger.info("Welcome email skipped — no client_email set")
+        app.logger.info("Welcome email skipped - no client_email set")
         return
 
     contact_name = client.get("_contact_name") or client.get("firm_name", "")
     firm_name    = client.get("firm_name", "")
 
-    # Always send from vito@argusreach.com — client outreach account not configured yet
+    # Always send from vito@argusreach.com - client outreach account not configured yet
     from_email   = "vito@argusreach.com"
     app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
     sender_name  = "Vito Resciniti | ArgusReach"
 
     if not app_password:
-        app.logger.warning(f"Welcome email skipped — ARGUSREACH_GMAIL_APP_PASS not set in .env")
-        _notify_telegram(f"⚠️ Welcome email NOT sent to {to_email} for *{firm_name}* — `ARGUSREACH_GMAIL_APP_PASS` not configured in .env. Send manually.")
+        app.logger.warning(f"Welcome email skipped - ARGUSREACH_GMAIL_APP_PASS not set in .env")
+        _notify_telegram(f"⚠️ Welcome email NOT sent to {to_email} for *{firm_name}* - `ARGUSREACH_GMAIL_APP_PASS` not configured in .env. Send manually.")
         return
 
     first_name = contact_name.split()[0] if contact_name else "there"
 
     body = f"""Hi {first_name},
 
-Welcome to ArgusReach — we've received your intake and we're already building your prospect list and outreach sequence. We'll send you the draft sequence shortly for your review before anything goes out.
+Welcome to ArgusReach - we've received your intake and we're already building your prospect list and outreach sequence. We'll send you the draft sequence shortly for your review before anything goes out.
 
 In the meantime, there are a few things we need from you to get everything ready:
 
 1. Set up your outreach email address
 
-We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account for this — something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.
+We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account for this - something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.
 
-Important: this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work — we need a full account with its own login credentials.
+Important: this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work - we need a full account with its own login credentials.
 
 What you need to do:
 - Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6–$8/mo for an additional user)
@@ -116,13 +116,13 @@ If you don't have an IT person, just let us know and we'll walk you through it.
 
 3. Do-not-contact list (if you have one)
 
-If there are specific people or companies you never want us to contact — existing clients, referral partners, competitors — reply with that list and we'll make sure they're excluded before a single email goes out.
+If there are specific people or companies you never want us to contact - existing clients, referral partners, competitors - reply with that list and we'll make sure they're excluded before a single email goes out.
 
-The most reliable way to send it: include the email domain for each company (e.g. @smithlaw.com or smithlaw.com). That way we block every person at that company, not just the ones you happen to know. Individual email addresses work too. A spreadsheet, plain text list, or CRM export are all fine — we'll extract what we need from whatever format you have.
+The most reliable way to send it: include the email domain for each company (e.g. @smithlaw.com or smithlaw.com). That way we block every person at that company, not just the ones you happen to know. Individual email addresses work too. A spreadsheet, plain text list, or CRM export are all fine - we'll extract what we need from whatever format you have.
 
 4. Warm leads (optional)
 
-If there are people you already have a relationship with — or anyone you'd like us to prioritize reaching out to first — send those over and we'll move them to the front of the list.
+If there are people you already have a relationship with - or anyone you'd like us to prioritize reaching out to first - send those over and we'll move them to the front of the list.
 
 Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with:
 - Your outreach sequence draft for review
@@ -138,7 +138,7 @@ vito@argusreach.com
         msg = MIMEMultipart("alternative")
         msg["From"]    = f"{sender_name} <{from_email}>"
         msg["To"]      = to_email
-        msg["Subject"] = f"Welcome to ArgusReach — next steps for {firm_name}"
+        msg["Subject"] = f"Welcome to ArgusReach - next steps for {firm_name}"
         msg.attach(MIMEText(body, "plain"))
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
@@ -279,7 +279,7 @@ def validate_campaign_id(campaign_id: str) -> tuple[bool, str]:
             return False, f"Instantly API error: {r.status_code}"
         data = r.json()
         if not data:
-            # ID not found in analytics — double-check via campaign list
+            # ID not found in analytics - double-check via campaign list
             r2 = requests.get(
                 "https://api.instantly.ai/api/v2/campaigns",
                 headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
@@ -294,14 +294,14 @@ def validate_campaign_id(campaign_id: str) -> tuple[bool, str]:
     except Exception as e:
         return False, f"Validation error: {e}"
 
-# Public email providers — never block by domain
+# Public email providers - never block by domain
 _PUBLIC_DOMAINS = {
     "gmail.com","yahoo.com","hotmail.com","outlook.com","aol.com","icloud.com",
     "me.com","msn.com","live.com","ymail.com","protonmail.com","mail.com",
 }
 
 def load_global_dnc():
-    """Load the global DNC — anyone who unsubscribed from any ArgusReach campaign ever."""
+    """Load the global DNC - anyone who unsubscribed from any ArgusReach campaign ever."""
     p = DNC_DIR / "global.txt"
     if not p.exists():
         return set()
@@ -327,7 +327,7 @@ def is_dnc_blocked(email, dnc_set):
 def parse_dnc_input(raw_text):
     """
     Extract DNC entries from any messy text (CRM paste, CSV, Excel copy-paste).
-    Returns a list of clean entries — either emails or @domain.com domain blocks.
+    Returns a list of clean entries - either emails or @domain.com domain blocks.
     Ignores names, phone numbers, and other non-email/domain content.
     Never adds public email providers as domain blocks.
     """
@@ -579,7 +579,7 @@ def client_go_live(client_id):
     save_clients(config)
     sync_client_from_config(client)
     # Notify via Telegram
-    notify(f"🟢 *{client.get('firm_name')}* is now LIVE — monitor is watching, campaign active.")
+    notify(f"🟢 *{client.get('firm_name')}* is now LIVE - monitor is watching, campaign active.")
     flash(f"✅ {client.get('firm_name')} is live. Monitor is now watching for replies.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
@@ -597,7 +597,7 @@ def client_status_update(client_id):
 @app.route("/clients/<client_id>/update", methods=["POST"])
 @login_required
 def client_update(client_id):
-    """Update campaign ID, activate/deactivate, set launch date — the fields that connect a client to Instantly."""
+    """Update campaign ID, activate/deactivate, set launch date - the fields that connect a client to Instantly."""
     config = load_clients()
     client = next((c for c in config["clients"] if c.get("id") == client_id), None)
     if not client:
@@ -610,7 +610,7 @@ def client_update(client_id):
         if new_cid and new_cid != client.get("instantly_campaign_id", ""):
             valid, msg = validate_campaign_id(new_cid)
             if not valid:
-                flash(f"❌ Campaign ID rejected — {msg}", "error")
+                flash(f"❌ Campaign ID rejected - {msg}", "error")
                 return redirect(url_for("client_detail", client_id=client_id))
         client["instantly_campaign_id"] = new_cid
     if "campaign_name" in f:
@@ -652,7 +652,7 @@ def campaign_add(client_id):
 
     valid, msg = validate_campaign_id(new_campaign["instantly_campaign_id"])
     if not valid:
-        flash(f"❌ Campaign ID rejected — {msg}", "error")
+        flash(f"❌ Campaign ID rejected - {msg}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     if "campaigns" not in client:
@@ -718,7 +718,7 @@ def campaign_launch(client_id):
 
     # Store log in a file so we can stream it
     log_path = BASE_DIR / "monitor" / "logs" / f"launch_{client_id}.log"
-    log_path.write_text(f"[{datetime.now(zoneinfo.ZoneInfo('America/New_York')).strftime('%I:%M %p ET')}] Starting campaign launch for {client.get('firm_name')} — {month}\n")
+    log_path.write_text(f"[{datetime.now(zoneinfo.ZoneInfo('America/New_York')).strftime('%I:%M %p ET')}] Starting campaign launch for {client.get('firm_name')} - {month}\n")
 
     def run_in_background():
         try:
@@ -742,7 +742,7 @@ def campaign_launch(client_id):
             sys.stdout = orig_stdout
 
             with open(log_path, "a") as f:
-                f.write(f"\n✅ DONE — Campaign created as DRAFT in Instantly. Review sequence and leads, then activate.\n")
+                f.write(f"\n✅ DONE - Campaign created as DRAFT in Instantly. Review sequence and leads, then activate.\n")
                 f.write("__COMPLETE__\n")
         except Exception as e:
             with open(log_path, "a") as f:
@@ -752,7 +752,7 @@ def campaign_launch(client_id):
     t = threading.Thread(target=run_in_background, daemon=True)
     t.start()
 
-    flash(f"Campaign launch started for {month}. Building leads and creating campaign now — check progress below.", "success")
+    flash(f"Campaign launch started for {month}. Building leads and creating campaign now - check progress below.", "success")
     return redirect(url_for("client_detail", client_id=client_id) + "?launch=1")
 
 
@@ -891,7 +891,7 @@ def campaigns():
             **m,
         })
 
-    # Unregistered campaigns — pull live list and cross-reference
+    # Unregistered campaigns - pull live list and cross-reference
     unregistered = []
     live_campaign_ids = set()
     try:
@@ -1147,7 +1147,7 @@ def intake_approve(intake_id):
             "compliance_note":       intake.get("compliance_note",""),
             "positioning_note":      f.get("positioning_note",""),
             "prospects_csv":         f"campaigns/{client_id}/prospects.csv",
-            # Full intake context — used by monthly_cycle.py for Apollo search + sequence writing
+            # Full intake context - used by monthly_cycle.py for Apollo search + sequence writing
             "_intake_id":            intake_id,
             "_contact_name":         intake.get("contact_name",""),
             "_contact_title":        intake.get("contact_title",""),
@@ -1216,7 +1216,7 @@ def intake_approve(intake_id):
 @app.route("/meetings/log", methods=["POST"])
 @login_required
 def log_meeting():
-    """Manually log a meeting booking — for client-confirmed meetings that didn't come through webhook."""
+    """Manually log a meeting booking - for client-confirmed meetings that didn't come through webhook."""
     f = request.form
     client_id    = f.get("client_id","").strip()
     prospect_email = f.get("prospect_email","").strip()

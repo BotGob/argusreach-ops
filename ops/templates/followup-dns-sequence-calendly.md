@@ -1,31 +1,31 @@
 # Setup Email Template: DNS + Sequence + Calendly + Timeline
 > Send manually from vito@argusreach.com after client sends outreach email + app password.
-> Customize [brackets]. DNS records and Calendly link come from Gob — ask before sending.
+> Customize [brackets]. DNS records and Calendly link come from Gob - ask before sending.
 > This is the last email before the ready-to-launch email. Everything the client needs to action is in here.
 
 ---
 
-**Subject:** Your sequence + next setup steps — [Firm Name]
+**Subject:** Your sequence + next setup steps - [Firm Name]
 
 Hi [First Name],
 
-We're ready on our end — here's everything you need to get the final pieces in place before we go live.
+We're ready on our end - here's everything you need to get the final pieces in place before we go live.
 
 **1. DNS records for your IT person**
 
 Have your IT person (or whoever manages your domain at [GoDaddy / Cloudflare / Namecheap / etc.]) add the following records to [theirdomain.com]. This is what ensures your outreach emails land in inboxes, not spam folders. Should take about 10 minutes.
 
-[PASTE DNS RECORDS HERE — get from Gob]
+[PASTE DNS RECORDS HERE - get from Gob]
 
-Once added, DNS typically propagates within a few hours. We'll verify on our end — no action needed from you after that.
+Once added, DNS typically propagates within a few hours. We'll verify on our end - no action needed from you after that.
 
-**2. Your outreach sequence — please review**
+**2. Your outreach sequence - please review**
 
 Below are the three emails we'll be sending on your behalf. Read through them and reply with any edits or just say "looks good" and we'll be ready to launch.
 
 ---
 
-[PASTE SEQUENCE HERE — pull from Instantly draft campaign]
+[PASTE SEQUENCE HERE - pull from Instantly draft campaign]
 
 Touch 1 (Day 0):
 Subject: [subject]
@@ -45,9 +45,9 @@ Subject: [subject]
 
 We've set up your booking page: [https://calendly.com/argusreach/[client-slug]]
 
-Click the link and connect your [Google / Outlook] calendar — takes about 2 minutes. Once connected, prospects will see your available meeting options ([phone / video / in-person]) and book directly onto your calendar. You'll get a confirmation with their name, company, and meeting details.
+Click the link and connect your [Google / Outlook] calendar - takes about 2 minutes. Once connected, prospects will see your available meeting options ([phone / video / in-person]) and book directly onto your calendar. You'll get a confirmation with their name, company, and meeting details.
 
-Once all three are done on your end, we handle the rest. Your sending address is already warming up in the background — that process takes about 2–3 weeks and is what ensures your emails land in inboxes reliably. When warmup is complete and everything checks out, I'll send you a final email with your subscription payment link to kick off the campaign.
+Once all three are done on your end, we handle the rest. Your sending address is already warming up in the background - that process takes about 2–3 weeks and is what ensures your emails land in inboxes reliably. When warmup is complete and everything checks out, I'll send you a final email with your subscription payment link to kick off the campaign.
 
 Any questions, just reply here.
 

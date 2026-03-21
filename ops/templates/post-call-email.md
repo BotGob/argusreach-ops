@@ -3,11 +3,11 @@
 
 ---
 
-**Subject:** Next steps — ArgusReach x [Firm Name]
+**Subject:** Next steps - ArgusReach x [Firm Name]
 
 Hi [First Name],
 
-Great talking with you today. Based on our conversation, I think there's a real opportunity to build a consistent referral pipeline for [Firm Name] — and I'd love to get started.
+Great talking with you today. Based on our conversation, I think there's a real opportunity to build a consistent referral pipeline for [Firm Name] - and I'd love to get started.
 
 Here are your three next steps:
 
@@ -33,4 +33,4 @@ vito@argusreach.com
 - Do NOT approve the intake in the portal until payment clears and agreement is signed
 - Stripe payment confirmation comes via Telegram alert
 - HelloSign/DocuSign sends signed copy to vito@argusreach.com automatically
-- Intake sits in portal Intakes tab waiting for your approval — only approve after both above are confirmed
+- Intake sits in portal Intakes tab waiting for your approval - only approve after both above are confirmed
