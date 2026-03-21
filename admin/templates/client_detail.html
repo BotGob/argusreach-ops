@@ -25,6 +25,19 @@
 <p class="subtitle">{{ client.vertical }} · {{ client.plan }} · {{ client.outreach_email }}</p>
 
 {% if not client.active %}
+
+{% if client.get('onboarding_status') == 'ready_to_launch' %}
+<div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+  <div>
+    <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:4px">All gates green — campaign is in Instantly as DRAFT</div>
+    <div style="font-size:12px;color:#64748b">Activate the campaign in Instantly, then click here to start the monitor.</div>
+  </div>
+  <form method="POST" action="{{ url_for('client_go_live', client_id=client.id) }}" style="flex-shrink:0">
+    <button type="submit" class="btn btn-primary" style="background:#4ade80;color:#000;font-weight:800;padding:10px 20px;white-space:nowrap">✅ Mark Campaign Live</button>
+  </form>
+</div>
+{% endif %}
+
 <form method="POST" action="{{ url_for('client_status_update', client_id=client.id) }}" style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
   <label style="font-size:11px;color:#64748b">Onboarding stage:</label>
   <select name="onboarding_status" style="font-size:12px;padding:4px 8px;background:#1e293b;border:1px solid #334155;border-radius:4px;color:#e2e8f0">

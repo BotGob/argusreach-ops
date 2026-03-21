@@ -514,6 +514,26 @@ def client_detail(client_id):
     )
 
 
+@app.route("/clients/<client_id>/go-live", methods=["POST"])
+@login_required
+def client_go_live(client_id):
+    """Mark campaign as live after Vito has activated it in Instantly."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        return ("not found", 404)
+    client["active"] = True
+    client["onboarding_status"] = None
+    if not client.get("launch_date"):
+        import zoneinfo
+        client["launch_date"] = datetime.now(zoneinfo.ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
+    save_clients(config)
+    sync_client_from_config(client)
+    # Notify via Telegram
+    notify(f"🟢 *{client.get('firm_name')}* is now LIVE — monitor is watching, campaign active.")
+    flash(f"✅ {client.get('firm_name')} is live. Monitor is now watching for replies.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
 @app.route("/clients/<client_id>/status", methods=["POST"])
 @login_required
 def client_status_update(client_id):

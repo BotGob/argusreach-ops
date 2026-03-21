@@ -14,6 +14,20 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
+def send_telegram(message: str):
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
+    if not token or not chat_id:
+        return
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"},
+            timeout=10
+        )
+    except Exception:
+        pass
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from db.database import get_db, init_db, sync_client_from_config
 
@@ -80,6 +94,24 @@ def sync_campaign_stats(campaign_id: str, client_id: str, campaign_name: str = "
     conn.close()
 
     print(f"  ✅ {campaign_name or campaign_id}: {leads_count} leads, {emails_sent} sent, {replies} replies")
+
+    # Campaign completion alert — fires once when leads hit 0 after active sending
+    if leads_count == 0 and emails_sent > 0:
+        alert_file = BASE_DIR / "monitor" / "logs" / "sync_completion_alerts.json"
+        try:
+            alerted = json.loads(alert_file.read_text()) if alert_file.exists() else []
+        except Exception:
+            alerted = []
+        if campaign_id not in alerted:
+            send_telegram(
+                f"📭 *Campaign exhausted — action needed*\n\n"
+                f"*{campaign_name or campaign_id}* has reached 0 remaining leads.\n"
+                f"Sent: {emails_sent} emails · {replies} replies received\n\n"
+                f"Build next month's lead list when ready."
+            )
+            alerted.append(campaign_id)
+            alert_file.write_text(json.dumps(alerted))
+
     return data
 
 
