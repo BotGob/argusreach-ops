@@ -67,11 +67,30 @@
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
 
-    /* Checkboxes */
-    .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 8px; }
-    .cb { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--sub); cursor: pointer; transition: color 0.15s; }
-    .cb:hover { color: var(--text); }
-    .cb input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; }
+    /* Pill checkboxes */
+    .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .cb { position: relative; cursor: pointer; }
+    .cb input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .cb-label {
+      display: inline-block;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--sub);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .cb:hover .cb-label { color: var(--text); border-color: rgba(255,255,255,0.25); }
+    .cb input[type="checkbox"]:checked + .cb-label {
+      color: #000;
+      background: var(--green);
+      border-color: var(--green);
+      font-weight: 600;
+    }
 
     /* Submit */
     .submit-wrap { margin-top: 48px; }
@@ -304,21 +323,21 @@
         <span class="hint">Select all that apply. This narrows your prospect search to the right type of business — without it we may pull contacts from the wrong sector entirely.</span>
       </label>
       <div class="checkbox-grid">
-        <label class="cb"><input type="checkbox" name="target_industry" value="healthcare"> Healthcare (clinics, medical practices)</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="physical_therapy"> Physical Therapy / Rehab</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="accounting"> Accounting / Bookkeeping / CPA</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="legal"> Legal / Law Firms</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="real_estate"> Real Estate</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="financial_services"> Financial Services / Wealth Management</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="insurance"> Insurance</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="banking"> Banking / Lending</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="construction"> Construction / Contracting</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="technology"> Technology / SaaS</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="marketing"> Marketing / Advertising / PR</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="retail"> Retail</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="hospitality"> Hospitality / Food &amp; Beverage</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="nonprofit"> Nonprofit</label>
-        <label class="cb"><input type="checkbox" name="target_industry" value="other"> Other — I'll describe below</label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="healthcare"><span class="cb-label">Healthcare (clinics, medical practices)</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="physical_therapy"><span class="cb-label">Physical Therapy / Rehab</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="accounting"><span class="cb-label">Accounting / Bookkeeping / CPA</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="legal"><span class="cb-label">Legal / Law Firms</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="real_estate"><span class="cb-label">Real Estate</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="financial_services"><span class="cb-label">Financial Services / Wealth Management</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="insurance"><span class="cb-label">Insurance</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="banking"><span class="cb-label">Banking / Lending</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="construction"><span class="cb-label">Construction / Contracting</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="technology"><span class="cb-label">Technology / SaaS</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="marketing"><span class="cb-label">Marketing / Advertising / PR</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="retail"><span class="cb-label">Retail</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="hospitality"><span class="cb-label">Hospitality / Food &amp; Beverage</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="nonprofit"><span class="cb-label">Nonprofit</span></label>
+        <label class="cb"><input type="checkbox" name="target_industry" value="other"><span class="cb-label">Other — I'll describe below</span></label>
       </div>
     </div>
     <div class="field">
@@ -332,11 +351,11 @@
         <span class="hint">Select all that apply. Helps us find the right person, not just anyone with the right title.</span>
       </label>
       <div class="checkbox-grid">
-        <label class="cb"><input type="checkbox" name="target_seniority" value="owner_founder"> Owner / Founder / Partner</label>
-        <label class="cb"><input type="checkbox" name="target_seniority" value="c_suite"> C-Suite (CEO, COO, CMO, etc.)</label>
-        <label class="cb"><input type="checkbox" name="target_seniority" value="vp_director"> VP / Director</label>
-        <label class="cb"><input type="checkbox" name="target_seniority" value="manager"> Manager / Team Lead</label>
-        <label class="cb"><input type="checkbox" name="target_seniority" value="any"> Anyone with the right title</label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="owner_founder"><span class="cb-label">Owner / Founder / Partner</span></label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="c_suite"><span class="cb-label">C-Suite (CEO, COO, CMO, etc.)</span></label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="vp_director"><span class="cb-label">VP / Director</span></label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="manager"><span class="cb-label">Manager / Team Lead</span></label>
+        <label class="cb"><input type="checkbox" name="target_seniority" value="any"><span class="cb-label">Anyone with the right title</span></label>
       </div>
     </div>
     <div class="field">
@@ -350,11 +369,11 @@
         <span class="hint">Select all that apply. Employee count of the companies you want to reach.</span>
       </label>
       <div class="checkbox-grid">
-        <label class="cb"><input type="checkbox" name="target_company_size" value="1-10"> 1–10 employees (solo / micro firms)</label>
-        <label class="cb"><input type="checkbox" name="target_company_size" value="11-50"> 11–50 employees (small firms)</label>
-        <label class="cb"><input type="checkbox" name="target_company_size" value="51-200"> 51–200 employees (mid-size)</label>
-        <label class="cb"><input type="checkbox" name="target_company_size" value="201-500"> 201–500 employees</label>
-        <label class="cb"><input type="checkbox" name="target_company_size" value="any"> Any size</label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="1-10"><span class="cb-label">1–10 employees (solo / micro firms)</span></label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="11-50"><span class="cb-label">11–50 employees (small firms)</span></label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="51-200"><span class="cb-label">51–200 employees (mid-size)</span></label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="201-500"><span class="cb-label">201–500 employees</span></label>
+        <label class="cb"><input type="checkbox" name="target_company_size" value="any"><span class="cb-label">Any size</span></label>
       </div>
     </div>
     <div class="field">
@@ -388,10 +407,10 @@
         <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
       </label>
       <div class="checkbox-grid" id="meeting_format_group">
-        <label class="cb"><input type="checkbox" name="meeting_format" value="phone" onchange="toggleOfficeAddress()"> Phone call</label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="zoom" onchange="toggleOfficeAddress()"> Video call (Zoom / Teams / Google Meet)</label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_their_office" onchange="toggleOfficeAddress()"> In-person — I go to their office</label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_my_office" onchange="toggleOfficeAddress()"> In-person — they come to my office</label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="phone" onchange="toggleOfficeAddress()"><span class="cb-label">Phone call</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="zoom" onchange="toggleOfficeAddress()"><span class="cb-label">Video call (Zoom / Teams / Google Meet)</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_their_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person — I go to their office</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_my_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person — they come to my office</span></label>
       </div>
       <div style="font-size:0.72rem;color:#666;margin-top:6px;">Select all that apply — prospects will choose from these options when they book.</div>
     </div>
