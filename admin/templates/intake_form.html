@@ -3,38 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Client Onboarding — ArgusReach</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Client Setup — ArgusReach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 40px 20px; }
-    .container { max-width: 700px; margin: 0 auto; }
-    .logo { font-size: 20px; font-weight: 700; color: #60a5fa; margin-bottom: 8px; letter-spacing: -0.5px; }
-    h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-    .subtitle { color: #64748b; font-size: 14px; margin-bottom: 36px; line-height: 1.6; }
-    .section-header { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #60a5fa; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e2535; }
-    .field { margin-bottom: 18px; }
-    label { display: block; font-size: 13px; font-weight: 500; color: #94a3b8; margin-bottom: 6px; }
-    label span.req { color: #ef4444; margin-left: 2px; }
-    label span.hint { font-weight: 400; color: #475569; font-size: 11px; display: block; margin-top: 3px; line-height: 1.5; }
-    input, select, textarea {
-      width: 100%; background: #0f1623; border: 1px solid #1e2535; border-radius: 6px;
-      color: #e2e8f0; font-size: 14px; font-family: 'Inter', sans-serif;
-      padding: 10px 14px; outline: none; transition: border 0.15s;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #0f0f0f;
+      --bg2:     #161616;
+      --bg3:     #1d1d1d;
+      --border:  rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text:    #f5f5f5;
+      --sub:     #888;
+      --muted:   #444;
+      --green:   #4ade80;
     }
-    input:focus, select:focus, textarea:focus { border-color: #3b82f6; }
-    textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* NAV */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 56px; background: rgba(15,15,15,0.97); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 0.95rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .logo-mark { width: 22px; height: 22px; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 5px; display: grid; place-items: center; }
+    .logo-mark-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+    .logo span { color: var(--sub); font-weight: 300; }
+    .nav-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); }
+
+    /* HERO */
+    .hero { padding: 72px 24px 48px; text-align: center; border-bottom: 1px solid var(--border); }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,222,128,0.07); border: 1px solid rgba(74,222,128,0.18); border-radius: 3px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 28px; }
+    .live-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: blink 2.5s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+    .hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 900; letter-spacing: -0.04em; line-height: 1.05; color: #fff; margin-bottom: 20px; }
+    .hero p { font-size: 1rem; color: var(--sub); line-height: 1.75; max-width: 520px; margin: 0 auto; }
+
+    /* FORM */
+    .form-wrap { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+    .section-header { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); margin: 48px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .section-header:first-child { margin-top: 0; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+    label span.req { color: #f87171; margin-left: 2px; }
+    label span.hint { font-weight: 400; color: var(--sub); font-size: 0.72rem; display: block; margin-top: 4px; line-height: 1.6; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: rgba(74,222,128,0.5); background: var(--bg3); }
+    select option { background: var(--bg2); }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .btn { background: #3b82f6; color: #fff; border: none; border-radius: 6px; padding: 14px 32px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 32px; }
-    .btn:hover { background: #2563eb; }
-    .footer { text-align: center; margin-top: 32px; font-size: 12px; color: #334155; }
-    .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
-    .checkbox-group label { display: flex; align-items: flex-start; gap: 8px; color: #e2e8f0; font-size: 13px; font-weight: 400; cursor: pointer; }
-    .checkbox-group input[type=checkbox] { width: auto; margin-top: 2px; flex-shrink: 0; }
-    @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
-  .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 6px; }
-  .cb { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; cursor: pointer; }
-  .cb input[type="checkbox"] { accent-color: #4ade80; width: 15px; height: 15px; cursor: pointer; }
+    @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
+
+    /* Checkboxes */
+    .checkbox-grid { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 8px; }
+    .cb { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--sub); cursor: pointer; transition: color 0.15s; }
+    .cb:hover { color: var(--text); }
+    .cb input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; }
+
+    /* Submit */
+    .submit-wrap { margin-top: 48px; }
+    .btn-submit { width: 100%; background: var(--green); color: #000; border: none; border-radius: 6px; padding: 15px 32px; font-size: 0.9rem; font-weight: 800; letter-spacing: -0.01em; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
+    .btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .submit-note { text-align: center; margin-top: 14px; font-size: 0.72rem; color: var(--muted); }
+
+    /* Footer */
+    footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--muted); }
   </style>
   <script>
   function toggleOfficeAddress() {
@@ -52,10 +94,22 @@
   </script>
 </head>
 <body>
-<div class="container">
-  <div class="logo">ArgusReach</div>
-  <h1>Client Onboarding Form</h1>
-  <p class="subtitle">Fill this out once — we use every answer to build your prospect list, write your outreach emails, and launch your campaign. The more detail you give us, the better your results. Takes about 10 minutes.</p>
+
+<nav>
+  <a href="https://argusreach.com" class="logo">
+    <div class="logo-mark"><div class="logo-mark-dot"></div></div>
+    ArgusReach <span>/ Client Setup</span>
+  </a>
+  <span class="nav-badge">Confidential · Secure</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow"><div class="live-dot"></div> New Client Setup</div>
+  <h1>Tell us about<br>your business.</h1>
+  <p>Fill this out once — we use every answer to build your prospect list, write your outreach emails, and launch your campaign. The more detail you give us, the better your results.</p>
+</div>
+
+<div class="form-wrap">
 
   <form method="POST" action="/intake">
 
@@ -384,10 +438,16 @@
       <textarea name="notes" placeholder="Seasonal considerations, upcoming events, anything unique about your market or situation..."></textarea>
     </div>
 
-    <button type="submit" class="btn">Submit Onboarding Form →</button>
+    <div class="submit-wrap">
+      <button type="submit" class="btn-submit">Submit →</button>
+      <p class="submit-note">Your information is kept strictly confidential and used only to run your campaign.</p>
+    </div>
   </form>
-
-  <p class="footer">Questions? Email <a href="mailto:vito@argusreach.com" style="color:#475569">vito@argusreach.com</a></p>
 </div>
+
+<footer>
+  Questions? Email <a href="mailto:vito@argusreach.com" style="color:var(--sub)">vito@argusreach.com</a> &nbsp;·&nbsp; © 2026 ArgusReach
+</footer>
+
 </body>
 </html>
