@@ -514,6 +514,17 @@ def client_detail(client_id):
     )
 
 
+@app.route("/clients/<client_id>/status", methods=["POST"])
+@login_required
+def client_status_update(client_id):
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        return ("not found", 404)
+    client["onboarding_status"] = request.form.get("onboarding_status", client.get("onboarding_status","email_setup"))
+    save_clients(config)
+    return redirect(url_for("client_detail", client_id=client_id))
+
 @app.route("/clients/<client_id>/update", methods=["POST"])
 @login_required
 def client_update(client_id):
@@ -1058,6 +1069,7 @@ def intake_approve(intake_id):
         new_client = {
             "id":                    client_id,
             "active":                False,
+            "onboarding_status":     "email_setup",
             "mode":                  "draft_approval",
             "firm_name":             intake["firm_name"],
             "vertical":              intake["vertical"],

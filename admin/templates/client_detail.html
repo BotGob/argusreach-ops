@@ -9,8 +9,33 @@
   {% else %}
     <span class="badge badge-gray">Paused</span>
   {% endif %}
+  {% set os = client.get('onboarding_status','email_setup') %}
+  {% if not client.active %}
+    {% if os == 'email_setup' %}
+      <span style="font-size:11px;background:#1e3a5f;color:#60a5fa;border:1px solid #2563eb44;padding:3px 10px;border-radius:20px">📬 Awaiting email + app password</span>
+    {% elif os == 'warming_up' %}
+      <span style="font-size:11px;background:#1a2e1a;color:#4ade80;border:1px solid #22c55e44;padding:3px 10px;border-radius:20px">🔥 Warming up</span>
+    {% elif os == 'pending_review' %}
+      <span style="font-size:11px;background:#2d2005;color:#facc15;border:1px solid #ca8a0444;padding:3px 10px;border-radius:20px">👀 Pending client review</span>
+    {% elif os == 'ready_to_launch' %}
+      <span style="font-size:11px;background:#2d1505;color:#fb923c;border:1px solid #ea580c44;padding:3px 10px;border-radius:20px">🚀 Ready to launch</span>
+    {% endif %}
+  {% endif %}
 </div>
 <p class="subtitle">{{ client.vertical }} · {{ client.plan }} · {{ client.outreach_email }}</p>
+
+{% if not client.active %}
+<form method="POST" action="{{ url_for('client_status_update', client_id=client.id) }}" style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+  <label style="font-size:11px;color:#64748b">Onboarding stage:</label>
+  <select name="onboarding_status" style="font-size:12px;padding:4px 8px;background:#1e293b;border:1px solid #334155;border-radius:4px;color:#e2e8f0">
+    <option value="email_setup" {% if client.get('onboarding_status')=='email_setup' %}selected{% endif %}>📬 Awaiting email + app password</option>
+    <option value="warming_up" {% if client.get('onboarding_status')=='warming_up' %}selected{% endif %}>🔥 Warming up</option>
+    <option value="pending_review" {% if client.get('onboarding_status')=='pending_review' %}selected{% endif %}>👀 Pending client review</option>
+    <option value="ready_to_launch" {% if client.get('onboarding_status')=='ready_to_launch' %}selected{% endif %}>🚀 Ready to launch</option>
+  </select>
+  <button type="submit" style="font-size:11px;padding:4px 10px;background:#334155;border:none;border-radius:4px;color:#e2e8f0;cursor:pointer">Update</button>
+</form>
+{% endif %}
 <p style="font-size:11px;color:#334155;margin-bottom:16px;">🔄 Stats sync from Instantly hourly · Status auto-activates when campaign goes live in Instantly · Dashboard regenerates hourly</p>
 
 <div class="cards">

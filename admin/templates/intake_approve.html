@@ -12,27 +12,35 @@
     <div class="section-title">📋 Client Submission</div>
     {% set fields = [
       ('Firm Name', intake.firm_name),
+      ('Plan Selected', intake.get('plan','') | upper),
       ('Website', intake.get('website','')),
       ('Business Address', intake.get('business_address','')),
       ('Vertical', intake.vertical),
       ('Contact', intake.contact_name ~ ' · ' ~ intake.contact_email ~ (' · ' ~ intake.contact_phone if intake.get('contact_phone') else '')),
-      ('Target Geography', intake.get('target_geography','') ~ (' · ' ~ intake.get('target_radius','') if intake.get('target_radius') else '')),
+      ('Target Locations', intake.get('target_locations','')),
+      ('Target Industry', intake.get('target_industry','') | replace(',', ', ')),
+      ('Target Seniority', intake.get('target_seniority','') | replace(',', ', ')),
+      ('Target Company Size', intake.get('target_company_size','') | replace(',', ', ')),
       ('Target Titles', intake.get('target_titles','')),
       ('Target Company Type', intake.get('target_company_type','')),
-      ('Monthly Capacity', intake.get('monthly_capacity','')),
+      ('Meeting Format', intake.get('meeting_format','') | replace(',', ', ')),
+      ('Office Address', intake.get('office_address','')),
+      ('Calendar Type', intake.get('calendar_type','')),
       ('Ideal Prospect', intake.get('icp_summary','')),
       ('Business Description', intake.get('business_description','')),
       ('Differentiator', intake.get('differentiator','')),
       ('Outcomes', intake.get('outcomes','')),
       ('Best Referral Sources', intake.get('best_referral_sources','')),
       ('Prior Outreach', intake.get('prior_outreach','')),
+      ('Success Story', intake.get('success_story','')),
+      ('Biggest Objection', intake.get('prospect_objection','')),
       ('Value Proposition', intake.get('value_prop','')),
       ('Voice Sample', intake.get('voice_sample','')),
       ('Tone', intake.get('tone','')),
+      ('DNC Emails / Domains', intake.get('dnc_emails','')),
       ('DNC Notes', intake.get('dnc_notes','')),
       ('Compliance Note', intake.get('compliance_note','')),
       ('Desired Action', intake.get('desired_action','')),
-      ('Calendly Link', intake.get('calendly_link','')),
       ('Existing List', intake.get('has_existing_list','')),
       ('How They Heard', intake.get('how_heard','')),
       ('Notes', intake.get('notes','')),
@@ -60,10 +68,12 @@
       <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Plan *</label>
         <select name="plan" id="plan_select" onchange="updateContacts(this.value)" required>
-          <option value="starter" {% if not form.get('plan') or form.get('plan')=='starter' %}selected{% endif %}>Starter — $750/mo (200 contacts)</option>
-          <option value="growth" {% if form.get('plan')=='growth' %}selected{% endif %}>Growth — $1,500/mo (500 contacts)</option>
-          <option value="scale" {% if form.get('plan')=='scale' %}selected{% endif %}>Scale — $2,500/mo (1,000 contacts)</option>
+          {% set selected_plan = form.get('plan') or intake.get('plan') or 'starter' %}
+          <option value="starter" {% if selected_plan=='starter' %}selected{% endif %}>Starter — $750/mo (200 contacts)</option>
+          <option value="growth" {% if selected_plan=='growth' %}selected{% endif %}>Growth — $1,500/mo (500 contacts)</option>
+          <option value="scale" {% if selected_plan=='scale' %}selected{% endif %}>Scale — $2,500/mo (1,000 contacts)</option>
         </select>
+        <div style="font-size:10px;color:#4ade80;margin-top:3px">↑ Pre-filled from client's intake selection</div>
       </div>
 
       <div style="margin-bottom:14px">

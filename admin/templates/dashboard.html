@@ -47,7 +47,18 @@
       {% if c.active %}
         <span class="badge badge-green">Active</span>
       {% else %}
-        <span class="badge badge-gray">Paused</span>
+        {% set os = c.get('onboarding_status','email_setup') %}
+        {% if os == 'email_setup' %}
+          <span style="font-size:11px;color:#60a5fa">📬 Email setup</span>
+        {% elif os == 'warming_up' %}
+          <span style="font-size:11px;color:#4ade80">🔥 Warming up</span>
+        {% elif os == 'pending_review' %}
+          <span style="font-size:11px;color:#facc15">👀 Review</span>
+        {% elif os == 'ready_to_launch' %}
+          <span style="font-size:11px;color:#fb923c">🚀 Launch ready</span>
+        {% else %}
+          <span class="badge badge-gray">Paused</span>
+        {% endif %}
       {% endif %}
     </td>
     <td style="font-size:12px;color:#64748b">{{ c.campaign_name }}</td>
