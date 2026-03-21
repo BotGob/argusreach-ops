@@ -567,6 +567,49 @@ def client_detail(client_id):
     )
 
 
+@app.route("/clients/<client_id>/sequence", methods=["POST"])
+@login_required
+def save_sequence(client_id):
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+    f = request.form
+    client["sequence"] = [
+        {"subject": f.get("t1_subject","").strip(), "body": f.get("t1_body","").strip(), "delay_days": 0},
+        {"subject": f.get("t2_subject","").strip(), "body": f.get("t2_body","").strip(), "delay_days": int(f.get("t2_delay", 5))},
+        {"subject": f.get("t3_subject","").strip(), "body": f.get("t3_body","").strip(), "delay_days": int(f.get("t3_delay", 5))},
+    ]
+    client["schedule"] = {
+        "timezone": "America/New_York",
+        "start_hour": int(f.get("start_hour", 8)),
+        "end_hour":   int(f.get("end_hour", 17)),
+        "send_days":  f.getlist("send_days") or ["monday","tuesday","wednesday","thursday","friday"],
+    }
+    save_clients(config)
+    flash("Sequence and schedule saved.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+@app.route("/clients/<client_id>/checklist", methods=["POST"])
+@login_required
+def save_checklist(client_id):
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        return ("not found", 404)
+    f = request.form
+    client["checklist"] = {
+        "icp_reviewed":       f.get("icp_reviewed") == "1",
+        "dns_verified":       f.get("dns_verified") == "1",
+        "warmup_complete":    f.get("warmup_complete") == "1",
+        "payment_confirmed":  f.get("payment_confirmed") == "1",
+        "sequence_approved":  f.get("sequence_approved") == "1",
+        "calendar_connected": f.get("calendar_connected") == "1",
+    }
+    save_clients(config)
+    return ("ok", 200)
+
 @app.route("/clients/<client_id>/go-live", methods=["POST"])
 @login_required
 def client_go_live(client_id):
@@ -1187,6 +1230,28 @@ def intake_approve(intake_id):
             "_website":              intake.get("website",""),
             "_email_provider":       intake.get("email_provider","google"),
             "_dns_provider":         intake.get("dns_provider",""),
+            # Sequence (written by Gob, reviewed + approved by Vito before launch)
+            "sequence": [
+                {"subject": "", "body": "", "delay_days": 0},
+                {"subject": "", "body": "", "delay_days": 5},
+                {"subject": "", "body": "", "delay_days": 5},
+            ],
+            # Campaign schedule
+            "schedule": {
+                "timezone": "America/New_York",
+                "start_hour": 8,
+                "end_hour": 17,
+                "send_days": ["monday","tuesday","wednesday","thursday","friday"],
+            },
+            # Pre-launch checklist state (persists between sessions)
+            "checklist": {
+                "icp_reviewed":       False,
+                "dns_verified":       False,
+                "warmup_complete":    False,
+                "payment_confirmed":  False,
+                "sequence_approved":  False,
+                "calendar_connected": False,
+            },
         }
 
         config["clients"].append(new_client)

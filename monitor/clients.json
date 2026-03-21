@@ -50,7 +50,46 @@
       "_has_existing_list": "no",
       "_website": "https://www.argusreach.com",
       "_email_provider": "google",
-      "_dns_provider": ""
+      "_dns_provider": "",
+      "app_password": "mekd ejxy pejm kubb",
+      "calendly_event_slug": "",
+      "sequence": [
+        {
+          "subject": "",
+          "body": "",
+          "delay_days": 0
+        },
+        {
+          "subject": "",
+          "body": "",
+          "delay_days": 5
+        },
+        {
+          "subject": "",
+          "body": "",
+          "delay_days": 5
+        }
+      ],
+      "schedule": {
+        "timezone": "America/New_York",
+        "start_hour": 8,
+        "end_hour": 17,
+        "send_days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday"
+        ]
+      },
+      "checklist": {
+        "icp_reviewed": false,
+        "dns_verified": false,
+        "warmup_complete": false,
+        "payment_confirmed": false,
+        "sequence_approved": false,
+        "calendar_connected": false
+      }
     }
   ]
 }

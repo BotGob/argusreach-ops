@@ -421,21 +421,29 @@ def _save_sequence_template(client_id, steps):
 def create_instantly_campaign(client, month_name, sequence_steps=None):
     """Create a new Instantly campaign for the given month."""
     firm     = client["firm_name"]
-    name     = f"ArgusReach — {firm} — {month_name}"
-    timezone = client.get("send_timezone", "America/New_York")
+    name     = f"ArgusReach - {firm} - {month_name}"
+
+    # Use schedule from portal if available, else defaults
+    sched    = client.get("schedule", {})
+    tz       = sched.get("timezone", client.get("send_timezone", "America/New_York"))
+    sh       = sched.get("start_hour", 8)
+    eh       = sched.get("end_hour", 17)
+    send_days_list = sched.get("send_days", ["monday","tuesday","wednesday","thursday","friday"])
+    day_map  = {"monday":"1","tuesday":"2","wednesday":"3","thursday":"4","friday":"5","saturday":"6","sunday":"0"}
+    days_obj = {day_map[d]: True for d in send_days_list if d in day_map}
 
     payload = {
         "name": name,
         "campaign_schedule": {
             "schedules": [{
-                "name":   "Business Hours",
-                "timing": {"from": "08:00", "to": "17:00"},
-                "days":   {"1": True, "2": True, "3": True, "4": True, "5": True},
-                "timezone": timezone
+                "name":     "Business Hours",
+                "timing":   {"from": f"{sh:02d}:00", "to": f"{eh:02d}:00"},
+                "days":     days_obj,
+                "timezone": tz
             }]
         },
-        "stop_on_reply":   True,
-        "track_settings":  ["open_lead_clicked"],
+        "stop_on_reply":  True,
+        "track_settings": ["open_lead_clicked"],
     }
 
     if sequence_steps:
@@ -706,16 +714,37 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
     write_csv(contacts, client_id, month_name)
 
     # ── Step 4: Get sequence ──────────────────────────────────────────────────
-    sequence = get_sequence_for_new_campaign(client)
-    if not sequence:
-        print("⚠️  No sequence found — campaign will be created without steps.")
-        print("   Write sequence in Instantly after campaign creation.")
+    # Primary: use portal-stored approved sequence (from clients.json)
+    portal_seq = client.get("sequence", [])
+    sequence_steps = None
+    if portal_seq and any(s.get("subject") and s.get("body") for s in portal_seq):
+        print(f"✅ Using portal-stored sequence ({len(portal_seq)} touches)")
+        sequence_steps = []
+        for i, touch in enumerate(portal_seq):
+            if not touch.get("subject") or not touch.get("body"):
+                continue
+            delay_days = touch.get("delay_days", 0) if i > 0 else 0
+            sequence_steps.append({
+                "type":    "email",
+                "delay":   delay_days,
+                "subject": touch["subject"],
+                "body":    touch["body"],
+            })
+    else:
+        # Fallback: pull from existing Instantly campaign (month 2+)
+        legacy = get_sequence_for_new_campaign(client)
+        if legacy:
+            seq_data = legacy if isinstance(legacy, list) else legacy.get("steps", [])
+            sequence_steps = seq_data
+        else:
+            print("⚠️  No sequence found in portal or Instantly - campaign will be created without steps.")
+            print("   Save sequence in portal and relaunch, or add manually in Instantly.")
 
     if not dry_run:
         # ── Step 5: Create campaign ───────────────────────────────────────────
         campaign_id, campaign_name = create_instantly_campaign(
             client, month_name,
-            sequence_steps=sequence.get("steps") if sequence else None
+            sequence_steps=sequence_steps
         )
 
         # ── Step 6: Link sending account ─────────────────────────────────────

@@ -192,42 +192,96 @@
   </details>
 </div>
 
+<!-- ── OUTREACH SEQUENCE ─────────────────────────────────────────────── -->
+{% set seq = client.get('sequence', [{},{},{}]) %}
+{% set sched = client.get('schedule', {}) %}
+{% set cl = client.get('checklist', {}) %}
+<div class="section" style="margin-bottom:20px">
+  <div class="section-title">✉️ Outreach Sequence</div>
+  <p style="font-size:12px;color:#64748b;margin-bottom:14px">Written by Gob from intake data. Review here, copy into your client email, paste edits back, then mark approved. Loads into Instantly automatically on launch.</p>
+  <form method="POST" action="{{ url_for('save_sequence', client_id=client.id) }}">
+    {% for i, touch in [(1, seq[0] if seq|length > 0 else {}), (2, seq[1] if seq|length > 1 else {}), (3, seq[2] if seq|length > 2 else {})] %}
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;color:#4ade80;letter-spacing:.08em;text-transform:uppercase">Touch {{ i }}</span>
+        {% if i > 1 %}
+        <span style="font-size:11px;color:#64748b">Sends
+          <input type="number" name="t{{ i }}_delay" value="{{ touch.get('delay_days', 5) }}" min="1" max="30"
+                 style="width:40px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:11px;text-align:center">
+          days after Touch {{ i - 1 }}</span>
+        {% else %}
+        <span style="font-size:11px;color:#64748b">Sends on launch day</span>
+        {% endif %}
+      </div>
+      <input type="text" name="t{{ i }}_subject" value="{{ touch.get('subject','') }}" placeholder="Subject line"
+             style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;margin-bottom:8px">
+      <textarea name="t{{ i }}_body" placeholder="Email body..." rows="5"
+                style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;line-height:1.5;resize:vertical">{{ touch.get('body','') }}</textarea>
+    </div>
+    {% endfor %}
+
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Send Schedule</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:10px">
+        {% for day in ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#94a3b8;cursor:pointer">
+          <input type="checkbox" name="send_days" value="{{ day }}"
+                 {% if day in (sched.get('send_days', ['monday','tuesday','wednesday','thursday','friday'])) %}checked{% endif %}
+                 style="accent-color:#4ade80">
+          {{ day[:3]|capitalize }}
+        </label>
+        {% endfor %}
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:12px;color:#64748b">Send window:</span>
+        <select name="start_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
+          {% for h in range(6,13) %}
+          <option value="{{ h }}" {% if sched.get('start_hour',8)==h %}selected{% endif %}>{{ '%d:00 %s'|format(h if h<=12 else h-12, 'AM' if h<12 else 'PM') }}</option>
+          {% endfor %}
+        </select>
+        <span style="font-size:12px;color:#64748b">to</span>
+        <select name="end_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
+          {% for h in range(13,21) %}
+          <option value="{{ h }}" {% if sched.get('end_hour',17)==h %}selected{% endif %}>{{ '%d:00 %s'|format(h if h<=12 else h-12, 'AM' if h<12 else 'PM') }}</option>
+          {% endfor %}
+        </select>
+        <span style="font-size:11px;color:#475569">Eastern Time</span>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save Sequence &amp; Schedule</button>
+  </form>
+</div>
+
 <!-- ── LAUNCH NEW CAMPAIGN ─────────────────────────────────────────────── -->
 <div class="section" style="margin-bottom:24px;border:1px solid #1e3a5f;background:rgba(30,58,95,0.15)">
   <div class="section-title">🚀 Launch New Campaign</div>
   <p style="font-size:13px;color:#94a3b8;margin-bottom:16px">
-    Runs the full pipeline: Apollo lead pull → DNC filter → create campaign in Instantly as <b>DRAFT</b> → load leads → notify you to review and activate.
+    All 6 gates must be checked before launching. On launch: Apollo pull → DNC filter → NeverBounce → create Instantly campaign as <b>DRAFT</b> → load contacts + approved sequence + schedule. Then review in Instantly and hit Go.
   </p>
 
-  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
-    <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Pre-Launch Checklist — confirm before clicking Launch</div>
-      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Client ICP is configured (target titles, geography, industry in client settings)
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Sequence is written and ready to load (I'll paste it into Instantly after campaign is created)
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        DNS records verified — SPF, DKIM, DMARC passing for {{ client.get('outreach_email','sending domain') }}
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Sending account ({{ client.get('outreach_email','—') }}) warmup complete — score ≥ 85% in Instantly
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Subscription payment confirmed — first month received in Stripe
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer">
-        <input type="checkbox" class="launch-check" required style="width:16px;height:16px;accent-color:#4ade80">
-        Sequence approved by client — I will review in Instantly and activate manually
-      </label>
-    </div>
+  <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">Pre-Launch Checklist — saves automatically</div>
 
+    {% set checklist_items = [
+      ('icp_reviewed',       'Targeting reviewed - titles, locations, and industry look right'),
+      ('dns_verified',       'DNS verified - SPF, DKIM, DMARC passing for ' ~ client.get('outreach_email','sending domain')),
+      ('warmup_complete',    'Warmup complete - sending account score ≥ 85% in Instantly'),
+      ('payment_confirmed',  'Subscription payment confirmed in Stripe'),
+      ('sequence_approved',  'Sequence approved by client - stored in portal above'),
+      ('calendar_connected', 'Calendar connected - Calendly event live, client confirmed'),
+    ] %}
+
+    {% for key, label in checklist_items %}
+    <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer" class="checklist-row">
+      <input type="checkbox" class="launch-check persist-check" data-key="{{ key }}"
+             {% if cl.get(key) %}checked{% endif %}
+             style="width:16px;height:16px;accent-color:#4ade80;margin-top:1px;flex-shrink:0">
+      <span {% if cl.get(key) %}style="color:#4ade80"{% endif %}>{{ label }}</span>
+    </label>
+    {% endfor %}
+  </div>
+
+  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
       <div>
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Campaign Month</label>
@@ -236,28 +290,51 @@
       </div>
       <div>
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Lead Limit</label>
-        <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="10" max="500"
+        <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="1" max="1000"
                style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:90px">
       </div>
-      <button type="submit" id="launch-btn" class="btn btn-primary" style="background:#4ade80;color:#0f172a;font-weight:700" disabled>
-        🚀 Build &amp; Create Campaign
+      <button type="submit" id="launch-btn" class="btn btn-primary"
+              style="background:#4ade80;color:#0f172a;font-weight:700{% if not (cl.get('icp_reviewed') and cl.get('dns_verified') and cl.get('warmup_complete') and cl.get('payment_confirmed') and cl.get('sequence_approved') and cl.get('calendar_connected')) %};opacity:0.45;cursor:not-allowed{% endif %}"
+              {% if not (cl.get('icp_reviewed') and cl.get('dns_verified') and cl.get('warmup_complete') and cl.get('payment_confirmed') and cl.get('sequence_approved') and cl.get('calendar_connected')) %}disabled{% endif %}>
+        🚀 Build &amp; Launch Campaign
       </button>
     </div>
+    {% if not (cl.get('icp_reviewed') and cl.get('dns_verified') and cl.get('warmup_complete') and cl.get('payment_confirmed') and cl.get('sequence_approved') and cl.get('calendar_connected')) %}
+    <p style="font-size:11px;color:#475569;margin-top:8px">All 6 checklist items must be checked to enable launch.</p>
+    {% endif %}
   </form>
 
   <!-- Live progress log (shown after launch) -->
   <div id="launch-log" style="display:none;margin-top:16px">
     <div style="font-size:12px;color:#64748b;margin-bottom:6px">Launch Progress</div>
-    <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:200px;overflow-y:auto;white-space:pre-wrap"></pre>
+    <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></pre>
   </div>
 </div>
 
 <script>
-// Enable launch button only when all boxes checked
-document.querySelectorAll('.launch-check').forEach(cb => {
+// Checklist — auto-save on toggle, update label color, re-evaluate launch button
+document.querySelectorAll('.persist-check').forEach(cb => {
   cb.addEventListener('change', () => {
-    const allChecked = [...document.querySelectorAll('.launch-check')].every(c => c.checked);
-    document.getElementById('launch-btn').disabled = !allChecked;
+    const key = cb.dataset.key;
+    const label = cb.closest('label').querySelector('span');
+    label.style.color = cb.checked ? '#4ade80' : '';
+
+    // Build state from all checkboxes
+    const state = {};
+    document.querySelectorAll('.persist-check').forEach(c => { state[c.dataset.key] = c.checked ? '1' : '0'; });
+
+    fetch('{{ url_for("save_checklist", client_id=client.id) }}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(state).toString()
+    });
+
+    // Enable/disable launch button
+    const allDone = Object.values(state).every(v => v === '1');
+    const btn = document.getElementById('launch-btn');
+    btn.disabled = !allDone;
+    btn.style.opacity = allDone ? '1' : '0.45';
+    btn.style.cursor = allDone ? 'pointer' : 'not-allowed';
   });
 });
 

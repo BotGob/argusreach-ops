@@ -59,5 +59,6 @@ vito@argusreach.com
 ## Gob checklist before Vito sends this email
 - [ ] Generate DNS records for client's domain (SPF, DKIM, DMARC for their outreach email)
 - [ ] Create Calendly event type for client (calendly.com/argusreach/[client-slug])
-- [ ] Pull sequence from Instantly DRAFT campaign and paste in
+- [ ] Write sequence in portal (admin portal → client → Outreach Sequence section) and save
+- [ ] Copy sequence from portal and paste into this email under section 2
 - [ ] Confirm outreach email + app password linked to client record in clients.json
