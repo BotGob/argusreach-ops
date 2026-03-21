@@ -56,17 +56,17 @@
       "sequence": [
         {
           "subject": "Quick question, {{firstName}}",
-          "body": "Hi {{firstName}}, I came across {{companyName}} and wanted to reach out directly. We work with professional services firms to build a consistent pipeline of new client meetings through targeted outreach - handling everything from list building to managing replies. Most of our clients were relying on referrals alone before working with us. If adding 3-5 qualified conversations per month to your calendar sounds interesting, I'd love to show you how it works. Would a quick call this week make sense?\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\n\nI came across {{companyName}} and wanted to reach out directly.\n\nWe help professional services firms in Florida generate a consistent pipeline of new client meetings - handling everything from building the list to managing replies. Your team only shows up when someone's already interested.\n\nMost of the firms we work with were running almost entirely on referrals before. That tends to plateau.\n\nWould a quick call this week make sense?\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 0
         },
         {
           "subject": "Re: Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\n\nFollowing up on my last note.\n\nWe handle everything - sourcing, writing, sending, and managing replies. Most services hand you a list or a template and walk away. We run the full process under your name, so you only get involved when someone is ready to talk.\n\nHappy to walk you through it in 15 minutes if there's any interest.\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\n\nWanted to follow up on my last note.\n\nThe way it works: we identify your ideal clients, write personalized outreach under your name, send it, and manage every reply until someone's ready to meet. You get a calendar invite. That's it.\n\nIf adding a few qualified conversations per month sounds useful, happy to walk through it in 15 minutes.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         },
         {
-          "subject": "Last note - {{companyName}}",
-          "body": "Hi {{firstName}},\n\nI'll keep this short - I know your inbox is full.\n\nIf building a consistent pipeline of new client meetings ever becomes a priority, feel free to reach out anytime.\n\nVito Resciniti\nCEO, ArgusReach",
+          "subject": "Closing the loop, {{firstName}}",
+          "body": "Hi {{firstName}},\n\nI'll keep this short.\n\nIf building a more consistent pipeline ever becomes a priority, we'd love to help. Feel free to reach out anytime.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         }
       ],

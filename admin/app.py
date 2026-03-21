@@ -66,24 +66,94 @@ def to_et_filter(dt_str):
 # ── SEQUENCE GENERATOR ────────────────────────────────────────────────────────
 
 def _generate_sequence_from_intake(client: dict) -> list:
-    """Auto-generate a 3-touch email sequence from intake data.
+    """Auto-generate a 3-touch email sequence using Claude AI from intake data.
     Called immediately on intake approval so Vito sees a draft when he opens the client page.
-    Uses the voice_sample as Touch 1 if provided (most authentic), otherwise builds from value_prop.
+    Falls back to template-based generation if API call fails.
     """
-    sender       = client.get("sender_name", "Vito")
-    title_role   = client.get("title", "Founder")
-    firm         = client.get("firm_name", "")
-    value_prop   = client.get("_value_prop", "").strip()
-    differentiator = client.get("_differentiator", "").strip()
-    outcomes     = client.get("_outcomes", "").strip()
-    voice_sample = client.get("_voice_sample", "").strip()
-    calendly     = client.get("calendly_link", "").strip()
+    import os, json as _json
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
-    sig = f"{sender}\n{title_role}, {firm}"
+    sender     = client.get("sender_name", "Vito")
+    title_role = client.get("title", "Founder")
+    firm       = client.get("firm_name", "")
+    calendly   = client.get("calendly_link", "").strip()
+    sig        = f"{sender}\n{title_role}, {firm}"
     if calendly:
         sig += f"\n{calendly}"
 
-    # Touch 1 — use voice sample if present (it's the client's own words, best)
+    if api_key:
+        try:
+            import anthropic as _anthropic
+            aclient = _anthropic.Anthropic(api_key=api_key)
+
+            intake_context = f"""
+Firm name: {firm}
+Sender name / signer: {sender}
+Sender title: {title_role}
+Vertical / industry: {client.get('vertical','')}
+Business description: {client.get('_business_description','')}
+Value proposition: {client.get('_value_prop','')}
+Differentiator (what makes them different): {client.get('_differentiator','')}
+Client outcomes: {client.get('_outcomes','')}
+Voice sample (client's own words — use this as style guide for Touch 1): {client.get('_voice_sample','')}
+Target titles: {client.get('_target_titles','')}
+Target locations: {client.get('_target_locations','')}
+Target company size: {client.get('_target_company_size','')}
+Success story: {client.get('_success_story','')}
+Common prospect objection: {client.get('_prospect_objection','')}
+Tone: {client.get('tone','warm-professional')}
+Desired action: {client.get('_desired_action','book_call')}
+Compliance note: {client.get('compliance_note','')}
+Email signature to append: {sig}
+""".strip()
+
+            prompt = f"""You are writing a 3-touch cold email outreach sequence for a client of ArgusReach, a done-for-you outbound prospecting service.
+
+Here is everything you know about this client:
+
+{intake_context}
+
+Write a 3-touch cold email sequence. Rules:
+- Touch 1: Short cold intro (60-80 words max). Use {{{{firstName}}}} and {{{{companyName}}}} for personalization. If a voice sample is provided, use it as your style guide — preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
+- Touch 2: Follow-up 5 days later. Different angle — explain the mechanism or add a specific proof point. 50-70 words. Same signature.
+- Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. Same signature.
+- All touches: plain text only, no markdown, no bullet points, no em dashes (use hyphens), sound like a real human wrote it, not a template
+- Use {{{{firstName}}}}, {{{{companyName}}}} as the only personalization tags
+
+Respond with ONLY valid JSON in this exact format, no other text:
+{{
+  "touches": [
+    {{"subject": "...", "body": "...", "delay_days": 0}},
+    {{"subject": "...", "body": "...", "delay_days": 5}},
+    {{"subject": "...", "body": "...", "delay_days": 5}}
+  ]
+}}"""
+
+            resp = aclient.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=1200,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            raw = resp.content[0].text.strip()
+            # Strip markdown code fences if present
+            if raw.startswith("```"):
+                raw = raw.split("```")[1]
+                if raw.startswith("json"):
+                    raw = raw[4:]
+                raw = raw.strip()
+            data = _json.loads(raw)
+            touches = data.get("touches", [])
+            if len(touches) == 3:
+                app.logger.info(f"✅ Claude-generated sequence for {firm}")
+                return touches
+        except Exception as e:
+            app.logger.warning(f"⚠️  Claude sequence generation failed ({e}), falling back to template")
+
+    # Fallback: template-based generation
+    app.logger.info(f"Using template sequence for {firm}")
+    voice_sample = client.get("_voice_sample", "").strip()
+    differentiator = client.get("_differentiator", "").strip()
+
     if voice_sample and len(voice_sample) > 40:
         t1_body = (
             voice_sample
@@ -92,41 +162,26 @@ def _generate_sequence_from_intake(client: dict) -> list:
             .replace("[Company]",    "{{companyName}}")
             .replace("[City]",       "{{city}}")
         )
-        # Append signature if not already there
         if sender.lower() not in t1_body.lower():
             t1_body += f"\n\n{sig}"
     else:
-        vp = value_prop or "help firms like yours build a consistent pipeline of new client meetings"
+        vp = client.get("_value_prop","") or "help firms like yours build a consistent pipeline of new client meetings"
         t1_body = (
             f"Hi {{{{firstName}}}},\n\n"
             f"I came across {{{{companyName}}}} and wanted to reach out directly.\n\n"
             f"We {vp} - handling the full process so your team only gets involved when someone is ready to talk.\n\n"
-            f"Would a quick call this week make sense?\n\n"
-            f"{sig}"
+            f"Would a quick call this week make sense?\n\n{sig}"
         )
 
-    # Touch 2 — follow-up with differentiator angle
-    if differentiator and len(differentiator) > 20:
-        t2_middle = differentiator
-    else:
-        t2_middle = "Wanted to make sure my last note didn't get buried."
-
     t2_body = (
-        f"Hi {{{{firstName}}}},\n\n"
-        f"Following up on my last note.\n\n"
-        f"{t2_middle}\n\n"
-        f"Happy to walk you through it in 15 minutes if there's any interest.\n\n"
-        f"{sig}"
+        f"Hi {{{{firstName}}}},\n\nFollowing up on my last note.\n\n"
+        f"{differentiator or 'Wanted to make sure this did not get buried.'}\n\n"
+        f"Happy to walk you through it in 15 minutes.\n\n{sig}"
     )
-
-    # Touch 3 — short final
     t3_body = (
-        f"Hi {{{{firstName}}}},\n\n"
-        f"I'll keep this short - I know your inbox is full.\n\n"
-        f"If this ever becomes a priority, feel free to reach out anytime.\n\n"
-        f"{sig}"
+        f"Hi {{{{firstName}}}},\n\nI'll keep this short - I know your inbox is full.\n\n"
+        f"If this ever becomes a priority, feel free to reach out anytime.\n\n{sig}"
     )
-
     return [
         {"subject": "Quick question, {{firstName}}",        "body": t1_body, "delay_days": 0},
         {"subject": "Re: Quick question, {{firstName}}",    "body": t2_body, "delay_days": 5},
