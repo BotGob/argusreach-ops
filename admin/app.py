@@ -89,57 +89,61 @@ def _send_welcome_email(client: dict):
 
     first_name = contact_name.split()[0] if contact_name else "there"
 
-    body = f"""Hi {first_name},
+    html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;">
+<div style="max-width:580px;margin:0 auto;padding:40px 24px;">
 
-Welcome to ArgusReach - we've received your intake and we're already building your prospect list and outreach sequence. We'll send you the draft sequence shortly for your review before anything goes out.
+  <div style="margin-bottom:32px;">
+    <span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
+  </div>
 
-In the meantime, there are a few things we need from you to get everything ready:
+  <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first_name},</p>
 
-1. Set up your outreach email address
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Welcome - we've received your intake and we're already building your prospect list and outreach sequence. We'll send you the draft sequence shortly for your review before anything goes out.</p>
 
-We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account for this - something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">In the meantime, there are a few things we need from you to get everything ready:</p>
 
-Important: this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work - we need a full account with its own login credentials.
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>1. Set up your outreach email address</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account - something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;"><strong>Important:</strong> this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work - we need a full account with its own login credentials.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0;">Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6-$8/mo for an additional user), then reply with the email address and app password and we'll handle the rest. Don't have Google Workspace or Microsoft 365 yet? Let us know and we'll point you in the right direction.</p>
+  </div>
 
-What you need to do:
-- Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6–$8/mo for an additional user)
-- Once it's created, we'll send you instructions to generate an app password so we can send on your behalf
-- Send us the email address and app password and we'll handle the rest
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>2. Email authentication setup (DNS)</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0;">We can't move forward to this step until step 1 is complete. Once we have your outreach email address, we'll send you the exact DNS records to add to your domain (SPF, DKIM, DMARC) - this is what ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain can handle it in about 10 minutes.</p>
+  </div>
 
-If you don't have Google Workspace or Microsoft 365 yet, let us know and we'll point you in the right direction.
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>3. Do-not-contact list</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">If there are specific people or companies you never want us to contact - existing clients, partners, competitors - reply with that list and we'll make sure they're excluded before a single email goes out.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0;">Best way to send it: include the email domain for each company (e.g. smithlaw.com). That blocks every person at that company, not just the ones you know by name. Individual email addresses work too - a spreadsheet or CRM export is fine.</p>
+  </div>
 
-2. Email authentication setup (DNS)
+  <div style="border-left:3px solid #e5e5e5;padding-left:16px;margin-bottom:32px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;color:#888;"><strong>4. Warm leads (optional)</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#888;margin:0;">If there are people you already have a relationship with - or anyone you'd like us to prioritize - send those over and we'll move them to the front of the list.</p>
+  </div>
 
-We can't move forward to this step until step 1 is complete. Once we have your outreach email address, we'll send you the exact DNS records to add to your domain. This is a standard email security setup (SPF, DKIM, DMARC) that ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain (GoDaddy, Cloudflare, Namecheap, etc.) can handle it in about 10 minutes.
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with your sequence draft, DNS records, and booking link.</p>
 
-If you don't have an IT person, just let us know and we'll walk you through it.
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
+    <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
+  </div>
 
-3. Do-not-contact list (if you have one)
-
-If there are specific people or companies you never want us to contact - existing clients, referral partners, competitors - reply with that list and we'll make sure they're excluded before a single email goes out.
-
-The most reliable way to send it: include the email domain for each company (e.g. @smithlaw.com or smithlaw.com). That way we block every person at that company, not just the ones you happen to know. Individual email addresses work too. A spreadsheet, plain text list, or CRM export are all fine - we'll extract what we need from whatever format you have.
-
-4. Warm leads (optional)
-
-If there are people you already have a relationship with - or anyone you'd like us to prioritize reaching out to first - send those over and we'll move them to the front of the list.
-
-Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with:
-- Your outreach sequence draft for review
-- DNS records for your IT person
-- Your booking link to connect to your calendar (so prospects can schedule directly with you)
-
-— Vito Resciniti
-Founder, ArgusReach
-vito@argusreach.com
-"""
+</div>
+</body>
+</html>"""
 
     try:
         msg = MIMEMultipart("alternative")
         msg["From"]    = f"{sender_name} <{from_email}>"
         msg["To"]      = to_email
         msg["Subject"] = f"Welcome to ArgusReach - next steps for {firm_name}"
-        msg.attach(MIMEText(body, "plain"))
+        msg.attach(MIMEText(html, "html"))
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
             smtp.login(from_email, app_password)

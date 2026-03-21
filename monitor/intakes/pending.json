@@ -2,7 +2,7 @@
   {
     "id": "20260321213641",
     "submitted_at": "2026-03-21T21:36:41.817489",
-    "status": "pending",
+    "status": "approved",
     "firm_name": "ArgusReach",
     "contact_name": "Vito Resciniti",
     "contact_title": "CEO",
@@ -39,6 +39,7 @@
     "desired_action": "book_call",
     "has_existing_list": "no",
     "how_heard": "N/A",
-    "notes": "Nope."
+    "notes": "Nope.",
+    "client_id": "argusreach"
   }
 ]
