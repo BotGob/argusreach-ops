@@ -62,7 +62,8 @@
     }
     input:focus, select:focus, textarea:focus { border-color: rgba(74,222,128,0.5); background: var(--bg3); }
     select option { background: var(--bg2); }
-    textarea { resize: none; min-height: 90px; line-height: 1.6; overflow: hidden; }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.6; overflow-y: hidden; }
+    textarea::-webkit-scrollbar { display: none; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
 
