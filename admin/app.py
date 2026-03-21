@@ -1092,9 +1092,15 @@ def intake():
             f"Review at: https://admin.argusreach.com/intakes"
         )
 
-        return render_template("intake_thanks.html", name=submission["contact_name"])
+        # PRG pattern — redirect to GET so browser reload doesn't resubmit
+        return redirect(url_for("intake_thanks", name=submission["contact_name"]))
 
     return render_template("intake_form.html")
+
+@app.route("/intake/thanks")
+def intake_thanks():
+    name = request.args.get("name", "")
+    return render_template("intake_thanks.html", name=name)
 
 
 @app.route("/intakes")
