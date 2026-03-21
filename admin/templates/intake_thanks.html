@@ -3,27 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thank You — ArgusReach</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Submitted - ArgusReach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
-    .container { max-width: 480px; text-align: center; }
-    .icon { font-size: 52px; margin-bottom: 24px; }
-    .logo { font-size: 16px; font-weight: 700; color: #60a5fa; margin-bottom: 24px; letter-spacing: -0.5px; }
-    h1 { font-size: 26px; font-weight: 700; margin-bottom: 12px; }
-    p { color: #64748b; font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
-    .highlight { color: #e2e8f0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f0f0f; --bg2: #161616; --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13); --text: #f5f5f5; --sub: #888; --green: #4ade80;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; -webkit-font-smoothing: antialiased; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; padding: 0 40px; height: 56px; background: rgba(15,15,15,0.97); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 0.95rem; font-weight: 800; letter-spacing: -0.02em; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .logo-mark { width: 22px; height: 22px; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 5px; display: grid; place-items: center; }
+    .logo-mark-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+
+    .card { max-width: 480px; width: 100%; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; padding: 48px 40px; text-align: center; }
+    .check { width: 56px; height: 56px; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 28px; }
+    .check svg { color: var(--green); }
+    .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+    h1 { font-size: 1.75rem; font-weight: 900; letter-spacing: -0.04em; color: #fff; margin-bottom: 16px; }
+    p { font-size: 0.875rem; color: var(--sub); line-height: 1.75; margin-bottom: 10px; }
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .footer-note { font-size: 0.75rem; color: var(--sub); }
+    .footer-note a { color: var(--sub); text-decoration: underline; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="logo">ArgusReach</div>
-  <div class="icon">✅</div>
+
+<nav>
+  <a href="https://argusreach.com" class="logo">
+    <div class="logo-mark"><div class="logo-mark-dot"></div></div>
+    ArgusReach
+  </a>
+</nav>
+
+<div class="card">
+  <div class="check">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="eyebrow">Received</div>
   <h1>You're all set{% if name %}, {{ name.split()[0] }}{% endif %}.</h1>
-  <p>We received your onboarding information and will review it within 1 business day.</p>
-  <p>Once we've confirmed everything on our end, <span class="highlight">Vito will reach out directly</span> to walk you through next steps and confirm your campaign launch date.</p>
-  <p style="margin-top: 24px; font-size: 12px;">Questions? <a href="mailto:vito@argusreach.com" style="color:#3b82f6">vito@argusreach.com</a></p>
+  <p>We have everything we need. Our team will review your intake and be in touch shortly with your next steps.</p>
+  <p>Keep an eye on your inbox - you'll hear from us at <strong style="color:var(--text)">vito@argusreach.com</strong>.</p>
+  <div class="divider"></div>
+  <p class="footer-note">Questions? <a href="mailto:vito@argusreach.com">vito@argusreach.com</a></p>
 </div>
+
 </body>
 </html>
