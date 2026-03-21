@@ -116,7 +116,9 @@ If you don't have an IT person, just let us know and we'll walk you through it.
 
 3. Do-not-contact list (if you have one)
 
-If there are specific people, companies, or domains you never want us to contact — existing clients, partners, competitors — reply with that list and we'll make sure they're excluded before a single email goes out. Emails, names, or company domains all work.
+If there are specific people or companies you never want us to contact — existing clients, referral partners, competitors — reply with that list and we'll make sure they're excluded before a single email goes out.
+
+The most reliable way to send it: include the email domain for each company (e.g. @smithlaw.com or smithlaw.com). That way we block every person at that company, not just the ones you happen to know. Individual email addresses work too. A spreadsheet, plain text list, or CRM export are all fine — we'll extract what we need from whatever format you have.
 
 4. Warm leads (optional)
 
