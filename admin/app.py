@@ -744,6 +744,9 @@ def client_go_live(client_id):
     client = next((c for c in config["clients"] if c.get("id") == client_id), None)
     if not client:
         return ("not found", 404)
+    if not client.get("instantly_campaign_id"):
+        flash("❌ No campaign found - run Launch first before marking live.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
     client["active"] = True
     client["onboarding_status"] = None
     if not client.get("launch_date"):

@@ -237,9 +237,9 @@ def search_apollo(client, target, exclude_emails):
     seniority_levels = list(dict.fromkeys(seniority_levels))  # dedupe
 
     print(f"🔍 Apollo search — need {target} fresh contacts (excluding {len(exclude_emails)} already contacted)")
-    if industry_tags:    print(f"   Industry: {industry}")
-    if seniority_levels: print(f"   Seniority: {seniority}")
-    if employee_ranges:  print(f"   Company size: {company_size}")
+    if industry_tags:    print(f"   Industry: {industries}")
+    if seniority_levels: print(f"   Seniority: {seniorities}")
+    if employee_ranges:  print(f"   Company size: {company_sizes}")
 
     while len(contacts) < target and page <= max_pages:
         payload = {

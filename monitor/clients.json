@@ -4,7 +4,7 @@
     {
       "id": "argusreach",
       "active": false,
-      "onboarding_status": "warming_up",
+      "onboarding_status": "email_setup",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
       "vertical": "B2BServices",
@@ -56,17 +56,17 @@
       "sequence": [
         {
           "subject": "Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\n\nI came across {{companyName}} and wanted to reach out directly.\n\nWe help professional services firms in Florida generate a consistent pipeline of new client meetings - handling everything from building the list to managing replies. Your team only shows up when someone's already interested.\n\nMost of the firms we work with were running almost entirely on referrals before. That tends to plateau.\n\nWould a quick call this week make sense?\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\r\n\r\nMost PT clinics run on physician referrals - until those relationships shift. Building a reliable pipeline that isn't dependent on a few referring docs is where it gets hard.\r\n\r\nWe run targeted outreach automatically every month under your name. You only get involved when someone's ready to talk.\r\n\r\nWorth a quick call? \r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
           "delay_days": 0
         },
         {
           "subject": "Re: Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\n\nWanted to follow up on my last note.\n\nThe way it works: we identify your ideal clients, write personalized outreach under your name, send it, and manage every reply until someone's ready to meet. You get a calendar invite. That's it.\n\nIf adding a few qualified conversations per month sounds useful, happy to walk through it in 15 minutes.\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\r\n\r\nFollowing up on my last note.\r\n\r\nHere's how it works: we build your prospect list, write every email in your voice, send it, and manage every reply until someone says they want to talk. You get a calendar invite. That's the only step that requires you.\r\n\r\nIf adding a few qualified conversations per month sounds worth 15 minutes, happy to walk through it.\r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
           "delay_days": 5
         },
         {
           "subject": "Closing the loop, {{firstName}}",
-          "body": "Hi {{firstName}},\n\nI'll keep this short.\n\nIf building a more consistent pipeline ever becomes a priority, we'd love to help. Feel free to reach out anytime.\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\r\n\r\nI'll keep this short.\r\n\r\nIf building a consistent pipeline outside of referrals ever becomes a priority, we'd love to help. Feel free to reach out anytime.\r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
           "delay_days": 5
         }
       ],
@@ -75,20 +75,16 @@
         "start_hour": 8,
         "end_hour": 17,
         "send_days": [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday"
+          "saturday"
         ]
       },
       "checklist": {
-        "icp_reviewed": false,
-        "dns_verified": false,
-        "warmup_complete": false,
-        "payment_confirmed": false,
-        "sequence_approved": false,
-        "calendar_connected": false
+        "icp_reviewed": true,
+        "dns_verified": true,
+        "warmup_complete": true,
+        "payment_confirmed": true,
+        "sequence_approved": true,
+        "calendar_connected": true
       }
     }
   ]
