@@ -1454,19 +1454,17 @@ def check_campaign_cycles(clients):
 
 
 def _auto_activate_client(client_id, campaign_id, firm_name):
-    """If Instantly campaign is live but clients.json says inactive, auto-activate."""
+    """Notify Vito that campaign is live in Instantly — manual Mark Campaign Live required in portal.
+    Auto-activation disabled: Vito is the last gate before monitor starts watching.
+    """
     try:
         data = json.loads(CLIENTS_FILE.read_text())
         for c in data.get('clients', []):
             if c['id'] == client_id and not c.get('active'):
-                c['active']            = True
-                c['onboarding_status'] = None
-                c['launch_date']       = c.get('launch_date') or datetime.utcnow().strftime('%Y-%m-%d')
-                CLIENTS_FILE.write_text(json.dumps(data, indent=2))
-                log(f"[AutoActivate] {firm_name} is live in Instantly — auto-activated in clients.json")
+                log(f"[AutoActivate] {firm_name} campaign is live in Instantly — waiting for Vito to Mark Campaign Live in portal")
                 notify(
-                    f"✅ *{firm_name}* campaign detected as live in Instantly.\n"
-                    f"Monitor is now watching for replies."
+                    f"🟡 *{firm_name}* campaign is live in Instantly.\n\n"
+                    f"Go to the portal and hit *Mark Campaign Live* to start the monitor."
                 )
                 break
     except Exception as e:
