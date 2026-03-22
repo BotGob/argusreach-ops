@@ -308,8 +308,11 @@
     {% endfor %}
   </div>
 
-  <!-- ── TOOLS: DNS Records + Payment Link ───────────────────────────── -->
+  <!-- ── TOOLS: Auto-verify + DNS Records + Payment Link ─────────────── -->
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+    <button id="auto-verify-btn" onclick="runAutoVerify()" class="btn btn-ghost btn-sm" style="font-size:12px">
+      🔍 Auto-verify DNS &amp; Warmup
+    </button>
     <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank"
        class="btn btn-ghost btn-sm" style="font-size:12px">
       📋 Get DNS Record Block
@@ -360,7 +363,75 @@
   </div>
 </div>
 
+<!-- Auto-verify result panel (hidden until run) -->
+<div id="auto-verify-result" style="display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.7"></div>
+
 <script>
+// ── Auto-verify DNS + Warmup ──────────────────────────────────────────────
+function runAutoVerify() {
+  const btn = document.getElementById('auto-verify-btn');
+  const panel = document.getElementById('auto-verify-result');
+  btn.disabled = true;
+  btn.textContent = '⏳ Checking...';
+  panel.style.display = 'block';
+  panel.innerHTML = '<span style="color:#94a3b8">Querying DNS and Instantly API…</span>';
+
+  fetch('{{ url_for("auto_check_gates", client_id=client.id) }}')
+    .then(r => r.json())
+    .then(data => {
+      btn.disabled = false;
+      btn.textContent = '🔍 Auto-verify DNS & Warmup';
+
+      const dns  = data.dns  || {};
+      const warm = data.warmup || {};
+      const score = warm.score !== null && warm.score !== undefined ? warm.score : '—';
+      const warmPass = data.warmup_pass;
+      const dnsPass  = data.dns_pass;
+
+      let html = `<div style="font-weight:700;color:#e2e8f0;margin-bottom:8px">Auto-verify results — ${data.checked_at || ''}</div>`;
+
+      // DNS
+      html += `<div style="margin-bottom:6px;color:${dnsPass ? '#4ade80' : '#f87171'}">`;
+      html += `<b>DNS:</b> ${dnsPass ? '✅ All passing' : '❌ Issues found'}<br>`;
+      html += `<span style="color:${dns.spf ? '#4ade80' : '#f87171'}">  SPF: ${dns.spf ? '✅' : '❌'}</span>`;
+      if (dns.spf_record) html += ` <span style="color:#64748b;font-size:11px">${dns.spf_record.substring(0, 60)}…</span>`;
+      html += '<br>';
+      html += `<span style="color:${dns.dmarc ? '#4ade80' : '#f87171'}">  DMARC: ${dns.dmarc ? '✅' : '❌'}</span>`;
+      html += '<br>';
+      html += `<span style="color:${dns.dkim ? '#4ade80' : '#f87171'}">  DKIM: ${dns.dkim ? '✅' : '❌'}`;
+      if (dns.dkim_selector) html += ` <span style="color:#64748b;font-size:11px">(selector: ${dns.dkim_selector})</span>`;
+      html += '</span>';
+      if (dns.error) html += `<br><span style="color:#f87171;font-size:11px">⚠️ ${dns.error}</span>`;
+      html += '</div>';
+
+      // Warmup
+      html += `<div style="color:${warmPass ? '#4ade80' : '#f87171'}">`;
+      html += `<b>Warmup:</b> ${warmPass ? '✅' : '❌'} Score: ${score}${score !== '—' ? '/100' : ''} (need ≥ 85%)`;
+      if (warm.error) html += `<br><span style="color:#f87171;font-size:11px">⚠️ ${warm.error}</span>`;
+      html += '</div>';
+
+      // What was auto-updated
+      const cl = data.checklist_updated || {};
+      if (dnsPass || warmPass) {
+        html += `<div style="margin-top:8px;color:#4ade80;font-size:11px">`;
+        if (dnsPass) html += '✅ DNS Verified box auto-checked. ';
+        if (warmPass) html += '✅ Warmup Complete box auto-checked. ';
+        html += 'Reloading…</div>';
+        panel.innerHTML = html;
+        // Reload to reflect updated checklist state
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        html += `<div style="margin-top:8px;color:#94a3b8;font-size:11px">No boxes auto-checked — fix the issues above, then run again.</div>`;
+        panel.innerHTML = html;
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = '🔍 Auto-verify DNS & Warmup';
+      panel.innerHTML = `<span style="color:#f87171">Error: ${err}</span>`;
+    });
+}
+
 // Checklist — auto-save on toggle, update label color, re-evaluate launch button
 document.querySelectorAll('.persist-check').forEach(cb => {
   cb.addEventListener('change', () => {

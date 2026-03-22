@@ -27,6 +27,11 @@ from functools import wraps
 from pathlib import Path
 
 import requests
+try:
+    import dns.resolver as _dns_resolver
+    _DNS_OK = True
+except ImportError:
+    _DNS_OK = False
 from dotenv import load_dotenv
 from flask import (Flask, Response, flash, redirect, render_template,
                    request, send_file, session, url_for)
@@ -999,6 +1004,143 @@ def campaign_launch_log(client_id):
     if not log_path.exists():
         return "No launch in progress.", 200
     return log_path.read_text(), 200, {"Content-Type": "text/plain"}
+
+
+@app.route("/clients/<client_id>/auto-check")
+@login_required
+def auto_check_gates(client_id):
+    """Auto-verify DNS records and Instantly warmup score. Updates checklist in-place."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        return (json.dumps({"error": "Client not found"}), 404, {"Content-Type": "application/json"})
+
+    outreach_email = client.get("outreach_email", "").strip()
+    email_provider = client.get("_email_provider", "google")
+    results = {}
+
+    # ── DNS CHECK ────────────────────────────────────────────────────────────
+    dns_result = {"spf": False, "dmarc": False, "dkim": False,
+                  "spf_record": "", "dmarc_record": "", "dkim_record": "",
+                  "error": None}
+
+    if not outreach_email:
+        dns_result["error"] = "No outreach email set — add it in Monitor & Client Settings first."
+    elif not _DNS_OK:
+        dns_result["error"] = "dnspython not installed on server."
+    else:
+        domain = outreach_email.split("@")[-1].lower()
+        try:
+            # SPF
+            for r in _dns_resolver.resolve(domain, "TXT"):
+                txt = r.to_text().strip('"')
+                if txt.startswith("v=spf1"):
+                    dns_result["spf"] = True
+                    dns_result["spf_record"] = txt
+                    break
+        except Exception:
+            pass
+        try:
+            # DMARC
+            for r in _dns_resolver.resolve(f"_dmarc.{domain}", "TXT"):
+                txt = r.to_text().strip('"')
+                if "v=DMARC1" in txt:
+                    dns_result["dmarc"] = True
+                    dns_result["dmarc_record"] = txt
+                    break
+        except Exception:
+            pass
+        # DKIM — try provider-specific selectors first, then common fallbacks
+        provider_selectors = {
+            "google":    ["google"],
+            "microsoft": ["selector1", "selector2"],
+        }
+        selectors = provider_selectors.get(email_provider, []) + ["google", "selector1", "selector2", "mail", "default", "dkim"]
+        seen = []
+        for sel in selectors:
+            if sel in seen:
+                continue
+            seen.append(sel)
+            try:
+                for r in _dns_resolver.resolve(f"{sel}._domainkey.{domain}", "TXT"):
+                    txt = r.to_text().strip('"')
+                    if "v=DKIM1" in txt or "k=rsa" in txt or "p=" in txt:
+                        dns_result["dkim"] = True
+                        dns_result["dkim_record"] = (txt[:80] + "...") if len(txt) > 80 else txt
+                        dns_result["dkim_selector"] = sel
+                        break
+                if dns_result["dkim"]:
+                    break
+            except Exception:
+                continue
+
+    dns_pass = dns_result["spf"] and dns_result["dmarc"] and dns_result["dkim"]
+    results["dns"] = dns_result
+    results["dns_pass"] = dns_pass
+
+    # ── WARMUP CHECK ─────────────────────────────────────────────────────────
+    warmup_result = {"score": None, "error": None, "status": None}
+    warmup_pass = False
+
+    if not outreach_email:
+        warmup_result["error"] = "No outreach email set."
+    elif not INSTANTLY_KEY:
+        warmup_result["error"] = "INSTANTLY_API_KEY not configured."
+    else:
+        try:
+            r = requests.get(
+                "https://api.instantly.ai/api/v2/accounts",
+                headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
+                params={"limit": 100},
+                timeout=10
+            )
+            r.raise_for_status()
+            items = r.json().get("items", [])
+            matched = next((a for a in items if a.get("email", "").lower() == outreach_email.lower()), None)
+            if matched:
+                # warmup_score may be at top level or nested in warmup object
+                score = matched.get("warmup_score")
+                if score is None:
+                    score = (matched.get("warmup") or {}).get("score")
+                if score is None:
+                    score = (matched.get("warmup") or {}).get("warmup_score")
+                warmup_result["score"] = score
+                warmup_result["status"] = matched.get("status")
+                warmup_pass = score is not None and int(score) >= 85
+            else:
+                warmup_result["error"] = f"Account {outreach_email} not found in Instantly — has it been added?"
+        except Exception as e:
+            warmup_result["error"] = str(e)[:120]
+
+    results["warmup"] = warmup_result
+    results["warmup_pass"] = warmup_pass
+
+    # ── AUTO-UPDATE CHECKLIST ─────────────────────────────────────────────────
+    checklist = client.setdefault("checklist", {})
+    import zoneinfo as _zi
+    now_str = datetime.now(_zi.ZoneInfo("America/New_York")).strftime("%Y-%m-%d %H:%M ET")
+
+    if dns_pass:
+        checklist["dns_verified"] = True
+    if warmup_pass:
+        checklist["warmup_complete"] = True
+
+    # Store last check metadata on client record
+    client["_gate_check"] = {
+        "checked_at": now_str,
+        "dns_pass": dns_pass,
+        "warmup_score": warmup_result.get("score"),
+        "warmup_pass": warmup_pass,
+    }
+    save_clients(config)
+
+    results["checklist_updated"] = {
+        "dns_verified": checklist.get("dns_verified", False),
+        "warmup_complete": checklist.get("warmup_complete", False),
+    }
+    results["checked_at"] = now_str
+
+    return (json.dumps(results), 200, {"Content-Type": "application/json"})
 
 
 @app.route("/clients/<client_id>/dns-records")

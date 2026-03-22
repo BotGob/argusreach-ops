@@ -272,7 +272,7 @@ def save_pending(pending):
     PENDING_FILE.write_text(json.dumps(pending, indent=2))
 
 def queue_pending(client, from_email, from_name, subject, draft, classification,
-                  in_reply_to=None, references=None):
+                  in_reply_to=None, references=None, confidence=None):
     pending = load_pending()
     # Dedup: if entry already exists for this prospect, update silently — do NOT re-notify
     is_new = True
@@ -296,6 +296,7 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
         'subject':               subject,
         'draft':                 draft,
         'classification':        classification,
+        'confidence':            confidence,
         'queued_at':             datetime.now().isoformat(),
         'in_reply_to':           in_reply_to or '',
         'references':            references or in_reply_to or '',
@@ -750,6 +751,7 @@ Use the meeting format context above to pick the right tone. Never write "video 
 Return ONLY valid JSON (no markdown, no commentary):
 {{
   "classification": "positive|question|not_now|negative|ooo|other",
+  "confidence": 85,
   "reasoning": "one sentence max",
   "should_respond": true,
   "escalate": false,
@@ -759,7 +761,13 @@ Return ONLY valid JSON (no markdown, no commentary):
   "notify_reason": "brief reason",
   "follow_up_date": null,
   "urgency": "high|medium|low"
-}}"""
+}}
+
+confidence: integer 0-100. How certain are you this classification is correct?
+  95-100 = unmistakably clear
+  75-94  = clear with minor ambiguity
+  50-74  = plausible but uncertain — VITO SHOULD REVIEW CAREFULLY
+  0-49   = very ambiguous — always escalate"""
 
     try:
         ai_tick()
@@ -1061,7 +1069,8 @@ def process_client(client, processed_ids):
                 elif client['mode'] == 'draft_approval':
                     approval_id, is_new_notification = queue_pending(client, from_email, from_name,
                                                 subject, draft, classification,
-                                                in_reply_to=message_id, references=references)
+                                                in_reply_to=message_id, references=references,
+                                                confidence=result.get('confidence'))
 
             # ── TELEGRAM NOTIFICATION
             emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
@@ -1069,8 +1078,17 @@ def process_client(client, processed_ids):
 
             if is_new_notification:
                 campaign_name = client.get('campaign_name', '')
+                confidence = result.get('confidence')
+                if confidence is not None:
+                    try:
+                        confidence = int(confidence)
+                        conf_display = f" ({confidence}%{'⚠️ REVIEW' if confidence < 75 else ''})"
+                    except Exception:
+                        conf_display = ''
+                else:
+                    conf_display = ''
                 msg_lines = [
-                    f"{emoji} *{firm}* — {classification.upper()}",
+                    f"{emoji} *{firm}* — {classification.upper()}{conf_display}",
                     f"📋 Campaign: {campaign_name}" if campaign_name else None,
                     f"👤 From: {from_name or from_email} `<{from_email}>`",
                     f"_{result.get('reasoning', '')}_ ",
@@ -1115,6 +1133,7 @@ def process_client(client, processed_ids):
                     elif approval_id:
                         _log_event(cid, _pid2, 'draft_queued', {
                             'classification': classification,
+                            'confidence': result.get('confidence'),
                             'approval_id': approval_id
                         })
                 except Exception as _e:
