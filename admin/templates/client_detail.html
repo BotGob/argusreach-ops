@@ -171,6 +171,10 @@
       <button class="btn btn-sm" style="background:#1e293b;color:#94a3b8;border:1px solid #334155">⏸ Pause Monitor</button>
     </form>
     {% endif %}
+    <form method="POST" action="{{ url_for('client_offboard', client_id=client.id) }}" style="display:inline"
+          onsubmit="return confirm('Offboard {{ client.firm_name }}? This pauses the campaign and sends a checklist to Telegram. Data is preserved.')">
+      <button class="btn btn-sm" style="background:#1e293b;color:#ef4444;border:1px solid #ef444433">⛔ Offboard</button>
+    </form>
   </div>
   {% endif %}
 

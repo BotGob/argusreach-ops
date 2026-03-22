@@ -799,6 +799,36 @@ def client_status_update(client_id):
     save_clients(config)
     return redirect(url_for("client_detail", client_id=client_id))
 
+
+@app.route("/clients/<client_id>/offboard", methods=["POST"])
+@login_required
+def client_offboard(client_id):
+    """Pause campaign and mark client as offboarding. Does NOT delete data."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    client["active"]            = False
+    client["onboarding_status"] = "offboarding"
+    import zoneinfo
+    client["offboard_date"] = datetime.now(zoneinfo.ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
+    save_clients(config)
+
+    firm = client.get("firm_name", client_id)
+    notify(
+        f"⛔ *{firm}* marked for offboarding.\n\n"
+        f"Manual steps:\n"
+        f"1. Pause/deactivate campaign in Instantly\n"
+        f"2. Cancel Stripe subscription\n"
+        f"3. Send final monthly report\n"
+        f"4. Remove email account from Instantly\n"
+        f"5. Confirm with client all outreach has stopped"
+    )
+    flash(f"⛔ {firm} paused. Offboarding checklist sent to Telegram.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
 @app.route("/clients/<client_id>/update", methods=["POST"])
 @login_required
 def client_update(client_id):

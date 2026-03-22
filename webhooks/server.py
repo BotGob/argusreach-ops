@@ -169,7 +169,7 @@ def stripe_webhook():
         )
         print(f"✅ Renewal logged: {plan} {amount_fmt} from {customer_email}")
 
-    # ── Payment failed — alert Vito immediately ──
+    # ── Payment failed — alert Vito + auto-pause campaign after 2nd failed attempt ──
     elif event_type == "invoice.payment_failed":
         invoice        = event["data"]["object"]
         customer_email = invoice.get("customer_email", "")
@@ -177,12 +177,32 @@ def stripe_webhook():
         sub_id         = invoice.get("subscription", "")
         attempt        = invoice.get("attempt_count", 1)
 
+        # Auto-pause campaign on 2nd+ failed attempt — don't work for free
+        paused_firm = ""
+        if attempt >= 2:
+            try:
+                clients = _load_clients()
+                for c in clients:
+                    if c.get("client_email", "").lower() == customer_email.lower() or \
+                       c.get("outreach_email", "").lower() == customer_email.lower():
+                        c["active"] = False
+                        paused_firm = c.get("firm_name", c["id"])
+                        data = {"clients": clients}
+                        CLIENTS_FILE.write_text(json.dumps(data, indent=2))
+                        print(f"⛔ Auto-paused {paused_firm} — payment failed attempt {attempt}")
+                        break
+            except Exception as e:
+                print(f"Auto-pause failed (non-fatal): {e}")
+
+        pause_note = f"\n⛔ <b>Campaign auto-paused</b> — {paused_firm}" if paused_firm else \
+                     "\nStripe will retry. Campaign still active."
+
         telegram_notify(
             f"⚠️ <b>Payment failed!</b>\n"
             f"Email: {customer_email}\n"
             f"Amount due: ${amount_cents/100:.2f}\n"
             f"Attempt #{attempt} — Sub: <code>{sub_id}</code>\n"
-            f"Check Stripe dashboard and reach out to client."
+            f"Reach out to client immediately.{pause_note}"
         )
         print(f"⚠️ Payment failed: {customer_email} ${amount_cents/100:.2f} (attempt {attempt})")
 
