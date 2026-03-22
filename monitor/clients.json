@@ -14,7 +14,7 @@
       "title": "CEO",
       "client_email": "Vito@argusreach.com",
       "calendly_link": "",
-      "instantly_campaign_id": "c5d453c7-d479-415d-87a3-546842a7d5ea",
+      "instantly_campaign_id": "2f71b644-df93-4d28-ade4-0921a9cc7398",
       "campaign_name": "ArgusReach - ArgusReach - April 2026",
       "contacts_per_month": 5,
       "launch_date": "",
@@ -56,17 +56,17 @@
       "sequence": [
         {
           "subject": "Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\r\n\r\nMost PT clinics run on physician referrals - until those relationships shift. Building a reliable pipeline that isn't dependent on a few referring docs is where it gets hard.\r\n\r\nWe run targeted outreach automatically every month under your name. You only get involved when someone's ready to talk.\r\n\r\nWorth a quick call? \r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\n\nI came across {{companyName}} while looking at PT practices in {{city}} - wanted to reach out directly.\n\nMost clinics like yours run on physician referrals until those relationships shift. Building a reliable pipeline outside of referrals is where it gets hard.\n\nWe run targeted outreach automatically every month under your name. You only get involved when someone's ready to talk.\n\nWorth a quick call?\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 0
         },
         {
           "subject": "Re: Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\r\n\r\nFollowing up on my last note.\r\n\r\nHere's how it works: we build your prospect list, write every email in your voice, send it, and manage every reply until someone says they want to talk. You get a calendar invite. That's the only step that requires you.\r\n\r\nFor what it's worth - we found you through this exact system. It's running for us right now.\r\n\r\nIf adding a few qualified conversations per month sounds worth 15 minutes, happy to walk through it.\r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\n\nFollowing up on my last note.\n\nHere's how it works: we build {{companyName}}'s prospect list, write every email in your voice, send it, and manage every reply until someone says they want to talk. You get a calendar invite. That's the only step that requires you.\n\nFor what it's worth - we found you through this exact system. It's running for us right now.\n\nIf adding a few qualified conversations per month sounds worth 15 minutes, happy to walk through it.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         },
         {
           "subject": "Closing the loop, {{firstName}}",
-          "body": "Hi {{firstName}},\r\n\r\nI'll keep this short.\r\n\r\nIf building a consistent pipeline outside of referrals ever becomes a priority, we'd love to help. Feel free to reach out anytime.\r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\n\nI'll keep this short.\n\nIf building a consistent pipeline outside of referrals ever becomes a priority for {{companyName}}, we'd love to help. Feel free to reach out anytime.\n\nVito Resciniti\nCEO, ArgusReach",
           "delay_days": 5
         }
       ],

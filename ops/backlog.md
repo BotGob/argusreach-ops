@@ -55,6 +55,11 @@ Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client
 
 ## 🟢 Scale Features (3+ Clients)
 
+### 32. Pre-load prospects into DB at campaign launch
+When contacts are loaded to Instantly, also write them to the `prospects` table in our DB. Currently prospects only appear in the DB after they reply. Pre-loading enables: full prospect list visible in portal before replies, accurate total-contacted counts, better reporting at scale. Trigger: before second client onboarded.
+
+
+
 ### Clay.com — LinkedIn activity personalization
 $149/mo. Enriches each prospect with LinkedIn activity, recent posts, company news, job changes.
 Enables true 1:1 personalization in sequences (e.g. "I saw your post about X last week").
