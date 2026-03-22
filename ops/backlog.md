@@ -29,18 +29,14 @@ Free tier (50 exports/mo) insufficient for client campaigns.
 
 ## 🔴 Pre-Launch Gates (Gob)
 
-### 8. Fix PT Tampa Bay sequence copy in Instantly
-Sequence says "mental health practices" — wrong vertical. Must rewrite all 3 touches before any real prospect enrolled.
-✅ Test client (argusreach) sequence rewritten to generic B2B copy (2026-03-22)
+### ✅ 8. Fix PT Tampa Bay sequence copy — DONE (2026-03-22)
+Old PT Tampa Bay test campaign is obsolete. Active test client (argusreach) sequence rewritten to clean generic B2B copy.
 
-### 9. Run timers setup
-```
-sudo bash /home/argus/.openclaw/workspace/argusreach/ops/setup-timers.sh
-```
-Installs hourly systemd timers for Instantly sync + dashboard refresh.
+### ✅ 9. Timers setup — DONE
+Healthcheck, dashboard, and Instantly sync timers all running via systemd.
 
-### 33. Service agreement template — DONE (2026-03-22)
-Draft at ops/templates/service-agreement.md — ready to upload to HelloSign once account is created.
+### ✅ 33. Service agreement template — DONE (2026-03-22)
+Draft at ops/templates/service-agreement.md — ready to upload to HelloSign. Covers 3-month initial term, early cancellation clause, all standard protections.
 
 ---
 

@@ -102,7 +102,7 @@ Both parties agree to keep the terms of this Agreement and any proprietary infor
 
 ## 10. Termination
 
-Either party may terminate this Agreement with 30 days' written notice to the other party. Upon termination:
+Either party may terminate this Agreement with 30 days' written notice to the other party after the initial 3-month term. During the initial term, Client may cancel with 30 days' written notice, but the remaining balance of the 3-month term becomes due upon cancellation. Upon termination:
 
 - Provider will stop all outreach immediately upon the effective termination date
 - Client retains all prospect data and campaign materials
@@ -155,3 +155,5 @@ Date: ___________________________
 - *The setup fee Stripe link is: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01*
 - *For HelloSign: upload this doc, set signature fields, send to client email from intake*
 - *LLC must be filed before you use this agreement in production — "Florida limited liability company" is the registered entity*
+- *Vito's title: use "Founder" until LLC is filed, then switch to "Managing Member" or "CEO"*
+- *[COUNTY]: Hillsborough if operating from Tampa*
