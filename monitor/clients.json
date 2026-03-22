@@ -3,7 +3,7 @@
   "clients": [
     {
       "id": "argusreach",
-      "active": true,
+      "active": false,
       "onboarding_status": null,
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
