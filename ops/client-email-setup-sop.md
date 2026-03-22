@@ -104,3 +104,13 @@ Template location: handled by app.py `send_welcome_email()`
 ### Follow-up email (Vito sends manually)
 Sent after client provides email + app password. Contains: DNS records, sequence draft, Calendly link.
 Template: `ops/templates/followup-dns-sequence-calendly.md`
+
+## Critical: Disable Auto-Signature on Outreach Account
+Before launch, the client (or Gob if we have access) must disable any auto-signature on the outreach email account.
+
+**Google Workspace:** Gmail → Settings (gear icon) → See all settings → General → Signature → set to "(No signature)"
+**Microsoft 365:** Outlook → Settings → Mail → Compose and reply → Email signature → clear and save
+
+**Why:** Our sequences include the sender's name and title in the body. If Gmail also appends an auto-signature, it renders inconsistently across email touches and looks unprofessional.
+
+**Add to pre-launch checklist:** "Auto-signature disabled on outreach account"
