@@ -398,7 +398,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">$500 setup fee collected</div>
-        <div class="step-detail">Stripe Payment Link sent to client. Paid online instantly. Payment webhook fires → auto-logged to database + Telegram alert to Vito. Monthly subscription link sent separately. Live links: Setup buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01 · Starter buy.stripe.com/5kQdR8b6IcST6VB1Jk5gc02 · Growth buy.stripe.com/14A3cu7UwbOP2Fl0Fg5gc00 · Scale buy.stripe.com/3cI9AS2AcdWXdjZcnY5gc03</div>
+        <div class="step-detail">Stripe Payment Link sent to client. Paid online instantly. Payment webhook fires → auto-logged to database + Telegram alert to Vito. Subscription billing — client is auto-charged monthly until cancelled. Portal generates per-client Stripe payment link with client_id in metadata (so revenue is auto-attributed). Setup fee live: buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01 · Subscription links generated per-client via portal at launch.</div>
         <span class="step-tool t-purple">Stripe</span>
       </div>
       <div class="arrow">↓</div>
@@ -1197,7 +1197,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="font-size:0.75rem;color:#888;">• Bot renamed from "Go" → "Gob" across all files, repos, and docs</div>
     <div style="font-size:0.75rem;color:#888;">• Rule added: flowchart updated every time anything changes — single source of truth</div>
     <div style="font-size:0.75rem;color:#888;">• Backlog cleaned — completed items removed, active items only</div>
-    <div style="font-size:0.75rem;color:#888;">• Stripe payment flow split into 2 steps — setup fee at signing only; subscription link sent at campaign launch (Stripe starts billing immediately on click)</div>
+    <div style="font-size:0.75rem;color:#888;">• Stripe payment flow: (1) Setup fee $500 at signing, (2) Per-client subscription link generated in portal at launch — includes client_id metadata for auto-attribution. Recurring monthly billing, Stripe handles retries on failed payments, webhook fires on every renewal.</div>
     <div style="font-size:0.75rem;color:#888;">• Campaign launch email template added to post-call-followup.md</div>
   </div>
 </div>

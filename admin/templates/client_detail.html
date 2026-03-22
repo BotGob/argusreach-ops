@@ -304,6 +304,28 @@
     {% endfor %}
   </div>
 
+  <!-- ── TOOLS: DNS Records + Payment Link ───────────────────────────── -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+    <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank"
+       class="btn btn-ghost btn-sm" style="font-size:12px">
+      📋 Get DNS Record Block
+    </a>
+
+    {% if client.get('stripe_payment_link') %}
+    <div style="display:flex;align-items:center;gap:8px;background:#052e16;border:1px solid #166534;border-radius:6px;padding:6px 12px">
+      <span style="font-size:12px;color:#4ade80">✅ Payment link:</span>
+      <a href="{{ client.stripe_payment_link }}" target="_blank" style="font-size:12px;color:#4ade80;word-break:break-all">{{ client.stripe_payment_link }}</a>
+    </div>
+    <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}" style="margin:0">
+      <button type="submit" class="btn btn-ghost btn-sm" style="font-size:12px">🔄 Regenerate</button>
+    </form>
+    {% else %}
+    <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}" style="margin:0">
+      <button type="submit" class="btn btn-ghost btn-sm" style="font-size:12px">💳 Generate Stripe Payment Link</button>
+    </form>
+    {% endif %}
+  </div>
+
   <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
       <div>
