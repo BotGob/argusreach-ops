@@ -1,7 +1,7 @@
 # ArgusReach — Ops Backlog
 
 > Active items only. Completed items live in the flowchart changelog.
-> Last updated: 2026-03-18
+> Last updated: 2026-03-22
 
 ---
 
@@ -31,12 +31,16 @@ Free tier (50 exports/mo) insufficient for client campaigns.
 
 ### 8. Fix PT Tampa Bay sequence copy in Instantly
 Sequence says "mental health practices" — wrong vertical. Must rewrite all 3 touches before any real prospect enrolled.
+✅ Test client (argusreach) sequence rewritten to generic B2B copy (2026-03-22)
 
 ### 9. Run timers setup
 ```
 sudo bash /home/argus/.openclaw/workspace/argusreach/ops/setup-timers.sh
 ```
 Installs hourly systemd timers for Instantly sync + dashboard refresh.
+
+### 33. Service agreement template — DONE (2026-03-22)
+Draft at ops/templates/service-agreement.md — ready to upload to HelloSign once account is created.
 
 ---
 
@@ -135,9 +139,5 @@ Archive file grows indefinitely (by design — never delete history). At 2+ year
 
 ## 🟡 Design / Polish — Added 2026-03-18
 
-### 31. Update intake form to match argusreach.com style
-The public intake form at admin.argusreach.com/intake should look like it belongs to the ArgusReach brand — not a generic internal tool. First impression matters.
-
-**Reference:** argusreach.com — dark bg #0f0f0f, Inter font, green accent #4ade80, card borders rgba(255,255,255,0.07), clean section headers, minimal spacing.
-
-**Priority:** Before first real client sees the form. Currently functional but visually inconsistent with the brand.
+### 31. ✅ Update intake form to match argusreach.com style — DONE
+Intake form fully styled: dark bg, Inter + JetBrains Mono, green accent, animated canvas hero, pill checkboxes, auto-expand textareas. Matches argusreach.com exactly.
