@@ -371,18 +371,25 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
     instantly_sent = a.get("emails_sent_count", 0)
     leads          = a.get("leads_count", 0)
 
+    # Report buckets: Interested = positive + question, Not Now = not_now, Removed = negative
+    interested = breakdown.get("positive", 0) + breakdown.get("question", 0)
+
     return {
-        "leads":           leads,
-        "instantly_sent":  instantly_sent,
-        "replies_sent":    replies_sent,
-        "total_sent":      instantly_sent + replies_sent,
-        "replies_received": total_replies,
-        "reply_positive":  breakdown.get("positive", 0),
-        "reply_not_now":   breakdown.get("not_now", 0),
-        "reply_negative":  breakdown.get("negative", 0),
-        "reply_escalated": breakdown.get("escalated", 0),
-        "replies_ignored": rejected,
-        "meetings":        meetings,
+        "leads":             leads,
+        "instantly_sent":    instantly_sent,
+        "replies_sent":      replies_sent,
+        "total_sent":        instantly_sent + replies_sent,
+        "replies_received":  total_replies,
+        # Reporting buckets (for client reports + dashboard)
+        "reply_interested":  interested,
+        "reply_not_now":     breakdown.get("not_now", 0),
+        "reply_negative":    breakdown.get("negative", 0),
+        "reply_escalated":   breakdown.get("escalated", 0),
+        # Operational detail (kept for internal use)
+        "reply_positive":    breakdown.get("positive", 0),
+        "reply_question":    breakdown.get("question", 0),
+        "replies_ignored":   rejected,
+        "meetings":          meetings,
         "revenue_cents":   revenue,
         "revenue":         f"${revenue/100:,.2f}",
         "prospects_tracked": prospects_tracked,
@@ -576,7 +583,8 @@ def dashboard():
         GROUP BY cls
     """).fetchall()
     reply_breakdown = {r[0]: r[1] for r in reply_rows}
-    total_replies = sum(reply_breakdown.values())
+    reply_breakdown['interested'] = reply_breakdown.get('positive', 0) + reply_breakdown.get('question', 0)
+    total_replies = sum(v for k, v in reply_breakdown.items() if k != 'interested')  # avoid double count
 
     # Replies we sent back (approved drafts that went out)
     replies_sent_db = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='reply_sent'").fetchone()[0]
