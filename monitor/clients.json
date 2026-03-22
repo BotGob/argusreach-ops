@@ -3,7 +3,7 @@
   "clients": [
     {
       "id": "argusreach",
-      "active": false,
+      "active": true,
       "onboarding_status": "ready_to_launch",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
@@ -17,7 +17,7 @@
       "instantly_campaign_id": "2f71b644-df93-4d28-ade4-0921a9cc7398",
       "campaign_name": "ArgusReach - ArgusReach - April 2026",
       "contacts_per_month": 5,
-      "launch_date": "",
+      "launch_date": "2026-03-22",
       "icp_summary": "",
       "tone": "warm-professional",
       "compliance_note": "never discuss personal or financial or sensitive information. never discuss medical records never give advice.",

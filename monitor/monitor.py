@@ -66,7 +66,7 @@ if _DB_ENABLED:
 # ── DATABASE ──────────────────────────────────────────────────────────────────
 try:
     sys.path.insert(0, str(BASE_DIR.parent))
-    from db.database import init_db as _init_db, log_event, upsert_prospect, update_prospect_stage, prospect_id as _prospect_id
+    from db.database import init_db as _init_db, log_event, upsert_prospect, update_prospect_stage, prospect_id as _prospect_id, get_db
     _init_db()
     _DB_ENABLED = True
 except Exception as _db_err:
