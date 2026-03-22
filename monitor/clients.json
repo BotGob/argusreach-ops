@@ -4,7 +4,7 @@
     {
       "id": "argusreach",
       "active": true,
-      "onboarding_status": "ready_to_launch",
+      "onboarding_status": null,
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
       "vertical": "B2BServices",

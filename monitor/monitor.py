@@ -1459,8 +1459,9 @@ def _auto_activate_client(client_id, campaign_id, firm_name):
         data = json.loads(CLIENTS_FILE.read_text())
         for c in data.get('clients', []):
             if c['id'] == client_id and not c.get('active'):
-                c['active']      = True
-                c['launch_date'] = c.get('launch_date') or datetime.utcnow().strftime('%Y-%m-%d')
+                c['active']            = True
+                c['onboarding_status'] = None
+                c['launch_date']       = c.get('launch_date') or datetime.utcnow().strftime('%Y-%m-%d')
                 CLIENTS_FILE.write_text(json.dumps(data, indent=2))
                 log(f"[AutoActivate] {firm_name} is live in Instantly — auto-activated in clients.json")
                 notify(
