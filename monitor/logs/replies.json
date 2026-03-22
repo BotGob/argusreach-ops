@@ -907,5 +907,14 @@
     "sent": false,
     "notes": "Prospect unsubscribe request - ensure list removal is processed",
     "test_mode": false
+  },
+  {
+    "ts": "2026-03-22T01:27:17.000424",
+    "client": "argusreach",
+    "prospect": "vresciniti27@gmail.com",
+    "classification": "negative",
+    "draft_preview": "Understood, removing you now - sorry for the interruption.\n\nVito Resciniti\nCEO, ArgusReach",
+    "sent": true,
+    "notes": "approved by Vito"
   }
 ]
