@@ -14,8 +14,8 @@
       "title": "CEO",
       "client_email": "Vito@argusreach.com",
       "calendly_link": "",
-      "instantly_campaign_id": "",
-      "campaign_name": "",
+      "instantly_campaign_id": "c5d453c7-d479-415d-87a3-546842a7d5ea",
+      "campaign_name": "ArgusReach - ArgusReach - April 2026",
       "contacts_per_month": 5,
       "launch_date": "",
       "icp_summary": "",
@@ -71,7 +71,7 @@
         }
       ],
       "schedule": {
-        "timezone": "America/New_York",
+        "timezone": "America/Detroit",
         "start_hour": 8,
         "end_hour": 20,
         "send_days": [

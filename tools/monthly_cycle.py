@@ -243,25 +243,31 @@ def search_apollo(client, target, exclude_emails):
 
     while len(contacts) < target and page <= max_pages:
         payload = {
-            "api_key":    APOLLO_API_KEY,
             "per_page":   100,
             "page":       page,
-            "person_titles": titles or [],
             "contact_email_status": ["verified", "likely to engage"],
         }
+        # person_titles: only use if they look like actual job titles (not company type descriptions)
+        job_titles = [t for t in titles if len(t.split()) <= 4 and not any(
+            w in t.lower() for w in ["clinic", "firm", "office", "company", "practice", "services"]
+        )]
+        if job_titles:
+            payload["person_titles"] = job_titles
         if locations:
             payload["person_locations"] = locations
         if employee_ranges:
             payload["organization_num_employees_ranges"] = employee_ranges
+        # industry_tags: Apollo needs numeric IDs for organization_industry_tag_ids.
+        # Use q_organization_industry_tag_name for string matching instead.
         if industry_tags:
-            payload["organization_industry_tag_ids"] = industry_tags
+            payload["q_organization_industry_tag_name"] = ", ".join(industry_tags)
         if seniority_levels:
             payload["person_seniorities"] = seniority_levels
 
         try:
             resp = requests.post(
                 "https://api.apollo.io/v1/mixed_people/search",
-                headers={"Content-Type": "application/json"},
+                headers={"Content-Type": "application/json", "X-Api-Key": APOLLO_API_KEY},
                 json=payload, timeout=30
             )
             if resp.status_code == 429:
@@ -424,8 +430,10 @@ def create_instantly_campaign(client, month_name, sequence_steps=None):
     name     = f"ArgusReach - {firm} - {month_name}"
 
     # Use schedule from portal if available, else defaults
+    # NOTE: Instantly rejects "America/New_York" — use "America/Detroit" (same ET zone, accepted)
     sched    = client.get("schedule", {})
-    tz       = sched.get("timezone", client.get("send_timezone", "America/New_York"))
+    tz_raw   = sched.get("timezone", client.get("send_timezone", "America/Detroit"))
+    tz       = "America/Detroit" if tz_raw in ("America/New_York", "America/Eastern") else tz_raw
     sh       = sched.get("start_hour", 8)
     eh       = sched.get("end_hour", 17)
     send_days_list = sched.get("send_days", ["monday","tuesday","wednesday","thursday","friday"])
@@ -725,10 +733,12 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
                 continue
             delay_days = touch.get("delay_days", 0) if i > 0 else 0
             sequence_steps.append({
-                "type":    "email",
-                "delay":   delay_days,
-                "subject": touch["subject"],
-                "body":    touch["body"],
+                "type":  "email",
+                "delay": delay_days,
+                "variants": [{
+                    "subject": touch["subject"],
+                    "body":    touch["body"],
+                }],
             })
     else:
         # Fallback: pull from existing Instantly campaign (month 2+)
