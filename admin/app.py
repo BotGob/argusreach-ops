@@ -39,6 +39,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from db.database import get_db, init_db, sync_client_from_config
+from db.generate_dashboard import fetch_stats, render as render_stats_html
 
 CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
 CAMPAIGNS_DIR = BASE_DIR / "campaigns"
@@ -1169,11 +1170,13 @@ def stats():
 @app.route("/stats/data")
 @login_required
 def stats_data():
-    """Serve the dashboard HTML directly from the server."""
-    dash_path = BASE_DIR / "db" / "dashboard.html"
-    if dash_path.exists():
-        return dash_path.read_text(), 200, {"Content-Type": "text/html"}
-    return "<p style='color:#fff;font-family:sans-serif;padding:40px'>Dashboard not generated yet. Run: python3 db/generate_dashboard.py</p>", 200
+    """Generate and serve the stats dashboard fresh on every page load."""
+    try:
+        stats = fetch_stats()
+        html  = render_stats_html(stats)
+        return html, 200, {"Content-Type": "text/html"}
+    except Exception as e:
+        return f"<p style='color:#fff;font-family:sans-serif;padding:40px'>Stats error: {e}</p>", 500
 
 
 @app.route("/flowchart")

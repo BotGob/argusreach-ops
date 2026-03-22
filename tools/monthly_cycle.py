@@ -65,15 +65,25 @@ def get_client(client_id):
     return None
 
 def save_client_campaign(client_id, campaign_id, campaign_name):
-    """Update clients.json with new campaign ID and name."""
+    """Update clients.json with new campaign ID and name, then mirror to DB."""
     data = load_all_clients()
+    updated_client = None
     for c in data.get("clients", []):
         if c["id"] == client_id:
             c["instantly_campaign_id"] = campaign_id
             c["campaign_name"]         = campaign_name
             c["active"]                = False   # stays inactive until Vito hits GO
+            updated_client = c
             break
     CLIENTS_FILE.write_text(json.dumps(data, indent=2))
+    # Mirror update to DB so clients table stays in sync
+    if updated_client:
+        try:
+            sys.path.insert(0, str(BASE_DIR))
+            from db.database import sync_client_from_config
+            sync_client_from_config(updated_client)
+        except Exception as e:
+            print(f"⚠️  DB sync after campaign save failed (non-fatal): {e}")
 
 # ── Cycle state (prevents duplicate alerts) ───────────────────────────────────
 def load_cycle_state():
