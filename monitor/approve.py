@@ -109,21 +109,37 @@ def db_write_approval(entry, approved: bool):
 
         # Stage map: classification → prospect stage after approval
         stage_map = {
-            'positive':  'meeting_booking',
-            'question':  'engaged',
-            'not_now':   'not_now',
-            'negative':  'dnc',
-            'ooo':       'ooo',
-            'other':     'replied_by_us',
+            'positive':   'meeting_booking',
+            'question':   'engaged',
+            'not_now':    'not_now',
+            'negative':   'dnc',
+            'ooo':        'ooo',
+            'escalated':  'engaged',   # approved escalations = interested prospect
+            'other':      'replied_by_us',
         }
+
+        # Escalations approved by Vito count as Interested in reporting
+        # Reclassify to 'positive' for metrics so it rolls into the Interested bucket
+        report_classification = 'positive' if classification == 'escalated' else classification
 
         if approved:
             stage = stage_map.get(classification, 'replied_by_us')
             log_event(cid, pid, 'draft_approved', {
-                'classification': classification,
+                'classification': report_classification,
+                'original_classification': classification,
                 'approved_by': 'vito',
                 'approved_at': datetime.utcnow().isoformat(),
             })
+            log_event(cid, pid, 'reply_sent', {
+                'classification': report_classification,
+                'note': 'approved via portal/telegram',
+            })
+            # Also log a classified event with the report classification so metrics bucket correctly
+            if classification == 'escalated':
+                log_event(cid, pid, 'classified', {
+                    'classification': 'positive',
+                    'note': 'escalation approved by Vito — counted as Interested',
+                })
             update_prospect_stage(pid, stage)
             log(f"[DB] logged draft_approved for {from_email} → stage: {stage}")
         else:
