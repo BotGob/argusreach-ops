@@ -878,7 +878,27 @@ Return ONLY valid JSON (no markdown, no commentary):
             raw = '\n'.join(raw.split('\n')[1:])
             if raw.endswith('```'):
                 raw = raw[:-3]
-        return json.loads(raw.strip())
+        result = json.loads(raw.strip())
+
+        # Substitute known placeholders in draft before returning
+        draft = result.get('draft_response', '') or ''
+        calendly = client.get('calendly_link', '')
+        if calendly:
+            draft = draft.replace('[BOOKING_LINK]', calendly)
+            draft = draft.replace('[CALENDLY_LINK]', calendly)
+            draft = draft.replace('[CALENDAR_LINK]', calendly)
+        result['draft_response'] = draft
+
+        # Block send if any unfilled placeholders remain
+        import re as _re
+        remaining = _re.findall(r'\[[A-Z_]{3,}\]', draft)
+        if remaining:
+            log(f"[Draft] Unfilled placeholders detected: {remaining} — escalating")
+            result['should_respond'] = False
+            result['escalate'] = True
+            result['escalate_reason'] = f"Draft has unfilled placeholders: {remaining}. Set {[p.lower().strip('[]') for p in remaining]} in clients.json."
+
+        return result
     except json.JSONDecodeError as e:
         log(f"AI JSON parse error: {e}")
         return _fallback_result('AI returned invalid JSON')
