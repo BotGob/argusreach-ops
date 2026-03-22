@@ -237,22 +237,8 @@ def do_approve(entry):
         log_reply(entry['client_id'], entry['from_email'],
                   entry.get('classification', 'unknown'), draft, True, 'approved by Vito')
 
-        # Write outcome to DB
+        # Write outcome to DB (logs draft_approved + reply_sent + updates stage)
         db_write_approval(entry, approved=True)
-
-        # Log reply_sent to DB — this is what powers total sent count in reporting
-        try:
-            from db.database import get_db, upsert_prospect, log_event
-            cid = entry['client_id']
-            pid = upsert_prospect(cid, entry.get('instantly_campaign_id',''),
-                                  entry['from_email'], '', '', '', 'replied_by_us')
-            log_event(cid, pid, 'reply_sent', {
-                'to': entry['from_email'],
-                'classification': entry.get('classification', ''),
-                'subject': entry.get('subject', ''),
-            })
-        except Exception as _e:
-            log(f"[DB] reply_sent log failed (non-fatal): {_e}")
 
         # Alert client if positive reply
         send_client_booking_alert(entry)
