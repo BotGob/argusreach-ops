@@ -26,11 +26,11 @@
 
 {% if not client.active %}
 
-{% if client.get('onboarding_status') == 'ready_to_launch' %}
+{% if client.get('onboarding_status') == 'ready_to_launch' and client.get('instantly_campaign_id') %}
 <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px">
   <div>
-    <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:4px">All gates green — campaign is in Instantly as DRAFT</div>
-    <div style="font-size:12px;color:#64748b">Activate the campaign in Instantly, then click here to start the monitor.</div>
+    <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:4px">Campaign is in Instantly as DRAFT</div>
+    <div style="font-size:12px;color:#64748b">Review the sequence in Instantly, activate it, then click here to start the monitor.</div>
   </div>
   <form method="POST" action="{{ url_for('client_go_live', client_id=client.id) }}" style="flex-shrink:0">
     <button type="submit" class="btn btn-primary" style="background:#4ade80;color:#000;font-weight:800;padding:10px 20px;white-space:nowrap">✅ Mark Campaign Live</button>

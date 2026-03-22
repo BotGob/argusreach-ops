@@ -583,6 +583,7 @@ def dashboard():
             "vertical":         c.get("vertical",""),
             "plan":             c.get("plan",""),
             "active":           c.get("active", False),
+            "onboarding_status": c.get("onboarding_status", "email_setup"),
             "campaign_name":    c.get("campaign_name","—"),
             **m,
         })
