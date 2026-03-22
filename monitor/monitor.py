@@ -1099,8 +1099,16 @@ def process_client(client, processed_ids):
                         })
                     except Exception as _e:
                         log(f"[DB] escalation classify log failed: {_e}")
-                mail.store(msg_id, '+FLAGS', '\\Seen')
-                new_processed.add(fingerprint)
+                # If escalation is a config gap, don't fingerprint — monitor retries after fix
+                escalate_reason = result.get('escalate_reason', '')
+                is_config_gap = any(x in escalate_reason.lower() for x in [
+                    'calendly_link', 'not set', 'not configured', 'missing', 'config gap'
+                ])
+                if is_config_gap:
+                    log(f"{label} Config gap escalation for {from_email} — NOT marking processed, will retry after fix")
+                else:
+                    mail.store(msg_id, '+FLAGS', '\\Seen')
+                    new_processed.add(fingerprint)
                 continue
 
             # ── DATABASE: log classification event
