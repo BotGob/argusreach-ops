@@ -328,8 +328,18 @@ def load_clients():
         return json.load(f)
 
 def save_clients(config):
+    """Write clients.json (master) then sync every client record to DB.
+    DB client table is kept in sync automatically - never stale.
+    """
     with open(CLIENTS_FILE, "w") as f:
         json.dump(config, f, indent=2)
+    # Keep DB in sync - client state lives in clients.json, DB mirrors it
+    for c in config.get("clients", []):
+        if not c.get("id", "").startswith("_"):
+            try:
+                sync_client_from_config(c)
+            except Exception as e:
+                app.logger.warning(f"DB sync failed for {c.get('id')}: {e}")
 
 def get_client_by_id(client_id):
     config = load_clients()
@@ -754,7 +764,6 @@ def client_go_live(client_id):
         import zoneinfo
         client["launch_date"] = datetime.now(zoneinfo.ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
     save_clients(config)
-    sync_client_from_config(client)
     # Notify via Telegram
     notify(f"🟢 *{client.get('firm_name')}* is now LIVE - monitor is watching, campaign active.")
     flash(f"✅ {client.get('firm_name')} is live. Monitor is now watching for replies.", "success")
@@ -800,7 +809,6 @@ def client_update(client_id):
         client["calendly_event_slug"] = f["calendly_event_slug"].strip()
 
     save_clients(config)
-    sync_client_from_config(client)
     flash("Client updated.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
@@ -842,7 +850,6 @@ def campaign_add(client_id):
     client["launch_date"]           = new_campaign["launch_date"]
 
     save_clients(config)
-    sync_client_from_config(client)
     flash(f"Campaign '{new_campaign['campaign_name'] or new_campaign['instantly_campaign_id']}' added.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 

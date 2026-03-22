@@ -204,15 +204,26 @@ def mark_follow_up_sent(pid: str):
 
 
 def sync_client_from_config(c: dict):
+    """Sync client state from clients.json (master) into DB.
+    Called automatically by save_clients() — DB is always a mirror, never the source of truth.
+    """
     conn = get_db()
+    # Add onboarding_status column if it doesn't exist yet (migration-safe)
+    try:
+        conn.execute("ALTER TABLE clients ADD COLUMN onboarding_status TEXT DEFAULT 'email_setup'")
+        conn.commit()
+    except Exception:
+        pass  # Column already exists
     conn.execute("""
-        INSERT INTO clients (id, name, vertical, plan, status, launch_date, instantly_campaign_id, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO clients (id, name, vertical, plan, status, onboarding_status, launch_date, instantly_campaign_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
-            name = excluded.name,
-            vertical = excluded.vertical,
-            status = excluded.status,
-            launch_date = excluded.launch_date,
+            name                = excluded.name,
+            vertical            = excluded.vertical,
+            plan                = excluded.plan,
+            status              = excluded.status,
+            onboarding_status   = excluded.onboarding_status,
+            launch_date         = excluded.launch_date,
             instantly_campaign_id = excluded.instantly_campaign_id
     """, (
         c.get("id"),
@@ -220,8 +231,9 @@ def sync_client_from_config(c: dict):
         c.get("vertical"),
         c.get("plan", "unknown"),
         "active" if c.get("active") else "paused",
-        c.get("launch_date"),
-        c.get("instantly_campaign_id"),
+        c.get("onboarding_status", "email_setup"),
+        c.get("launch_date", ""),
+        c.get("instantly_campaign_id", ""),
         datetime.utcnow().isoformat()
     ))
     conn.commit()

@@ -61,7 +61,7 @@
         },
         {
           "subject": "Re: Quick question, {{firstName}}",
-          "body": "Hi {{firstName}},\n\nFollowing up on my last note.\n\nHere's how it works: we build your prospect list, write every email in your voice, send it, and manage every reply until someone says they want to talk. You get a calendar invite. That's the only step that requires you.\n\nFor what it's worth - we found you through this exact system. It's running for us right now.\n\nIf adding a few qualified conversations per month sounds worth 15 minutes, happy to walk through it.\n\nVito Resciniti\nCEO, ArgusReach",
+          "body": "Hi {{firstName}},\r\n\r\nFollowing up on my last note.\r\n\r\nHere's how it works: we build your prospect list, write every email in your voice, send it, and manage every reply until someone says they want to talk. You get a calendar invite. That's the only step that requires you.\r\n\r\nFor what it's worth - we found you through this exact system. It's running for us right now.\r\n\r\nIf adding a few qualified conversations per month sounds worth 15 minutes, happy to walk through it.\r\n\r\nVito Resciniti\r\nCEO, ArgusReach",
           "delay_days": 5
         },
         {
@@ -73,7 +73,7 @@
       "schedule": {
         "timezone": "America/New_York",
         "start_hour": 8,
-        "end_hour": 17,
+        "end_hour": 20,
         "send_days": [
           "saturday"
         ]
