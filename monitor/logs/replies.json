@@ -916,5 +916,25 @@
     "draft_preview": "Understood, removing you now - sorry for the interruption.\n\nVito Resciniti\nCEO, ArgusReach",
     "sent": true,
     "notes": "approved by Vito"
+  },
+  {
+    "ts": "2026-03-22T02:14:33.768159",
+    "client": "argusreach",
+    "prospect": "djholleran@gmail.com",
+    "classification": "question",
+    "draft_preview": "Dave,\n\nPerfect - that's exactly what I'd want to walk through on a quick call. I can show you how we build the list, handle the outreach in your voice, and get you qualified conversations without any ",
+    "sent": false,
+    "notes": "Interested prospect requesting details - good conversion signal.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-22T02:15:10.181213",
+    "client": "argusreach",
+    "prospect": "djholleran@gmail.com",
+    "classification": "question",
+    "draft_preview": "Dave,\n\nGreat question - that is exactly what I would want to cover on a quick call. Here is my calendar:\n\n[BOOKING_LINK]\n\nVito Resciniti\nCEO, ArgusReach",
+    "sent": false,
+    "notes": "Qualified prospect asking for details - high conversion potential",
+    "test_mode": false
   }
 ]

@@ -1154,6 +1154,14 @@ def process_client(client, processed_ids):
                 ]
                 msg_lines = [l for l in msg_lines if l is not None]
 
+                # Show the prospect's original email so Vito can reference it
+                body_preview = body.strip()[:400] if body else ""
+                if body_preview:
+                    msg_lines += [
+                        f"\n*Their email:*",
+                        f"```\n{body_preview}\n```",
+                    ]
+
                 if approval_id and draft:
                     msg_lines += [
                         f"\n*Draft ready:*",

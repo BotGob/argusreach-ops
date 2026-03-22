@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "argusreach:djholleran@gmail.com:1774145710",
+    "client_id": "argusreach",
+    "firm_name": "ArgusReach",
+    "campaign_name": "ArgusReach - ArgusReach - April 2026",
+    "instantly_campaign_id": "2f71b644-df93-4d28-ade4-0921a9cc7398",
+    "client_email": "Vito@argusreach.com",
+    "outreach_email": "vito@argusreach.com",
+    "app_password": "mekd ejxy pejm kubb",
+    "sender_name": "Vito Resciniti",
+    "from_email": "djholleran@gmail.com",
+    "from_name": "David Holleran",
+    "subject": "Re: Quick question, David",
+    "draft": "Dave,\n\nGreat question - that is exactly what I would want to cover on a quick call. Here is my calendar:\n\n[BOOKING_LINK]\n\nVito Resciniti\nCEO, ArgusReach",
+    "classification": "question",
+    "queued_at": "2026-03-22T02:15:10.081275",
+    "in_reply_to": "<CAN9w6Y8vTLAnUTY_NCTRk0zzTqcADDP5QOSe86VhEu_t7TGp9A@mail.gmail.com>",
+    "references": "<019d133e-4268-7a09-9053-7bc296cb85f8@argusreach.com>"
+  }
+]
