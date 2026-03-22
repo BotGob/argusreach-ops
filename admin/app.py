@@ -756,11 +756,17 @@ def client_go_live(client_id):
     client = next((c for c in config["clients"] if c.get("id") == client_id), None)
     if not client:
         return ("not found", 404)
+    missing = []
     if not client.get("instantly_campaign_id"):
-        flash("❌ No campaign found - run Launch first before marking live.", "error")
-        return redirect(url_for("client_detail", client_id=client_id))
-    if not client.get("calendly_link","").strip():
-        flash("❌ Booking link is not set. Add calendly_link in client settings before going live.", "error")
+        missing.append("campaign ID (run Launch first)")
+    if not client.get("calendly_link", "").strip():
+        missing.append("booking link (set in Monitor & Client Settings)")
+    if not client.get("outreach_email", "").strip():
+        missing.append("outreach email address")
+    if not client.get("app_password", "").strip():
+        missing.append("email app password")
+    if missing:
+        flash(f"❌ Cannot go live — missing: {', '.join(missing)}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
     client["active"] = True
     client["onboarding_status"] = None
