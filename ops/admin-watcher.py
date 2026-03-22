@@ -21,7 +21,7 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 WATCH_DIR = Path(__file__).parent.parent / "admin"
-RESTART_CMD = ["sudo", "systemctl", "restart", "argusreach-admin"]
+RESTART_CMD = ["sudo", "systemctl", "restart", "argusreach-admin", "argusreach-monitor"]
 DEBOUNCE_SECONDS = 3  # wait 3s after last change before restarting (handles rapid saves)
 
 class RestartHandler(FileSystemEventHandler):
