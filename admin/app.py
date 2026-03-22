@@ -811,6 +811,8 @@ def client_update(client_id):
         client["active"] = f["active"] == "true"
     if "calendly_event_slug" in f:
         client["calendly_event_slug"] = f["calendly_event_slug"].strip()
+    if "calendly_link" in f:
+        client["calendly_link"] = f["calendly_link"].strip()
 
     save_clients(config)
     flash("Client updated.", "success")

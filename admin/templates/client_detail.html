@@ -200,6 +200,11 @@
         </div>
       </div>
         <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Booking Link <span style="color:#ef4444">*required before go-live</span></label>
+          <input name="calendly_link" value="{{ client.get('calendly_link','') }}" placeholder="https://calendly.com/..." style="width:100%;font-size:12px">
+          <div style="font-size:10px;color:#475569;margin-top:3px">Full booking URL — included in all reply drafts sent to prospects</div>
+        </div>
+        <div>
           <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Event Slug</label>
           <input name="calendly_event_slug" value="{{ client.get('calendly_event_slug','') }}" placeholder="e.g. pt-tampa-bay-intro" style="width:100%;font-size:12px">
           <div style="font-size:10px;color:#475569;margin-top:3px">From your Calendly URL: calendly.com/argusreach/<b>slug</b></div>
