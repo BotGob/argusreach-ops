@@ -496,7 +496,7 @@ def add_sending_account(campaign_id, outreach_email):
         print(f"⚠️  Sending account link failed (link manually): {e}")
 
 # ── Load contacts into Instantly ──────────────────────────────────────────────
-def load_to_instantly(contacts, campaign_id, dry_run=False):
+def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
     if dry_run:
         print(f"   [DRY RUN] Would load {len(contacts)} contacts to {campaign_id}")
         return
@@ -547,6 +547,32 @@ def load_to_instantly(contacts, campaign_id, dry_run=False):
             errors += 1
             print(f"❌ Lead load error ({c['email']}): {e}")
     print(f"✅ {loaded} contacts loaded to Instantly ({errors} errors)")
+
+    # ── Pre-load all prospects into ArgusReach DB ─────────────────────────────
+    # Runs after Instantly load so every contact is visible in portal/reports
+    # from day 1, even before any reply arrives.
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from db.database import upsert_prospect, init_db as _init_db
+        _init_db()
+        db_loaded = 0
+        for c in contacts:
+            email = (c.get("email") or "").strip().lower()
+            if not email:
+                continue
+            upsert_prospect(
+                client_id   = client_id,
+                campaign_id = campaign_id,
+                email       = email,
+                first_name  = c.get("first_name", ""),
+                last_name   = c.get("last_name",  ""),
+                company     = c.get("company") or c.get("company_name", ""),
+                stage       = "added",
+            )
+            db_loaded += 1
+        print(f"💾 {db_loaded} prospects pre-loaded into ArgusReach DB (stage: added)")
+    except Exception as _e:
+        print(f"⚠️  DB pre-load skipped: {_e} (not critical — contacts are in Instantly)")
 
 # ── Write prospects CSV ────────────────────────────────────────────────────────
 def write_csv(contacts, client_id, month_name):
@@ -772,7 +798,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             add_sending_account(campaign_id, client["outreach_email"])
 
         # ── Step 7: Load contacts with personalization fields ─────────────────
-        load_to_instantly(contacts, campaign_id, dry_run=dry_run)
+        load_to_instantly(contacts, campaign_id, dry_run=dry_run, client_id=client_id)
 
         # ── Step 8: Update clients.json ───────────────────────────────────────
         save_client_campaign(client_id, campaign_id, campaign_name)

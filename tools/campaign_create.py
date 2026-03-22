@@ -268,10 +268,37 @@ def main():
         print(f"   ✗ Failed to create campaign: {e}")
         sys.exit(1)
 
-    # 6. Upload prospects
+    # 6. Upload prospects to Instantly + pre-load into ArgusReach DB
     print("\n[ UPLOADING PROSPECTS ]")
     time.sleep(2)  # let Instantly register the campaign
     upload_prospects(campaign_id, prospects, client)
+
+    print("\n[ PRE-LOADING PROSPECTS INTO DB ]")
+    try:
+        sys.path.insert(0, str(BASE_DIR))
+        from db.database import upsert_prospect, init_db
+        init_db()
+        loaded = 0
+        skipped = 0
+        for p in prospects:
+            email = (p.get("email") or p.get("Email") or "").strip().lower()
+            if not email:
+                skipped += 1
+                continue
+            upsert_prospect(
+                client_id   = client_id,
+                campaign_id = campaign_id,
+                email       = email,
+                first_name  = p.get("first_name") or p.get("First Name") or p.get("firstName") or "",
+                last_name   = p.get("last_name")  or p.get("Last Name")  or p.get("lastName")  or "",
+                company     = p.get("company")    or p.get("Company")    or p.get("company_name") or "",
+                stage       = "added",
+            )
+            loaded += 1
+        print(f"   ✅ {loaded} prospects pre-loaded into DB ({skipped} skipped — no email)")
+        print(f"   → Visible in portal, cross-campaign DNC active from day 1")
+    except Exception as e:
+        print(f"   ⚠️  DB pre-load failed: {e} (not critical — contacts still in Instantly)")
 
     # 7. Update clients.json with new campaign_id and campaign_name
     print("\n[ UPDATING CLIENTS.JSON ]")
