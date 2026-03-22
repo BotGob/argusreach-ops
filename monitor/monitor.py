@@ -797,17 +797,21 @@ def classify_and_draft(reply_body, from_name, from_email, subject, client):
             'notify_reason': 'Config gap: calendly_link missing', 'follow_up_date': None, 'urgency': 'high'
         }
 
-    prompt = f"""You are a reply routing assistant for {client['sender_name']} at {client['firm_name']}.
+    sender_name = client.get('sender_name') or client.get('firm_name') or 'the team'
+    firm_name   = client.get('firm_name') or client.get('sender_name') or 'our firm'
+    vertical    = client.get('vertical') or 'professional services'
+
+    prompt = f"""You are a reply routing assistant for {sender_name} at {firm_name}.
 
 YOUR SOLE JOB: Classify this reply and draft a brief, safe response that routes interested prospects to a calendar booking. Nothing else.
 
 CLIENT CONTEXT:
-- Sender: {client['sender_name']}, {client['firm_name']}
-- Vertical: {client['vertical']}
+- Sender: {sender_name}, {firm_name}
+- Vertical: {vertical}
 - Tone: {client.get('tone', 'warm-professional')}
 - Compliance notes: {client.get('compliance_note', 'none')}
 - Positioning: {client.get('positioning_note', 'We help clients build sales pipelines and networks - we amplify their efforts, not replace them.')}
-- Booking link: {client['calendly_link']}
+- Booking link: {client.get('calendly_link', '')}
 - Meeting format: {client.get('_meeting_format', 'any')}
 - ICP: {client.get('icp_summary', '')}
 
