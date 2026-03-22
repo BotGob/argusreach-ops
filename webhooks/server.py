@@ -74,6 +74,29 @@ def monitor_health():
         return jsonify({"status": "error", "reason": str(e)}), 500
 
 
+def _log_stripe_revenue(payment_id: str, amount_cents: int, plan: str,
+                         customer_email: str, client_id: str, billing_period: str = "monthly"):
+    """Write a revenue row to DB. Safe to call from any Stripe event handler."""
+    now = datetime.utcnow().isoformat()
+    conn = get_db()
+    conn.execute("""
+        INSERT OR IGNORE INTO revenue
+            (id, client_id, stripe_payment_id, amount_cents, plan, billing_period, customer_email, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (str(uuid.uuid4()), client_id, payment_id,
+          amount_cents, plan, billing_period, customer_email, now))
+    conn.commit()
+    conn.close()
+
+
+# Map Stripe price amounts (cents) to plan names — fallback when metadata is missing
+_PRICE_PLAN_MAP = {
+    75000:  "starter",
+    150000: "growth",
+    250000: "scale",
+}
+
+
 @app.route("/webhooks/stripe", methods=["POST"])
 def stripe_webhook():
     payload    = request.get_data()
@@ -90,28 +113,94 @@ def stripe_webhook():
         print(f"Stripe webhook error: {e}")
         return jsonify({"error": str(e)}), 400
 
-    if event.get("type") == "checkout.session.completed":
+    event_type = event.get("type", "")
+
+    # ── First payment via checkout (one-time or first month of subscription) ──
+    if event_type == "checkout.session.completed":
         session        = event["data"]["object"]
         amount_cents   = session.get("amount_total", 0)
         customer_email = session.get("customer_details", {}).get("email", "")
         meta           = session.get("metadata", {})
-        plan           = meta.get("plan", "unknown")
+        plan           = meta.get("plan", "") or _PRICE_PLAN_MAP.get(amount_cents, "unknown")
         client_id      = meta.get("client_id", "")
 
-        now = datetime.utcnow().isoformat()
-        conn = get_db()
-        conn.execute("""
-            INSERT OR IGNORE INTO revenue
-                (id, client_id, stripe_payment_id, amount_cents, plan, billing_period, customer_email, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (str(uuid.uuid4()), client_id, session.get("id", ""),
-              amount_cents, plan, "monthly", customer_email, now))
-        conn.commit()
-        conn.close()
+        _log_stripe_revenue(session.get("id", ""), amount_cents, plan,
+                            customer_email, client_id)
 
         amount_fmt = f"${amount_cents/100:.2f}"
-        telegram_notify(f"💰 <b>New payment!</b>\n{plan} — {amount_fmt}\n{customer_email}")
-        print(f"✅ Payment logged: {plan} {amount_fmt} from {customer_email}")
+        telegram_notify(
+            f"💰 <b>New payment!</b>\n"
+            f"Plan: {plan} — {amount_fmt}\n"
+            f"Email: {customer_email}"
+        )
+        print(f"✅ Checkout payment logged: {plan} {amount_fmt} from {customer_email}")
+
+    # ── Recurring monthly charge (subscription renewal) ──
+    elif event_type == "invoice.paid":
+        invoice        = event["data"]["object"]
+        # Skip $0 invoices (trials, etc.)
+        amount_cents   = invoice.get("amount_paid", 0)
+        if amount_cents == 0:
+            return jsonify({"status": "ok"})
+
+        customer_email = invoice.get("customer_email", "")
+        invoice_id     = invoice.get("id", "")
+        sub_id         = invoice.get("subscription", "")
+
+        # Derive plan from line items
+        lines      = invoice.get("lines", {}).get("data", [])
+        plan       = "unknown"
+        client_id  = ""
+        for line in lines:
+            price_amt = line.get("amount", 0)
+            plan      = _PRICE_PLAN_MAP.get(price_amt, plan)
+            meta      = line.get("metadata", {})
+            client_id = meta.get("client_id", client_id)
+
+        _log_stripe_revenue(invoice_id, amount_cents, plan,
+                            customer_email, client_id, "monthly_renewal")
+
+        amount_fmt = f"${amount_cents/100:.2f}"
+        telegram_notify(
+            f"🔄 <b>Subscription renewed!</b>\n"
+            f"Plan: {plan} — {amount_fmt}\n"
+            f"Email: {customer_email}\n"
+            f"Sub: <code>{sub_id}</code>"
+        )
+        print(f"✅ Renewal logged: {plan} {amount_fmt} from {customer_email}")
+
+    # ── Payment failed — alert Vito immediately ──
+    elif event_type == "invoice.payment_failed":
+        invoice        = event["data"]["object"]
+        customer_email = invoice.get("customer_email", "")
+        amount_cents   = invoice.get("amount_due", 0)
+        sub_id         = invoice.get("subscription", "")
+        attempt        = invoice.get("attempt_count", 1)
+
+        telegram_notify(
+            f"⚠️ <b>Payment failed!</b>\n"
+            f"Email: {customer_email}\n"
+            f"Amount due: ${amount_cents/100:.2f}\n"
+            f"Attempt #{attempt} — Sub: <code>{sub_id}</code>\n"
+            f"Check Stripe dashboard and reach out to client."
+        )
+        print(f"⚠️ Payment failed: {customer_email} ${amount_cents/100:.2f} (attempt {attempt})")
+
+    # ── Subscription cancelled ──
+    elif event_type == "customer.subscription.deleted":
+        sub            = event["data"]["object"]
+        customer_email = sub.get("customer_email", "")
+        sub_id         = sub.get("id", "")
+        cancel_reason  = sub.get("cancellation_details", {}).get("reason", "unknown")
+
+        telegram_notify(
+            f"❌ <b>Subscription cancelled</b>\n"
+            f"Email: {customer_email}\n"
+            f"Sub: <code>{sub_id}</code>\n"
+            f"Reason: {cancel_reason}\n"
+            f"Pause monitor and follow up with client."
+        )
+        print(f"❌ Subscription cancelled: {customer_email}")
 
     return jsonify({"status": "ok"})
 
