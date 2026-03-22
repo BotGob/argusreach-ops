@@ -787,6 +787,15 @@ def log_reply(client_id, prospect_email, classification, draft, sent, notes=''):
 def classify_and_draft(reply_body, from_name, from_email, subject, client):
     if not ai:
         return _fallback_result('No ANTHROPIC_API_KEY configured')
+    if not client.get('calendly_link', '').strip():
+        log(f"[Draft] calendly_link not set for {client.get('id')} — escalating instead of generating broken draft")
+        return {
+            'classification': 'other', 'reasoning': 'calendly_link not configured',
+            'should_respond': False, 'escalate': True,
+            'escalate_reason': 'calendly_link is not set in clients.json. Set it in the portal before monitor can draft responses.',
+            'draft_response': '', 'notify_vito': True,
+            'notify_reason': 'Config gap: calendly_link missing', 'follow_up_date': None, 'urgency': 'high'
+        }
 
     prompt = f"""You are a reply routing assistant for {client['sender_name']} at {client['firm_name']}.
 

@@ -759,6 +759,9 @@ def client_go_live(client_id):
     if not client.get("instantly_campaign_id"):
         flash("❌ No campaign found - run Launch first before marking live.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
+    if not client.get("calendly_link","").strip():
+        flash("❌ Booking link is not set. Add calendly_link in client settings before going live.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
     client["active"] = True
     client["onboarding_status"] = None
     if not client.get("launch_date"):
