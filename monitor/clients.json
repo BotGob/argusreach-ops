@@ -4,7 +4,7 @@
     {
       "id": "argusreach",
       "active": true,
-      "onboarding_status": null,
+      "onboarding_status": "dns_pending",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
       "vertical": "B2BServices",
@@ -51,7 +51,7 @@
       "_website": "https://www.argusreach.com",
       "_email_provider": "google",
       "_dns_provider": "",
-      "app_password": "mekd ejxy pejm kubb",
+      "app_password": "gAAAAABpwJ1tg40SHvy2OGBrqUpacoRjsq2orahMgXLQaYgYDyY_aKfIEXC-tJ8Ck9mmGQZEuR33-lA0_GzsVFCDEX-Cdozpxa0s43xO5gbh1aRHdgTou4o=",
       "calendly_event_slug": "",
       "sequence": [
         {
@@ -85,7 +85,11 @@
         "payment_confirmed": true,
         "sequence_approved": true,
         "calendar_connected": true
-      }
+      },
+      "_setup_token": "3erHDOhOh3k6ydoPekxMLvHejnvVWP2vaOTawL5cYzM",
+      "_setup_token_expires": "2026-03-30T02:00:32.849603+00:00",
+      "_setup_token_used": false,
+      "_credentials_received_at": "2026-03-23T01:54:53.441934"
     }
   ]
 }
