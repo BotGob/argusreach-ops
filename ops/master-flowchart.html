@@ -196,9 +196,10 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#4ade80;">●</span> Client record created (clients.json + DB + DNC file)<br>
           <span style="color:#4ade80;">●</span> Welcome email auto-sent<br>
           <span style="color:#4ade80;font-weight:600;">AUTO (after Vito confirms email + app password):</span><br>
-          <span style="color:#4ade80;">●</span> Apollo → DNC filter → NeverBounce → replacement loop → target count hit<br>
+          <span style="color:#4ade80;">●</span> Apollo → DNC filter (loop up to 5 rounds) → NeverBounce → target count hit<br>
           <span style="color:#4ade80;">●</span> 3-touch sequence written + loaded into Instantly DRAFT via API<br>
-          <span style="color:#4ade80;">●</span> Leads loaded with personalization fields (city, title, state)<br>
+          <span style="color:#4ade80;">●</span> Auto-personalization: company website fetched per lead → Claude Haiku generates {{custom_intro}} opener → validated (domain match + company presence + generic check)<br>
+          <span style="color:#4ade80;">●</span> Leads loaded with personalization fields (city, title, state, custom_intro)<br>
           <span style="color:#4ade80;">●</span> DNS records generated for client domain<br>
           <span style="color:#4ade80;">●</span> Calendly event type created for client<br>
           <span style="color:#4ade80;font-weight:600;">AUTO (on active: true):</span><br>
@@ -499,7 +500,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
       <div class="auto">
         <div class="step-label">Gob runs monthly_cycle.py — full automated pipeline</div>
-        <div class="step-detail">Single command: python3 tools/monthly_cycle.py --client [id] --month "Month YYYY". Pipeline: (1) Pull all previously contacted emails from DB → exclusion list. (2) Apollo API search by ICP titles + geography, auto-refill pages until target count met — never contacts same prospect twice. (3) NeverBounce email verification — bad/risky emails auto-added to DNC. (4) DNC filter applied (global + client-specific). (5) New Instantly campaign created automatically with naming convention: "ArgusReach — [Firm] — [Month YYYY]". (6) Sequence pulled from previous campaign in Instantly (7-day minimum delays enforced). (7) Contacts loaded to campaign. (8) Pre-launch checklist sent to Vito via Telegram.</div>
+        <div class="step-detail">Single command: python3 tools/monthly_cycle.py --client [id] --month "Month YYYY". Pipeline: (1) Pull all previously contacted emails from DB → exclusion list. (2) Apollo API search by ICP titles + geography, auto-refill pages until target count met — never contacts same prospect twice. (3) NeverBounce email verification — bad/risky emails auto-added to DNC. (4) DNC filter applied (global + client-specific), loop back to Apollo for replacements up to 5 rounds. (5) New Instantly campaign created automatically with naming convention: "ArgusReach — [Firm] — [Month YYYY]". (6) Sequence pulled from previous campaign in Instantly (7-day minimum delays enforced). (7) Auto-personalization: for each lead, fetch company website (from Apollo), validate domain match, run Claude Haiku to generate a {{custom_intro}} opener (15-25 words, specific to their business). Falls back silently if no website, domain mismatch, or generic output detected. (8) Contacts loaded to campaign with custom_intro + city + title + state as custom variables. (9) Pre-launch checklist sent to Vito via Telegram.</div>
         <span class="step-tool t-orange">Apollo.io (paid for emails)</span>
         <span class="step-tool t-red">NeverBounce</span>
         <span class="step-tool t-orange">Instantly.ai</span>
@@ -697,8 +698,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free (built-in)</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">personalize.py</div>
-      <div class="tool-role">AI icebreaker generator. Takes Apollo CSV → runs each prospect through Claude Haiku → outputs enriched CSV with unique custom_opening per row. ~$0.0003/prospect. Used before every campaign launch. Approve the template + spot-check 10-15 outputs. No per-email approval needed.</div>
+      <div class="tool-name">Auto-Personalization (built into pipeline)</div>
+      <div class="tool-role">AI opener generator — runs automatically inside monthly_cycle.py and campaign_create.py at lead-load time. For each prospect: fetches company website (from Apollo's organization_website_url), validates domain match (exact/fuzzy/no-match), checks company name presence on page, calls Claude Haiku to generate a 15-25 word {{custom_intro}} opener specific to that company. 3-layer validation rejects wrong domains, unrelated pages, and generic output. Falls back to empty string silently. ~$0.10-0.25 per 200-lead campaign. No separate script or manual step required.</div>
       <div class="tool-cost">~$0.03–0.30/campaign</div>
     </div>
     <div class="tool-card">
@@ -796,9 +797,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div class="df-arr">→</div>
     <div class="df-node" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.3);color:#fb923c;">CSV export</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.3);color:#c084fc;">personalize.py (Claude Haiku)</div>
+    <div class="df-node" style="background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.3);color:#c084fc;">Auto-Personalization (Claude Haiku → {{custom_intro}})</div>
     <div class="df-arr">→</div>
-    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Enriched CSV (custom_opening)</div>
+    <div class="df-node" style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;">Leads enriched (custom_intro + city + title + state)</div>
     <div class="df-arr">→</div>
     <div class="df-node" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ade80;">Client outreach Gmail</div>
     <div class="df-note">Lead data flow (B2B) — unique icebreaker per prospect</div>
