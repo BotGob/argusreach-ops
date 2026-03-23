@@ -70,13 +70,14 @@ _log_event        = log_event
 _upsert_prospect  = upsert_prospect
 _update_stage     = update_prospect_stage
 
-CLIENTS_FILE    = BASE_DIR / 'clients.json'
-LOG_DIR         = BASE_DIR / 'logs'
-DNC_DIR         = BASE_DIR / 'dnc'
-REPLY_LOG       = LOG_DIR / 'replies.json'
-PENDING_FILE    = LOG_DIR / 'pending_approvals.json'
-PROCESSED_FILE  = LOG_DIR / 'processed_ids.json'
-MONITOR_LOG     = LOG_DIR / 'monitor.log'
+CLIENTS_FILE              = BASE_DIR / 'clients.json'
+LOG_DIR                   = BASE_DIR / 'logs'
+DNC_DIR                   = BASE_DIR / 'dnc'
+REPLY_LOG                 = LOG_DIR / 'replies.json'
+PENDING_FILE              = LOG_DIR / 'pending_approvals.json'
+PROCESSED_FILE            = LOG_DIR / 'processed_ids.json'
+MONITOR_LOG               = LOG_DIR / 'monitor.log'
+COMPLETED_CAMPAIGNS_FILE  = LOG_DIR / 'completed_campaigns.json'
 
 LOG_DIR.mkdir(exist_ok=True)
 DNC_DIR.mkdir(exist_ok=True)
@@ -1553,6 +1554,81 @@ def sync_instantly_stages(clients):
             log(f"[Sync] Stage sync failed for {cid} (non-fatal): {e}")
 
 
+def check_campaign_completions(clients):
+    """
+    Check if any active client's Instantly campaign has status=3 (completed).
+    Fires a Telegram alert once per campaign via completed_campaigns.json dedup.
+    Non-fatal: exception on one client does not stop the cycle.
+    """
+    if not INSTANTLY_API_KEY:
+        return
+
+    # Load already-alerted campaign IDs
+    alerted = []
+    try:
+        if COMPLETED_CAMPAIGNS_FILE.exists():
+            alerted = json.loads(COMPLETED_CAMPAIGNS_FILE.read_text())
+    except Exception as e:
+        log(f"[CampaignComplete] Failed to load completed_campaigns.json: {e}")
+        alerted = []
+
+    changed = False
+
+    for client in clients:
+        cid         = client['id']
+        firm        = client.get('firm_name', cid)
+        campaign_id = client.get('instantly_campaign_id', '')
+        campaign_name = client.get('campaign_name', campaign_id)
+
+        if not campaign_id:
+            continue
+        if campaign_id in alerted:
+            continue  # Already alerted — skip silently
+
+        try:
+            resp = requests.get(
+                f'https://api.instantly.ai/api/v2/campaigns/{campaign_id}',
+                headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
+                timeout=10
+            )
+            if resp.status_code != 200:
+                log(f"[CampaignComplete] API error for {firm} ({campaign_id}): {resp.status_code}")
+                continue
+
+            data = resp.json()
+            status = data.get('status', -1)
+            # Use API campaign name if we don't have one locally
+            api_name = data.get('name', campaign_name)
+
+            if status != 3:
+                continue  # Not completed — skip
+
+            # Completed and not yet alerted — fire alert
+            log(f"[CampaignComplete] Campaign completed: {firm} — {api_name} ({campaign_id})")
+            notify(
+                f"🏁 *Campaign Complete — {firm}*\n\n"
+                f"All prospects have been reached for the current campaign.\n\n"
+                f"*Campaign:* {api_name}\n"
+                f"*Client:* {firm}\n\n"
+                f"Next steps:\n"
+                f"• Reply with campaign details to build the next batch\n"
+                f"• Or close out the campaign if the client is offboarding\n\n"
+                f"Run: `python3 tools/monthly_cycle.py --client {cid} --month \"Month YYYY\"` to launch the next cycle."
+            )
+
+            alerted.append(campaign_id)
+            changed = True
+
+        except Exception as e:
+            log(f"[CampaignComplete] Error checking {firm} (non-fatal): {e}")
+
+    if changed:
+        try:
+            COMPLETED_CAMPAIGNS_FILE.write_text(json.dumps(alerted, indent=2))
+        except Exception as e:
+            log(f"[CampaignComplete] Failed to save completed_campaigns.json: {e}")
+
+
 def maybe_send_digest():
     global _last_digest_day
     now = datetime.now()
@@ -1695,6 +1771,7 @@ def run():
             maybe_send_digest()
             check_due_followups()
             check_stale_pending()
+            check_campaign_completions(clients if clients else [])
             # Sync Instantly lead statuses to DB every 15 min + check cycle completion
             if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
                 pass
