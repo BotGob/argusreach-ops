@@ -53,6 +53,7 @@ load_env()
 APOLLO_API_KEY      = os.environ.get("APOLLO_API_KEY", "")
 NEVERBOUNCE_API_KEY = os.environ.get("NEVERBOUNCE_API_KEY", "")
 INSTANTLY_API_KEY   = os.environ.get("INSTANTLY_API_KEY", "")
+ANTHROPIC_API_KEY   = os.environ.get("ANTHROPIC_API_KEY", "")
 
 # ── Client helpers ─────────────────────────────────────────────────────────────
 def load_all_clients():
@@ -299,14 +300,15 @@ def search_apollo(client, target, exclude_emails):
                     continue  # skip already contacted or already added
                 seen_emails.add(email)
                 contacts.append({
-                    "first_name":   p.get("first_name", ""),
-                    "last_name":    p.get("last_name", ""),
-                    "email":        email,
-                    "company":      (p.get("organization") or {}).get("name", ""),
-                    "title":        p.get("title", ""),
-                    "city":         p.get("city", ""),
-                    "state":        p.get("state", ""),
-                    "linkedin_url": p.get("linkedin_url", ""),
+                    "first_name":                p.get("first_name", ""),
+                    "last_name":                 p.get("last_name", ""),
+                    "email":                     email,
+                    "company":                   (p.get("organization") or {}).get("name", ""),
+                    "title":                     p.get("title", ""),
+                    "city":                      p.get("city", ""),
+                    "state":                     p.get("state", ""),
+                    "linkedin_url":              p.get("linkedin_url", ""),
+                    "organization_website_url":  (p.get("organization") or {}).get("website_url", ""),
                 })
                 new_this_page += 1
                 if len(contacts) >= target:
@@ -495,6 +497,105 @@ def add_sending_account(campaign_id, outreach_email):
     except Exception as e:
         print(f"⚠️  Sending account link failed (link manually): {e}")
 
+# ── Auto-personalization: company website → custom_intro ──────────────────────
+def _strip_html(html: str) -> str:
+    """Strip HTML tags and collapse whitespace to plain text."""
+    import re
+    text = re.sub(r"<style[^>]*>.*?</style>", " ", html, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<script[^>]*>.*?</script>", " ", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"&nbsp;", " ", text)
+    text = re.sub(r"&amp;", "&", text)
+    text = re.sub(r"&lt;", "<", text)
+    text = re.sub(r"&gt;", ">", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def enrich_contact(contact: dict) -> str:
+    """
+    Fetch a contact's company website and generate a personalized 1-sentence
+    cold-email opener using Claude Haiku.
+
+    Returns the sentence string, or "" on any failure (non-fatal).
+    """
+    website = (
+        contact.get("organization_website_url", "")
+        or contact.get("website_url", "")
+        or contact.get("website", "")
+        or ""
+    ).strip()
+
+    company    = contact.get("company", "") or contact.get("company_name", "")
+    first_name = contact.get("first_name", "")
+
+    if not website or not ANTHROPIC_API_KEY:
+        return ""
+
+    # Ensure URL has a scheme
+    if not website.startswith(("http://", "https://")):
+        website = "https://" + website
+
+    # Fetch homepage
+    snippet = ""
+    try:
+        resp = requests.get(
+            website,
+            timeout=5,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"},
+            allow_redirects=True,
+        )
+        if resp.ok:
+            plain = _strip_html(resp.text)
+            snippet = plain[:500]
+    except Exception:
+        return ""  # website unreachable — skip gracefully
+
+    if not snippet:
+        return ""
+
+    # Call Claude Haiku for the personalized opener
+    try:
+        import anthropic as _anthropic
+        aclient = _anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        prompt = (
+            f"Write a single natural sentence (15-25 words) to open a cold email to "
+            f"{first_name} at {company}. "
+            f"Use this recent context from their website: {snippet}. "
+            f"Make it specific and relevant, not generic. Plain text only, no punctuation at end"
+        )
+        msg = aclient.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=150,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        result = msg.content[0].text.strip()
+        # Strip trailing punctuation if present (period, exclamation, question mark)
+        result = result.rstrip(".!?")
+        return result
+    except Exception:
+        return ""
+
+
+def enrich_contacts(contacts: list) -> list:
+    """
+    Enrich each contact with a personalized `custom_intro` opener.
+    Adds key `custom_intro` to each contact dict (empty string if enrichment fails).
+    Rate-limited to 0.3s between requests.
+    """
+    total = len(contacts)
+    print(f"✨ Enriching {total} leads with personalized intros...")
+    for i, contact in enumerate(contacts, 1):
+        contact["custom_intro"] = enrich_contact(contact)
+        if i % 10 == 0 or i == total:
+            filled = sum(1 for c in contacts[:i] if c.get("custom_intro"))
+            print(f"   {i}/{total} enriched ({filled} with intros so far)")
+        time.sleep(0.3)
+    filled_total = sum(1 for c in contacts if c.get("custom_intro"))
+    print(f"✅ Enrichment complete: {filled_total}/{total} contacts have a custom intro")
+    return contacts
+
+
 # ── Load contacts into Instantly ──────────────────────────────────────────────
 def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
     if dry_run:
@@ -516,9 +617,10 @@ def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
             "city":                 c.get("city", ""),
             "state":                c.get("state", ""),
             "custom_variables": {
-                "title":   c.get("title", ""),
-                "city":    c.get("city", ""),
-                "state":   c.get("state", ""),
+                "title":        c.get("title", ""),
+                "city":         c.get("city", ""),
+                "state":        c.get("state", ""),
+                "custom_intro": c.get("custom_intro", ""),
             },
         }
         try:
@@ -797,7 +899,10 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
         if client.get("outreach_email"):
             add_sending_account(campaign_id, client["outreach_email"])
 
-        # ── Step 7: Load contacts with personalization fields ─────────────────
+        # ── Step 7: Enrich contacts with personalized intros ─────────────────
+        contacts = enrich_contacts(contacts)
+
+        # ── Step 7b: Load contacts with personalization fields ────────────────
         load_to_instantly(contacts, campaign_id, dry_run=dry_run, client_id=client_id)
 
         # ── Step 8: Update clients.json ───────────────────────────────────────

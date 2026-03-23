@@ -38,6 +38,88 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
+# ── HTML stripping helper ──────────────────────────────────────────────────────
+def _strip_html(html: str) -> str:
+    text = re.sub(r"<style[^>]*>.*?</style>", " ", html, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<script[^>]*>.*?</script>", " ", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"&nbsp;", " ", text)
+    text = re.sub(r"&amp;", "&", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
+def enrich_contact(contact: dict) -> str:
+    """Fetch company website and generate a personalized 1-sentence opener via Claude Haiku.
+    Returns "" on any failure — always non-fatal."""
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not api_key:
+        return ""
+
+    website = (
+        contact.get("organization_website_url", "")
+        or contact.get("website_url", "")
+        or contact.get("website", "")
+        or ""
+    ).strip()
+    company    = contact.get("company") or contact.get("company_name") or contact.get("Company", "")
+    first_name = contact.get("first_name") or contact.get("First Name") or contact.get("firstName", "")
+
+    if not website:
+        return ""
+
+    if not website.startswith(("http://", "https://")):
+        website = "https://" + website
+
+    snippet = ""
+    try:
+        resp = requests.get(
+            website, timeout=5,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"},
+            allow_redirects=True,
+        )
+        if resp.ok:
+            snippet = _strip_html(resp.text)[:500]
+    except Exception:
+        return ""
+
+    if not snippet:
+        return ""
+
+    try:
+        import anthropic as _anthropic
+        aclient = _anthropic.Anthropic(api_key=api_key)
+        prompt = (
+            f"Write a single natural sentence (15-25 words) to open a cold email to "
+            f"{first_name} at {company}. "
+            f"Use this recent context from their website: {snippet}. "
+            f"Make it specific and relevant, not generic. Plain text only, no punctuation at end"
+        )
+        msg = aclient.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=150,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        result = msg.content[0].text.strip().rstrip(".!?")
+        return result
+    except Exception:
+        return ""
+
+
+def enrich_prospects(prospects: list) -> list:
+    """Add `custom_intro` key to each prospect dict. Rate-limited to 0.3s between fetches."""
+    total = len(prospects)
+    print(f"   ✨ Enriching {total} prospects with personalized intros...")
+    for i, p in enumerate(prospects, 1):
+        p["custom_intro"] = enrich_contact(p)
+        if i % 10 == 0 or i == total:
+            filled = sum(1 for x in prospects[:i] if x.get("custom_intro"))
+            print(f"      {i}/{total} enriched ({filled} with intros)")
+        time.sleep(0.3)
+    filled_total = sum(1 for p in prospects if p.get("custom_intro"))
+    print(f"   ✅ Enrichment done: {filled_total}/{total} have a custom intro")
+    return prospects
+
 BASE_DIR = Path(__file__).parent.parent
 load_dotenv(BASE_DIR / "monitor" / ".env")
 
@@ -192,6 +274,9 @@ def upload_prospects(campaign_id, prospects, client):
                 "last_name": p.get("last_name") or p.get("Last Name") or p.get("lastName") or "",
                 "company_name": p.get("company") or p.get("Company") or p.get("company_name") or "",
                 "skip_if_in_workspace": False,
+                "custom_variables": {
+                    "custom_intro": p.get("custom_intro", ""),
+                },
             })
         if not leads:
             continue
@@ -268,7 +353,10 @@ def main():
         print(f"   ✗ Failed to create campaign: {e}")
         sys.exit(1)
 
-    # 6. Upload prospects to Instantly + pre-load into ArgusReach DB
+    # 6. Enrich prospects with personalized intros, then upload
+    print("\n[ ENRICHING PROSPECTS ]")
+    prospects = enrich_prospects(prospects)
+
     print("\n[ UPLOADING PROSPECTS ]")
     time.sleep(2)  # let Instantly register the campaign
     upload_prospects(campaign_id, prospects, client)
