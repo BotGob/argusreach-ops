@@ -285,18 +285,8 @@
       </label>
       <textarea name="outcomes" placeholder="Clients who switch to us typically find errors or missed deductions in their prior returns. On average our new clients save $4,200 in the first year just from the transition review. Retention rate is 94% - people don't leave once they're with us."></textarea>
     </div>
-    <div class="field">
-      <label>Where does most of your new business come from right now? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Referrals, networking, inbound leads, repeat clients, cold outreach - whatever is working. Helps us understand your market and what messaging will resonate with prospects.</span>
-      </label>
-      <textarea name="best_referral_sources" placeholder="Most of our new clients come from word of mouth - existing clients referring friends or colleagues. We also get a few from local networking events. We've never done systematic outreach so there's no real pipeline outside of referrals."></textarea>
-    </div>
-    <div class="field">
-      <label>Have you tried outreach or marketing before? What worked or didn't? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Helps us avoid repeating approaches that didn't land for your market.</span>
-      </label>
-      <textarea name="prior_outreach" placeholder="We tried a marketing agency that ran Google ads - got clicks but no real leads. We've had better luck from in-person networking events but can't scale that. Never done any direct outbound prospecting."></textarea>
-    </div>
+
+
     <div class="field">
       <label>Best client success story <span style="color:#666;font-size:0.75rem;">(optional)</span>
         <span class="hint">A specific result you've delivered - anonymized is fine. Numbers make sequences far more compelling. e.g. "Helped a 3-partner CPA firm cut their close time in half and add 6 new clients in one quarter."</span>
@@ -358,12 +348,7 @@
         <label class="cb"><input type="checkbox" name="target_seniority" value="any"><span class="cb-label">Anyone with the right title</span></label>
       </div>
     </div>
-    <div class="field">
-      <label>Target Company / Practice Type <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Any specifics about the type of organization? Specialty, ownership, stage, etc.</span>
-      </label>
-      <input name="target_company_type" placeholder="Independent firms and practices - not national chains or corporate-owned. Locally owned, growing.">
-    </div>
+
     <div class="field">
       <label>Target Company Size <span class="req">*</span>
         <span class="hint">Select all that apply. Employee count of the companies you want to reach.</span>
@@ -376,19 +361,7 @@
         <label class="cb"><input type="checkbox" name="target_company_size" value="any"><span class="cb-label">Any size</span></label>
       </div>
     </div>
-    <div class="field">
-      <label>How many new clients can you realistically take per month? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">This helps us set the right campaign volume and avoid overwhelming your team.</span>
-      </label>
-      <select name="monthly_capacity">
-        <option value="">— Select —</option>
-        <option value="1-5">1–5 new clients</option>
-        <option value="5-15">5–15 new clients</option>
-        <option value="15-30">15–30 new clients</option>
-        <option value="30-50">30–50 new clients</option>
-        <option value="50+">50+ - no meaningful cap</option>
-      </select>
-    </div>
+
     <div class="field">
       <label>Do-Not-Contact list - email addresses or domains <span style="color:#666;font-size:0.75rem;">(optional)</span>
         <span class="hint">The best way to protect a company: include their email domain (e.g. smithlaw.com or @smithlaw.com). This blocks every person at that company, not just the ones you know by name. Individual email addresses work too. One per line - a spreadsheet or CRM export is fine, we'll extract what we need.</span>
@@ -396,24 +369,6 @@
       <textarea name="dnc_emails" placeholder="smithlaw.com&#10;firstnationalbank.com&#10;john@specificperson.com"></textarea>
     </div>
 
-    <div class="field">
-      <label>When a prospect says yes - how do you prefer to meet? <span class="req">*</span>
-        <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
-      </label>
-      <div class="checkbox-grid" id="meeting_format_group">
-        <label class="cb"><input type="checkbox" name="meeting_format" value="phone" onchange="toggleOfficeAddress()"><span class="cb-label">Phone call</span></label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="zoom" onchange="toggleOfficeAddress()"><span class="cb-label">Video call (Zoom / Teams / Google Meet)</span></label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_their_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person - I go to their office</span></label>
-        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_my_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person - they come to my office</span></label>
-      </div>
-      <div style="font-size:0.72rem;color:#666;margin-top:6px;">Select all that apply - prospects will choose from these options when they book.</div>
-    </div>
-    <div class="field" id="office_address_field" style="display:none;">
-      <label>Your office address <span class="req">*</span>
-        <span class="hint">Required when "they come to my office" is selected. Shown on booking confirmations.</span>
-      </label>
-      <input name="office_address" id="office_address" placeholder="1234 Bay Harbor Blvd, Suite 200, Tampa, FL 33601">
-    </div>
 
     <!-- ── SECTION 5: YOUR MESSAGE & VOICE ──────────────────────────── -->
     <div class="section-header">Your Message & Voice</div>
@@ -443,6 +398,26 @@
         <span class="hint">Compliance constraints, things that don't fit your brand, anything that could create legal risk.</span>
       </label>
       <textarea name="compliance_note" placeholder="Do not promise specific results or savings figures. Do not say 'best' or 'top-rated.' Do not mention our fees - we handle that in the discovery call. Do not use the word 'guarantee.'"></textarea>
+    </div>
+
+
+    <div class="field">
+      <label>When a prospect says yes - how do you prefer to meet? <span class="req">*</span>
+        <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
+      </label>
+      <div class="checkbox-grid" id="meeting_format_group">
+        <label class="cb"><input type="checkbox" name="meeting_format" value="phone" onchange="toggleOfficeAddress()"><span class="cb-label">Phone call</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="zoom" onchange="toggleOfficeAddress()"><span class="cb-label">Video call (Zoom / Teams / Google Meet)</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_their_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person - I go to their office</span></label>
+        <label class="cb"><input type="checkbox" name="meeting_format" value="in_person_my_office" onchange="toggleOfficeAddress()"><span class="cb-label">In-person - they come to my office</span></label>
+      </div>
+      <div style="font-size:0.72rem;color:#666;margin-top:6px;">Select all that apply - prospects will choose from these options when they book.</div>
+    </div>
+    <div class="field" id="office_address_field" style="display:none;">
+      <label>Your office address <span class="req">*</span>
+        <span class="hint">Required when "they come to my office" is selected. Shown on booking confirmations.</span>
+      </label>
+      <input name="office_address" id="office_address" placeholder="1234 Bay Harbor Blvd, Suite 200, Tampa, FL 33601">
     </div>
 
     <!-- ── SECTION 6: BOOKING & CAMPAIGN ────────────────────────────── -->
@@ -488,10 +463,7 @@
         <option value="yes_later">Yes - I'll email it to vito@argusreach.com before we start</option>
       </select>
     </div>
-    <div class="field">
-      <label>How did you hear about ArgusReach? <span style="color:#666;font-size:0.75rem;">(optional)</span></label>
-      <input name="how_heard" placeholder="Referral, LinkedIn, Google, etc.">
-    </div>
+
     <div class="field">
       <label>Anything else we should know before we start <span style="color:#666;font-size:0.75rem;">(optional)</span></label>
       <textarea name="notes" placeholder="Seasonal considerations, upcoming events, anything unique about your market or situation..."></textarea>
