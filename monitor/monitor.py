@@ -98,6 +98,22 @@ INSTANTLY_API_KEY   = os.environ.get('INSTANTLY_API_KEY', '')
 _CRED_KEY           = os.environ.get('CREDENTIAL_ENCRYPTION_KEY', '')
 
 # ── CREDENTIAL DECRYPTION ─────────────────────────────────────────────────────
+def _write_connection_status(client_id: str, status: str, error: str):
+    """Write IMAP connection status to a log file so the portal can display it."""
+    import zoneinfo as _zi
+    status_file = LOG_DIR / 'connection_status.json'
+    try:
+        data = json.loads(status_file.read_text()) if status_file.exists() else {}
+        data[client_id] = {
+            'status': status,  # 'ok' or 'error'
+            'error': error,
+            'checked_at': datetime.now(_zi.ZoneInfo('America/New_York')).strftime('%Y-%m-%d %I:%M %p ET'),
+        }
+        status_file.write_text(json.dumps(data, indent=2))
+    except Exception:
+        pass  # non-fatal
+
+
 def _get_app_password(client: dict) -> str:
     """Return decrypted app_password. Falls back to plaintext (backward compat)."""
     raw = client.get('app_password', '')
@@ -857,6 +873,7 @@ def process_client(client, processed_ids):
         imaplib.IMAP4_SSL.port = 993
         mail = imaplib.IMAP4_SSL('imap.gmail.com', timeout=30)
         mail.login(client['outreach_email'], _get_app_password(client))
+        _write_connection_status(client['id'], 'ok', '')
         mail.select('inbox')
 
         # Search since yesterday — IMAP SINCE is date-only; catches manually-read emails; dedup prevents double-processing
@@ -1213,11 +1230,17 @@ def process_client(client, processed_ids):
         mail.logout()
 
     except imaplib.IMAP4.error as e:
+        err_str = str(e).lower()
         log(f"IMAP error {firm}: {e}")
-        notify(f"⚠️ *{firm}* IMAP error: `{str(e)[:150]}`")
+        if 'authenticate' in err_str or 'invalid credentials' in err_str or 'login' in err_str:
+            notify(f"🔐 *{firm}* — bad app password\nIMAP authentication failed for `{client.get('outreach_email','')}`\nAsk the client to resubmit credentials via the portal resend link.")
+        else:
+            notify(f"⚠️ *{firm}* IMAP error: `{str(e)[:150]}`")
+        _write_connection_status(client['id'], 'error', str(e)[:200])
     except Exception as e:
         log(f"Error processing {firm}: {e}")
         notify(f"⚠️ *{firm}* monitor error: `{str(e)[:150]}`")
+        _write_connection_status(client['id'], 'error', str(e)[:200])
 
     return new_processed
 

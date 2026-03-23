@@ -760,12 +760,22 @@ def client_detail(client_id):
 
     metrics = get_client_metrics(client_id, client.get("instantly_campaign_id",""))
 
+    # Load connection status from monitor
+    conn_status_file = BASE_DIR / "monitor" / "logs" / "connection_status.json"
+    conn_status = {}
+    if conn_status_file.exists():
+        try:
+            conn_status = json.loads(conn_status_file.read_text()).get(client_id, {})
+        except Exception:
+            pass
+
     return render_template("client_detail.html",
         client=client,
         dnc_count=len(dnc),
         lead_count=lead_count,
         metrics=metrics,
-        events=[dict(e) for e in events]
+        events=[dict(e) for e in events],
+        conn_status=conn_status,
     )
 
 
