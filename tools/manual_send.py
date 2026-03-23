@@ -11,14 +11,32 @@ Example:
 Always logs: reply_received + draft_approved events to DB with correct client_id + campaign_id.
 """
 
-import sys, json, smtplib, argparse
+import sys, json, os, smtplib, argparse
 from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / 'monitor' / '.env')
 sys.path.insert(0, str(BASE_DIR))
 from db.database import log_event, upsert_prospect, update_prospect_stage
+
+try:
+    from cryptography.fernet import Fernet as _Fernet
+    _FERNET_OK = True
+except ImportError:
+    _FERNET_OK = False
+
+def _get_app_password(client: dict) -> str:
+    raw = client.get('app_password', '')
+    key = os.environ.get('CREDENTIAL_ENCRYPTION_KEY', '')
+    if raw and _FERNET_OK and key:
+        try:
+            return _Fernet(key.encode()).decrypt(raw.encode()).decode()
+        except Exception:
+            pass
+    return raw
 
 CLIENTS_FILE = BASE_DIR / 'monitor' / 'clients.json'
 
@@ -92,7 +110,7 @@ def main():
 
     # Send
     send_email(
-        client['outreach_email'], client['app_password'],
+        client['outreach_email'], _get_app_password(client),
         client.get('sender_name', ''), args.to_email, args.subject, body,
         in_reply_to=args.in_reply_to
     )

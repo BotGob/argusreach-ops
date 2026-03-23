@@ -22,7 +22,8 @@ import os
 import sys
 import hashlib
 import re
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
 
@@ -32,6 +33,12 @@ try:
     _DNS_OK = True
 except ImportError:
     _DNS_OK = False
+
+try:
+    from cryptography.fernet import Fernet as _Fernet
+    _CRYPTO_OK = True
+except ImportError:
+    _CRYPTO_OK = False
 from dotenv import load_dotenv
 from flask import (Flask, Response, flash, redirect, render_template,
                    request, send_file, session, url_for)
@@ -50,8 +57,49 @@ CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
 CAMPAIGNS_DIR = BASE_DIR / "campaigns"
 DNC_DIR       = BASE_DIR / "monitor" / "dnc"
 INTAKES_FILE  = BASE_DIR / "monitor" / "intakes" / "pending.json"
-INSTANTLY_KEY = os.environ.get("INSTANTLY_API_KEY", "")
+INSTANTLY_KEY  = os.environ.get("INSTANTLY_API_KEY", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "argusreach2026")
+_CRED_KEY      = os.environ.get("CREDENTIAL_ENCRYPTION_KEY", "")
+
+# ── CREDENTIAL ENCRYPTION HELPERS ────────────────────────────────────────────
+def _encrypt_credential(plaintext: str) -> str:
+    """Encrypt a credential string with Fernet. Returns ciphertext or plaintext if no key."""
+    if not _CRYPTO_OK or not _CRED_KEY:
+        return plaintext
+    try:
+        f = _Fernet(_CRED_KEY.encode())
+        return f.encrypt(plaintext.encode()).decode()
+    except Exception:
+        return plaintext
+
+
+def _decrypt_credential(value: str) -> str:
+    """Decrypt a Fernet-encrypted credential. Falls back to plaintext (backward compat)."""
+    if not value:
+        return value
+    if not _CRYPTO_OK or not _CRED_KEY:
+        return value
+    try:
+        f = _Fernet(_CRED_KEY.encode())
+        return f.decrypt(value.encode()).decode()
+    except Exception:
+        return value  # already plaintext or wrong key — return as-is
+
+
+def _generate_setup_token(client: dict) -> str:
+    """Generate a one-time setup token, store on client dict, return token string."""
+    token   = secrets.token_urlsafe(32)
+    expires = (datetime.utcnow() + timedelta(days=7)).isoformat()
+    client["_setup_token"]         = token
+    client["_setup_token_expires"] = expires
+    client["_setup_token_used"]    = False
+    return token
+
+
+def _setup_token_url(token: str) -> str:
+    base = os.environ.get("PORTAL_BASE_URL", "https://admin.argusreach.com")
+    return f"{base}/setup/{token}"
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
@@ -197,7 +245,7 @@ Respond with ONLY valid JSON in this exact format, no other text:
 
 # ── WELCOME EMAIL ─────────────────────────────────────────────────────────────
 
-def _send_welcome_email(client: dict):
+def _send_welcome_email(client: dict, setup_url: str = ""):
     """Send a welcome/next-steps email to a newly approved client.
     Always sends FROM vito@argusreach.com - client sending account not set up yet at this stage.
     """
@@ -241,8 +289,10 @@ def _send_welcome_email(client: dict):
     <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>1. Set up your outreach email address</strong></p>
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">We send outreach on your behalf from an email address you own and control. You'll need to create a dedicated email account - something like outreach@yourdomain.com. This keeps your main inbox completely separate from campaign activity.</p>
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;"><strong>Important:</strong> this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work - we need a full account with its own login credentials.</p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6-$8/mo for an additional user), then reply with the email address and app password and we'll handle the rest. Don't have Google Workspace or Microsoft 365 yet? Let us know and we'll point you in the right direction.</p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0;"><strong>One more thing:</strong> once the account is set up, go into Gmail (or Outlook) settings and disable the auto-signature. Our sequences include your name and signature already - if Gmail adds its own on top, it looks inconsistent. Takes 30 seconds: Gmail → Settings → General → Signature → set to "No signature".</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6-$8/mo for an additional user). Don't have Google Workspace or Microsoft 365 yet? Let us know and we'll point you in the right direction.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;"><strong>One more thing:</strong> once the account is set up, go into Gmail (or Outlook) settings and disable the auto-signature. Our sequences include your name and signature already - if Gmail adds its own on top, it looks inconsistent. Takes 30 seconds: Gmail → Settings → General → Signature → set to "No signature".</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Once the account is ready, submit your credentials using the secure link below - it's encrypted end-to-end and the link expires after use:</p>
+    {"<p style='text-align:left;margin:16px 0;'><a href='" + setup_url + "' style='background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;'>Submit Email Credentials Securely →</a></p><p style='font-size:12px;color:#888;margin:0;'>This link expires in 7 days and can only be used once. If it expires, just reply and we'll send a new one.</p>" if setup_url else "<p style='font-size:14px;color:#444;margin:0;'>Once ready, reply to this email with your outreach address and we'll send you a secure submission link.</p>"}
   </div>
 
   <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
@@ -1603,6 +1653,149 @@ def intake_thanks():
     return render_template("intake_thanks.html", name=name)
 
 
+# ── SECURE CREDENTIAL SETUP (public — token IS the auth) ─────────────────────
+
+@app.route("/setup/<token>", methods=["GET", "POST"])
+def setup_credentials(token):
+    """Client-facing secure credential submission. No login needed — token is the auth."""
+    config  = load_clients()
+    client  = next((c for c in config["clients"]
+                    if c.get("_setup_token") == token and not c.get("_setup_token_used")), None)
+
+    # Token not found or already used
+    if not client:
+        # Check if it was already used (so we can show a different message)
+        used_client = next((c for c in config["clients"]
+                            if c.get("_setup_token") == token and c.get("_setup_token_used")), None)
+        if used_client:
+            return render_template("setup_credential.html",
+                                   state="used", firm=used_client.get("firm_name", ""))
+        return render_template("setup_credential.html", state="invalid", firm="")
+
+    # Check expiry
+    import zoneinfo as _zi
+    expires_str = client.get("_setup_token_expires", "")
+    if expires_str:
+        try:
+            expires_dt = datetime.fromisoformat(expires_str)
+            if datetime.utcnow() > expires_dt:
+                return render_template("setup_credential.html",
+                                       state="expired", firm=client.get("firm_name", ""))
+        except Exception:
+            pass
+
+    firm       = client.get("firm_name", "")
+    contact    = client.get("_contact_name", firm)
+    first_name = contact.split()[0] if contact else "there"
+    provider   = client.get("_email_provider", "google")
+
+    if request.method == "GET":
+        return render_template("setup_credential.html",
+                               state="form", firm=firm, first_name=first_name,
+                               provider=provider, token=token)
+
+    # POST — process submission
+    outreach_email = request.form.get("outreach_email", "").strip().lower()
+    app_password   = request.form.get("app_password", "").strip()
+    confirm_pass   = request.form.get("confirm_password", "").strip()
+
+    errors = []
+    if not outreach_email or "@" not in outreach_email:
+        errors.append("Please enter a valid email address.")
+    if not app_password:
+        errors.append("App password is required.")
+    if app_password and confirm_pass and app_password != confirm_pass:
+        errors.append("App passwords don't match — please re-enter.")
+
+    if errors:
+        return render_template("setup_credential.html",
+                               state="form", firm=firm, first_name=first_name,
+                               provider=provider, token=token, errors=errors,
+                               outreach_email=outreach_email)
+
+    # Save encrypted credentials
+    client["outreach_email"]       = outreach_email
+    client["app_password"]         = _encrypt_credential(app_password)
+    client["_setup_token_used"]    = True
+    client["_credentials_received_at"] = datetime.utcnow().isoformat()
+
+    # Advance onboarding status
+    if client.get("onboarding_status") in (None, "email_setup"):
+        client["onboarding_status"] = "dns_pending"
+
+    save_clients(config)
+
+    # Alert Vito
+    _notify_telegram(
+        f"🔐 *{firm}* submitted email credentials securely\n"
+        f"📧 Outreach email: `{outreach_email}`\n"
+        f"→ Generate DNS records + send follow-up email when ready"
+    )
+
+    app.logger.info(f"Credentials received for {client['id']} via secure form ({outreach_email})")
+    return render_template("setup_credential.html", state="success", firm=firm, first_name=first_name)
+
+
+@app.route("/clients/<client_id>/resend-setup-link", methods=["POST"])
+@login_required
+def resend_setup_link(client_id):
+    """Regenerate setup token and resend email to client."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    to_email = client.get("client_email", "")
+    if not to_email:
+        flash("No client email on file — update it in settings first.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    # Generate fresh token
+    token = _generate_setup_token(client)
+    save_clients(config)
+
+    # Send email
+    setup_url  = _setup_token_url(token)
+    firm_name  = client.get("firm_name", "")
+    contact    = client.get("_contact_name", firm_name)
+    first_name = contact.split()[0] if contact else "there"
+    app_pass   = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+
+    if app_pass:
+        try:
+            html = f"""<!DOCTYPE html><html><body style="font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;max-width:580px;margin:0 auto;padding:40px 24px;">
+<div style="margin-bottom:32px;"><span style="font-size:14px;font-weight:800;">ArgusReach</span></div>
+<p style="font-size:15px;line-height:1.7;">Hi {first_name},</p>
+<p style="font-size:15px;line-height:1.7;">Here's a new secure link to submit your outreach email credentials. The previous link has been deactivated.</p>
+<p style="font-size:15px;line-height:1.7;">This link expires in 7 days and can only be used once:</p>
+<p style="text-align:center;margin:32px 0;">
+  <a href="{setup_url}" style="background:#000;color:#fff;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;">Submit Credentials Securely →</a>
+</p>
+<p style="font-size:13px;color:#666;">Or copy this link: {setup_url}</p>
+<div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
+<p style="font-size:14px;color:#444;margin:0;">Vito Resciniti<br>Founder, ArgusReach<br>vito@argusreach.com</p>
+</div></body></html>"""
+            msg = MIMEMultipart("alternative")
+            msg["From"]    = "Vito Resciniti | ArgusReach <vito@argusreach.com>"
+            msg["To"]      = to_email
+            msg["Subject"] = f"New credential setup link — {firm_name}"
+            msg.attach(MIMEText(html, "html"))
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+                smtp.login("vito@argusreach.com", app_pass)
+                smtp.send_message(msg)
+            flash(f"✅ New setup link sent to {to_email}. Valid for 7 days.", "success")
+            _notify_telegram(f"🔗 New setup link sent to *{firm_name}* ({to_email})")
+        except Exception as e:
+            flash(f"Token regenerated but email failed: {e}", "error")
+            _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* — email failed, send manually:\n{setup_url}")
+    else:
+        flash("Token regenerated. ARGUSREACH_GMAIL_APP_PASS not set — send link manually.", "error")
+        _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* — send manually:\n`{setup_url}`")
+
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/intakes")
 @login_required
 def intakes_list():
@@ -1732,9 +1925,12 @@ def intake_approve(intake_id):
                 i["client_id"] = client_id
         save_intakes(intakes)
 
-        # Send welcome email to new client
+        # Generate secure credential setup token + send welcome email
         try:
-            _send_welcome_email(new_client)
+            setup_token = _generate_setup_token(new_client)
+            save_clients(config)  # persist token to clients.json
+            setup_url   = _setup_token_url(setup_token)
+            _send_welcome_email(new_client, setup_url=setup_url)
         except Exception as _we:
             app.logger.warning(f"Welcome email failed (non-fatal): {_we}")
 

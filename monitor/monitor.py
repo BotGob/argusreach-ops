@@ -30,6 +30,12 @@ import requests
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
+try:
+    from cryptography.fernet import Fernet as _Fernet
+    _FERNET_AVAILABLE = True
+except ImportError:
+    _FERNET_AVAILABLE = False
+
 # ── PATHS ─────────────────────────────────────────────────────────────────────
 BASE_DIR        = Path(__file__).parent
 load_dotenv(BASE_DIR / '.env')   # load .env before reading os.environ below
@@ -89,6 +95,21 @@ AI_MODEL            = 'claude-haiku-4-5-20251001'  # updated 2026-03-11
 
 # ── INTEGRATION KEYS (loaded from .env) ──────────────────────────────────────
 INSTANTLY_API_KEY   = os.environ.get('INSTANTLY_API_KEY', '')
+_CRED_KEY           = os.environ.get('CREDENTIAL_ENCRYPTION_KEY', '')
+
+# ── CREDENTIAL DECRYPTION ─────────────────────────────────────────────────────
+def _get_app_password(client: dict) -> str:
+    """Return decrypted app_password. Falls back to plaintext (backward compat)."""
+    raw = client.get('app_password', '')
+    if not raw:
+        return raw
+    if _FERNET_AVAILABLE and _CRED_KEY:
+        try:
+            f = _Fernet(_CRED_KEY.encode())
+            return f.decrypt(raw.encode()).decode()
+        except Exception:
+            pass  # not encrypted or wrong key — return as-is
+    return raw
 
 # ── ARGS ──────────────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser()
@@ -289,7 +310,7 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
         'instantly_campaign_id': client.get('instantly_campaign_id', ''),
         'client_email':          client.get('client_email', ''),
         'outreach_email':        client['outreach_email'],
-        'app_password':          client['app_password'],
+        'app_password':          _get_app_password(client),
         'sender_name':           client['sender_name'],
         'from_email':            from_email,
         'from_name':             from_name,
@@ -835,7 +856,7 @@ def process_client(client, processed_ids):
     try:
         imaplib.IMAP4_SSL.port = 993
         mail = imaplib.IMAP4_SSL('imap.gmail.com', timeout=30)
-        mail.login(client['outreach_email'], client['app_password'])
+        mail.login(client['outreach_email'], _get_app_password(client))
         mail.select('inbox')
 
         # Search since yesterday — IMAP SINCE is date-only; catches manually-read emails; dedup prevents double-processing
@@ -1037,7 +1058,7 @@ def process_client(client, processed_ids):
                     if client['mode'] == 'automated':
                         if not TEST_MODE:
                             try:
-                                _send_email(client['outreach_email'], client['app_password'],
+                                _send_email(client['outreach_email'], _get_app_password(client),
                                             client['sender_name'], from_email, subject, draft,
                                             in_reply_to=message_id, references=references)
                                 sent = True
@@ -1056,7 +1077,7 @@ def process_client(client, processed_ids):
                     is_new_notification = True
                     if not TEST_MODE:
                         try:
-                            _send_email(client['outreach_email'], client['app_password'],
+                            _send_email(client['outreach_email'], _get_app_password(client),
                                         client['sender_name'], from_email, subject, draft,
                                         in_reply_to=message_id, references=references)
                             sent = True
@@ -1152,7 +1173,7 @@ def process_client(client, processed_ids):
 <br>
 <p>— ArgusReach</p>"""
                     _send_email(
-                        client['outreach_email'], client['app_password'],
+                        client['outreach_email'], _get_app_password(client),
                         'ArgusReach', client_email,
                         f"[ArgusReach] Heads up — {prospect_display} may be booking",
                         booking_alert

@@ -28,6 +28,26 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).parent
 load_dotenv(BASE_DIR / '.env')
 
+try:
+    from cryptography.fernet import Fernet as _Fernet
+    _FERNET_OK = True
+except ImportError:
+    _FERNET_OK = False
+
+_CRED_KEY = os.environ.get('CREDENTIAL_ENCRYPTION_KEY', '') if 'os' in dir() else __import__('os').environ.get('CREDENTIAL_ENCRYPTION_KEY', '')
+
+def _get_app_password(entry: dict) -> str:
+    raw = entry.get('app_password', '')
+    if not raw:
+        return raw
+    if _FERNET_OK and _CRED_KEY:
+        try:
+            f = _Fernet(_CRED_KEY.encode())
+            return f.decrypt(raw.encode()).decode()
+        except Exception:
+            pass
+    return raw
+
 PENDING_FILE = BASE_DIR / 'logs' / 'pending_approvals.json'
 REPLY_LOG    = BASE_DIR / 'logs' / 'replies.json'
 MONITOR_LOG  = BASE_DIR / 'logs' / 'monitor.log'
@@ -205,7 +225,7 @@ If the meeting doesn't materialize within a few days, no action needed — we'll
     try:
         send_email(
             outreach_email=entry['outreach_email'],
-            app_password=entry['app_password'],
+            app_password=_get_app_password(entry),
             sender_name='ArgusReach',
             to_email=client_email,
             subject=f"[ArgusReach] Heads up — {prospect_display} may be booking",
@@ -225,7 +245,7 @@ def do_approve(entry):
     try:
         send_email(
             outreach_email=entry['outreach_email'],
-            app_password=entry['app_password'],
+            app_password=_get_app_password(entry),
             sender_name=entry['sender_name'],
             to_email=entry['from_email'],
             subject=entry['subject'],
