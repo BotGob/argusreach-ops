@@ -1717,7 +1717,8 @@ def setup_credentials(token):
     client["outreach_email"]       = outreach_email
     client["app_password"]         = _encrypt_credential(app_password)
     client["_setup_token_used"]    = True
-    client["_credentials_received_at"] = datetime.utcnow().isoformat()
+    import zoneinfo as _zi2
+    client["_credentials_received_at"] = datetime.now(_zi2.ZoneInfo("America/New_York")).strftime("%Y-%m-%d %I:%M %p ET")
 
     # Advance onboarding status
     if client.get("onboarding_status") in (None, "email_setup"):
