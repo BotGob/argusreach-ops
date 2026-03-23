@@ -49,8 +49,57 @@ def _strip_html(html: str) -> str:
     return text.strip()
 
 
+def _normalize_domain(raw: str) -> str:
+    """
+    Normalize a domain or URL to a bare root token for fuzzy comparison.
+    Examples:
+      deepblue-inv.com   → deepblue
+      deepblue.com       → deepblue
+      smithadvisors.com  → smith
+      smith-and-associates.com → smithandassociates
+    """
+    d = raw.strip().lower()
+    d = re.sub(r'^https?://', '', d)
+    d = re.sub(r'^www\.', '', d)
+    d = d.split('/')[0]  # strip path, query string
+    # Remove TLD (.com .io .net .org .co .us .biz .ai .xyz .app .dev .ca .uk etc.)
+    d = re.sub(r'\.[a-z]{2,6}$', '', d)
+    # Remove common trailing business suffixes (repeat to catch stacked ones)
+    _SUFFIX_RE = r'[-]?(inc|llc|corp|advisors|advisor|group|partners|partner|investments|investment|inv|capital|mgmt|management|consulting|solutions|services)$'
+    for _ in range(3):
+        d = re.sub(_SUFFIX_RE, '', d)
+    # Remove hyphens and spaces
+    d = re.sub(r'[-\s]', '', d)
+    return d
+
+
+def _domain_confidence(email: str, website: str) -> str:
+    """
+    Compare the email domain against the website domain (both normalized).
+    Returns 'EXACT', 'FUZZY', or 'NO_MATCH'.
+    """
+    try:
+        if not email or '@' not in email:
+            return 'NO_MATCH'
+        email_domain = email.strip().lower().split('@')[1]
+        ne = _normalize_domain(email_domain)
+        nw = _normalize_domain(website)
+        if not ne or not nw:
+            return 'NO_MATCH'
+        if ne == nw:
+            return 'EXACT'
+        # Fuzzy: one normalized token is a substring of the other with ≥5 char overlap
+        shorter, longer = (ne, nw) if len(ne) <= len(nw) else (nw, ne)
+        if len(shorter) >= 5 and shorter in longer:
+            return 'FUZZY'
+        return 'NO_MATCH'
+    except Exception:
+        return 'NO_MATCH'
+
+
 def enrich_contact(contact: dict) -> str:
     """Fetch company website and generate a personalized 1-sentence opener via Claude Haiku.
+    Validates domain match, company presence, and rejects generic intros.
     Returns "" on any failure — always non-fatal."""
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key:
@@ -64,6 +113,7 @@ def enrich_contact(contact: dict) -> str:
     ).strip()
     company    = contact.get("company") or contact.get("company_name") or contact.get("Company", "")
     first_name = contact.get("first_name") or contact.get("First Name") or contact.get("firstName", "")
+    email      = contact.get("email") or contact.get("Email") or ""
 
     if not website:
         return ""
@@ -71,6 +121,17 @@ def enrich_contact(contact: dict) -> str:
     if not website.startswith(("http://", "https://")):
         website = "https://" + website
 
+    # ── Step 1: Domain confidence check ──────────────────────────────────────
+    try:
+        confidence = _domain_confidence(email, website)
+    except Exception:
+        confidence = "NO_MATCH"
+
+    if confidence == "NO_MATCH":
+        print(f"  [enrich] {company}: domain=NO_MATCH, company_in_page=N/A, intro_accepted=False")
+        return ""
+
+    # ── Fetch homepage ────────────────────────────────────────────────────────
     snippet = ""
     try:
         resp = requests.get(
@@ -86,6 +147,15 @@ def enrich_contact(contact: dict) -> str:
     if not snippet:
         return ""
 
+    # ── Step 2: Company name presence check ──────────────────────────────────
+    company_in_page = bool(company and company.lower() in snippet.lower())
+    if confidence == "FUZZY" and not company_in_page:
+        print(f"  [enrich] {company}: domain=FUZZY, company_in_page=False, intro_accepted=False")
+        return ""
+    if confidence == "EXACT" and not company_in_page:
+        print(f"  [enrich] {company}: domain=EXACT, company_in_page=False (warning — page may use short brand name)")
+
+    # ── Call Claude Haiku for the personalized opener ─────────────────────────
     try:
         import anthropic as _anthropic
         aclient = _anthropic.Anthropic(api_key=api_key)
@@ -101,9 +171,24 @@ def enrich_contact(contact: dict) -> str:
             messages=[{"role": "user", "content": prompt}],
         )
         result = msg.content[0].text.strip().rstrip(".!?")
-        return result
     except Exception:
         return ""
+
+    # ── Step 3: Generic intro rejection ──────────────────────────────────────
+    _GENERIC_PHRASES = [
+        "i noticed your company",
+        "i came across your website",
+        "i see that your company",
+        "your organization",
+        "your business",
+    ]
+    intro_lower = result.lower()
+    if any(phrase in intro_lower for phrase in _GENERIC_PHRASES):
+        print(f"  [enrich] {company}: domain={confidence}, company_in_page={company_in_page}, intro_accepted=False (generic phrase detected)")
+        return ""
+
+    print(f"  [enrich] {company}: domain={confidence}, company_in_page={company_in_page}, intro_accepted=True")
+    return result
 
 
 def enrich_prospects(prospects: list) -> list:
