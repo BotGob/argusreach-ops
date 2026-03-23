@@ -3,7 +3,7 @@
   "clients": [
     {
       "id": "argusreach",
-      "active": false,
+      "active": true,
       "onboarding_status": "dns_pending",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
@@ -51,7 +51,7 @@
       "_website": "https://www.argusreach.com",
       "_email_provider": "google",
       "_dns_provider": "",
-      "app_password": "gAAAAABpwJ1tg40SHvy2OGBrqUpacoRjsq2orahMgXLQaYgYDyY_aKfIEXC-tJ8Ck9mmGQZEuR33-lA0_GzsVFCDEX-Cdozpxa0s43xO5gbh1aRHdgTou4o=",
+      "app_password": "gAAAAABpwKXcKUEPBRGFBrqHLzhmH0uU0ASM5FVJf0-6Lh9vzBlhHUgdSdZWoM9fzrdglBEC9G38txcA2atu-PpUjkrW5IYWXEZuz9EzalVBoHkUtaVJOzs=",
       "calendly_event_slug": "",
       "sequence": [
         {
@@ -86,10 +86,10 @@
         "sequence_approved": true,
         "calendar_connected": true
       },
-      "_setup_token": "3erHDOhOh3k6ydoPekxMLvHejnvVWP2vaOTawL5cYzM",
-      "_setup_token_expires": "2026-03-30T02:00:32.849603+00:00",
-      "_setup_token_used": false,
-      "_credentials_received_at": "2026-03-23T01:54:53.441934"
+      "_setup_token": "nq5KGvaWpIZYQ-vRTSxzHMmmJCYwSF9k8Z8Ns2vLRG8",
+      "_setup_token_expires": "2026-03-30T02:29:56.180924+00:00",
+      "_setup_token_used": true,
+      "_credentials_received_at": "2026-03-22 10:30 PM ET"
     }
   ]
 }
