@@ -1,7 +1,7 @@
 # ArgusReach — Ops Backlog
 
 > Active items only. Completed items live in the flowchart changelog.
-> Last updated: 2026-03-22
+> Last updated: 2026-03-23
 
 ---
 
@@ -55,8 +55,8 @@ Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client
 
 ## 🟢 Scale Features (3+ Clients)
 
-### 32. Pre-load prospects into DB at campaign launch
-When contacts are loaded to Instantly, also write them to the `prospects` table in our DB. Currently prospects only appear in the DB after they reply. Pre-loading enables: full prospect list visible in portal before replies, accurate total-contacted counts, better reporting at scale. Trigger: before second client onboarded.
+### ✅ 32. Pre-load prospects into DB at campaign launch — DONE (2026-03-22)
+Both launch paths (monthly_cycle + campaign_create) now write every contact to the prospects table immediately after Instantly upload. stage='added' on insert; ON CONFLICT updates name/company if enriched later.
 
 
 
