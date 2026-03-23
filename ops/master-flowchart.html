@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated 2026-03-20 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-23 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -181,8 +181,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#fbbf24;font-weight:600;">VITO CHECKLIST — in order:</span><br>
           <span style="color:#60a5fa;">☐</span> Confirm payment cleared (Stripe alert) + agreement signed<br>
           <span style="color:#60a5fa;">☐</span> Approve intake in portal → welcome email auto-fires<br>
-          <span style="color:#60a5fa;">☐</span> Wait for client to reply with outreach email + app password<br>
-          <span style="color:#60a5fa;">☐</span> Forward email + app password here with client ID → Gob links to client<br>
+          <span style="color:#60a5fa;">☐</span> Client submits outreach email + app password via secure one-time token link (included in welcome email or sent separately by Vito)<br>
+          <span style="color:#60a5fa;">☐</span> Portal confirms credentials received (Fernet-encrypted at rest) → Gob links to client record automatically<br>
           <span style="color:#60a5fa;">☐</span> Ask Gob: "ready for follow-up email?" → Gob provides DNS records + Calendly link + confirms sequence is in Instantly<br>
           <span style="color:#60a5fa;">☐</span> Send follow-up email to client (DNS + sequence draft + Calendly link)<br>
           <span style="color:#60a5fa;">☐</span> Wait for client: IT adds DNS / sequence approved / calendar connected<br>
@@ -195,7 +195,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#4ade80;font-weight:600;">AUTO (on intake approval):</span><br>
           <span style="color:#4ade80;">●</span> Client record created (clients.json + DB + DNC file)<br>
           <span style="color:#4ade80;">●</span> Welcome email auto-sent<br>
-          <span style="color:#4ade80;font-weight:600;">AUTO (after Vito confirms email + app password):</span><br>
+          <span style="color:#4ade80;font-weight:600;">AUTO (after client submits credentials via secure token form):</span><br>
           <span style="color:#4ade80;">●</span> Apollo → DNC filter (loop up to 5 rounds) → NeverBounce → target count hit<br>
           <span style="color:#4ade80;">●</span> 3-touch sequence written + loaded into Instantly DRAFT via API<br>
           <span style="color:#4ade80;">●</span> Auto-personalization: company website fetched per lead → Claude Haiku generates {{custom_intro}} opener → validated (domain match + company presence + generic check)<br>
@@ -208,7 +208,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.9;">
           <span style="color:#a78bfa;font-weight:600;">CLIENT CHECKLIST:</span><br>
           <span style="color:#a78bfa;">☐</span> Creates outreach email (real mailbox, NOT alias — Google Workspace or M365, ~$6-8/mo)<br>
-          <span style="color:#a78bfa;">☐</span> Generates app password → emails address + password to vito@argusreach.com<br>
+          <span style="color:#a78bfa;">☐</span> Generates app password → submits outreach email + app password via secure one-time token link (Fernet-encrypted at rest; link provided in welcome email or sent separately by Vito)<br>
           <span style="color:#a78bfa;">☐</span> Sends DNC list (emails/domains) if applicable<br>
           <span style="color:#a78bfa;">☐</span> Sends warm leads if applicable<br>
           <span style="color:#a78bfa;">☐</span> Forwards DNS records to IT → IT adds SPF/DKIM/DMARC (~10 min)<br>
@@ -251,10 +251,10 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#4ade80;">●</span> Monitor detects reply (IMAP, last 24h window)<br>
           <span style="color:#4ade80;">●</span> Filters: spam, automated senders, non-replies<br>
           <span style="color:#4ade80;">●</span> Instantly: sequence paused for this prospect<br>
-          <span style="color:#4ade80;">●</span> Claude AI classifies: positive / not_now / OOO / negative / escalate<br>
+          <span style="color:#4ade80;">●</span> Claude AI classifies: Interested / Not Now / OOO / Removed / Escalate — returns confidence score (0–100%) with each classification<br>
           <span style="color:#4ade80;">●</span> AI drafts reply in client voice with Calendly link<br>
           <span style="color:#4ade80;">●</span> Queues in pending_approvals.json<br>
-          <span style="color:#4ade80;">●</span> Fires Telegram alert: firm, campaign, classification, draft, APPROVE/REJECT command<br>
+          <span style="color:#4ade80;">●</span> Fires Telegram alert: firm, campaign, classification + confidence score, draft, APPROVE/REJECT command — e.g. "🎯 INTERESTED (87%)" or "⚠️ INTERESTED (52% — REVIEW)"; scores below 75% flagged for extra attention<br>
           <span style="color:#4ade80;">●</span> On APPROVE: sends reply via Gmail SMTP with In-Reply-To/References threading headers<br>
           <span style="color:#4ade80;">●</span> Logs to replies.json, clears pending entry
         </td>
@@ -296,7 +296,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#60a5fa;">●</span> Reviews preview before sending (--preview flag)
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#4ade80;">●</span> Pre-populates positive, not_now, OOO counts from replies.json<br>
+          <span style="color:#4ade80;">●</span> Pre-populates Interested, Not Now, OOO counts from replies.json<br>
           <span style="color:#4ade80;">●</span> Generates HTML report with campaign history table + running totals<br>
           <span style="color:#4ade80;">●</span> Sends email to client_email via Gmail SMTP<br>
           <span style="color:#4ade80;">●</span> Saves HTML copy to reports/[client_id]_[month].html<br>
@@ -500,7 +500,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ ALWAYS (fills remaining volume)</div>
       <div class="auto">
         <div class="step-label">Gob runs monthly_cycle.py — full automated pipeline</div>
-        <div class="step-detail">Single command: python3 tools/monthly_cycle.py --client [id] --month "Month YYYY". Pipeline: (1) Pull all previously contacted emails from DB → exclusion list. (2) Apollo API search by ICP titles + geography, auto-refill pages until target count met — never contacts same prospect twice. (3) NeverBounce email verification — bad/risky emails auto-added to DNC. (4) DNC filter applied (global + client-specific), loop back to Apollo for replacements up to 5 rounds. (5) New Instantly campaign created automatically with naming convention: "ArgusReach — [Firm] — [Month YYYY]". (6) Sequence pulled from previous campaign in Instantly (7-day minimum delays enforced). (7) Auto-personalization: for each lead, fetch company website (from Apollo), validate domain match, run Claude Haiku to generate a {{custom_intro}} opener (15-25 words, specific to their business). Falls back silently if no website, domain mismatch, or generic output detected. (8) Contacts loaded to campaign with custom_intro + city + title + state as custom variables. (9) Pre-launch checklist sent to Vito via Telegram.</div>
+        <div class="step-detail">Single command: python3 tools/monthly_cycle.py --client [id] --month "Month YYYY". Pipeline: (1) Pull all previously contacted emails from DB → exclusion list. (2) Apollo API search by ICP titles + geography, auto-refill pages until target count met — never contacts same prospect twice. (3) NeverBounce email verification — bad/risky emails auto-added to DNC. (4) DNC filter applied (global + client-specific), loop back to Apollo for replacements up to 5 rounds. (5) New Instantly campaign created automatically with naming convention: "ArgusReach — [Firm] — [Month YYYY]". (6) Sequence pulled from previous campaign in Instantly (7-day minimum delays enforced). (7) Auto-personalization: for each lead, fetch company website (from Apollo), validate domain match, run Claude Haiku to generate a {{custom_intro}} opener (15-25 words, specific to their business). Falls back silently if no website, domain mismatch, or generic output detected. (8) Contacts loaded to campaign with custom_intro + city + title + state as custom variables. (8b) All contacts simultaneously written to prospects table in SQLite DB with stage='added' — enables portal visibility of full prospect list before any replies come in, and accurate total-contacted counts from day 1. (9) Pre-launch checklist sent to Vito via Telegram.</div>
         <span class="step-tool t-orange">Apollo.io (paid for emails)</span>
         <span class="step-tool t-red">NeverBounce</span>
         <span class="step-tool t-orange">Instantly.ai</span>
@@ -509,7 +509,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">Vito reviews pre-launch checklist in Instantly</div>
-        <div class="step-detail">Before hitting GO: (1) Sequence copy correct for this client. (2) Step delays: Day 0 → 7+ days → 7+ days. (3) Sending account linked. (4) Mon–Fri business hours schedule. (5) Stop on reply: ON. Nothing launches until Vito manually activates in Instantly.</div>
+        <div class="step-detail">Before hitting GO: (1) Sequence copy correct for this client. (2) Step delays: Day 0 → 7+ days → 7+ days. (3) Sending account linked. (4) Mon–Fri business hours schedule. (5) Stop on reply: ON. (6) DNS verified — auto-verified in portal via single button: queries live SPF/DKIM/DMARC records; last check time and per-record details shown inline. (7) Warmup score ≥85% — auto-verified in portal via same button: queries Instantly API for current warmup score. Nothing launches until Vito manually activates in Instantly.</div>
       </div>
       <div class="arrow">↓</div>
       <div class="auto">
@@ -545,20 +545,20 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓ YES</div>
       <div class="auto">
         <div class="step-label">Claude classifies reply</div>
-        <div class="step-detail">Positive / Question / Not Now / Negative / Escalate. Drafts safe 2-4 sentence response. Strict guardrails — only routes to booking, never gives advice.</div>
+        <div class="step-detail">Interested / Question / Not Now / Removed / Escalate. Returns a confidence score (0–100%) with each classification — scores below 75% flagged for extra attention. Drafts safe 2-4 sentence response. Strict guardrails — only routes to booking, never gives advice.</div>
         <span class="step-tool t-blue">Claude API</span>
       </div>
       <div class="arrow">↓</div>
       <div class="decision">
         <div class="step-label">Classification result</div>
       </div>
-      <div class="arrow">↓ POSITIVE / QUESTION</div>
+      <div class="arrow">↓ INTERESTED / QUESTION</div>
       <div class="auto">
         <div class="step-label">Response sent with Calendly link</div>
         <div class="step-detail">Automated: sends immediately. Draft mode: Vito approves via Telegram first.</div>
         <span class="step-tool t-purple">Calendly link</span>
       </div>
-      <div class="arrow">↓ NEGATIVE</div>
+      <div class="arrow">↓ REMOVED</div>
       <div class="auto">
         <div class="step-label">Polite removal auto-sent</div>
         <div class="step-detail">Prospect added to DNC (client + global). Sequence paused in Instantly. Event logged in database.</div>
@@ -597,7 +597,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="auto">
         <div class="step-label">Monthly performance report</div>
-        <div class="step-detail">Run: python3 tools/monthly_report.py --client [id] --month "Month YYYY". Auto-pulls from Instantly API: contacts reached, emails sent, open rate, completed sequences, bounced, unsubscribed. Auto-pulls reply classifications from SQLite DB: positive, not_now, negative, escalated. Meetings from DB. Vito reviews, then emailed to client. Never auto-sent.</div>
+        <div class="step-detail">Run: python3 tools/monthly_report.py --client [id] --month "Month YYYY". Auto-pulls from Instantly API: contacts reached, emails sent, open rate, completed sequences, bounced, unsubscribed. Auto-pulls reply classifications from SQLite DB: Interested, Not Now, Removed, escalated. Meetings from DB. Vito reviews, then emailed to client. Never auto-sent.</div>
         <span class="step-tool t-blue">monthly_report.py</span>
         <span class="step-tool" style="background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44">SQLite DB</span>
         <span class="step-tool t-orange">Instantly.ai API</span>
@@ -704,7 +704,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Admin Portal ✅ LIVE</div>
-      <div class="tool-role">Internal operations hub at admin.argusreach.com (port 5056, password-protected). Tabs: Dashboard, Clients, Prospects, Meetings, Revenue, Replies, Intakes, Reports, DNC. Intake form at admin.argusreach.com/intake (public, client-facing). Multi-campaign support per client. Meeting logging, DNC management, lead upload, monthly report generation.</div>
+      <div class="tool-role">Internal operations hub at admin.argusreach.com (port 5056, password-protected). Tabs: Dashboard, Clients, Prospects, Meetings, Revenue, Replies, Intakes, Reports, DNC. Intake form at admin.argusreach.com/intake (public, client-facing). Multi-campaign support per client. Meeting logging, DNC management, lead upload, monthly report generation. <strong>IMAP status:</strong> portal shows live IMAP connection status per client — 🟢 connected or 🔴 failed/bad password — checked on each monitor cycle. Bad password triggers a smart alert to Vito.</div>
       <div class="tool-cost">Free (self-hosted)</div>
     </div>
     <div class="tool-card">
@@ -719,7 +719,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Stripe ✅ LIVE + WEBHOOK CONNECTED</div>
-      <div class="tool-role">Payment collection. 4 live payment links: Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. Recurring billing enabled. Invoice PDF on every transaction. Webhook live at hooks.argusreach.com/webhooks/stripe — payments auto-log to database and fire Telegram alert on every successful payment. Connected 2026-03-17.</div>
+      <div class="tool-role">Payment collection. 4 live payment links: Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. Recurring billing enabled. Invoice PDF on every transaction. Webhook live at hooks.argusreach.com/webhooks/stripe — payments auto-log to database and fire Telegram alert on every successful payment. Connected 2026-03-17. <strong>Failed payment auto-pause:</strong> on 2nd failed Stripe payment attempt, client is automatically paused (active=false) and Vito receives a Telegram alert. Stripe handles retries; if payment recovers, Vito manually reactivates.</div>
       <div class="tool-cost">2.9% + $0.30/txn</div>
     </div>
     <div class="tool-card">
@@ -923,7 +923,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div style="display:flex;flex-direction:column;gap:6px;">
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">DocuSign / HelloSign</span> — No digital signature capability. Service agreement cannot be formally executed. (Vito action: set up free tier on DocuSign or HelloSign.)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Client-Facing Onboarding Guide</span> — No document exists telling the client what THEY need to do: buy domain, buy Google Workspace, provide access, set up Calendly. The internal checklist exists but nothing is client-ready.</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Campaign Creation Script</span> — Creating a new Instantly campaign is still fully manual (copy-paste, API calls, prospects.csv sync). One wrong step corrupts the campaign. Script must be built before first client launch. (Backlog #5)</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Campaign Creation — Fully Automated</span> — campaign_create.py handles everything: creates Instantly campaign, loads sequence, enriches and loads leads (with auto-personalization), and sends Telegram pre-launch checklist to Vito. No manual steps required.</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Instantly Sequence Copy (PT Tampa Bay)</span> — Current test campaign sequence says "mental health practices" — wrong vertical. Must be rewritten before any real prospect is enrolled. (Backlog #5a)</div>
       </div>
     </div>
@@ -992,7 +992,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Metrics — Single Source of Truth</div>
     <div style="font-size:0.75rem;color:#888;">• get_client_metrics() — unified helper function used by all three views (dashboard, client detail, campaigns page). Change it once, correct everywhere.</div>
     <div style="font-size:0.75rem;color:#888;">• Metric definitions locked: Sequence Sent (Instantly API) + Replies Sent (our DB reply_sent events) = Total Sent. Verified: 8 + 1 = 9 for test campaign.</div>
-    <div style="font-size:0.75rem;color:#888;">• Reply breakdown visible at all levels: ✅ positive / 🕐 not_now / ❌ negative / 🚨 escalated / 🚫 ignored.</div>
+    <div style="font-size:0.75rem;color:#888;">• Reply breakdown visible at all levels: ✅ Interested / 🕐 Not Now / ❌ Removed / 🚨 escalated / 🚫 ignored.</div>
     <div style="font-size:0.75rem;color:#888;">• reply_sent event now logged to DB on every approved draft send (was missing — approve.py fixed).</div>
     <div style="font-size:0.75rem;color:#888;">• Dashboard, Client Detail, Campaigns page all show: Leads / Sequence Sent / Replies Sent / Total Sent / Reply Breakdown / Meetings / Revenue / Reply Rate.</div>
     <div style="font-size:0.72rem;color:#60a5fa;font-family:'JetBrains Mono',monospace;margin-top:10px;margin-bottom:8px;">Campaign Launch Flow (Portal)</div>
