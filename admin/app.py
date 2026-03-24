@@ -769,6 +769,39 @@ def client_detail(client_id):
         except Exception:
             pass
 
+    # Live warmup score from Instantly — check on every profile load, auto-gate at ≥85%
+    warmup_live = {"score": None, "status": None, "error": None}
+    outreach_email = client.get("outreach_email","")
+    if outreach_email:
+        try:
+            _inst_key = os.environ.get("INSTANTLY_API_KEY","")
+            _r = requests.get(
+                "https://api.instantly.ai/api/v2/accounts?limit=50",
+                headers={"Authorization": f"Bearer {_inst_key}"},
+                timeout=8
+            )
+            if _r.ok:
+                _accounts = _r.json().get("items", [])
+                _acct = next((a for a in _accounts if a.get("email","").lower() == outreach_email.lower()), None)
+                if _acct:
+                    _score = _acct.get("stat_warmup_score")
+                    _wstatus = _acct.get("warmup_status")  # 0=off,1=on
+                    warmup_live = {"score": _score, "status": _wstatus, "error": None}
+                    # Auto-check gate if score ≥ 85 and not already checked
+                    if _score is not None and int(_score) >= 85 and not client.get("checklist", {}).get("warmup_complete"):
+                        config2 = load_clients()
+                        c2 = next((x for x in config2["clients"] if x.get("id") == client_id), None)
+                        if c2:
+                            c2.setdefault("checklist", {})["warmup_complete"] = True
+                            save_clients(config2)
+                            client["checklist"] = c2["checklist"]
+                            _notify_telegram(f"🌡️ *{client.get('firm_name')}* warmup hit {_score}/100 — gate auto-checked ✅")
+                            app.logger.info(f"Warmup gate auto-checked for {client_id} (score={_score})")
+                else:
+                    warmup_live["error"] = f"{outreach_email} not found in Instantly"
+        except Exception as _we:
+            warmup_live["error"] = str(_we)[:80]
+
     # Monitor health check — read heartbeat timestamp
     monitor_status = {"running": False, "last_seen": None, "age_minutes": None}
     heartbeat_file = BASE_DIR / "monitor" / "logs" / "monitor_heartbeat.txt"
@@ -799,6 +832,7 @@ def client_detail(client_id):
         events=[dict(e) for e in events],
         conn_status=conn_status,
         monitor_status=monitor_status,
+        warmup_live=warmup_live,
     )
 
 
