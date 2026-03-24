@@ -1841,6 +1841,125 @@ def resend_setup_link(client_id):
     return redirect(url_for("client_detail", client_id=client_id))
 
 
+@app.route("/clients/<client_id>/send-followup-email", methods=["POST"])
+@login_required
+def send_followup_email(client_id):
+    """Generate and send the DNS + sequence + Calendly follow-up email to client."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    to_email  = client.get("client_email", "")
+    firm      = client.get("firm_name", "")
+    contact   = client.get("_contact_name") or firm
+    first     = contact.split()[0] if contact else "there"
+    calendly  = client.get("calendly_link") or f"https://calendly.com/argusreach/{client_id}"
+    sequence  = client.get("sequence", [])
+    checklist = client.get("checklist", {})
+    override  = request.form.get("override") == "1"
+
+    if not to_email:
+        flash("No client email on file — update it in settings first.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    if not client.get("outreach_email"):
+        flash("No outreach email on file — client must submit credentials first.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    # DNS warning check
+    dns_ok = checklist.get("dns_verified", False)
+    dns_warning = "" if dns_ok else (
+        "<div style='background:#2d1a00;border:1px solid #92400e;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#fbbf24'>"
+        "⚠️ <strong>DNS not yet verified</strong> — sending this email before DNS is set up is fine; "
+        "it includes the DNS records for the client to add. Just make sure you paste the actual records in."
+        "</div>"
+    )
+
+    # Build sequence HTML
+    seq_html = ""
+    for i, touch in enumerate(sequence):
+        delay = touch.get("delay_days", 0)
+        day_label = f"Day {delay}" if delay > 0 else "Day 0 — first email"
+        seq_html += f"""
+  <div style="background:#f9f9f9;border-left:3px solid #4ade80;padding:14px;margin-bottom:14px;border-radius:0 6px 6px 0;">
+    <p style="font-size:11px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em">Touch {i+1} — {day_label}</p>
+    <p style="font-size:13px;font-weight:700;margin:0 0 8px;color:#111">Subject: {touch.get('subject','')}</p>
+    <p style="font-size:13px;line-height:1.7;color:#333;margin:0;white-space:pre-wrap">{touch.get('body','')}</p>
+  </div>"""
+
+    if not seq_html:
+        seq_html = "<p style='color:#888;font-size:13px'>Sequence not yet written — add it in the portal before sending this email.</p>"
+
+    outreach_domain = client["outreach_email"].split("@")[-1] if "@" in client.get("outreach_email","") else "[your-domain.com]"
+    provider = client.get("_email_provider","google")
+    spf_include = "include:_spf.google.com" if provider != "microsoft" else "include:spf.protection.outlook.com"
+
+    dns_block = f"""<div style="background:#f4f4f4;padding:14px;border-radius:6px;font-family:monospace;font-size:12px;line-height:2;color:#333;">
+Type: TXT &nbsp;&nbsp; Host: @ &nbsp;&nbsp; Value: v=spf1 {spf_include} ~all<br>
+Type: TXT &nbsp;&nbsp; Host: google._domainkey &nbsp;&nbsp; Value: <em>[Get from Google Workspace Admin → Apps → Gmail → Authenticate email → Copy DKIM record]</em><br>
+Type: TXT &nbsp;&nbsp; Host: _dmarc &nbsp;&nbsp; Value: v=DMARC1; p=none; rua=mailto:vito@argusreach.com
+</div>
+<p style="font-size:12px;color:#888;margin:8px 0 0;">Add these to <strong>{outreach_domain}</strong> at your DNS provider. Usually takes under 10 minutes — DNS propagates within a few hours after that.</p>"""
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;">
+<div style="max-width:580px;margin:0 auto;padding:40px 24px;">
+  <div style="margin-bottom:32px;"><span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span></div>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first},</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">We're ready on our end. Here's everything you need to action before we go live.</p>
+
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>1. DNS records for your IT person</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Have whoever manages your domain add the following records. This ensures your outreach emails land in inboxes — not spam. Should take about 10 minutes on their end, then a few hours to propagate.</p>
+    {dns_block}
+  </div>
+
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 12px;"><strong>2. Your outreach sequence — please review</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;">These are the three emails we'll send on your behalf. Read through and reply with any edits — or just say "looks good" and we're ready.</p>
+    {seq_html}
+    <p style="font-size:12px;color:#aaa;margin:4px 0 0;">Note: {{{{custom_intro}}}}, {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} are personalized per recipient at send time.</p>
+  </div>
+
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:32px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>3. Connect your calendar</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 12px;">We've set up your booking page. Click the link below and connect your calendar — takes about 2 minutes. Interested prospects will book directly onto your calendar from here.</p>
+    <p style="text-align:left;margin:0;"><a href="{calendly}" style="background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">Connect Your Calendar →</a></p>
+  </div>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Your sending address is already warming up in the background — this takes 2–3 weeks. Once warmup is complete and everything above is done, I'll send you the subscription payment link to kick things off.</p>
+  <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Any questions, just reply here.</p>
+
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
+    <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
+  </div>
+</div></body></html>"""
+
+    app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+    if not app_password:
+        flash("ARGUSREACH_GMAIL_APP_PASS not set — cannot send email.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["From"]    = "Vito Resciniti | ArgusReach <vito@argusreach.com>"
+        msg["To"]      = to_email
+        msg["Subject"] = f"Your sequence + next setup steps — {firm}"
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+            smtp.login("vito@argusreach.com", app_password)
+            smtp.send_message(msg)
+        _notify_telegram(f"📨 Follow-up email sent to *{to_email}* for *{firm}*\n{'⚠️ DNS not verified — records in email for client to add' if not dns_ok else '✅ DNS verified'}")
+        flash(f"Follow-up email sent to {to_email}.", "success")
+    except Exception as e:
+        flash(f"Email failed: {e}", "error")
+
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/intakes")
 @login_required
 def intakes_list():
