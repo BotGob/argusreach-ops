@@ -4,68 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{% block title %}ArgusReach Admin{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ── Reset ── */
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-a{color:#60a5fa;text-decoration:none}a:hover{text-decoration:underline}
-.nav{background:#13161f;border-bottom:1px solid #1e2535;padding:0 32px;display:flex;align-items:center;gap:32px;height:52px}
-.nav-brand{font-weight:700;color:#fff;font-size:15px;letter-spacing:-.02em}
-.nav-brand span{color:#60a5fa}
-.nav a{color:#94a3b8;font-size:13px;font-weight:500}
-.nav a:hover,.nav a.active{color:#fff;text-decoration:none}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
-.container{max-width:1200px;margin:0 auto;padding:32px}
-h1{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
-h2{font-size:15px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin:28px 0 12px}
-.subtitle{color:#64748b;font-size:13px;margin-bottom:28px}
-.cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
-.card{background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;padding:18px 22px;min-width:160px;flex:1}
-.card-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-.card-value{font-size:26px;font-weight:700;color:#fff}
-table{width:100%;border-collapse:collapse;background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;overflow:hidden}
-th{background:#151922;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;border-bottom:1px solid #2d3448}
-td{padding:10px 14px;border-bottom:1px solid #1e2535;font-size:13px;vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#1e2535}
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-green{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
-.badge-yellow{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
-.badge-red{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
-.badge-gray{background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid rgba(148,163,184,.2)}
-.btn{display:inline-block;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;text-decoration:none}
-.btn-primary{background:#3b82f6;color:#fff}.btn-primary:hover{background:#2563eb;text-decoration:none}
-.btn-sm{padding:5px 10px;font-size:12px}
-.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #2d3448}.btn-ghost:hover{color:#fff;text-decoration:none}
-.form-group{margin-bottom:18px}
-label{display:block;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-input,select,textarea{width:100%;background:#13161f;border:1px solid #2d3448;border-radius:6px;padding:9px 12px;color:#e2e8f0;font-size:13px;font-family:inherit}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#3b82f6}
-textarea{min-height:80px;resize:vertical}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px}
-.alert-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e}
-.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
-.section{background:#1a1f2e;border:1px solid #2d3448;border-radius:10px;padding:20px;margin-bottom:20px}
-.section-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:14px}
-.upload-area{border:2px dashed #2d3448;border-radius:8px;padding:24px;text-align:center;color:#64748b;font-size:13px}
-.upload-area:hover{border-color:#3b82f6;color:#94a3b8}
-.warn-row td{background:rgba(245,158,11,.05)!important}
+
+/* ── Tokens ── */
+:root {
+  --bg:       #0a0a0a;
+  --bg2:      #111111;
+  --bg3:      #161616;
+  --border:   rgba(255,255,255,0.06);
+  --border2:  rgba(255,255,255,0.10);
+  --text:     #f0f0f0;
+  --muted:    #6b7280;
+  --sub:      #9ca3af;
+  --green:    #4ade80;
+  --green-bg: rgba(74,222,128,0.07);
+  --green-bd: rgba(74,222,128,0.22);
+  --red:      #f87171;
+  --yellow:   #facc15;
+  --blue:     #60a5fa;
+  --purple:   #a78bfa;
+}
+
+/* ── Base ── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--green); text-decoration: none; }
+a:hover { opacity: 0.8; text-decoration: none; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+/* ── Nav ── */
+.nav {
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand {
+  font-weight: 800;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-brand .brand-mark {
+  width: 22px; height: 22px;
+  border: 1.5px solid var(--green-bd);
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.nav-brand .brand-name span { color: var(--green); }
+.nav a {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav a:hover { color: var(--text); opacity: 1; }
+.nav a.active { color: #fff; border-bottom-color: var(--green); }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+
+/* ── Layout ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 32px; }
+
+/* ── Typography ── */
+h1 { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.03em; margin-bottom: 4px; }
+h2 { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin: 28px 0 12px; }
+.subtitle { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+/* ── Cards ── */
+.cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  min-width: 140px;
+  flex: 1;
+}
+.card-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; font-weight: 600; }
+.card-value { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.03em; }
+
+/* ── Tables ── */
+table { width: 100%; border-collapse: collapse; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+th { background: var(--bg3); color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-weight: 700; }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── Badges ── */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+.badge-green  { background: var(--green-bg);              color: var(--green); border: 1px solid var(--green-bd); }
+.badge-yellow { background: rgba(250,204,21,.08);          color: var(--yellow); border: 1px solid rgba(250,204,21,.2); }
+.badge-red    { background: rgba(248,113,113,.08);         color: var(--red);    border: 1px solid rgba(248,113,113,.2); }
+.badge-gray   { background: rgba(107,114,128,.08);         color: var(--sub);    border: 1px solid rgba(107,114,128,.15); }
+.badge-blue   { background: rgba(96,165,250,.08);          color: var(--blue);   border: 1px solid rgba(96,165,250,.2); }
+
+/* ── Buttons ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; letter-spacing: -0.01em; transition: opacity 0.15s, background 0.15s; white-space: nowrap; }
+.btn:hover { opacity: 0.88; text-decoration: none; }
+.btn-primary { background: var(--green); color: #000; }
+.btn-primary:hover { background: var(--green); opacity: 0.88; }
+.btn-danger  { background: var(--red); color: #000; }
+.btn-sm      { padding: 5px 10px; font-size: 12px; }
+.btn-ghost   { background: transparent; color: var(--sub); border: 1px solid var(--border2); }
+.btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+/* ── Forms ── */
+.form-group { margin-bottom: 18px; }
+label { display: block; font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+input, select, textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); }
+textarea { min-height: 80px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── Alerts ── */
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; }
+.alert-success { background: var(--green-bg); border: 1px solid var(--green-bd); color: var(--green); }
+.alert-error   { background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.2); color: var(--red); }
+
+/* ── Sections ── */
+.section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.section-title { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -0.01em; margin-bottom: 14px; }
+
+/* ── Upload area ── */
+.upload-area { border: 2px dashed var(--border2); border-radius: 8px; padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+.upload-area:hover { border-color: var(--green); color: var(--sub); }
+
+/* ── Misc ── */
+.warn-row td { background: rgba(250,204,21,.04) !important; }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
 </style>
 </head>
 <body>
 <nav class="nav">
-  <div class="nav-brand">⚡ <span>Argus</span>Reach</div>
-  <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
-  <a href="{{ url_for('campaigns') }}" class="{{ 'active' if request.endpoint == 'campaigns' }}">Campaigns</a>
+  <a href="{{ url_for('dashboard') }}" class="nav-brand">
+    <div class="brand-mark">⚡</div>
+    <div class="brand-name"><span>Argus</span>Reach</div>
+  </a>
+  <a href="{{ url_for('dashboard') }}"   class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('campaigns') }}"   class="{{ 'active' if request.endpoint == 'campaigns' }}">Campaigns</a>
   <a href="{{ url_for('intakes_list') }}" class="{{ 'active' if request.endpoint in ['intakes_list','intake_approve'] }}">Intakes</a>
-  <a href="{{ url_for('pipeline') }}" class="{{ 'active' if request.endpoint == 'pipeline' }}">Pipeline</a>
-  <a href="{{ url_for('stats') }}" class="{{ 'active' if request.endpoint == 'stats' }}">Stats</a>
-  <a href="{{ url_for('flowchart') }}" class="{{ 'active' if request.endpoint == 'flowchart' }}">Flowchart</a>
-  <a href="{{ url_for('backlog') }}" class="{{ 'active' if request.endpoint == 'backlog' }}">Backlog</a>
+  <a href="{{ url_for('pipeline') }}"    class="{{ 'active' if request.endpoint == 'pipeline' }}">Pipeline</a>
+  <a href="{{ url_for('stats') }}"       class="{{ 'active' if request.endpoint == 'stats' }}">Stats</a>
   <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
-  {# + New Client removed from nav — use /intake for client onboarding #}
+  <a href="{{ url_for('flowchart') }}"   class="{{ 'active' if request.endpoint == 'flowchart' }}">Flowchart</a>
+  <a href="{{ url_for('backlog') }}"     class="{{ 'active' if request.endpoint == 'backlog' }}">Backlog</a>
   <div class="nav-right">
-    <a href="{{ url_for('logout') }}" style="color:#ef4444;font-size:12px">Logout</a>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">ADMIN</span>
+    <a href="{{ url_for('logout') }}" style="color:var(--muted);font-size:12px">Logout</a>
   </div>
 </nav>
 <div class="container">

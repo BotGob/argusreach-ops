@@ -64,12 +64,12 @@
       <div style="display:flex;flex-direction:column;align-items:center;width:88px;text-align:center">
         <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;
           {% if done %}background:#052e16;border:2px solid #4ade80;color:#4ade80
-          {% elif is_active %}background:#1e3a5f;border:2px solid #60a5fa;color:#60a5fa
+          {% elif is_active %}background:rgba(74,222,128,0.08);border:2px solid #4ade80;color:#4ade80
           {% else %}background:#1e293b;border:2px solid #334155;color:#475569{% endif %}">
           {% if done %}✓{% else %}{{ loop.index }}{% endif %}
         </div>
         <div style="font-size:10px;margin-top:5px;line-height:1.3;
-          {% if done %}color:#4ade80{% elif is_active %}color:#60a5fa;font-weight:700{% else %}color:#475569{% endif %}">
+          {% if done %}color:#4ade80{% elif is_active %}color:#4ade80;font-weight:700{% else %}color:#475569{% endif %}">
           {{ label }}
         </div>
       </div>
@@ -86,7 +86,7 @@
   {% set cur = steps[ns.active_idx] %}
   <div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <div>
-      <div style="font-size:11px;color:#60a5fa;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Next step</div>
+      <div style="font-size:11px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Next step</div>
       <div style="font-size:13px;color:#e2e8f0">{{ cur[2] }} — {{ cur[4] }}</div>
     </div>
     {# Contextual action button #}
@@ -168,7 +168,7 @@
 {% if client.active %}
 <div class="cards" style="margin-bottom:16px">
   <div class="card"><div class="card-label">Leads Uploaded</div><div class="card-value">{{ metrics.leads }}</div></div>
-  <div class="card"><div class="card-label">Total Sent</div><div class="card-value" style="color:#60a5fa">{{ metrics.total_sent }}</div></div>
+  <div class="card"><div class="card-label">Total Sent</div><div class="card-value" style="color:#4ade80">{{ metrics.total_sent }}</div></div>
   <div class="card"><div class="card-label">🙋 Interested</div><div class="card-value" style="color:#4ade80">{{ metrics.reply_interested }}</div></div>
   <div class="card"><div class="card-label">🕐 Not Now</div><div class="card-value" style="color:#facc15">{{ metrics.reply_not_now }}</div></div>
   <div class="card"><div class="card-label">❌ Removed</div><div class="card-value" style="color:#f87171">{{ metrics.reply_negative }}</div></div>
@@ -253,7 +253,7 @@
 </div>
 
 {# ── LAUNCH SECTION ──────────────────────────────────────────────── #}
-<div class="section" style="margin-bottom:24px;border:1px solid {% if all_gates %}rgba(74,222,128,0.3){% else %}#1e3a5f{% endif %}">
+<div class="section" style="margin-bottom:24px;border:1px solid {% if all_gates %}rgba(74,222,128,0.3){% else %}rgba(74,222,128,0.08){% endif %}">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <div class="section-title" style="margin:0">🚀 Launch Campaign</div>
     <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#f87171;cursor:pointer">
@@ -370,7 +370,7 @@
       <div style="font-family:monospace;color:#64748b;font-size:11px">{{ client.instantly_campaign_id }}</div>
     </div>
   {% endif %}
-  <details><summary style="font-size:12px;color:#3b82f6;cursor:pointer;padding:6px 0">+ Add Campaign</summary>
+  <details><summary style="font-size:12px;color:#4ade80;cursor:pointer;padding:6px 0">+ Add Campaign</summary>
     <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:12px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
@@ -576,7 +576,7 @@ function handleFileSelect(input) {
   }
 }
 if (dropZone) {
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#60a5fa'; });
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = '#4ade80'; });
   dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#1e2535'; });
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
