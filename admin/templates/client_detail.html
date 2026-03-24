@@ -268,8 +268,20 @@
         <span style="font-size:11px;color:#475569">Eastern Time</span>
       </div>
     </div>
-    <button type="submit" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save Sequence &amp; Schedule</button>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button type="submit" name="push_instantly" value="0" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save</button>
+      {% if client.instantly_campaign_id %}
+      <button type="submit" name="push_instantly" value="1" class="btn btn-primary btn-sm">💾 Save &amp; Push to Instantly</button>
+      <span style="font-size:11px;color:var(--muted)">Updates the sequence in your Instantly DRAFT campaign. Safe — doesn't affect lead-level personalization.</span>
+      {% endif %}
+    </div>
   </form>
+
+  {% if client.instantly_campaign_id %}
+  <form method="POST" action="{{ url_for('push_sequence', client_id=client.id) }}" style="margin-top:8px">
+    <button type="submit" class="btn btn-ghost btn-sm">🔄 Push Current Sequence to Instantly (without saving changes)</button>
+  </form>
+  {% endif %}
 </div>
 
 {# ── LAUNCH SECTION ──────────────────────────────────────────────── #}

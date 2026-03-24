@@ -277,50 +277,59 @@ def check_no_duplicate(client):
 
 # ── SEQUENCE LOADER ───────────────────────────────────────────────────────────
 
+def sequence_to_instantly_steps(steps_raw):
+    """Convert clients.json sequence format to Instantly API steps format."""
+    steps = []
+    for i, s in enumerate(steps_raw):
+        body = s.get("body", "")
+        # Wrap plain text in minimal HTML if not already HTML
+        if body and not body.strip().startswith("<"):
+            body = "<p>" + body.replace("\n\n", "</p><p>").replace("\n", "<br>") + "</p>"
+        steps.append({
+            "type": "email",
+            "delay": s.get("delay_days", 0) if i > 0 else 0,
+            "delay_unit": "days",
+            "pre_delay_unit": "days",
+            "variants": [{"subject": s.get("subject", ""), "body": body}]
+        })
+    return steps
+
+
 def load_sequence(client):
     """
-    Load sequence steps from campaigns/{client_id}/sequence.json if it exists.
-    Falls back to a placeholder that must be filled in Instantly UI.
-    
-    sequence.json format:
-    [
-      {"subject": "...", "body": "...<html>...", "delay_days": 0},
-      {"subject": "...", "body": "...<html>...", "delay_days": 5},
-      {"subject": "...", "body": "...<html>...", "delay_days": 7}
-    ]
+    Load sequence steps from client record (clients.json).
+    Falls back to sequence.json in campaigns folder, then placeholder.
+    Priority: clients.json sequence > sequence.json file > placeholder
     """
+    # 1. Try clients.json sequence (set via portal editor)
+    seq_raw = client.get("sequence", [])
+    if seq_raw and any(s.get("subject") for s in seq_raw):
+        steps = sequence_to_instantly_steps(seq_raw)
+        print(f"   ✅ Loaded {len(steps)} sequence steps from client record (portal)")
+        return steps
+
+    # 2. Fall back to sequence.json file
     seq_file = BASE_DIR / "campaigns" / client["id"] / "sequence.json"
     if seq_file.exists():
         with open(seq_file) as f:
             steps_raw = json.load(f)
-        steps = []
-        for i, s in enumerate(steps_raw):
-            steps.append({
-                "type": "email",
-                "delay": s.get("delay_days", 0) if i > 0 else 0,
-                "delay_unit": "days",
-                "pre_delay_unit": "days",
-                "variants": [{
-                    "subject": s["subject"],
-                    "body": s["body"]
-                }]
-            })
+        steps = sequence_to_instantly_steps(steps_raw)
         print(f"   ✅ Loaded {len(steps)} sequence steps from sequence.json")
         return steps
-    else:
-        print(f"   ⚠️  No sequence.json found at {seq_file}")
-        print(f"   → Campaign will be created with a placeholder step.")
-        print(f"   → Write your sequence in Instantly UI before launching.")
-        return [{
-            "type": "email",
-            "delay": 0,
-            "delay_unit": "days",
-            "pre_delay_unit": "days",
-            "variants": [{
-                "subject": "PLACEHOLDER — update in Instantly",
-                "body": "<p>PLACEHOLDER — write sequence in Instantly UI before launching.</p>"
-            }]
+
+    # 3. Placeholder
+    print(f"   ⚠️  No sequence found in client record or sequence.json")
+    print(f"   → Campaign will be created with a placeholder step.")
+    return [{
+        "type": "email",
+        "delay": 0,
+        "delay_unit": "days",
+        "pre_delay_unit": "days",
+        "variants": [{
+            "subject": "PLACEHOLDER — update in Instantly",
+            "body": "<p>PLACEHOLDER — write sequence in portal before launching.</p>"
         }]
+    }]
 
 
 # ── PROSPECT LOADER ───────────────────────────────────────────────────────────

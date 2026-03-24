@@ -802,6 +802,46 @@ def client_detail(client_id):
     )
 
 
+def _push_sequence_to_instantly(client):
+    """Push the client's current sequence to their Instantly campaign. Returns (ok, message)."""
+    campaign_id = client.get("instantly_campaign_id","")
+    if not campaign_id:
+        return False, "No campaign ID on file — launch a campaign first."
+    seq_raw = client.get("sequence", [])
+    if not seq_raw or not any(s.get("subject") for s in seq_raw):
+        return False, "Sequence is empty — write it in the portal first."
+
+    # Convert to Instantly format
+    steps = []
+    for i, s in enumerate(seq_raw):
+        body = s.get("body","")
+        if body and not body.strip().startswith("<"):
+            body = "<p>" + body.replace("\n\n","</p><p>").replace("\n","<br>") + "</p>"
+        steps.append({
+            "type": "email",
+            "delay": s.get("delay_days", 0) if i > 0 else 0,
+            "delay_unit": "days",
+            "pre_delay_unit": "days",
+            "variants": [{"subject": s.get("subject",""), "body": body}]
+        })
+
+    inst_key = os.environ.get("INSTANTLY_API_KEY","")
+    headers  = {"Authorization": f"Bearer {inst_key}", "Content-Type": "application/json"}
+    try:
+        r = requests.patch(
+            f"https://api.instantly.ai/api/v2/campaigns/{campaign_id}",
+            headers=headers,
+            json={"sequences": [{"steps": steps}]},
+            timeout=15
+        )
+        if r.ok:
+            return True, f"Sequence pushed to Instantly ({len(steps)} touches)."
+        else:
+            return False, f"Instantly API error: {r.status_code} — {r.text[:120]}"
+    except Exception as e:
+        return False, f"Push failed: {str(e)[:120]}"
+
+
 @app.route("/clients/<client_id>/sequence", methods=["POST"])
 @login_required
 def save_sequence(client_id):
@@ -823,7 +863,29 @@ def save_sequence(client_id):
         "send_days":  f.getlist("send_days") or ["monday","tuesday","wednesday","thursday","friday"],
     }
     save_clients(config)
-    flash("Sequence and schedule saved.", "success")
+
+    # Auto-push to Instantly if campaign exists
+    push_to_instantly = f.get("push_instantly") == "1"
+    if push_to_instantly and client.get("instantly_campaign_id"):
+        ok, msg = _push_sequence_to_instantly(client)
+        flash(f"Sequence saved. {'✅ ' if ok else '⚠️ '}{msg}", "success" if ok else "error")
+    else:
+        flash("Sequence and schedule saved.", "success")
+
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
+@app.route("/clients/<client_id>/sequence/push", methods=["POST"])
+@login_required
+def push_sequence(client_id):
+    """Push current portal sequence to Instantly campaign (standalone action)."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+    ok, msg = _push_sequence_to_instantly(client)
+    flash(f"{'✅ ' if ok else '⚠️ '}{msg}", "success" if ok else "error")
     return redirect(url_for("client_detail", client_id=client_id))
 
 @app.route("/clients/<client_id>/checklist", methods=["POST"])
