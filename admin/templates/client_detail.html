@@ -164,6 +164,26 @@
 </div>
 {% endif %}
 
+{# ── MONITOR STATUS (active clients only) ───────────────────────── #}
+{% if client.active %}
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid {% if monitor_status.running %}rgba(74,222,128,0.2){% else %}rgba(248,113,113,0.25){% endif %};border-radius:8px;padding:10px 16px;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:8px;height:8px;border-radius:50%;background:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %};{% if monitor_status.running %}box-shadow:0 0 6px #4ade80{% endif %}"></div>
+    <span style="font-size:12px;font-weight:600;color:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %}">
+      Monitor {% if monitor_status.running %}running{% else %}⚠️ offline{% endif %}
+    </span>
+    {% if monitor_status.last_seen %}
+    <span style="font-size:11px;color:var(--muted)">Last cycle: {{ monitor_status.last_seen }}
+      {% if monitor_status.age_minutes is not none %}({{ monitor_status.age_minutes }}m ago){% endif %}
+    </span>
+    {% endif %}
+  </div>
+  {% if not monitor_status.running %}
+  <span style="font-size:11px;color:#f87171">Monitor hasn't checked in for {{ monitor_status.age_minutes or '?' }} minutes — may need restart</span>
+  {% endif %}
+</div>
+{% endif %}
+
 {# ── STATS (shown prominently when active, compact otherwise) ─────── #}
 {% if client.active %}
 <div class="cards" style="margin-bottom:16px">

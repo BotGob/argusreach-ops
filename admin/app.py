@@ -769,6 +769,28 @@ def client_detail(client_id):
         except Exception:
             pass
 
+    # Monitor health check — read heartbeat timestamp
+    monitor_status = {"running": False, "last_seen": None, "age_minutes": None}
+    heartbeat_file = BASE_DIR / "monitor" / "logs" / "monitor_heartbeat.txt"
+    if heartbeat_file.exists():
+        try:
+            import zoneinfo as _zi3
+            from datetime import timezone as _tz
+            ts_str = heartbeat_file.read_text().strip()
+            ts = datetime.fromisoformat(ts_str)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=_tz.utc)
+            now_utc = datetime.now(_tz.utc)
+            age_minutes = (now_utc - ts).total_seconds() / 60
+            ts_et = ts.astimezone(_zi3.ZoneInfo("America/New_York"))
+            monitor_status = {
+                "running": age_minutes < 30,
+                "last_seen": ts_et.strftime("%-I:%M %p ET"),
+                "age_minutes": round(age_minutes),
+            }
+        except Exception:
+            pass
+
     return render_template("client_detail.html",
         client=client,
         dnc_count=len(dnc),
@@ -776,6 +798,7 @@ def client_detail(client_id):
         metrics=metrics,
         events=[dict(e) for e in events],
         conn_status=conn_status,
+        monitor_status=monitor_status,
     )
 
 
