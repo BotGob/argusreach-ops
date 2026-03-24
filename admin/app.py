@@ -417,15 +417,20 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
     rejected          = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='draft_rejected' AND client_id=?", (client_id,)).fetchone()[0]
     meetings          = conn.execute("SELECT COUNT(*) FROM meetings WHERE client_id=?", (client_id,)).fetchone()[0]
     revenue           = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue WHERE client_id=?", (client_id,)).fetchone()[0]
+    # Leads: use our DB prospect count (accurate even before Instantly analytics are available)
+    # Instantly analytics endpoint returns [] for DRAFT campaigns — DB is always correct
+    leads_db          = conn.execute("SELECT COUNT(DISTINCT id) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
 
     breakdown     = {r[0]: r[1] for r in reply_rows}
     total_replies = sum(breakdown.values())
-    analytics     = fetch_instantly_analytics()
-    a             = analytics.get(instantly_campaign_id or "", {})
+
+    # Instantly analytics: emails_sent_count only (unreliable for leads_count, DRAFT returns empty)
+    analytics      = fetch_instantly_analytics()
+    a              = analytics.get(instantly_campaign_id or "", {})
     instantly_sent = a.get("emails_sent_count", 0)
-    leads          = a.get("leads_count", 0)
+    leads          = leads_db  # authoritative — DB never returns 0 for loaded prospects
 
     # Report buckets: Interested = positive + question, Not Now = not_now, Removed = negative
     interested = breakdown.get("positive", 0) + breakdown.get("question", 0)
@@ -446,10 +451,10 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
         "reply_question":    breakdown.get("question", 0),
         "replies_ignored":   rejected,
         "meetings":          meetings,
-        "revenue_cents":   revenue,
-        "revenue":         f"${revenue/100:,.2f}",
+        "revenue_cents":     revenue,
+        "revenue":           f"${revenue/100:,.2f}",
         "prospects_tracked": prospects_tracked,
-        "reply_rate":      f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
+        "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
     }
 
 def fetch_instantly_analytics():
@@ -2145,8 +2150,8 @@ def intake_approve(intake_id):
             "mode":                  "draft_approval",
             "firm_name":             intake["firm_name"],
             "vertical":              intake["vertical"],
-            "plan":                  plan,
-            "outreach_email":        f.get("outreach_email","vito@argusreach.com").strip(),
+            "plan":                  plan,  # from approval form — Vito can override intake value
+            "outreach_email":        "",   # set during credential submission — NEVER default to vito@argusreach.com
             "sender_name":           f.get("sender_name","Vito Resciniti").strip(),
             "title":                 f.get("title","Founder").strip(),
             "client_email":          intake["contact_email"],
@@ -2164,7 +2169,7 @@ def intake_approve(intake_id):
             "_intake_id":            intake_id,
             "_contact_name":         intake.get("contact_name",""),
             "_contact_title":        intake.get("contact_title",""),
-            "plan":                   intake.get("plan","starter"),
+            # NOTE: no second "plan" key here — form value above is the authoritative source
             "_meeting_format":        intake.get("meeting_format","any"),
             "_office_address":        intake.get("office_address",""),
             "_success_story":        intake.get("success_story",""),

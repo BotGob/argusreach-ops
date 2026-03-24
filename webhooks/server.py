@@ -91,9 +91,10 @@ def _log_stripe_revenue(payment_id: str, amount_cents: int, plan: str,
 
 # Map Stripe price amounts (cents) to plan names — fallback when metadata is missing
 _PRICE_PLAN_MAP = {
-    75000:  "starter",
-    150000: "growth",
-    250000: "scale",
+    50000:  "setup_fee",   # $500 setup fee (one-time)
+    75000:  "starter",     # $750/mo — 200 prospects
+    150000: "growth",      # $1,500/mo — 500 prospects
+    250000: "scale",       # $2,500/mo — 1,000 prospects
 }
 
 
