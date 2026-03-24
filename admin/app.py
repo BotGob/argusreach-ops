@@ -1881,7 +1881,10 @@ def send_followup_email(client_id):
     seq_html = ""
     for i, touch in enumerate(sequence):
         delay = touch.get("delay_days", 0)
-        day_label = f"Day {delay}" if delay > 0 else "Day 0 — first email"
+        if i == 0:
+            day_label = "Sends on day 1"
+        else:
+            day_label = f"Sends {delay} day{'s' if delay != 1 else ''} after Touch {i}"
         seq_html += f"""
   <div style="background:#f9f9f9;border-left:3px solid #4ade80;padding:14px;margin-bottom:14px;border-radius:0 6px 6px 0;">
     <p style="font-size:11px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em">Touch {i+1} — {day_label}</p>

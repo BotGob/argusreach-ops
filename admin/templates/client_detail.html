@@ -233,14 +233,16 @@
       <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
         <span style="font-size:12px;color:#64748b">Send window:</span>
         <select name="start_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
-          {% for h in range(6,13) %}
-          <option value="{{ h }}" {% if sched.get('start_hour',8)==h %}selected{% endif %}>{{ '%d:00 %s'|format(h if h<=12 else h-12, 'AM' if h<12 else 'PM') }}</option>
+          {% for h in range(0,24) %}
+          {% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}
+          <option value="{{ h }}" {% if sched.get('start_hour',8)==h %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
         <span style="font-size:12px;color:#64748b">to</span>
         <select name="end_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
-          {% for h in range(13,21) %}
-          <option value="{{ h }}" {% if sched.get('end_hour',17)==h %}selected{% endif %}>{{ '%d:00 %s'|format(h if h<=12 else h-12, 'AM' if h<12 else 'PM') }}</option>
+          {% for h in range(0,24) %}
+          {% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}
+          <option value="{{ h }}" {% if sched.get('end_hour',17)==h %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
         <span style="font-size:11px;color:#475569">Eastern Time</span>
