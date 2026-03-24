@@ -49,18 +49,18 @@
       "_dns_provider": "",
       "sequence": [
         {
-          "subject": "Quick question about {{companyName}}'s new client pipeline",
-          "body": "{{custom_intro}}\n\nWe work with PT clinics across {{city}} to handle all the prospecting legwork - finding the right referral sources, writing personalized outreach, managing replies. Basically everything except the actual closing, which you're already great at.\n\nWould a quick call make sense to see if this could work for {{companyName}}?\n\nVito Resciniti\nFounder, Argus Reach",
+          "subject": "",
+          "body": "",
           "delay_days": 0
         },
         {
-          "subject": "Re: Quick question about {{companyName}}'s new client pipeline",
-          "body": "{{firstName}}, most PT practices tell us their closers aren't the bottleneck - it's just not having enough qualified conversations happening. Our system sources contacts, personalizes every email to their specific practice, and only surfaces people actually interested in talking. That frees up your team to do what they do best.\n\nWorth 15 minutes?\n\nVito Resciniti\nFounder, Argus Reach",
+          "subject": "",
+          "body": "",
           "delay_days": 5
         },
         {
-          "subject": "Last one - {{companyName}}",
-          "body": "{{firstName}}, I'll leave this at your feet. If you ever want to explore consistent referral meetings without the prospecting headache, just reply. No pressure.\n\nVito Resciniti\nFounder, Argus Reach",
+          "subject": "",
+          "body": "",
           "delay_days": 5
         }
       ],
@@ -91,7 +91,7 @@
       "_credentials_received_at": "2026-03-23 09:20 PM ET",
       "calendly_event_slug": "30 minute meeting",
       "_gate_check": {
-        "checked_at": "2026-03-23 23:08 ET",
+        "checked_at": "2026-03-23 23:20 ET",
         "dns_pass": false,
         "warmup_score": null,
         "warmup_pass": false

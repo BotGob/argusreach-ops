@@ -349,7 +349,7 @@ def verify_emails(contacts):
         job_id = resp.json().get("job_id")
         print(f"   Job {job_id} — polling...")
 
-        for _ in range(60):
+        for _ in range(120):  # up to 20 min — enough for Growth/Scale (500-1000 leads)
             time.sleep(10)
             s = requests.get(
                 "https://api.neverbounce.com/v4/jobs/status",
@@ -439,7 +439,7 @@ def _save_sequence_template(client_id, steps):
 def create_instantly_campaign(client, month_name, sequence_steps=None):
     """Create a new Instantly campaign for the given month."""
     firm     = client["firm_name"]
-    name     = f"ArgusReach - {firm} - {month_name}"
+    name     = f"ArgusReach — {firm} — {month_name}"
 
     # Use schedule from portal if available, else defaults
     # NOTE: Instantly rejects "America/New_York" — use "America/Detroit" (same ET zone, accepted)

@@ -845,18 +845,15 @@ def _push_sequence_to_instantly(client):
     if not seq_raw or not any(s.get("subject") for s in seq_raw):
         return False, "Sequence is empty — write it in the portal first."
 
-    # Convert to Instantly format
+    # Convert to Instantly format — plain text only (HTML corrupts in Instantly editor)
     steps = []
     for i, s in enumerate(seq_raw):
-        body = s.get("body","")
-        if body and not body.strip().startswith("<"):
-            body = "<p>" + body.replace("\n\n","</p><p>").replace("\n","<br>") + "</p>"
         steps.append({
             "type": "email",
             "delay": s.get("delay_days", 0) if i > 0 else 0,
             "delay_unit": "days",
             "pre_delay_unit": "days",
-            "variants": [{"subject": s.get("subject",""), "body": body}]
+            "variants": [{"subject": s.get("subject",""), "body": s.get("body","")}]
         })
 
     inst_key = os.environ.get("INSTANTLY_API_KEY","")

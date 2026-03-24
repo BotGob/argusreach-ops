@@ -19,7 +19,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
 
-PENDING_FILE = Path(__file__).parent.parent / "monitor" / "logs" / "pending_approvals.json"
+PENDING_FILE  = Path(__file__).parent.parent / "monitor" / "logs" / "pending_approvals.json"
+CLIENTS_FILE  = Path(__file__).parent.parent / "monitor" / "clients.json"
+ENV_FILE      = Path(__file__).parent.parent / "monitor" / ".env"
+
+# Load env for CREDENTIAL_ENCRYPTION_KEY
+if ENV_FILE.exists():
+    for line in ENV_FILE.read_text().splitlines():
+        if "=" in line and not line.strip().startswith("#"):
+            k, v = line.split("=", 1)
+            import os as _os
+            _os.environ.setdefault(k.strip(), v.strip())
 
 
 def load_pending():
@@ -32,9 +42,34 @@ def save_pending(pending):
     PENDING_FILE.write_text(json.dumps(pending, indent=2))
 
 
+def _get_client_password(client_id, outreach_email):
+    """Look up and decrypt the app password from clients.json at send time.
+    Never stored in pending_approvals.json — security requirement."""
+    import os
+    try:
+        clients = json.loads(CLIENTS_FILE.read_text()).get("clients", [])
+        client = next((c for c in clients if c.get("id") == client_id), None)
+        if not client:
+            raise ValueError(f"Client {client_id} not found in clients.json")
+        raw = client.get("app_password", "")
+        if not raw:
+            raise ValueError(f"No app_password set for {client_id}")
+        # Decrypt if encrypted
+        try:
+            from cryptography.fernet import Fernet
+            cred_key = os.environ.get("CREDENTIAL_ENCRYPTION_KEY", "")
+            if cred_key:
+                return Fernet(cred_key.encode()).decrypt(raw.encode()).decode()
+        except Exception:
+            pass
+        return raw  # fallback: plaintext
+    except Exception as e:
+        raise RuntimeError(f"Could not retrieve app password for {client_id}: {e}")
+
+
 def send_reply(entry):
     outreach_email = entry["outreach_email"]
-    app_password   = entry["app_password"]
+    app_password   = _get_client_password(entry["client_id"], outreach_email)
     sender_name    = entry["sender_name"]
     to_email       = entry["from_email"]
     subject        = entry["subject"]

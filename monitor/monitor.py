@@ -327,7 +327,7 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
         'instantly_campaign_id': client.get('instantly_campaign_id', ''),
         'client_email':          client.get('client_email', ''),
         'outreach_email':        client['outreach_email'],
-        'app_password':          _get_app_password(client),
+        # app_password intentionally NOT stored here — looked up from clients.json at send time
         'sender_name':           client['sender_name'],
         'from_email':            from_email,
         'from_name':             from_name,
@@ -1044,20 +1044,6 @@ def process_client(client, processed_ids):
                     new_processed.add(fingerprint)
                 continue
 
-            # ── DATABASE: log classification event
-            if _DB_ENABLED:
-                try:
-                    _campaign_id = email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id',''))
-                    _pid = _upsert_prospect(cid, _campaign_id,
-                                            from_email, '', '', '', 'replied')
-                    _log_event(cid, _pid, 'classified', {
-                        'classification': classification,
-                        'subject': subject,
-                        'from_name': from_name
-                    })
-                except Exception as _e:
-                    log(f"[DB] classify log failed: {_e}")
-
             # ── INSTANTLY: pause sequence on any real reply
             if classification not in ('ooo',) and not escalate:
                 instantly_pause_contact(
@@ -1183,13 +1169,17 @@ def process_client(client, processed_ids):
             if classification == 'positive' and sent and client_email and not TEST_MODE:
                 try:
                     prospect_display = from_name if from_name else from_email
-                    booking_alert = f"""<p>Hi,</p>
-<p>Quick heads up — we just sent a reply to <strong>{prospect_display}</strong> ({from_email}) on your behalf and included your booking link.</p>
-<p>They indicated interest, so you may see a meeting land on your calendar soon.</p>
-<p><strong>Please reply to this email or log in to confirm when the meeting is officially booked.</strong> This helps us track your results accurately.</p>
-<p>If the meeting doesn't materialize within a few days, no action needed — we'll continue the follow-up sequence.</p>
-<br>
-<p>— ArgusReach</p>"""
+                    booking_alert = (
+                        f"Hi,\n\n"
+                        f"Quick heads up — we just sent a reply to {prospect_display} ({from_email}) "
+                        f"on your behalf and included your booking link.\n\n"
+                        f"They indicated interest, so you may see a meeting land on your calendar soon.\n\n"
+                        f"Please reply to this email or log in to confirm when the meeting is officially booked. "
+                        f"This helps us track your results accurately.\n\n"
+                        f"If the meeting doesn't materialize within a few days, no action needed — "
+                        f"we'll continue the follow-up sequence.\n\n"
+                        f"— ArgusReach"
+                    )
                     _send_email(
                         client['outreach_email'], _get_app_password(client),
                         'ArgusReach', client_email,
@@ -1514,13 +1504,15 @@ def sync_instantly_stages(clients):
             page_cursor = None
             processed   = 0
             while True:
-                payload = {'campaign': campaign_id, 'limit': 100}
+                # Use GET /api/v2/leads with campaign param — /leads/list does NOT reliably
+                # filter by campaign (returns workspace-level leads per MEMORY.md)
+                params = {'campaign': campaign_id, 'limit': 100}
                 if page_cursor:
-                    payload['starting_after'] = page_cursor
-                resp = requests.post(
-                    'https://api.instantly.ai/api/v2/leads/list',
-                    headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}', 'Content-Type': 'application/json'},
-                    json=payload, timeout=20
+                    params['starting_after'] = page_cursor
+                resp = requests.get(
+                    'https://api.instantly.ai/api/v2/leads',
+                    headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
+                    params=params, timeout=20
                 )
                 if resp.status_code != 200:
                     break
