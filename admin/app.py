@@ -1896,12 +1896,43 @@ def send_followup_email(client_id):
     provider = client.get("_email_provider","google")
     spf_include = "include:_spf.google.com" if provider != "microsoft" else "include:spf.protection.outlook.com"
 
-    dns_block = f"""<div style="background:#f4f4f4;padding:14px;border-radius:6px;font-family:monospace;font-size:12px;line-height:2;color:#333;">
-Type: TXT &nbsp;&nbsp; Host: @ &nbsp;&nbsp; Value: v=spf1 {spf_include} ~all<br>
-Type: TXT &nbsp;&nbsp; Host: google._domainkey &nbsp;&nbsp; Value: <em>[Get from Google Workspace Admin → Apps → Gmail → Authenticate email → Copy DKIM record]</em><br>
-Type: TXT &nbsp;&nbsp; Host: _dmarc &nbsp;&nbsp; Value: v=DMARC1; p=none; rua=mailto:vito@argusreach.com
-</div>
-<p style="font-size:12px;color:#888;margin:8px 0 0;">Add these to <strong>{outreach_domain}</strong> at your DNS provider. Usually takes under 10 minutes — DNS propagates within a few hours after that.</p>"""
+    if provider == "microsoft":
+        dkim_row = """<tr style="border-bottom:1px solid #e5e5e5">
+          <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">DKIM</td>
+          <td style="padding:10px 12px;font-size:12px;color:#333">2 CNAME records — get these from <strong>Microsoft 365 Admin Center → Settings → Domains → your domain → DNS records</strong>. Once added, enable DKIM in the Microsoft 365 Defender portal.</td>
+        </tr>"""
+    else:
+        dkim_row = """<tr style="border-bottom:1px solid #e5e5e5">
+          <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">DKIM</td>
+          <td style="padding:10px 12px;font-size:12px;color:#333">1 TXT record — get this from <strong>Google Workspace Admin → Apps → Google Workspace → Gmail → Authenticate email → Generate new record</strong>. Copy the TXT name and value, add to your DNS.</td>
+        </tr>"""
+
+    dns_block = f"""<table style="width:100%;border-collapse:collapse;border:1px solid #e5e5e5;border-radius:6px;overflow:hidden;font-family:sans-serif">
+  <thead>
+    <tr style="background:#f4f4f4">
+      <th style="text-align:left;padding:8px 12px;font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e5e5e5;width:60px">Type</th>
+      <th style="text-align:left;padding:8px 12px;font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #e5e5e5">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom:1px solid #e5e5e5">
+      <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">SPF</td>
+      <td style="padding:10px 12px;font-size:12px;color:#333">
+        <strong>Host:</strong> @ &nbsp;&nbsp; <strong>Value:</strong> <code style="background:#f4f4f4;padding:1px 5px;border-radius:3px">v=spf1 {spf_include} ~all</code><br>
+        <span style="font-size:11px;color:#aaa">If you already have an SPF record, add the include value to it — don't create a second one.</span>
+      </td>
+    </tr>
+    {dkim_row}
+    <tr>
+      <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">DMARC</td>
+      <td style="padding:10px 12px;font-size:12px;color:#333">
+        <strong>Host:</strong> <code style="background:#f4f4f4;padding:1px 5px;border-radius:3px">_dmarc.{outreach_domain}</code> &nbsp;&nbsp;
+        <strong>Value:</strong> <code style="background:#f4f4f4;padding:1px 5px;border-radius:3px">v=DMARC1; p=none; rua=mailto:vito@argusreach.com</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p style="font-size:12px;color:#888;margin:8px 0 0;">Add these to <strong>{outreach_domain}</strong> at your DNS provider (GoDaddy, Cloudflare, Namecheap, etc.). Usually 10 minutes — DNS propagates within a few hours.</p>"""
 
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
