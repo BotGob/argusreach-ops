@@ -64,6 +64,16 @@
     select option { background: var(--bg2); }
     textarea { resize: vertical; min-height: 90px; line-height: 1.6; overflow-y: hidden; }
     textarea::-webkit-scrollbar { display: none; }
+    /* Fix Chrome autofill overriding dark theme */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0px 1000px var(--bg2) inset !important;
+      -webkit-text-fill-color: var(--text) !important;
+      caret-color: var(--text);
+    }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
 
@@ -189,7 +199,7 @@
 
 <div class="form-wrap">
 
-  <form method="POST" action="/intake">
+  <form method="POST" action="/intake" autocomplete="off">
 
     <!-- ── SECTION 0: PLAN SELECTION ─────────────────────────────────── -->
     <div class="section-header">Your Plan</div>
