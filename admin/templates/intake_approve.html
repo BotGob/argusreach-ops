@@ -83,10 +83,10 @@
       </div>
 
       <div style="margin-bottom:14px">
-        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email Address *
-          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">The dedicated sending address for this client (e.g. brett@outreach.amfhealthcare.com). Leave as vito@argusreach.com if sending account not yet set up.</span>
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email Address
+          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">Leave blank — client submits their dedicated outreach email + app password via the secure credential form after the welcome email. Do not set this here.</span>
         </label>
-        <input name="outreach_email" value="{{ form.get('outreach_email', 'vito@argusreach.com') }}" required>
+        <input name="outreach_email" value="" placeholder="Set via credential form after welcome email" style="opacity:0.5">
       </div>
 
       <div style="margin-bottom:14px">
