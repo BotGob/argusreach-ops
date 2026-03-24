@@ -340,37 +340,38 @@ def load_prospects(client):
 
 
 def upload_prospects(campaign_id, prospects, client):
-    """Upload prospects to Instantly campaign in batches."""
-    BATCH = 25
+    """Upload prospects to Instantly campaign one at a time (batch endpoint is 404)."""
     uploaded = 0
-    skipped = 0
-    for i in range(0, len(prospects), BATCH):
-        batch = prospects[i:i+BATCH]
-        leads = []
-        for p in batch:
-            email = (p.get("email") or p.get("Email") or "").strip()
-            if not email:
-                skipped += 1
-                continue
-            leads.append({
-                "campaign": campaign_id,
-                "email": email,
-                "first_name": p.get("first_name") or p.get("First Name") or p.get("firstName") or "",
-                "last_name": p.get("last_name") or p.get("Last Name") or p.get("lastName") or "",
-                "company_name": p.get("company") or p.get("Company") or p.get("company_name") or "",
-                "skip_if_in_workspace": False,
-                "custom_variables": {
-                    "custom_intro": p.get("custom_intro", ""),
-                },
-            })
-        if not leads:
+    skipped  = 0
+    failed   = 0
+    for p in prospects:
+        email = (p.get("email") or p.get("Email") or "").strip()
+        if not email:
+            skipped += 1
             continue
-        # Use bulk endpoint
-        result = api("POST", "/leads/batch-add", json={"leads": leads})
-        uploaded += len(leads)
-        time.sleep(0.5)  # rate limit courtesy
+        payload = {
+            "campaign": campaign_id,          # must be "campaign" not "campaign_id"
+            "email": email,
+            "first_name": p.get("first_name") or p.get("First Name") or p.get("firstName") or "",
+            "last_name":  p.get("last_name")  or p.get("Last Name")  or p.get("lastName")  or "",
+            "company_name": p.get("company") or p.get("Company") or p.get("company_name") or "",
+            "skip_if_in_workspace": False,
+            "custom_variables": {
+                "title":        p.get("title", ""),
+                "city":         p.get("city", ""),
+                "state":        p.get("state", ""),
+                "custom_intro": p.get("custom_intro", ""),
+            },
+        }
+        try:
+            api("POST", "/leads", json=payload)
+            uploaded += 1
+        except Exception as e:
+            print(f"   ⚠️  Failed to upload {email}: {e}")
+            failed += 1
+        time.sleep(0.3)
 
-    print(f"   ✅ Uploaded {uploaded} prospects ({skipped} skipped — no email)")
+    print(f"   ✅ Uploaded {uploaded} prospects ({skipped} skipped — no email, {failed} failed)")
     return uploaded
 
 
@@ -419,7 +420,7 @@ def main():
                 "name": "Default",
                 "timing": {"from": "08:00", "to": "17:00"},
                 "days": {"1": True, "2": True, "3": True, "4": True, "5": True},
-                "timezone": client.get("timezone", "America/New_York")
+                "timezone": client.get("timezone", "America/Detroit")
             }]
         },
         "sequences": [{"steps": sequence_steps}],

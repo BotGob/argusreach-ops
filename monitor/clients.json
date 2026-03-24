@@ -4,7 +4,7 @@
     {
       "id": "argus_reach",
       "active": false,
-      "onboarding_status": "dns_pending",
+      "onboarding_status": "warming_up",
       "mode": "draft_approval",
       "firm_name": "Argus Reach",
       "vertical": "B2BServices",
@@ -14,10 +14,10 @@
       "title": "Founder",
       "client_email": "Vito@argusreach.com",
       "calendly_link": "https://calendly.com/vito-argusreach/30min",
-      "instantly_campaign_id": "",
-      "campaign_name": "",
+      "instantly_campaign_id": "7cd7c8d8-3663-4ced-add2-2e6be939750e",
+      "campaign_name": "ArgusReach \u2014 Argus Reach \u2014 March 2026",
       "contacts_per_month": 500,
-      "launch_date": "",
+      "launch_date": "2026-03-24",
       "icp_summary": "",
       "tone": "warm-professional",
       "compliance_note": "",
@@ -82,14 +82,20 @@
         "warmup_complete": true,
         "payment_confirmed": true,
         "sequence_approved": true,
-        "calendar_connected": false
+        "calendar_connected": true
       },
       "_setup_token": "uSjbYuYefu4bHElDeml1nULBbE08OcKqxRGpldnerQ4",
       "_setup_token_expires": "2026-03-31T01:17:14.011256",
       "_setup_token_used": true,
       "app_password": "gAAAAABpwebLApyi2iDdWutDLVarm1AzrE24nV4euVAb7g-NKitraXUNBq3d_-QdnUHlrWg465mt8yblfBniKt40T7KYIh4BJ8EAGFSz0IrrkTnhYBji6ZI=",
       "_credentials_received_at": "2026-03-23 09:20 PM ET",
-      "calendly_event_slug": "30 minute meeting"
+      "calendly_event_slug": "30 minute meeting",
+      "_gate_check": {
+        "checked_at": "2026-03-23 21:34 ET",
+        "dns_pass": false,
+        "warmup_score": null,
+        "warmup_pass": false
+      }
     }
   ]
 }
