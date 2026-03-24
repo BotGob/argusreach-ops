@@ -1,4 +1,94 @@
 {
   "_readme": "Set active=true to enable a client. Set active=false to pause without deleting. Mode: automated or draft_approval.",
-  "clients": []
+  "clients": [
+    {
+      "id": "argus_reach",
+      "active": false,
+      "onboarding_status": "dns_pending",
+      "mode": "draft_approval",
+      "firm_name": "Argus Reach",
+      "vertical": "B2BServices",
+      "plan": "growth",
+      "outreach_email": "gobbot95@gmail.com",
+      "sender_name": "Vito Resciniti",
+      "title": "Founder",
+      "client_email": "Vito@argusreach.com",
+      "calendly_link": "",
+      "instantly_campaign_id": "",
+      "campaign_name": "",
+      "contacts_per_month": 500,
+      "launch_date": "",
+      "icp_summary": "",
+      "tone": "warm-professional",
+      "compliance_note": "",
+      "positioning_note": "",
+      "prospects_csv": "campaigns/argus_reach/prospects.csv",
+      "_intake_id": "20260324011232",
+      "_contact_name": "Vito Resciniti",
+      "_contact_title": "CEO",
+      "_meeting_format": "in_person_their_office",
+      "_office_address": "",
+      "_success_story": "",
+      "_prospect_objection": "",
+      "_target_locations": "Tampa FL\r\nSaint Pete FL\r\nClearwater FL",
+      "_target_titles": "Physical Therapy",
+      "_value_prop": "You're already good at closing \u2014 you just don't have enough conversations. We fix that. Consistent meetings on your calendar every month, zero time spent prospecting.\"",
+      "_differentiator": "Fully managed, end to end \u2014 most 'outreach tools' hand you a platform and wish you luck. We don't. We source the contacts, write the sequences, handle every reply, and only surface a conversation when someone is actually interested. The other difference: our system runs on AI that personalizes every email to the specific company we're reaching out to \u2014 not a template blast. It reads their website and writes an opening line specific to their business before anything sends.",
+      "_outcomes": "",
+      "_voice_sample": "",
+      "_business_description": "We help professional services firms build a consistent pipeline of new client meetings \u2014 without their team doing any prospecting. We handle everything: finding the right contacts, writing personalized outreach in your voice, managing replies, and routing interested prospects straight to your calendar. You just show up to the meetings",
+      "_dnc_notes": "",
+      "_dnc_emails": "",
+      "_target_industry": "physical_therapy",
+      "_target_seniority": "owner_founder,manager,any",
+      "_target_company_size": "1-10,11-50",
+      "_desired_action": "book_call",
+      "_has_existing_list": "no",
+      "_website": "www.argusreach.com",
+      "_email_provider": "google",
+      "_dns_provider": "",
+      "sequence": [
+        {
+          "subject": "Quick question about {{companyName}}'s new client pipeline",
+          "body": "{{custom_intro}}\n\nWe work with PT clinics across {{city}} to handle all the prospecting legwork - finding the right referral sources, writing personalized outreach, managing replies. Basically everything except the actual closing, which you're already great at.\n\nWould a quick call make sense to see if this could work for {{companyName}}?\n\nVito Resciniti\nFounder, Argus Reach",
+          "delay_days": 0
+        },
+        {
+          "subject": "Re: Quick question about {{companyName}}'s new client pipeline",
+          "body": "{{firstName}}, most PT practices tell us their closers aren't the bottleneck - it's just not having enough qualified conversations happening. Our system sources contacts, personalizes every email to their specific practice, and only surfaces people actually interested in talking. That frees up your team to do what they do best.\n\nWorth 15 minutes?\n\nVito Resciniti\nFounder, Argus Reach",
+          "delay_days": 5
+        },
+        {
+          "subject": "Last one - {{companyName}}",
+          "body": "{{firstName}}, I'll leave this at your feet. If you ever want to explore consistent referral meetings without the prospecting headache, just reply. No pressure.\n\nVito Resciniti\nFounder, Argus Reach",
+          "delay_days": 5
+        }
+      ],
+      "schedule": {
+        "timezone": "America/New_York",
+        "start_hour": 8,
+        "end_hour": 17,
+        "send_days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday"
+        ]
+      },
+      "checklist": {
+        "icp_reviewed": false,
+        "dns_verified": false,
+        "warmup_complete": false,
+        "payment_confirmed": false,
+        "sequence_approved": false,
+        "calendar_connected": false
+      },
+      "_setup_token": "uSjbYuYefu4bHElDeml1nULBbE08OcKqxRGpldnerQ4",
+      "_setup_token_expires": "2026-03-31T01:17:14.011256",
+      "_setup_token_used": true,
+      "app_password": "gAAAAABpwebLApyi2iDdWutDLVarm1AzrE24nV4euVAb7g-NKitraXUNBq3d_-QdnUHlrWg465mt8yblfBniKt40T7KYIh4BJ8EAGFSz0IrrkTnhYBji6ZI=",
+      "_credentials_received_at": "2026-03-23 09:20 PM ET"
+    }
+  ]
 }
