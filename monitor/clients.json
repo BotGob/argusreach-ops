@@ -13,7 +13,7 @@
       "sender_name": "Vito Resciniti",
       "title": "Founder",
       "client_email": "Vito@argusreach.com",
-      "calendly_link": "",
+      "calendly_link": "https://calendly.com/vito-argusreach/30min",
       "instantly_campaign_id": "",
       "campaign_name": "",
       "contacts_per_month": 500,
@@ -77,18 +77,19 @@
         ]
       },
       "checklist": {
-        "icp_reviewed": false,
-        "dns_verified": false,
-        "warmup_complete": false,
-        "payment_confirmed": false,
-        "sequence_approved": false,
+        "icp_reviewed": true,
+        "dns_verified": true,
+        "warmup_complete": true,
+        "payment_confirmed": true,
+        "sequence_approved": true,
         "calendar_connected": false
       },
       "_setup_token": "uSjbYuYefu4bHElDeml1nULBbE08OcKqxRGpldnerQ4",
       "_setup_token_expires": "2026-03-31T01:17:14.011256",
       "_setup_token_used": true,
       "app_password": "gAAAAABpwebLApyi2iDdWutDLVarm1AzrE24nV4euVAb7g-NKitraXUNBq3d_-QdnUHlrWg465mt8yblfBniKt40T7KYIh4BJ8EAGFSz0IrrkTnhYBji6ZI=",
-      "_credentials_received_at": "2026-03-23 09:20 PM ET"
+      "_credentials_received_at": "2026-03-23 09:20 PM ET",
+      "calendly_event_slug": "30 minute meeting"
     }
   ]
 }

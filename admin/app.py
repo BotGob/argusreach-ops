@@ -1731,10 +1731,49 @@ def setup_credentials(token):
 
     save_clients(config)
 
+    # Auto-add to Instantly + enable warmup immediately
+    warmup_status = "⏳ starting"
+    try:
+        import requests as _req
+        _inst_key = os.environ.get("INSTANTLY_API_KEY", "")
+        _plain_pass = _decrypt_credential(client["app_password"])
+        _first = (client.get("sender_name") or "Vito").split()[0]
+        _last  = (client.get("sender_name") or "Vito Resciniti").split()[-1]
+        _add = _req.post(
+            "https://api.instantly.ai/api/v2/accounts",
+            headers={"Authorization": f"Bearer {_inst_key}", "Content-Type": "application/json"},
+            json={
+                "email": outreach_email,
+                "first_name": _first,
+                "last_name": _last,
+                "provider_code": 2 if client.get("_email_provider") == "microsoft" else 1,
+                "smtp_host": "smtp.office365.com" if client.get("_email_provider") == "microsoft" else "smtp.gmail.com",
+                "smtp_port": 587,
+                "smtp_username": outreach_email, "smtp_password": _plain_pass,
+                "imap_host": "outlook.office365.com" if client.get("_email_provider") == "microsoft" else "imap.gmail.com",
+                "imap_port": 993,
+                "imap_username": outreach_email, "imap_password": _plain_pass,
+            }, timeout=15
+        )
+        if _add.ok or "already" in _add.text.lower():
+            _warm = _req.patch(
+                f"https://api.instantly.ai/api/v2/accounts/{outreach_email}",
+                headers={"Authorization": f"Bearer {_inst_key}", "Content-Type": "application/json"},
+                json={"warmup_enabled": True}, timeout=15
+            )
+            warmup_status = "✅ running" if _warm.ok else f"⚠️ warmup failed ({_warm.status_code})"
+        else:
+            warmup_status = f"⚠️ add failed ({_add.status_code})"
+        app.logger.info(f"Instantly warmup for {outreach_email}: {warmup_status}")
+    except Exception as _we:
+        warmup_status = f"⚠️ error: {str(_we)[:80]}"
+        app.logger.warning(f"Warmup auto-enable failed for {outreach_email}: {_we}")
+
     # Alert Vito
     _notify_telegram(
         f"🔐 *{firm}* submitted email credentials securely\n"
         f"📧 Outreach email: `{outreach_email}`\n"
+        f"🌡️ Instantly warmup: {warmup_status}\n"
         f"→ Generate DNS records + send follow-up email when ready"
     )
 
