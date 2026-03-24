@@ -1,139 +1,90 @@
 # ArgusReach — Ops Backlog
 
-> Active items only. Completed items live in the flowchart changelog.
-> Last updated: 2026-03-23
+> Active items only. Completed items removed — see flowchart changelog for history.
+> Last updated: 2026-03-24
 
 ---
 
 ## 🔴 Vito — Action Required
 
-### 1. Reach out to Creekside Recovery Residences (Carter Pope)
-Warm intro, friend relationship — highest probability first client. Atlanta down 25% YoY. Message drafted.
+### 1. Reach out to Carter Pope (Creekside Recovery, Atlanta)
+Warm intro, friend relationship — highest probability first client. Atlanta down 25% YoY.
 
-### 2. DocuSign or HelloSign — free account
-Need for service agreement signing before first client. Free tier is fine to start.
-
-### 3. LLC filing — ArgusReach LLC
+### 2. LLC filing — ArgusReach LLC
 sunbiz.org — Florida — $125. Do before first client signs.
 
-### 4. Instantly.ai — upgrade to Growth ($47/mo) by March 23
-Free trial expires March 23. Don't wait — upgrade now.
+### 3. DocuSign or HelloSign — free account
+Service agreement signing. Free tier is fine. Required before first paid client.
+
+### 4. Instantly.ai — confirm Growth upgrade ($47/mo)
+Trial expired March 23. Confirm upgrade happened. Without Growth, warmup limits apply.
 
 ### 5. Apollo.io — upgrade to Basic ($49/mo) when first client signs
-Free tier (50 exports/mo) insufficient for client campaigns.
+Free tier (50 exports/mo) is insufficient for real campaigns.
 
-### 6. ✅ Stripe webhook — DONE (2026-03-17)
-### 7. ✅ Calendly webhook — DONE (2026-03-18)
+### 6. NeverBounce API key
+$0.003/email. Required for email validation in monthly_cycle.py (currently skipped without key).
+Get at: neverbounce.com → sign up → API key.
+
+### 7. Update Stripe payment links
+Current links work but `STRIPE_WEBHOOK_SECRET` not confirmed. Update metadata to include `client_id` per client when first client signs.
+
+### 8. Install DNS auto-poll systemd timer (one command)
+Run on server:
+```
+sudo bash -c 'cp /tmp/argusreach-dns-poll.service /etc/systemd/system/ && cp /tmp/argusreach-dns-poll.timer /etc/systemd/system/ && systemctl daemon-reload && systemctl enable --now argusreach-dns-poll.timer'
+```
+
+### 9. Delete duplicate Instantly campaign
+Campaign `25d4f3ab-6b82-43b0-ab6c-243ce1671de1` was created during testing when upload failed. Delete it manually in Instantly UI — only `7cd7c8d8-3663-4ced-add2-2e6be939750e` is the real one.
+
+### 10. Add ADMIN_PASSWORD to monitor/.env
+`ADMIN_PASSWORD=argusreach2026` — currently defaults in code, should be explicit in .env.
 
 ---
 
 ## 🔴 Pre-Launch Gates (Gob)
 
-### ✅ 8. Fix PT Tampa Bay sequence copy — DONE (2026-03-22)
-Old PT Tampa Bay test campaign is obsolete. Active test client (argusreach) sequence rewritten to clean generic B2B copy.
-
-### ✅ 9. Timers setup — DONE
-Healthcheck, dashboard, and Instantly sync timers all running via systemd.
-
-### ✅ 33. Service agreement template — DONE (2026-03-22)
-Draft at ops/templates/service-agreement.md — ready to upload to HelloSign. Covers 3-month initial term, early cancellation clause, all standard protections.
+### 11. Fix PT sequence copy in Instantly
+Test client (`argus_reach`) sequence is now correct generic B2B copy. But the old `pt_tampa_bay_test` campaign in Instantly still has wrong copy (references "mental health practices"). Delete or rewrite before reusing.
 
 ---
 
-## 🟡 High Value — Build After First Client Live
+## 🟡 High Value — Build When First Client Signs
 
-### 10. Campaign creation script (sequence.json → Instantly API)
-Fully automate campaign setup from a sequence.json file. Currently `campaign_create.py` handles leads + structure but sequence must be written manually in Instantly UI first.
+### 12. Ready-to-launch email button
+Send "subscription payment link + all gates green" email from portal when all 6 checklist items pass. Blocked on Vito updating Stripe links with per-client metadata. Route skeleton exists — needs wiring to portal button and Stripe per-client links.
 
-### 11. ✅ Calendly client-side limitation — SOLVED (2026-03-18)
-ArgusReach owns the Calendly account with per-client event types. Webhook live. Upgrade to Standard ($10/mo) when first client signs.
+### 13. All-gates-green notification
+When all 6 checklist items pass simultaneously, fire a Telegram alert: "Client X is ready to launch." Currently Vito must check manually.
 
-### 12. ArgusReach self-prospecting domain warm-up
-Set up outreach@mail.argusreach.com in Instantly. Start warmup when first client signs.
+### 14. Calendly event type setup (first client)
+ArgusReach owns one Calendly account. Create one event type per client (`calendly.com/argusreach/[client-id]`). Client connects their Google/Outlook calendar. Full setup checklist in MEMORY.md. Upgrade to Standard ($10/mo) when first client signs.
+
+### 15. Instantly open/click analytics
+`GET /api/v2/analytics/campaign/summary` returns 401 on current plan — likely a plan restriction. Revisit when on Growth. Scaffolding in `get_client_metrics()` ready to wire in when endpoint works.
+
+### 16. ArgusReach self-prospecting warmup
+Set up `outreach@mail.argusreach.com` in Instantly for our own prospecting. Start warmup when first client signs.
 
 ---
 
 ## 🟢 Scale Features (3+ Clients)
 
-### ✅ 32. Pre-load prospects into DB at campaign launch — DONE (2026-03-22)
-Both launch paths (monthly_cycle + campaign_create) now write every contact to the prospects table immediately after Instantly upload. stage='added' on insert; ON CONFLICT updates name/company if enriched later.
+### 17. Client-facing dashboard
+Per-client read-only view: campaign stats, reply breakdown, meetings booked. Internal portal exists — client version needs separate auth + filtered data.
 
+### 18. Clay.com — LinkedIn personalization
+$149/mo. Apollo → Clay enriches → Instantly loads. True 1:1 personalization. We have `{{custom_intro}}` from website enrichment as a $0 alternative covering ~60-70% of the value. Revisit at 2-3 clients.
 
+### 19. Monitor async processing (10+ clients)
+Currently single-threaded. At 10+ active clients, one cycle could take 3-5+ minutes. Fix: thread pool per client inbox. Trigger: 8 active clients.
 
-### Clay.com — LinkedIn activity personalization
-$149/mo. Enriches each prospect with LinkedIn activity, recent posts, company news, job changes.
-Enables true 1:1 personalization in sequences (e.g. "I saw your post about X last week").
-Currently we use name/company/title/city from Apollo — good but not 1:1.
-Clay sits between Apollo and Instantly: Apollo exports → Clay enriches → Instantly loads.
-**Trigger:** First paying client signed. This is a differentiator worth paying for early.
+### 20. PostgreSQL migration
+SQLite handles ~8 clients fine. Trigger: 8 active clients.
 
+### 21. Voice calling — Argus books meetings by phone
+Bland.ai / Vapi.ai — call positive replies within minutes. Trigger: 3+ clients.
 
-
-### 13. Client-facing dashboard
-Per-client read-only view: campaign stats, reply breakdown, meetings booked. Internal portal exists — client version needs auth + filtering.
-
-### 14. HubSpot CRM migration
-At 5+ clients, migrate from SQLite DB to HubSpot for CRM layer.
-
-### 15. Lead sourcing automation (Clay.com)
-$149/mo — replaces manual Apollo exports at 3+ simultaneous campaigns.
-
-### 16. Bitcoin payment acceptance
-BTCPay Server (self-hosted) — when payment infrastructure is being formalized.
-
-### 17. Voice calling — Argus books meetings by phone
-Bland.ai / Vapi.ai — call positive replies within minutes, book meeting on calendar. Build at 3+ clients.
-
----
-
-## 🟡 Backlog — Added 2026-03-16
-
-### 18. Monthly report auto-generate ✅ DONE
-Cron runs 1st of each month at 9am ET. Generates reports for all active clients, saves to reports/, alerts Vito to review before sending manually.
-
-### 19. Campaign completion notification
-When Instantly finishes all prospects in a campaign (status → completed), send Vito a Telegram alert to renew the lead list or close it out. No current hook.
-
-### 20. Welcome email to new client on onboarding ✅ DONE
-Auto-sends on intake approval. Covers next steps: intake form, IT email setup, sequence review, launch timeline.
-
-### 21. Service agreement / DocuSign
-No signed contract flow in the system. Client signs → record stored. Free tier HelloSign or DocuSign. Required before first paid client.
-
-### 22. Reports tab
-Admin portal Reports tab exists but empty — no reports have ever been generated. Populates automatically once `monthly_report.py` runs for the first time.
-
-### 23. Cross-client warm lead tracking ✅ DONE
-Global DNC now protects against re-contacting unsubscribes across all clients.
-
-### 24. Monitor health check timer ✅ DONE
-Healthcheck timer installed and running.
-
----
-
-## 🟢 Scale Features — Added 2026-03-17
-
-### 25. Monitor async processing (10+ clients)
-Currently single-threaded — processes client inboxes sequentially. At 10+ active clients with busy campaigns, one cycle could take 3-5+ minutes. Fix: run each client inbox check in a thread pool. Trigger: when we hit 8 active clients.
-
-### 26. PostgreSQL migration (10+ clients)
-SQLite handles concurrent reads/writes fine up to ~8 clients. Beyond that, lock contention will cause errors. Migration path: swap connection string in database.py, migrate schema + data with one-time script. Already designed for this — 2 hours of work when needed. Trigger: 8 active clients.
-
-### 27. Apollo paid API + automated lead sourcing script
-Upgrade to Apollo Basic ($49/mo) when first client signs. Build sourcing script that takes ICP parameters (title, geography, company size) and auto-exports a contact list directly into the campaign folder. Eliminates manual CSV exports entirely. Walk Vito through API key setup when ready.
-
-### 28. Admin portal — multi-campaign UI ✅ DONE
-client_detail.html now shows all campaigns in a table, Add Campaign form (collapsible), and Pause/Activate toggles per campaign. Legacy single-campaign clients display correctly.
-
-### 29. Reply from alternate email address — smarter matching
-Unknown senders currently escalated to Vito (good). Future improvement: fuzzy-match on name or domain against the prospect list to suggest likely matches. Reduces manual lookup burden at scale.
-
-### 30. processed_ids archive cleanup policy
-Archive file grows indefinitely (by design — never delete history). At 2+ years of operation, review and set a hard archive limit (e.g., keep 2 years). Not urgent — file is small, just document the policy.
-
----
-
-## 🟡 Design / Polish — Added 2026-03-18
-
-### 31. ✅ Update intake form to match argusreach.com style — DONE
-Intake form fully styled: dark bg, Inter + JetBrains Mono, green accent, animated canvas hero, pill checkboxes, auto-expand textareas. Matches argusreach.com exactly.
+### 22. Bitcoin payment acceptance
+BTCPay Server (self-hosted). When payment infrastructure is being formalized.
