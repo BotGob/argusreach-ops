@@ -2714,7 +2714,7 @@ def send_followup_email(client_id):
     <p style="font-size:15px;font-weight:700;margin:0 0 12px;"><strong>2. Your outreach sequence — please review</strong></p>
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;">These are the three emails we'll send on your behalf. Read through and reply with any edits — or just say "looks good" and we're ready.</p>
     {seq_html}
-    <p style="font-size:12px;color:#aaa;margin:4px 0 0;">Note: {{{{custom_intro}}}}, {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} are personalized per recipient at send time.</p>
+    <p style="font-size:12px;color:#aaa;margin:4px 0 0;">Each email is personalized with the recipient's name, company, and a custom opening line written specifically for their practice.</p>
   </div>
 
   <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:32px;">
