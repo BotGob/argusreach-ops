@@ -54,7 +54,7 @@
     ('intake',    '✅', 'Intake Approved',     True,      'Intake form received and approved.'),
     ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Client submits outreach email + app password via secure link.'),
     ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Instantly warming up the sending account (2–3 weeks).'),
-    ('followup',  '📨', 'Follow-up Email Sent',cl.get('followup_sent') or creds_ok, 'DNS records + sequence draft + Calendly link sent to client.'),
+    ('followup',  '📨', 'Follow-up Email Sent',cl.get('followup_sent'), 'DNS records + sequence draft + Calendly link sent to client.'),
     ('dns',       '🔒', 'DNS Verified',         dns_ok,    'SPF, DKIM, DMARC passing for the outreach domain.'),
     ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Client reviewed the sequence and gave the green light.'),
     ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Subscription Stripe payment confirmed.'),
