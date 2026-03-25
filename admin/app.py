@@ -2384,7 +2384,7 @@ def intake():
         # Handle file uploads (DNC file + existing contact list)
         intake_id = submission["id"]
         uploads_path = UPLOADS_DIR / intake_id
-        for field_name in ("dnc_file", "existing_list_file"):
+        for field_name in ("dnc_file",):
             uploaded = request.files.get(field_name)
             if uploaded and uploaded.filename:
                 uploads_path.mkdir(parents=True, exist_ok=True)
