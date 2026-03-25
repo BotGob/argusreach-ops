@@ -2348,6 +2348,8 @@ def intake():
             "contact_phone":        f.get("contact_phone","").strip(),
             "business_address":     f.get("business_address","").strip(),
             "website":              f.get("website","").strip(),
+            "sender_name":          f.get("sender_name","").strip(),
+            "sender_title":         f.get("sender_title","").strip(),
             "vertical":             (f.get("vertical_other","").strip() if f.get("vertical","").strip() == "Other" else f.get("vertical","").strip()),
             # What they do
             "business_description": f.get("business_description","").strip(),
@@ -2788,8 +2790,8 @@ def intake_approve(intake_id):
             "vertical":              intake["vertical"],
             "plan":                  plan,  # from approval form — Vito can override intake value
             "outreach_email":        "",   # set during credential submission — NEVER default to vito@argusreach.com
-            "sender_name":           f.get("sender_name","Vito Resciniti").strip(),
-            "title":                 f.get("title","Founder").strip(),
+            "sender_name":           f.get("sender_name", intake.get("sender_name","")).strip(),
+            "title":                 f.get("title", intake.get("sender_title","")).strip(),
             "client_email":          intake["contact_email"],
             "calendly_link":         intake.get("calendly_link","").strip(),
             "instantly_campaign_id": "",
@@ -2817,6 +2819,8 @@ def intake_approve(intake_id):
             "_outcomes":             intake.get("outcomes",""),
             "_voice_sample":         intake.get("voice_sample",""),
             "_business_description": intake.get("business_description",""),
+            "_sender_name":          intake.get("sender_name",""),
+            "_sender_title":         intake.get("sender_title",""),
             "_dnc_notes":            intake.get("dnc_notes",""),
             "_dnc_emails":           intake.get("dnc_emails",""),
             "_target_industry":      intake.get("target_industry",""),
@@ -2888,28 +2892,7 @@ def intake_approve(intake_id):
             except Exception as e:
                 app.logger.warning(f"DNC file processing failed for {client_id}: {e}")
 
-        # Store existing contact list (if uploaded) — saved for Vito to review before launch
-        existing_list_path = intake.get("_existing_list_file_path", "")
-        if existing_list_path and Path(existing_list_path).exists():
-            try:
-                import shutil
-                dest_dir = CAMPAIGNS_DIR / client_id
-                dest_dir.mkdir(parents=True, exist_ok=True)
-                dest = dest_dir / ("existing_contacts" + Path(existing_list_path).suffix)
-                shutil.copy2(existing_list_path, dest)
-                # Count rows for logging
-                with open(existing_list_path, "rb") as fh:
-                    class _FakeStorage2:
-                        filename = Path(existing_list_path).name
-                        def read(self): return fh.read()
-                    rows, err = parse_uploaded_file(_FakeStorage2())
-                row_count = len(rows) if not err else "?"
-                app.logger.info(f"Existing contact list saved for {client_id}: {row_count} rows → {dest}")
-                # Store path reference on client record
-                new_client["_existing_contacts_csv"] = str(dest)
-                save_clients(config)
-            except Exception as e:
-                app.logger.warning(f"Existing list processing failed for {client_id}: {e}")
+
 
         # Mark intake as approved
         for i in intakes:

@@ -279,6 +279,20 @@
         <input name="contact_phone" placeholder="(813) 555-0100">
       </div>
     </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Outreach emails should appear to be from <span class="req">*</span>
+          <span class="hint">The name prospects will see in their inbox. Usually the owner or lead clinician — whoever has the most credibility with your target audience.</span>
+        </label>
+        <input name="sender_name" required placeholder="Dr. Michael Smith">
+      </div>
+      <div class="field">
+        <label>Their title — as it should appear in the email signature <span class="req">*</span>
+          <span class="hint">How they'd sign off in a professional email. This flows directly into every outreach email we send.</span>
+        </label>
+        <input name="sender_title" required placeholder="Doctor of Physical Therapy, Owner">
+      </div>
+    </div>
 
     <!-- ── SECTION 3: WHAT YOU DO ────────────────────────────────────── -->
     <div class="section-header">What You Do</div>
@@ -476,19 +490,6 @@
 
     <!-- ── SECTION 7: ANYTHING ELSE ─────────────────────────────────── -->
     <div class="section-header">Anything Else</div>
-    <div class="field">
-      <label>Do you have an existing contact list you'd like us to prioritize? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Upload a CSV or Excel file with names, companies, and email addresses. We'll use these alongside (or instead of) our Apollo sourcing for your first campaign.</span>
-      </label>
-      <div class="upload-zone" id="list-zone" onclick="document.getElementById('existing_list_file').click()">
-        <input type="file" id="existing_list_file" name="existing_list_file" accept=".csv,.xlsx,.xls" style="display:none" onchange="showFileName(this,'list-zone')">
-        <div class="upload-icon">↑</div>
-        <div class="upload-label">Drag & drop or click to upload <span style="color:var(--sub);">(CSV or Excel)</span></div>
-        <div class="upload-sub" id="list-zone-name">No file selected</div>
-      </div>
-      <p style="font-size:0.78rem;color:var(--sub);margin-top:10px;">Don't have it ready? Email it to <a href="mailto:vito@argusreach.com" style="color:var(--sub);">vito@argusreach.com</a> any time before launch — we'll add it before your campaign starts.</p>
-    </div>
-
     <div class="field">
       <label>Anything else we should know before we start <span style="color:#666;font-size:0.75rem;">(optional)</span></label>
       <textarea name="notes" placeholder="Seasonal considerations, upcoming events, anything unique about your market or situation..."></textarea>
