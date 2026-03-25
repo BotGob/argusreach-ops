@@ -7,7 +7,7 @@
 
 Hi [First Name],
 
-Great talking with you today. Based on our conversation, I think there's a real opportunity to build a consistent referral pipeline for [Firm Name] - and I'd love to get started.
+Great talking with you today. Based on our conversation, I think there's a real opportunity to build a consistent pipeline of new client meetings for [Firm Name] - and I'd love to get started.
 
 Here are your three next steps:
 

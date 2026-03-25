@@ -110,3 +110,106 @@
   heartbeat_file.write_text(datetime.utcnow().isoformat())
 2026-03-25 17:44:18 Cycle complete. Next check in 10 min.
 
+2026-03-25 17:51:08 ArgusReach Monitor v2 starting
+2026-03-25 17:51:08 ArgusReach Monitor v2 started. Watching all active client inboxes, checking every 10 min.
+2026-03-25 17:51:08 No active clients. Waiting...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1767: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  run._last_sync = datetime.utcnow()
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1775: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  heartbeat_file.write_text(datetime.utcnow().isoformat())
+2026-03-25 17:51:11 Cycle complete. Next check in 10 min.
+
+2026-03-25 17:53:28 No active clients. Waiting...
+2026-03-25 17:53:30 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:01:11 No active clients. Waiting...
+2026-03-25 18:01:13 Daily digest: no replies processed today. Skipping notification.
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1762: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-25 18:01:13 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:03:30 No active clients. Waiting...
+2026-03-25 18:03:33 Daily digest: no replies processed today. Skipping notification.
+2026-03-25 18:03:33 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:11:13 No active clients. Waiting...
+2026-03-25 18:11:16 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:13:33 No active clients. Waiting...
+2026-03-25 18:13:35 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:21:16 No active clients. Waiting...
+2026-03-25 18:21:18 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:23:35 No active clients. Waiting...
+2026-03-25 18:23:37 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:31:18 No active clients. Waiting...
+2026-03-25 18:31:20 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:33:37 No active clients. Waiting...
+2026-03-25 18:33:40 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:41:20 No active clients. Waiting...
+2026-03-25 18:41:23 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:43:40 No active clients. Waiting...
+2026-03-25 18:43:42 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:51:23 No active clients. Waiting...
+2026-03-25 18:51:25 Cycle complete. Next check in 10 min.
+
+2026-03-25 18:53:42 No active clients. Waiting...
+2026-03-25 18:53:45 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:01:25 No active clients. Waiting...
+2026-03-25 19:01:28 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:03:45 No active clients. Waiting...
+2026-03-25 19:03:47 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:11:28 No active clients. Waiting...
+2026-03-25 19:11:30 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:13:47 No active clients. Waiting...
+2026-03-25 19:13:50 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:21:30 No active clients. Waiting...
+2026-03-25 19:21:32 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:23:50 No active clients. Waiting...
+2026-03-25 19:23:52 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:31:32 No active clients. Waiting...
+2026-03-25 19:31:35 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:33:52 No active clients. Waiting...
+2026-03-25 19:33:54 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:41:35 No active clients. Waiting...
+2026-03-25 19:41:37 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:43:54 No active clients. Waiting...
+2026-03-25 19:43:57 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:51:37 No active clients. Waiting...
+2026-03-25 19:51:40 Cycle complete. Next check in 10 min.
+
+2026-03-25 19:53:57 No active clients. Waiting...
+2026-03-25 19:53:59 Cycle complete. Next check in 10 min.
+
+2026-03-25 20:01:40 No active clients. Waiting...
+2026-03-25 20:01:42 Cycle complete. Next check in 10 min.
+
+2026-03-25 20:03:59 No active clients. Waiting...
+2026-03-25 20:04:02 Cycle complete. Next check in 10 min.
+
+2026-03-25 20:11:42 No active clients. Waiting...
+2026-03-25 20:11:44 Cycle complete. Next check in 10 min.
+
+2026-03-25 20:14:02 No active clients. Waiting...
+2026-03-25 20:14:04 Cycle complete. Next check in 10 min.
+
+2026-03-25 20:21:44 No active clients. Waiting...
+2026-03-25 20:21:45 Cycle complete. Next check in 10 min.
+

@@ -60,7 +60,7 @@ Client agrees to:
 - Set up a dedicated outreach email account (Google Workspace or Microsoft 365) and provide Provider with the email address and app password
 - Work with their IT contact to add DNS records (SPF, DKIM, DMARC) provided by Provider within 5 business days of receipt
 - Review and approve the outreach sequence within 5 business days of receiving the draft
-- Connect their calendar to the Calendly booking page set up by Provider
+- Connect their Google or Outlook calendar to the Calendly booking link provided by Provider
 - Promptly notify Provider of any prospect who should be added to the do-not-contact list
 - Confirm meeting bookings through the Provider's portal when requested
 
@@ -156,4 +156,4 @@ Date: ___________________________
 - *For HelloSign: upload this doc, set signature fields, send to client email from intake*
 - *LLC must be filed before you use this agreement in production — "Florida limited liability company" is the registered entity*
 - *Vito's title: use "Founder" until LLC is filed, then switch to "Managing Member" or "CEO"*
-- *[COUNTY]: Hillsborough if operating from Tampa*
+- *[COUNTY]: Pinellas (St. Petersburg address)*
