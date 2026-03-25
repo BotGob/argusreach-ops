@@ -14,7 +14,8 @@
 {% set cal_ok       = cl.get('calendar_connected') %}
 {% set icp_ok       = cl.get('icp_reviewed') %}
 {% set campaign_ok  = client.get('instantly_campaign_id') %}
-{% set all_gates    = icp_ok and dns_ok and warmup_ok and seq_ok and payment_ok and cal_ok %}
+{% set pre_payment_gates = icp_ok and dns_ok and warmup_ok and seq_ok and cal_ok %}
+{% set all_gates    = pre_payment_gates and payment_ok %}
 
 {# ── HEADER ──────────────────────────────────────────────────────── #}
 <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
@@ -134,7 +135,7 @@
       <button class="btn btn-ghost btn-sm">💳 {% if client.get('stripe_payment_link') %}View{% else %}Generate{% endif %} Payment Link</button>
     </form>
   {% endif %}
-  {% if all_gates and client.get('stripe_payment_link') %}
+  {% if pre_payment_gates and client.get('stripe_payment_link') %}
     {% if client.get('launch_email_sent_at') %}
       <span style="font-size:12px;color:#64748b;padding:6px 12px;border-radius:6px;background:#1e293b;border:1px solid #334155;white-space:nowrap">
         📧 Launch email sent {{ client.get('launch_email_sent_at') }}
