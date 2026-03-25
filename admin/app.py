@@ -2614,7 +2614,7 @@ def send_followup_email(client_id):
     firm      = client.get("firm_name", "")
     contact   = client.get("_contact_name") or firm
     first     = contact.split()[0] if contact else "there"
-    calendly  = client.get("calendly_link") or f"https://calendly.com/argusreach/{client_id}"
+    calendly  = client.get("calendly_link", "").strip()
     sequence  = client.get("sequence", [])
     checklist = client.get("checklist", {})
     override  = request.form.get("override") == "1"
@@ -2625,6 +2625,10 @@ def send_followup_email(client_id):
 
     if not client.get("outreach_email"):
         flash("No outreach email on file — client must submit credentials first.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    if not calendly:
+        flash("❌ No Calendly link set — add it in client settings before sending the follow-up email.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     # DNS warning check

@@ -84,7 +84,7 @@
         "warmup_complete": true,
         "payment_confirmed": true,
         "sequence_approved": false,
-        "calendar_connected": true
+        "calendar_connected": false
       },
       "_setup_token": "Zd-JW_GkDAL7MK7fDqKDkNsXk1xTQ5mnYgd3dIYC4Qs",
       "_setup_token_expires": "2026-04-01T22:57:35.601260",
