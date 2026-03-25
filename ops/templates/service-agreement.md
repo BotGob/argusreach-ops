@@ -154,6 +154,6 @@ Date: ___________________________
 - *Fill in [DATE], [CLIENT FIRM NAME], [CLIENT ADDRESS], [COUNTY]*
 - *The setup fee Stripe link is: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01*
 - *For HelloSign: upload this doc, set signature fields, send to client email from intake*
-- *LLC must be filed before you use this agreement in production — "Florida limited liability company" is the registered entity*
-- *Vito's title: "Founder & CEO"*
+- *LLC filed 2026-03-25 — entity name: ArgusReach LLC, Pinellas County, FL. Agreement is ready to use.*
+- *Vito's title: "Founder & CEO" — LLC filed 2026-03-25, entity: ArgusReach LLC, Pinellas County, FL*
 - *[COUNTY]: Pinellas (St. Petersburg address)*
