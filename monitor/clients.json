@@ -13,7 +13,7 @@
       "sender_name": "Vito Resciniti",
       "title": "Founder",
       "client_email": "vresciniti27@gmail.com",
-      "calendly_link": "",
+      "calendly_link": "https://calendly.com/vito-argusreach/30min",
       "instantly_campaign_id": "",
       "campaign_name": "",
       "contacts_per_month": 200,
@@ -98,7 +98,9 @@
         "warmup_score": null,
         "warmup_pass": false
       },
-      "_credentials_received_at": "2026-03-25 07:12 PM ET"
+      "_credentials_received_at": "2026-03-25 07:12 PM ET",
+      "followup_sent": true,
+      "calendly_event_slug": ""
     }
   ]
 }

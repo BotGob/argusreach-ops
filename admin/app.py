@@ -2749,6 +2749,13 @@ def send_followup_email(client_id):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
             smtp.login("vito@argusreach.com", app_password)
             smtp.send_message(msg)
+        # Mark follow-up as sent on client record
+        config2 = load_clients()
+        for c in config2["clients"]:
+            if c.get("id") == client_id:
+                c["followup_sent"] = True
+                break
+        save_clients(config2)
         _notify_telegram(f"📨 Follow-up email sent to *{to_email}* for *{firm}*\n{'⚠️ DNS not verified — records in email for client to add' if not dns_ok else '✅ DNS verified'}")
         flash(f"Follow-up email sent to {to_email}.", "success")
     except Exception as e:
