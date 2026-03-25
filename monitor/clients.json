@@ -82,9 +82,9 @@
         "icp_reviewed": true,
         "dns_verified": true,
         "warmup_complete": true,
-        "payment_confirmed": true,
+        "payment_confirmed": false,
         "sequence_approved": false,
-        "calendar_connected": false
+        "calendar_connected": true
       },
       "_setup_token": "Zd-JW_GkDAL7MK7fDqKDkNsXk1xTQ5mnYgd3dIYC4Qs",
       "_setup_token_expires": "2026-04-01T22:57:35.601260",
