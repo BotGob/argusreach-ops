@@ -311,18 +311,7 @@ def _send_welcome_email(client: dict, setup_url: str = ""):
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0;">We can't move forward to this step until step 1 is complete. Once we have your outreach email address, we'll send you the exact DNS records to add to your domain (SPF, DKIM, DMARC) - this is what ensures your emails land in inboxes, not spam. Your IT person or whoever manages your domain can handle it in about 10 minutes.</p>
   </div>
 
-  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
-    <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>3. Do-not-contact list</strong></p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">If there are specific people or companies you never want us to contact - existing clients, partners, competitors - reply with that list and we'll make sure they're excluded before a single email goes out.</p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0;">Best way to send it: include the email domain for each company (e.g. smithlaw.com). That blocks every person at that company, not just the ones you know by name. Individual email addresses work too - a spreadsheet or CRM export is fine.</p>
-  </div>
-
-  <div style="border-left:3px solid #e5e5e5;padding-left:16px;margin-bottom:32px;">
-    <p style="font-size:15px;font-weight:700;margin:0 0 8px;color:#888;"><strong>4. Warm leads (optional)</strong></p>
-    <p style="font-size:14px;line-height:1.7;color:#888;margin:0;">If there are people you already have a relationship with - or anyone you'd like us to prioritize - send those over and we'll move them to the front of the list.</p>
-  </div>
-
-  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Reply to this email with any of the above and we'll take it from there. We'll be back in touch shortly with your sequence draft, DNS records, and booking link.</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Once step 1 is complete, reply to this email and we'll take it from there. We'll be back in touch shortly with your sequence draft, DNS records, and booking link.</p>
 
   <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
     <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
