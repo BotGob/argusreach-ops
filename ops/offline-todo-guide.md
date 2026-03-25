@@ -1,6 +1,6 @@
 # Offline To-Do Guide
 *Historical reference — initial setup guide written before ArgusReach infrastructure was live.*
-*As of 2026-03-14: Apollo ✅, Airtable ✅, Anthropic API ✅, Instantly ✅ are all done. DocuSign and LLC filing still pending.*
+*As of 2026-03-14: Apollo ✅, Airtable ✅, Anthropic API ✅, Instantly ✅ are all done. HelloSign and LLC filing still pending.*
 
 ---
 
@@ -49,7 +49,7 @@
 
 ---
 
-## 4. DocuSign or HelloSign — Free Account
+## 4. HelloSign — Free Account
 **Why:** When a client agrees to work with us, they need to sign a service agreement. This lets you send a digital contract they can sign on their phone or computer. Professional and legally binding.
 
 **Which one:** Either works. HelloSign (now called **Dropbox Sign**) has a slightly more generous free tier.
@@ -61,8 +61,8 @@
 4. Free plan gives you **3 signature requests/month** — fine until you have paying clients
 5. You don't need to set anything up now. When you have a client ready to sign, I'll walk you through it step by step.
 
-**Alternative (DocuSign):**
-1. Go to **docusign.com**
+**Alternative (HelloSign):**
+1. Go to **hellosign.com**
 2. Click "Start free trial"
 3. Sign up with vito@argusreach.com
 4. Same idea — you won't use it until you have a client

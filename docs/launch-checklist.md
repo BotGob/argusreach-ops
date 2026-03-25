@@ -24,7 +24,7 @@ Everything needed to go from zero to first paying client.
 - [ ] Set up main sending domain: `outreach.argusreach.com` (warm-up for Vito's own prospecting)
 
 ### Legal (optional but recommended)
-- [ ] Create simple service agreement (DocuSign or HelloSign free tier)
+- [ ] Create simple service agreement (HelloSign free tier)
   - Scope of work, pricing, 3-month minimum, data handling, termination clause
   - Can use a template from LegalZoom or Bonsai
 

@@ -126,7 +126,7 @@ def main():
         spf_pass   = dns["spf"]
         dkim_pass  = dns["dkim"]
         dmarc_pass = dns["dmarc"]
-        all_pass   = spf_pass and dmarc_pass  # DKIM optional if not yet generated
+        all_pass   = spf_pass and dkim_pass and dmarc_pass  # all 3 required
 
         print(f"    SPF={spf_pass} DKIM={dkim_pass} DMARC={dmarc_pass}")
 
@@ -144,6 +144,22 @@ def main():
                     f"→ DNS gate auto-checked in portal"
                 )
                 print(f"    ✅ DNS gate auto-checked for {firm}")
+
+                # Check if all 6 gates are now green — fire ready-to-launch alert if so
+                _GATES = ("icp_reviewed", "dns_verified", "warmup_complete",
+                          "payment_confirmed", "sequence_approved", "calendar_connected")
+                checklist = c2.get("checklist", {})
+                if all(checklist.get(g) for g in _GATES):
+                    if not c2.get("launch_ready_alerted"):
+                        c2["onboarding_status"] = "ready_to_launch"
+                        c2["launch_ready_alerted"] = True
+                        notify(
+                            f"🚀 *{firm}* is ready to launch!\n\n"
+                            f"All 6 gates are green (DNS just cleared). "
+                            f"Head to the portal to send the ready-to-launch email.\n"
+                            f"https://admin.argusreach.com/clients/{c2['id']}"
+                        )
+                        print(f"    🚀 All gates green — ready-to-launch alert sent for {firm}")
         elif not all_pass:
             print(f"    ⏳ Not yet passing for {firm} (SPF={spf_pass}, DMARC={dmarc_pass})")
         else:

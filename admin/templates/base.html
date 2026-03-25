@@ -190,6 +190,7 @@ details > summary::-webkit-details-marker { display: none; }
   <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
   <a href="{{ url_for('flowchart') }}"   class="{{ 'active' if request.endpoint == 'flowchart' }}">Flowchart</a>
   <a href="{{ url_for('backlog') }}"     class="{{ 'active' if request.endpoint == 'backlog' }}">Backlog</a>
+  <a href="{{ url_for('system_status') }}" class="{{ 'active' if request.endpoint == 'system_status' }}">System</a>
   <div class="nav-right">
     <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">ADMIN</span>
     <a href="{{ url_for('logout') }}" style="color:var(--muted);font-size:12px">Logout</a>
@@ -198,7 +199,33 @@ details > summary::-webkit-details-marker { display: none; }
 <div class="container">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for cat, msg in messages %}
-      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% if cat == 'report' and msg.startswith('report_ready:') %}
+        {% set rfile = msg[13:] %}
+        {% set rcid  = rfile.split('_')[0] %}
+        <div style="background:#052e16;border:1px solid #4ade80;border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.2rem">📊</span>
+            <div>
+              <div style="font-weight:700;color:#4ade80;font-size:14px">Report draft ready</div>
+              <div style="font-size:12px;color:#86efac;margin-top:1px">Review before sending to client</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <a href="/reports/{{ rfile }}" target="_blank"
+               style="background:#1e293b;color:#e2e8f0;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;text-decoration:none;border:1px solid #334155">
+              👁 View Draft
+            </a>
+            <form method="POST" action="/reports/{{ rfile }}/send"
+                  onsubmit="return confirm('Send this report to the client now?')" style="margin:0">
+              <button style="background:#4ade80;color:#000;font-size:13px;font-weight:700;padding:8px 16px;border-radius:6px;border:none;cursor:pointer">
+                📤 Send to Client
+              </button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endif %}
     {% endfor %}
   {% endwith %}
   {% block content %}{% endblock %}

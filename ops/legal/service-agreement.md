@@ -2,7 +2,7 @@
 
 **Effective Date:** [DATE]
 **Client:** [CLIENT COMPANY NAME] ("Client")
-**Provider:** ArgusReach LLC ("ArgusReach")
+**Provider:** ArgusReach ("ArgusReach") *(LLC formation pending — agreement will be updated to ArgusReach LLC upon filing)*
 
 ---
 
@@ -70,9 +70,9 @@ Fees are outlined in Exhibit A.
 
 ## 6. Term and Cancellation
 
-This agreement begins on the Effective Date and continues on a month-to-month basis.
+This agreement has an **initial term of three (3) months** from the Effective Date ("Initial Term"). After the Initial Term, the agreement continues on a month-to-month basis.
 
-Either party may cancel with **30 days written notice**. Notice may be sent by email to the addresses on file.
+Either party may cancel with **30 days written notice** after the Initial Term has been completed. Notice may be sent by email to the addresses on file. Cancellation during the Initial Term is not permitted except in cases of material breach by ArgusReach.
 
 Upon cancellation:
 - ArgusReach will pause all active campaigns and cease outreach
@@ -118,7 +118,7 @@ This agreement, including Exhibit A, constitutes the entire agreement between th
 
 ## Signatures
 
-**ArgusReach LLC**
+**ArgusReach**
 
 Signature: ______________________________
 Name: Vito Resciniti
@@ -141,8 +141,7 @@ Date: ______________________________
 |---|---|---|---|
 | Setup Fee | $500 | $500 | $500 |
 | Monthly Retainer | $750 | $1,500 | $2,500 |
-| Prospects/Month | 200 | 400 | 750 |
-| Campaigns | 1 | Up to 2 | Up to 3 |
+| Prospects/Month | 200 | 500 | 1,000 |
 | Reply Management | ✓ | ✓ | ✓ |
 | Monthly Report | ✓ | ✓ | ✓ |
 | Admin Portal Access | ✓ | ✓ | ✓ |

@@ -72,7 +72,7 @@ Payment: Setup fee due upon signing. Monthly retainer due on the 1st of each act
 
 ## What Happens Next
 
-1. **Sign & Pay Setup Fee** — DocuSign agreement + invoice
+1. **Sign & Pay Setup Fee** — HelloSign agreement + invoice
 2. **Onboarding Call** (45 min) — ICP deep-dive, sequence brief, calendar access
 3. **We Build** — list, sequences, deliverability infra (3–5 business days)
 4. **You Approve** — review and approve the email sequences before launch; request any changes

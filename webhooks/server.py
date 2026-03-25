@@ -136,6 +136,20 @@ def stripe_webhook():
         )
         print(f"✅ Checkout payment logged: {plan} {amount_fmt} from {customer_email}")
 
+        # Auto-set payment_confirmed gate and check all gates
+        if client_id:
+            try:
+                clients = _load_clients()
+                for c in clients:
+                    if c.get("id") == client_id:
+                        c.setdefault("checklist", {})["payment_confirmed"] = True
+                        _save_clients(clients)
+                        print(f"✅ payment_confirmed gate set for {client_id}")
+                        _check_all_gates_webhook(client_id, clients)
+                        break
+            except Exception as _ge:
+                print(f"payment gate update failed (non-fatal): {_ge}")
+
     # ── Recurring monthly charge (subscription renewal) ──
     elif event_type == "invoice.paid":
         invoice        = event["data"]["object"]
@@ -170,6 +184,20 @@ def stripe_webhook():
         )
         print(f"✅ Renewal logged: {plan} {amount_fmt} from {customer_email}")
 
+        # Auto-set payment_confirmed gate and check all gates
+        if client_id:
+            try:
+                clients = _load_clients()
+                for c in clients:
+                    if c.get("id") == client_id:
+                        c.setdefault("checklist", {})["payment_confirmed"] = True
+                        _save_clients(clients)
+                        print(f"✅ payment_confirmed gate set for {client_id}")
+                        _check_all_gates_webhook(client_id, clients)
+                        break
+            except Exception as _ge:
+                print(f"payment gate update failed (non-fatal): {_ge}")
+
     # ── Payment failed — alert Vito + auto-pause campaign after 2nd failed attempt ──
     elif event_type == "invoice.payment_failed":
         invoice        = event["data"]["object"]
@@ -184,12 +212,19 @@ def stripe_webhook():
             try:
                 clients = _load_clients()
                 for c in clients:
-                    if c.get("client_email", "").lower() == customer_email.lower() or \
-                       c.get("outreach_email", "").lower() == customer_email.lower():
+                    # Match ONLY by client_email (the billing contact) — never by outreach_email
+                    # (outreach_email is our Gmail account, not the client's billing address)
+                    if c.get("client_email", "").lower() == customer_email.lower():
                         c["active"] = False
                         paused_firm = c.get("firm_name", c["id"])
-                        data = {"clients": clients}
-                        CLIENTS_FILE.write_text(json.dumps(data, indent=2))
+                        _save_clients(clients)
+                        # Mirror to DB so clients table stays in sync
+                        try:
+                            sys.path.insert(0, str(BASE_DIR))
+                            from argusreach.db.database import sync_client_from_config
+                            sync_client_from_config(c)
+                        except Exception as _dbe:
+                            print(f"DB sync after auto-pause failed (non-fatal): {_dbe}")
                         print(f"⛔ Auto-paused {paused_firm} — payment failed attempt {attempt}")
                         break
             except Exception as e:
@@ -229,12 +264,45 @@ def stripe_webhook():
 CLIENTS_FILE = BASE_DIR / "monitor" / "clients.json"
 CALENDLY_WEBHOOK_SIGNING_KEY = os.environ.get("CALENDLY_WEBHOOK_SIGNING_KEY", "")
 
+_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "payment_confirmed",
+          "sequence_approved", "calendar_connected")
+
 
 def _load_clients():
     try:
         return json.loads(CLIENTS_FILE.read_text()).get("clients", [])
     except Exception:
         return []
+
+
+def _save_clients(clients: list):
+    CLIENTS_FILE.write_text(json.dumps({"clients": clients}, indent=2))
+
+
+def _check_all_gates_webhook(client_id: str, clients: list):
+    """Check all 6 pre-launch gates for client_id. Fire Telegram alert if all green (once)."""
+    client = next((c for c in clients if c.get("id") == client_id), None)
+    if not client:
+        return
+    checklist = client.get("checklist", {})
+    all_green = all(checklist.get(g) for g in _GATES)
+    if all_green:
+        client["onboarding_status"] = "ready_to_launch"
+        if not client.get("launch_ready_alerted"):
+            firm = client.get("firm_name", client_id)
+            telegram_notify(
+                f"🚀 {firm} is ready to launch!\n\n"
+                f"All 6 gates are green. Head to the portal to send the ready-to-launch email.\n"
+                f"https://admin.argusreach.com/clients/{client_id}"
+            )
+            client["launch_ready_alerted"] = True
+            print(f"✅ All-gates Telegram alert fired for {client_id}")
+        _save_clients(clients)
+    elif not all_green and client.get("launch_ready_alerted") is not False:
+        if not client.get("active") and client.get("onboarding_status") == "ready_to_launch":
+            client["onboarding_status"] = "warming_up"
+        client["launch_ready_alerted"] = False
+        _save_clients(clients)
 
 
 def _identify_client_from_calendly(event_type_name: str, event_type_slug: str, invitee_email: str):
@@ -406,21 +474,38 @@ def calendly_webhook():
         print(f"✅ Meeting booked: {invitee_email} @ {start_time} → client: {client_id}")
 
     elif event_kind == "invitee.canceled":
-        conn = get_db()
-        conn.execute(
-            "UPDATE meetings SET status='cancelled' WHERE prospect_email=? AND status='confirmed'",
-            (invitee_email,)
+        # Identify client first so we don't cancel meetings across clients
+        cancel_client_id, _ = _identify_client_from_calendly(
+            event_type_name, event_type_slug, invitee_email
         )
+        conn = get_db()
+        if cancel_client_id:
+            conn.execute(
+                "UPDATE meetings SET status='cancelled' WHERE prospect_email=? AND client_id=? AND status='confirmed'",
+                (invitee_email, cancel_client_id)
+            )
+        else:
+            conn.execute(
+                "UPDATE meetings SET status='cancelled' WHERE prospect_email=? AND status='confirmed'",
+                (invitee_email,)
+            )
         conn.commit()
 
-        # Update prospect stage back
-        prospect_row = conn.execute(
-            "SELECT id, client_id FROM prospects WHERE email=? LIMIT 1",
-            (invitee_email,)
-        ).fetchone()
+        # Update prospect stage back — filter by client_id when available
+        if cancel_client_id:
+            prospect_row = conn.execute(
+                "SELECT id FROM prospects WHERE email=? AND client_id=? LIMIT 1",
+                (invitee_email, cancel_client_id)
+            ).fetchone()
+        else:
+            prospect_row = conn.execute(
+                "SELECT id, client_id FROM prospects WHERE email=? LIMIT 1",
+                (invitee_email,)
+            ).fetchone()
+
         if prospect_row:
             update_prospect_stage(prospect_row["id"], "replied_by_us")
-            log_event(prospect_row["client_id"], prospect_row["id"], "meeting_cancelled", {
+            log_event(cancel_client_id or prospect_row.get("client_id", ""), prospect_row["id"], "meeting_cancelled", {
                 "source": "calendly"
             })
         conn.close()

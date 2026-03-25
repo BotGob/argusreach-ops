@@ -448,7 +448,11 @@ def _send_status_to_telegram():
         lines.append(f"Campaign: {campaign}")
         lines.append(f"Launch: {launch} · {len(history)} month{'s' if len(history) != 1 else ''} active")
         if last:
-            lines.append(f"Last month: {last['contacts']} contacts · {last['positive']} positive · {last['meetings']} meetings")
+            # Support both old field names (contacts/positive) and new (prospects/reply_interested)
+            lcontacts  = last.get('prospects', last.get('contacts', '—'))
+            lpositive  = last.get('reply_interested', last.get('positive', '—'))
+            lmeetings  = last.get('meetings', '—')
+            lines.append(f"Last month: {lcontacts} contacts · {lpositive} interested · {lmeetings} meetings")
         if pending_n:
             lines.append(f"⚠️ {pending_n} pending approval{'s' if pending_n != 1 else ''}")
 
@@ -896,6 +900,9 @@ def process_client(client, processed_ids):
             )
             msg_ids = msg_ids[:MAX_PER_CLIENT]
 
+        # Load prospect list ONCE per client — not per message (avoids Instantly API hammering)
+        prospect_emails, email_to_campaign = load_prospect_emails(client)
+
         for msg_id in msg_ids:
             _, data = mail.fetch(msg_id, '(RFC822)')
             raw_email = data[0][1]
@@ -948,8 +955,7 @@ def process_client(client, processed_ids):
                 continue
 
             # Filter: prospect list — ONLY process emails from known prospects
-            # Pulls from local CSV + Instantly API leads. Filter is ALWAYS enforced.
-            prospect_emails, email_to_campaign = load_prospect_emails(client)
+            # (loaded once before this loop — see above)
             if from_email.lower() not in prospect_emails:
                 decoded_subject = subject.strip()
                 is_reply_subject = decoded_subject.lower().startswith('re:')
@@ -1148,22 +1154,6 @@ def process_client(client, processed_ids):
             log_reply(cid, from_email, classification, draft, sent,
                       result.get('notify_reason', ''))
 
-            # ── DATABASE: log send/queue outcome
-            if _DB_ENABLED:
-                try:
-                    _pid2 = _prospect_id(cid, from_email)
-                    if sent:
-                        _log_event(cid, _pid2, 'reply_sent', {'to': from_email, 'subject': subject})
-                        _update_stage(_pid2, 'replied_by_us')
-                    elif approval_id:
-                        _log_event(cid, _pid2, 'draft_queued', {
-                            'classification': classification,
-                            'confidence': result.get('confidence'),
-                            'approval_id': approval_id
-                        })
-                except Exception as _e:
-                    log(f"[DB] outcome log failed: {_e}")
-
             # ── CLIENT BOOKING ALERT: for positive replies, notify client to watch their calendar
             client_email = client.get('client_email', '')
             if classification == 'positive' and sent and client_email and not TEST_MODE:
@@ -1203,7 +1193,11 @@ def process_client(client, processed_ids):
                         'subject': subject
                     })
                     if approval_id:
-                        log_event(cid, _pid, 'draft_queued', {'classification': classification})
+                        log_event(cid, _pid, 'draft_queued', {
+                            'classification': classification,
+                            'confidence': result.get('confidence'),
+                            'approval_id': approval_id,
+                        })
                     if sent:
                         log_event(cid, _pid, 'reply_sent', {'to': from_email})
                         update_prospect_stage(_pid, 'replied_by_us')

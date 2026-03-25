@@ -13,7 +13,7 @@ Warm intro, friend relationship — highest probability first client. Atlanta do
 ### 2. LLC filing — ArgusReach LLC
 sunbiz.org — Florida — $125. Do before first client signs.
 
-### 3. DocuSign or HelloSign — free account
+### 3. HelloSign — free account
 Service agreement signing. Free tier is fine. Required before first paid client.
 
 ### 4. Instantly.ai — confirm Growth upgrade ($47/mo)
@@ -22,24 +22,19 @@ Trial expired March 23. Confirm upgrade happened. Without Growth, warmup limits 
 ### 5. Apollo.io — upgrade to Basic ($49/mo) when first client signs
 Free tier (50 exports/mo) is insufficient for real campaigns.
 
-### 6. NeverBounce API key
-$0.003/email. Required for email validation in monthly_cycle.py (currently skipped without key).
-Get at: neverbounce.com → sign up → API key.
+### 6. ~~NeverBounce API key~~ ✅ DONE (2026-03-24)
+Key live, pay-as-you-go, $0.003/email. In monitor/.env as NEVERBOUNCE_API_KEY.
 
-### 7. Update Stripe payment links
-Current links work but `STRIPE_WEBHOOK_SECRET` not confirmed. Update metadata to include `client_id` per client when first client signs.
+### 7. ~~Update Stripe payment links~~ ✅ DONE (2026-03-24)
+Per-client links auto-generated at intake approval with `client_id` in metadata. Price IDs in `.env`. Webhook confirmed. Revenue tracked per client in DB.
 
-### 8. Install DNS auto-poll systemd timer (one command)
-Run on server:
-```
-sudo bash -c 'cp /tmp/argusreach-dns-poll.service /etc/systemd/system/ && cp /tmp/argusreach-dns-poll.timer /etc/systemd/system/ && systemctl daemon-reload && systemctl enable --now argusreach-dns-poll.timer'
-```
+### 8. ~~Install DNS auto-poll systemd timer~~ ✅ DONE (2026-03-24)
+Timer live, enabled, runs every 4h. Auto-checks SPF/DKIM/DMARC, flips gate, fires Telegram alert.
 
-### 9. Delete duplicate Instantly campaign
-Campaign `25d4f3ab-6b82-43b0-ab6c-243ce1671de1` was created during testing when upload failed. Delete it manually in Instantly UI — only `7cd7c8d8-3663-4ced-add2-2e6be939750e` is the real one.
+### 9. ~~Delete duplicate Instantly campaign~~ ✅ DONE (2026-03-24)
+Campaign `25d4f3ab` deleted. Only `7cd7c8d8` remains.
 
-### 10. Add ADMIN_PASSWORD to monitor/.env
-`ADMIN_PASSWORD=argusreach2026` — currently defaults in code, should be explicit in .env.
+### 10. ~~Add ADMIN_PASSWORD to monitor/.env~~ ✅ DONE (2026-03-24)
 
 ---
 
@@ -52,11 +47,11 @@ Test client (`argus_reach`) sequence is now correct generic B2B copy. But the ol
 
 ## 🟡 High Value — Build When First Client Signs
 
-### 12. Ready-to-launch email button
-Send "subscription payment link + all gates green" email from portal when all 6 checklist items pass. Blocked on Vito updating Stripe links with per-client metadata. Route skeleton exists — needs wiring to portal button and Stripe per-client links.
+### 12. ~~Ready-to-launch email button~~ ✅ DONE (2026-03-24)
+Button live on client profile (only shows when all 6 gates green). Uses per-client Stripe link. Sends full template with plan name + price. Timestamps on send to prevent double-send.
 
-### 13. All-gates-green notification
-When all 6 checklist items pass simultaneously, fire a Telegram alert: "Client X is ready to launch." Currently Vito must check manually.
+### 13. ~~All-gates-green notification~~ ✅ DONE (2026-03-24)
+Telegram alert fires the moment all 6 gates flip green. `onboarding_status` auto-advances to `ready_to_launch`. Resets and re-alerts if a gate drops.
 
 ### 14. Calendly event type setup (first client)
 ArgusReach owns one Calendly account. Create one event type per client (`calendly.com/argusreach/[client-id]`). Client connects their Google/Outlook calendar. Full setup checklist in MEMORY.md. Upgrade to Standard ($10/mo) when first client signs.

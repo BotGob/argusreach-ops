@@ -153,5 +153,5 @@ Report includes: contacts reached, positive replies, not-now, meetings booked, u
 - [ ] Final performance report delivered
 - [ ] All prospect data returned to client or deleted per their preference
 - [ ] Sending domain decommissioned or transferred
-- [ ] DocuSign termination agreement executed
+- [ ] HelloSign termination agreement executed
 - [ ] Case study offer made (anonymous, with client permission)

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}System Status — ArgusReach{% endblock %}
+{% block content %}
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1 style="margin:0">System Status</h1>
+    <p style="color:var(--muted);font-size:12px;margin:4px 0 0">Live connection checks — {{ generated }}</p>
+  </div>
+  <a href="{{ url_for('system_status') }}" style="font-size:12px;background:#1e293b;color:#94a3b8;padding:6px 14px;border-radius:6px;border:1px solid #334155;text-decoration:none">🔄 Refresh</a>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+  {% for svc in services %}
+  <div style="background:var(--bg2);border:1px solid {% if svc.status == 'ok' %}rgba(74,222,128,0.2){% elif svc.status == 'warn' %}rgba(251,191,36,0.2){% else %}rgba(248,113,113,0.2){% endif %};border-radius:10px;padding:18px 20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <span style="font-weight:600;font-size:14px">{{ svc.name }}</span>
+      {% if svc.status == 'ok' %}
+        <span style="background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">✅ Connected</span>
+      {% elif svc.status == 'warn' %}
+        <span style="background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">⚠️ Warning</span>
+      {% else %}
+        <span style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.3);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600">❌ Error</span>
+      {% endif %}
+    </div>
+    <p style="color:var(--muted);font-size:12px;margin:0;line-height:1.6">{{ svc.detail }}</p>
+    {% if svc.note %}
+    <p style="color:#64748b;font-size:11px;margin:6px 0 0;font-style:italic">{{ svc.note }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

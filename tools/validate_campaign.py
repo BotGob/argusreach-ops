@@ -27,7 +27,11 @@ HEADERS = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/js
 # Instantly uses camelCase payload keys for substitution
 # CORRECT: {{firstName}}, {{lastName}}, {{companyName}}
 # WRONG (will NOT substitute): {{first_name}}, {{last_name}}, {{company}}, {{company_name}}
-VALID_VARS = ["{{firstName}}", "{{lastName}}", "{{companyName}}", "{{email}}", "{{website}}", "{{personalization}}"]
+VALID_VARS = [
+    "{{firstName}}", "{{lastName}}", "{{companyName}}", "{{email}}", "{{website}}", "{{personalization}}",
+    # ArgusReach custom variables (loaded via custom_variables field on each lead)
+    "{{custom_intro}}", "{{city}}", "{{state}}", "{{title}}",
+]
 INVALID_VARS = ["{{first_name}}", "{{last_name}}", "{{company_name}}", "{{company}}"]  # these will NOT substitute!
 
 def api_get(path):

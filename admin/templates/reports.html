@@ -1,26 +1,47 @@
 {% extends "base.html" %}
 {% block title %}Reports — ArgusReach Admin{% endblock %}
 {% block content %}
-<h1>Monthly Reports</h1>
-<p class="subtitle">All generated client reports. Click to view.</p>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1 style="margin:0">Monthly Reports</h1>
+    <p class="subtitle" style="margin:4px 0 0">Review drafts here before sending to clients. Sends from vito@argusreach.com to the client's main email.</p>
+  </div>
+</div>
 
 {% if files %}
 <table>
-  <thead><tr><th>File</th><th>Date</th><th>Size</th><th></th></tr></thead>
+  <thead>
+    <tr>
+      <th>Client</th>
+      <th>File</th>
+      <th>Generated</th>
+      <th></th>
+    </tr>
+  </thead>
   <tbody>
   {% for f in files %}
   <tr>
-    <td>{{ f.name }}</td>
+    <td style="font-weight:600">{{ f.firm_name }}</td>
+    <td style="color:#64748b;font-size:12px">{{ f.name }}</td>
     <td style="color:#64748b;font-size:12px">{{ f.modified }}</td>
-    <td style="color:#64748b;font-size:12px">{{ (f.size / 1024)|round(1) }} KB</td>
-    <td><a href="{{ url_for('view_report', filename=f.name) }}" target="_blank" class="btn btn-ghost btn-sm">View</a></td>
+    <td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a href="{{ url_for('view_report', filename=f.name) }}" target="_blank" class="btn btn-ghost btn-sm">👁 View Draft</a>
+      {% if f.sent %}
+        <span style="font-size:11px;color:#64748b;padding:4px 10px;border-radius:6px;background:#1e293b;border:1px solid #334155">✅ Sent {{ f.sent }}</span>
+      {% else %}
+        <form method="POST" action="{{ url_for('send_report', filename=f.name) }}"
+              onsubmit="return confirm('Send this report to the client now? This cannot be undone.')">
+          <button class="btn btn-sm" style="background:#4ade80;color:#000;font-weight:700;border:none">📤 Send to Client</button>
+        </form>
+      {% endif %}
+    </td>
   </tr>
   {% endfor %}
   </tbody>
 </table>
 {% else %}
 <div class="section" style="text-align:center;color:#64748b;padding:40px">
-  No reports generated yet. Run <code>python3 tools/monthly_report.py --client [id] --month "March 2026"</code> to generate one.
+  No reports generated yet. Go to a client profile and click <strong>Generate Monthly Report</strong>.
 </div>
 {% endif %}
 {% endblock %}

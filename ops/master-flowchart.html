@@ -168,7 +168,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#555;font-style:italic;">— nothing yet —</span>
         </td>
         <td style="padding:14px;font-size:0.72rem;color:#888;vertical-align:top;line-height:1.7;">
-          <span style="color:#a78bfa;">●</span> Signs service agreement (HelloSign/DocuSign)<br>
+          <span style="color:#a78bfa;">●</span> Signs service agreement (HelloSign)<br>
           <span style="color:#a78bfa;">●</span> Pays setup fee ($500 via Stripe)<br>
           <span style="color:#a78bfa;">●</span> Fills out intake form (admin.argusreach.com/intake)
         </td>
@@ -393,8 +393,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="arrow">↓</div>
       <div class="step">
         <div class="step-label">Service agreement signed</div>
-        <div class="step-detail">DocuSign or HelloSign free tier. 3-month minimum.</div>
-        <span class="step-tool t-white">DocuSign</span>
+        <div class="step-detail">HelloSign free tier. 3-month minimum.</div>
+        <span class="step-tool t-white">HelloSign</span>
       </div>
       <div class="arrow">↓</div>
       <div class="step">
@@ -669,9 +669,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free now → $49/mo at first client launch</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">NeverBounce / ZeroBounce</div>
-      <div class="tool-role">Email verification. Every prospect list verified before loading into Instantly. Removes invalid, risky, and catch-all addresses. Target: &lt;2% bounce rate. Protects client's sending domain reputation. Non-negotiable gate before every campaign launch. ~$3 per 1,000 verifications.</div>
-      <div class="tool-cost">~$3–5/campaign</div>
+      <div class="tool-name">NeverBounce ✅ CONNECTED</div>
+      <div class="tool-role">Email verification. API key live in monitor/.env. Every prospect list verified before loading into Instantly — runs automatically inside monthly_cycle.py. Removes invalid, disposable, and unknown addresses. Bad emails auto-added to DNC. Target: &lt;2% bounce rate. Non-negotiable gate before every campaign launch. Pay-as-you-go, no monthly fee.</div>
+      <div class="tool-cost">$0.008/email ($8 per 1,000) — pay-as-you-go</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">CAFR + EMMA (Public Records)</div>
@@ -679,8 +679,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">SQLite Database</div>
-      <div class="tool-role">Internal analytics and reporting layer. Stores all prospect events, classifications, approvals, meetings, and revenue data. Hosted on the ArgusReach server at argusreach.db. Syncs hourly from Instantly. Powers the admin portal dashboard, pipeline view, and monthly reports. No external dependency — fully owned infrastructure.</div>
+      <div class="tool-name">SQLite Database ✅ LIVE</div>
+      <div class="tool-role">Single source of truth. Tables: clients, campaigns, prospects, events, meetings, revenue — all keyed by client_id. Auto-synced from clients.json on every save. Powers all portal metrics, monthly reports, and revenue tracking. Hosted on ArgusReach server. No external dependency — fully owned. Scales to ~50 clients before PostgreSQL migration needed.</div>
+      <div class="tool-cost">Free (self-hosted)</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Claude Pro (Anthropic) ✅ ACTIVE</div>
@@ -718,8 +719,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Stripe ✅ LIVE + WEBHOOK CONNECTED</div>
-      <div class="tool-role">Payment collection. 4 live payment links: Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. Recurring billing enabled. Invoice PDF on every transaction. Webhook live at hooks.argusreach.com/webhooks/stripe — payments auto-log to database and fire Telegram alert on every successful payment. Connected 2026-03-17. <strong>Failed payment auto-pause:</strong> on 2nd failed Stripe payment attempt, client is automatically paused (active=false) and Vito receives a Telegram alert. Stripe handles retries; if payment recovers, Vito manually reactivates.</div>
+      <div class="tool-name">Stripe ✅ LIVE + WEBHOOK + PER-CLIENT LINKS</div>
+      <div class="tool-role">Payment collection. Setup Fee $500 · Starter $750/mo · Growth $1,500/mo · Scale $2,500/mo. All 4 Price IDs configured in .env. Per-client recurring payment links auto-generated at intake approval with client_id in metadata — revenue automatically attributed per client in DB. Webhook live at hooks.argusreach.com/webhooks/stripe — payments auto-log to revenue table + fire Telegram alert + auto-check payment_confirmed gate. <strong>Failed payment auto-pause:</strong> on 2nd failed attempt, client paused (active=false) + Telegram alert to Vito.</div>
       <div class="tool-cost">2.9% + $0.30/txn</div>
     </div>
     <div class="tool-card">
@@ -753,14 +754,14 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">DocuSign</div>
-      <div class="tool-role">Service agreement signing. Free tier for low volume.</div>
-      <div class="tool-cost">Free</div>
+      <div class="tool-name">HelloSign ✅ ACCOUNT CREATED</div>
+      <div class="tool-role">Service agreement signing. Account under vito@argusreach.com. Free tier = 3 signature requests/month — resets monthly (vs HelloSign which is 3 total lifetime). Used manually: Vito sends service agreement before intake approval. No system integration needed.</div>
+      <div class="tool-cost">Free (3 requests/mo)</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Instantly.ai — Free Trial</div>
-      <div class="tool-role">Email campaign sending, domain warm-up, sequence automation, stop_on_reply, blocklist API. API key live in monitor/.env. Free trial expires Mar 23 — account goes inactive after. Upgrade to Growth ($47/mo) when first client signs. Growth = 5,000 emails/mo, 1,000 contacts — sufficient for first 1-2 clients.</div>
-      <div class="tool-cost">Free trial now → $47/mo at first client launch</div>
+      <div class="tool-name">Instantly.ai ⚠️ CONFIRM UPGRADE</div>
+      <div class="tool-role">Email campaign sending, domain warm-up, sequence automation, stop_on_reply, blocklist API. API key live in monitor/.env. Free trial expired Mar 23 — confirm Growth upgrade ($47/mo) is active. Without Growth, warmup is capped and sending limits apply. Growth = 5,000 emails/mo, 1,000 contacts — sufficient for first 1-2 clients.</div>
+      <div class="tool-cost">$47/mo (Growth) — confirm upgrade completed</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Hostinger VPS ⚠️ Renews Mar 19</div>
@@ -868,7 +869,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">DocuSign or HelloSign — free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">For sending service agreements to clients.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">HelloSign — free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">For sending service agreements to clients.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
@@ -921,7 +922,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     <div style="background:#1a0f0f;border:1px solid rgba(248,113,113,0.25);border-radius:8px;padding:16px 20px;">
       <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f87171;margin-bottom:8px;">🔴 CRITICAL — Must Fix Before First Client</div>
       <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">DocuSign / HelloSign</span> — No digital signature capability. Service agreement cannot be formally executed. (Vito action: set up free tier on DocuSign or HelloSign.)</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">HelloSign / HelloSign</span> — No digital signature capability. Service agreement cannot be formally executed. (Vito action: set up free tier on HelloSign.)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Client-Facing Onboarding Guide</span> — No document exists telling the client what THEY need to do: buy domain, buy Google Workspace, provide access, set up Calendly. The internal checklist exists but nothing is client-ready.</div>
         <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Campaign Creation — Fully Automated</span> — campaign_create.py handles everything: creates Instantly campaign, loads sequence, enriches and loads leads (with auto-personalization), and sends Telegram pre-launch checklist to Vito. No manual steps required.</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Instantly Sequence Copy (PT Tampa Bay)</span> — Current test campaign sequence says "mental health practices" — wrong vertical. Must be rewritten before any real prospect is enrolled. (Backlog #5a)</div>

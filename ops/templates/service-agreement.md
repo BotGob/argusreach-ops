@@ -1,5 +1,5 @@
 # ArgusReach — Client Service Agreement
-> Ready for HelloSign/DocuSign. Fill in [BRACKETS] before sending. Remove all notes in italics.
+> Ready for HelloSign. Fill in [BRACKETS] before sending. Remove all notes in italics.
 
 ---
 

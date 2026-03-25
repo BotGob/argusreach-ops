@@ -363,19 +363,27 @@ def verify_emails(contacts):
             params={"key": NEVERBOUNCE_API_KEY, "job_id": job_id}, timeout=30
         ).text
 
-        good = set()
-        bad  = set()
+        good    = set()
+        bad     = set()
+        unknown = set()
         for row in csv.DictReader(results_text.strip().splitlines()):
             email  = row.get("email", "").lower().strip()
             status = row.get("result", "").lower()
             if status in ("valid", "catchall"):
                 good.add(email)
-            elif status in ("invalid", "disposable", "unknown"):
+            elif status in ("invalid", "disposable"):
                 bad.add(email)
+            else:
+                # "unknown" = NeverBounce couldn't verify — exclude from this batch
+                # but do NOT add to DNC (they might be valid; try again next month)
+                unknown.add(email)
 
         clean   = [c for c in contacts if c["email"] in good]
         removed = [c for c in contacts if c["email"] in bad]
-        print(f"✅ NeverBounce: {len(clean)} valid, {len(removed)} removed")
+        skipped = len(unknown)
+        if skipped:
+            print(f"   ⚠️  {skipped} contacts skipped (NeverBounce 'unknown' — not added to DNC, eligible next month)")
+        print(f"✅ NeverBounce: {len(clean)} valid, {len(removed)} removed (invalid/disposable), {skipped} skipped (unknown)")
         return clean, removed
 
     except Exception as e:
@@ -405,12 +413,10 @@ def get_sequence_for_new_campaign(client):
                 if sequences:
                     steps = sequences[0].get("steps", [])
                     if steps:
-                        # Enforce minimum 7-day delays (prevent accidental short delays)
+                        # Log delays for visibility — do NOT auto-correct (approved sequence must stay as-is)
                         for i, step in enumerate(steps):
-                            if i > 0 and step.get("delay", 0) < 7:
-                                old_delay = step["delay"]
-                                step["delay"] = 7
-                                print(f"   ⚠️  Step {i+1}: delay was {old_delay}d → enforced 7d minimum")
+                            if i > 0:
+                                print(f"   Step {i+1}: delay={step.get('delay',0)}d")
                         print(f"✅ Sequence pulled from Instantly ({len(steps)} steps)")
                         # Save as local backup
                         _save_sequence_template(client["id"], steps)
@@ -497,188 +503,9 @@ def add_sending_account(campaign_id, outreach_email):
     except Exception as e:
         print(f"⚠️  Sending account link failed (link manually): {e}")
 
-# ── Auto-personalization: company website → custom_intro ──────────────────────
-def _strip_html(html: str) -> str:
-    """Strip HTML tags and collapse whitespace to plain text."""
-    import re
-    text = re.sub(r"<style[^>]*>.*?</style>", " ", html, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<script[^>]*>.*?</script>", " ", text, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", " ", text)
-    text = re.sub(r"&nbsp;", " ", text)
-    text = re.sub(r"&amp;", "&", text)
-    text = re.sub(r"&lt;", "<", text)
-    text = re.sub(r"&gt;", ">", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
 
-
-def _normalize_domain(raw: str) -> str:
-    """
-    Normalize a domain or URL to a bare root token for fuzzy comparison.
-    Examples:
-      deepblue-inv.com   → deepblue
-      deepblue.com       → deepblue
-      smithadvisors.com  → smith
-      smith-and-associates.com → smithandassociates
-    """
-    import re
-    d = raw.strip().lower()
-    d = re.sub(r'^https?://', '', d)
-    d = re.sub(r'^www\.', '', d)
-    d = d.split('/')[0]  # strip path, query string
-    # Remove TLD (.com .io .net .org .co .us .biz .ai .xyz .app .dev .ca .uk etc.)
-    d = re.sub(r'\.[a-z]{2,6}$', '', d)
-    # Remove common trailing business suffixes (repeat to catch stacked ones)
-    _SUFFIX_RE = r'[-]?(inc|llc|corp|advisors|advisor|group|partners|partner|investments|investment|inv|capital|mgmt|management|consulting|solutions|services)$'
-    for _ in range(3):
-        d = re.sub(_SUFFIX_RE, '', d)
-    # Remove hyphens and spaces
-    d = re.sub(r'[-\s]', '', d)
-    return d
-
-
-def _domain_confidence(email: str, website: str) -> str:
-    """
-    Compare the email domain against the website domain (both normalized).
-    Returns 'EXACT', 'FUZZY', or 'NO_MATCH'.
-    """
-    try:
-        if not email or '@' not in email:
-            return 'NO_MATCH'
-        email_domain = email.strip().lower().split('@')[1]
-        ne = _normalize_domain(email_domain)
-        nw = _normalize_domain(website)
-        if not ne or not nw:
-            return 'NO_MATCH'
-        if ne == nw:
-            return 'EXACT'
-        # Fuzzy: one normalized token is a substring of the other with ≥5 char overlap
-        shorter, longer = (ne, nw) if len(ne) <= len(nw) else (nw, ne)
-        if len(shorter) >= 5 and shorter in longer:
-            return 'FUZZY'
-        return 'NO_MATCH'
-    except Exception:
-        return 'NO_MATCH'
-
-
-def enrich_contact(contact: dict) -> str:
-    """
-    Fetch a contact's company website and generate a personalized 1-sentence
-    cold-email opener using Claude Haiku.
-
-    Validates domain match, company presence, and rejects generic intros.
-    Returns the sentence string, or "" on any failure (non-fatal).
-    """
-    website = (
-        contact.get("organization_website_url", "")
-        or contact.get("website_url", "")
-        or contact.get("website", "")
-        or ""
-    ).strip()
-
-    company    = contact.get("company", "") or contact.get("company_name", "")
-    first_name = contact.get("first_name", "")
-    email      = contact.get("email", "")
-
-    if not website or not ANTHROPIC_API_KEY:
-        return ""
-
-    # Ensure URL has a scheme
-    if not website.startswith(("http://", "https://")):
-        website = "https://" + website
-
-    # ── Step 1: Domain confidence check ──────────────────────────────────────
-    try:
-        confidence = _domain_confidence(email, website)
-    except Exception:
-        confidence = "NO_MATCH"
-
-    if confidence == "NO_MATCH":
-        print(f"  [enrich] {company}: domain=NO_MATCH, company_in_page=N/A, intro_accepted=False")
-        return ""
-
-    # ── Fetch homepage ────────────────────────────────────────────────────────
-    snippet = ""
-    try:
-        resp = requests.get(
-            website,
-            timeout=5,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"},
-            allow_redirects=True,
-        )
-        if resp.ok:
-            plain = _strip_html(resp.text)
-            snippet = plain[:500]
-    except Exception:
-        return ""  # website unreachable — skip gracefully
-
-    if not snippet:
-        return ""
-
-    # ── Step 2: Company name presence check ──────────────────────────────────
-    company_in_page = bool(company and company.lower() in snippet.lower())
-    if confidence == "FUZZY" and not company_in_page:
-        print(f"  [enrich] {company}: domain=FUZZY, company_in_page=False, intro_accepted=False")
-        return ""
-    if confidence == "EXACT" and not company_in_page:
-        print(f"  [enrich] {company}: domain=EXACT, company_in_page=False (warning — page may use short brand name)")
-
-    # ── Call Claude Haiku for the personalized opener ─────────────────────────
-    try:
-        import anthropic as _anthropic
-        aclient = _anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-        prompt = (
-            f"Write a single natural sentence (15-25 words) to open a cold email to "
-            f"{first_name} at {company}. "
-            f"Use this recent context from their website: {snippet}. "
-            f"Make it specific and relevant, not generic. Plain text only, no punctuation at end"
-        )
-        msg = aclient.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=150,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        result = msg.content[0].text.strip()
-        # Strip trailing punctuation if present (period, exclamation, question mark)
-        result = result.rstrip(".!?")
-    except Exception:
-        return ""
-
-    # ── Step 3: Generic intro rejection ──────────────────────────────────────
-    _GENERIC_PHRASES = [
-        "i noticed your company",
-        "i came across your website",
-        "i see that your company",
-        "your organization",
-        "your business",
-    ]
-    intro_lower = result.lower()
-    if any(phrase in intro_lower for phrase in _GENERIC_PHRASES):
-        print(f"  [enrich] {company}: domain={confidence}, company_in_page={company_in_page}, intro_accepted=False (generic phrase detected)")
-        return ""
-
-    print(f"  [enrich] {company}: domain={confidence}, company_in_page={company_in_page}, intro_accepted=True")
-    return result
-
-
-def enrich_contacts(contacts: list) -> list:
-    """
-    Enrich each contact with a personalized `custom_intro` opener.
-    Adds key `custom_intro` to each contact dict (empty string if enrichment fails).
-    Rate-limited to 0.3s between requests.
-    """
-    total = len(contacts)
-    print(f"✨ Enriching {total} leads with personalized intros...")
-    for i, contact in enumerate(contacts, 1):
-        contact["custom_intro"] = enrich_contact(contact)
-        if i % 10 == 0 or i == total:
-            filled = sum(1 for c in contacts[:i] if c.get("custom_intro"))
-            print(f"   {i}/{total} enriched ({filled} with intros so far)")
-        time.sleep(0.3)
-    filled_total = sum(1 for c in contacts if c.get("custom_intro"))
-    print(f"✅ Enrichment complete: {filled_total}/{total} contacts have a custom intro")
-    return contacts
-
+# ── Enrichment: imported from shared module (edit tools/enrichment.py, not here) ──
+from enrichment import enrich_contacts, enrich_contact  # noqa: F401
 
 # ── Load contacts into Instantly ──────────────────────────────────────────────
 def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
@@ -969,8 +796,9 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             seq_data = legacy if isinstance(legacy, list) else legacy.get("steps", [])
             sequence_steps = seq_data
         else:
-            print("⚠️  No sequence found in portal or Instantly - campaign will be created without steps.")
-            print("   Save sequence in portal and relaunch, or add manually in Instantly.")
+            print("❌ No sequence found in portal or Instantly.")
+            print("   Save and push the approved sequence in the portal, then re-run the cycle.")
+            sys.exit(1)
 
     if not dry_run:
         # ── Step 5: Create campaign ───────────────────────────────────────────

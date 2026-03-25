@@ -45,7 +45,7 @@ YOUR NEXT STEPS:
 2. Pay the $500 setup fee (link below)
 3. We schedule your onboarding call — campaign builds from there
 
-Agreement: [DocuSign link]
+Agreement: [HelloSign link]
 Setup fee: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01
 
 Once both are done, I'll send the onboarding form and we'll get your kickoff call scheduled. Your monthly billing doesn't start until your campaign goes live — usually about 2 weeks after the onboarding call.

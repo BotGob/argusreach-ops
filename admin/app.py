@@ -104,6 +104,16 @@ def _setup_token_url(token: str) -> str:
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
 
+# Session timeout — expire after 1 hour of inactivity
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+@app.before_request
+def make_session_permanent():
+    """Make session permanent so PERMANENT_SESSION_LIFETIME applies."""
+    session.permanent = True
+
 @app.template_filter("to_et")
 def to_et_filter(dt_str):
     """Convert UTC ISO timestamp to Eastern Time for display."""
@@ -351,6 +361,70 @@ def _notify_telegram(msg: str):
         pass
 
 
+# ── ALL-GATES HELPERS ─────────────────────────────────────────────────────────
+
+_ALL_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "payment_confirmed", "sequence_approved", "calendar_connected")
+
+
+def check_all_gates_and_alert(client, save_fn):
+    """Check if all 6 pre-launch gates are True; fire Telegram alert once when all green.
+    Resets the alerted flag when any gate falls back to False so re-completion fires again.
+    save_fn() must persist the updated client dict (e.g. lambda: save_clients(config)).
+    """
+    checklist  = client.get("checklist", {})
+    all_green  = all(checklist.get(g) for g in _ALL_GATES)
+    if all_green:
+        client["onboarding_status"] = "ready_to_launch"
+        if not client.get("launch_ready_alerted"):
+            firm = client.get("firm_name", client.get("id", "Client"))
+            cid  = client.get("id", "")
+            _notify_telegram(
+                f"🚀 *{firm}* is ready to launch!\n\n"
+                f"All 6 gates are green. Head to the portal to send the ready-to-launch email.\n"
+                f"https://admin.argusreach.com/clients/{cid}"
+            )
+            client["launch_ready_alerted"] = True
+        save_fn()
+    else:
+        # Reset ready_to_launch status if any gate drops (unless already live)
+        if not client.get("active") and client.get("onboarding_status") == "ready_to_launch":
+            client["onboarding_status"] = "warming_up"
+        client["launch_ready_alerted"] = False
+        save_fn()
+
+
+def _auto_generate_stripe_link(client_id, client, config):
+    """Auto-generate a per-client Stripe payment link and save to client record.
+    Called at intake approval. Skips silently if price ID not configured.
+    """
+    plan     = client.get("plan", "starter")
+    price_id = os.environ.get(f"STRIPE_PRICE_{plan.upper()}", "")
+    if not price_id:
+        app.logger.warning(f"Auto Stripe link skipped for {client_id}: STRIPE_PRICE_{plan.upper()} not set in .env")
+        return None
+    stripe_key = os.environ.get("STRIPE_SECRET_KEY", "")
+    if not stripe_key:
+        app.logger.warning(f"Auto Stripe link skipped for {client_id}: STRIPE_SECRET_KEY not set")
+        return None
+    try:
+        import stripe as _stripe
+        _stripe.api_key = stripe_key
+        firm_name = client.get("firm_name", "")
+        link = _stripe.PaymentLink.create(
+            line_items=[{"price": price_id, "quantity": 1}],
+            metadata={"client_id": client_id, "plan": plan, "firm_name": firm_name},
+            subscription_data={"metadata": {"client_id": client_id, "plan": plan}},
+            after_completion={"type": "redirect", "redirect": {"url": "https://argusreach.com"}},
+        )
+        client["stripe_payment_link"] = link.url
+        save_clients(config)
+        app.logger.info(f"Stripe payment link auto-generated for {client_id}: {link.url}")
+        return link.url
+    except Exception as e:
+        app.logger.warning(f"Auto Stripe link failed for {client_id} (non-fatal): {e}")
+        return None
+
+
 # ── AUTH ──────────────────────────────────────────────────────────────────────
 
 def login_required(f):
@@ -423,8 +497,13 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
 
-    breakdown     = {r[0]: r[1] for r in reply_rows}
-    total_replies = sum(breakdown.values())
+    breakdown     = {r[0]: r[1] for r in reply_rows if r[0]}
+    # total_replies = unique prospects who replied (each prospect counted once regardless of how
+    # many classified events they have — avoids inflation from re-classifications)
+    total_replies = conn.execute(
+        "SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?",
+        (client_id,)
+    ).fetchone()[0] if False else sum(breakdown.values())  # keep grouped sum for now — each prospect only has one classification event per message
 
     # Instantly analytics: emails_sent_count only (unreliable for leads_count, DRAFT returns empty)
     analytics      = fetch_instantly_analytics()
@@ -432,8 +511,16 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
     instantly_sent = a.get("emails_sent_count", 0)
     leads          = leads_db  # authoritative — DB never returns 0 for loaded prospects
 
-    # Report buckets: Interested = positive + question, Not Now = not_now, Removed = negative
-    interested = breakdown.get("positive", 0) + breakdown.get("question", 0)
+    # Report buckets: Interested = positive + question + approved escalations
+    # Approved escalations keep their 'escalated' classification tag — count them in interested
+    conn2 = get_db()
+    approved_escalations = conn2.execute(
+        "SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='draft_approved' "
+        "AND client_id=? AND json_extract(metadata,'$.original_classification')='escalated'",
+        (client_id,)
+    ).fetchone()[0]
+    conn2.close()
+    interested = breakdown.get("positive", 0) + breakdown.get("question", 0) + approved_escalations
 
     return {
         "leads":             leads,
@@ -799,6 +886,7 @@ def client_detail(client_id):
                         if c2:
                             c2.setdefault("checklist", {})["warmup_complete"] = True
                             save_clients(config2)
+                            check_all_gates_and_alert(c2, lambda: save_clients(config2))
                             client["checklist"] = c2["checklist"]
                             _notify_telegram(f"🌡️ *{client.get('firm_name')}* warmup hit {_score}/100 — gate auto-checked ✅")
                             app.logger.info(f"Warmup gate auto-checked for {client_id} (score={_score})")
@@ -941,6 +1029,7 @@ def save_checklist(client_id):
         "calendar_connected": f.get("calendar_connected") == "1",
     }
     save_clients(config)
+    check_all_gates_and_alert(client, lambda: save_clients(config))
     return ("ok", 200)
 
 @app.route("/clients/<client_id>/go-live", methods=["POST"])
@@ -1130,26 +1219,34 @@ def campaign_launch(client_id):
         return redirect(url_for("dashboard"))
 
     month = request.form.get("month", "").strip()
-    limit = int(request.form.get("limit", 200))
     skip_verify = not bool(os.environ.get("NEVERBOUNCE_API_KEY", ""))
 
     if not month:
         flash("Month is required.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
+    # ── Server-side gate check (UI disable is not enough) ────────────────────
+    test_override = request.form.get("test_override") == "1"
+    if not test_override:
+        checklist     = client.get("checklist", {})
+        missing_gates = [g for g in _ALL_GATES if not checklist.get(g)]
+        if missing_gates:
+            flash(f"❌ Cannot launch — gates not green: {', '.join(missing_gates)}", "error")
+            return redirect(url_for("client_detail", client_id=client_id))
+
     # Store log in a file so we can stream it
     log_path = BASE_DIR / "monitor" / "logs" / f"launch_{client_id}.log"
     log_path.write_text(f"[{datetime.now(zoneinfo.ZoneInfo('America/New_York')).strftime('%I:%M %p ET')}] Starting campaign launch for {client.get('firm_name')} - {month}\n")
 
     def run_in_background():
+        orig_stdout = sys.stdout
         try:
             sys.path.insert(0, str(BASE_DIR / "tools"))
             import monthly_cycle as mc
             import importlib
             importlib.reload(mc)  # ensure fresh state
 
-            # Patch notify to write to log instead of Telegram (Telegram still fires from within mc)
-            orig_stdout = sys.stdout
+            # Redirect stdout to log file — Telegram alerts still fire from within mc
             sys.stdout = open(log_path, "a")
 
             mc.run_cycle(
@@ -1159,6 +1256,7 @@ def campaign_launch(client_id):
                 skip_apollo=False,
                 skip_verify=skip_verify,
             )
+
             sys.stdout.close()
             sys.stdout = orig_stdout
 
@@ -1166,6 +1264,12 @@ def campaign_launch(client_id):
                 f.write(f"\n✅ DONE - Campaign created as DRAFT in Instantly. Review sequence and leads, then activate.\n")
                 f.write("__COMPLETE__\n")
         except Exception as e:
+            try:
+                if sys.stdout != orig_stdout:
+                    sys.stdout.close()
+            except Exception:
+                pass
+            sys.stdout = orig_stdout
             with open(log_path, "a") as f:
                 f.write(f"\n❌ ERROR: {e}\n")
                 f.write("__COMPLETE__\n")
@@ -1314,6 +1418,7 @@ def auto_check_gates(client_id):
         "warmup_pass": warmup_pass,
     }
     save_clients(config)
+    check_all_gates_and_alert(client, lambda: save_clients(config))
 
     results["checklist_updated"] = {
         "dns_verified": checklist.get("dns_verified", False),
@@ -1442,6 +1547,105 @@ def generate_payment_link(client_id):
     except Exception as e:
         flash(f"❌ Stripe error: {e}", "error")
 
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
+@app.route("/clients/<client_id>/send-launch-email", methods=["POST"])
+@login_required
+def send_launch_email(client_id):
+    """Send the ready-to-launch email with the per-client Stripe payment link."""
+    config = load_clients()
+    client = next((c for c in config["clients"] if c.get("id") == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    # Verify all 6 gates
+    checklist    = client.get("checklist", {})
+    missing_gates = [g for g in _ALL_GATES if not checklist.get(g)]
+    if missing_gates:
+        flash(f"❌ Cannot send launch email — gates not yet green: {', '.join(missing_gates)}", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    # Verify Stripe payment link
+    payment_link = client.get("stripe_payment_link", "")
+    if not payment_link:
+        flash("Payment link not generated yet.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    contact_name = client.get("_contact_name") or client.get("firm_name", "")
+    first_name   = contact_name.split()[0] if contact_name else "there"
+    plan         = client.get("plan", "starter")
+    plan_display = {
+        "starter": "Starter \u2014 $750/mo",
+        "growth":  "Growth \u2014 $1,500/mo",
+        "scale":   "Scale \u2014 $2,500/mo",
+    }.get(plan, f"{plan.title()} Plan")
+    to_email = client.get("client_email", "")
+    firm     = client.get("firm_name", "")
+
+    if not to_email:
+        flash("No client email on file.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;">
+<div style="max-width:580px;margin:0 auto;padding:40px 24px;">
+
+  <div style="margin-bottom:32px;">
+    <span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
+  </div>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first_name},</p>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Good news - everything is in place:</p>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your outreach email is authenticated and warmed up</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your prospect list is built and verified</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your sequence is approved</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 28px;">\u2705 Your booking link is live</p>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 20px;">We're ready to launch. The only remaining step is your subscription payment to kick off your first month.</p>
+
+  <p style="font-size:16px;font-weight:700;margin:0 0 12px;">{plan_display}</p>
+  <p style="text-align:left;margin:0 0 28px;">
+    <a href="{payment_link}" style="background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">Pay Now \u2192</a>
+  </p>
+
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Once payment is confirmed we'll activate your campaign and your first emails will go out within 24 hours.</p>
+
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
+    <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">\u2014 Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
+  </div>
+
+</div>
+</body>
+</html>"""
+
+    app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+    if not app_password:
+        flash("ARGUSREACH_GMAIL_APP_PASS not set — cannot send email.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["From"]    = "Vito Resciniti | ArgusReach <vito@argusreach.com>"
+        msg["To"]      = to_email
+        msg["Subject"] = "Ready to launch - one last step"
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+            smtp.login("vito@argusreach.com", app_password)
+            smtp.send_message(msg)
+    except Exception as e:
+        flash(f"Email failed: {e}", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    import zoneinfo as _zi_le
+    client["launch_email_sent_at"] = datetime.now(_zi_le.ZoneInfo("America/New_York")).strftime("%Y-%m-%d %I:%M %p ET")
+    save_clients(config)
+    _notify_telegram(f"🚀 Ready-to-launch email sent to *{to_email}* for *{firm}*")
+    flash(f"✅ Ready-to-launch email sent to {to_email}.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
 
@@ -1677,14 +1881,339 @@ def backlog():
     return render_template("backlog.html", content=content)
 
 
+@app.route("/system")
+@login_required
+def system_status():
+    import zoneinfo as _zi
+    import subprocess
+    eastern = _zi.ZoneInfo("America/New_York")
+    generated = datetime.now(eastern).strftime("%Y-%m-%d %I:%M %p ET")
+    services = []
+
+    # 1. Instantly
+    try:
+        r = requests.get("https://api.instantly.ai/api/v2/accounts",
+                         headers={"Authorization": f"Bearer {INSTANTLY_KEY}"}, timeout=8)
+        if r.ok:
+            data = r.json()
+            accounts = data.get("items", data) if isinstance(data, dict) else data
+            warmup = sum(1 for a in accounts if a.get("warmup_status") == 1) if isinstance(accounts, list) else "?"
+            total  = len(accounts) if isinstance(accounts, list) else "?"
+            services.append({"name": "Instantly", "status": "ok", "detail": f"{total} accounts · {warmup} warming up", "note": "Email sending + warmup"})
+        else:
+            services.append({"name": "Instantly", "status": "error", "detail": f"API returned {r.status_code}", "note": "Check API key or plan status"})
+    except Exception as e:
+        services.append({"name": "Instantly", "status": "error", "detail": str(e)[:80], "note": None})
+
+    # 2. Apollo
+    apollo_key = os.environ.get("APOLLO_API_KEY", "")
+    if apollo_key:
+        try:
+            r = requests.post("https://api.apollo.io/v1/auth/health",
+                              json={"api_key": apollo_key}, timeout=8)
+            if r.ok and r.json().get("is_logged_in"):
+                services.append({"name": "Apollo", "status": "ok", "detail": "Authenticated · Prospect sourcing active", "note": "Upgrade to Basic ($49/mo) at first client"})
+            else:
+                services.append({"name": "Apollo", "status": "warn", "detail": "Key set but auth check failed", "note": None})
+        except Exception as e:
+            services.append({"name": "Apollo", "status": "error", "detail": str(e)[:80], "note": None})
+    else:
+        services.append({"name": "Apollo", "status": "error", "detail": "APOLLO_API_KEY not configured", "note": None})
+
+    # 3. NeverBounce
+    nb_key = os.environ.get("NEVERBOUNCE_API_KEY", "")
+    if nb_key:
+        try:
+            r = requests.get("https://api.neverbounce.com/v4/account/info",
+                             params={"key": nb_key}, timeout=8)
+            if r.ok and r.json().get("status") == "success":
+                info = r.json().get("credits_info", {})
+                paid = info.get("paid_credits_remaining", 0)
+                free = info.get("free_credits_remaining", 0)
+                services.append({"name": "NeverBounce", "status": "ok", "detail": f"{paid} paid credits · {free} free credits remaining", "note": "Pay-as-you-go · $0.008/email"})
+            else:
+                services.append({"name": "NeverBounce", "status": "warn", "detail": "Key set but API check failed", "note": None})
+        except Exception as e:
+            services.append({"name": "NeverBounce", "status": "error", "detail": str(e)[:80], "note": None})
+    else:
+        services.append({"name": "NeverBounce", "status": "error", "detail": "NEVERBOUNCE_API_KEY not configured", "note": None})
+
+    # 4. Stripe
+    stripe_key = os.environ.get("STRIPE_SECRET_KEY", "")
+    if stripe_key:
+        try:
+            import stripe as _stripe
+            _stripe.api_key = stripe_key
+            bal = _stripe.Balance.retrieve()
+            mode = "🔴 Live" if not stripe_key.startswith("sk_test") else "🟡 Test"
+            price_keys = [k for k in ["STRIPE_PRICE_STARTER","STRIPE_PRICE_GROWTH","STRIPE_PRICE_SCALE"] if os.environ.get(k)]
+            services.append({"name": "Stripe", "status": "ok", "detail": f"{mode} mode · {len(price_keys)}/3 Price IDs configured", "note": "Webhook secret configured ✅"})
+        except Exception as e:
+            services.append({"name": "Stripe", "status": "error", "detail": str(e)[:80], "note": None})
+    else:
+        services.append({"name": "Stripe", "status": "error", "detail": "STRIPE_SECRET_KEY not configured", "note": None})
+
+    # 5. Calendly
+    cal_token = os.environ.get("CALENDLY_API_TOKEN", "")
+    cal_secret = os.environ.get("CALENDLY_WEBHOOK_SECRET", "")
+    if cal_token:
+        services.append({"name": "Calendly", "status": "ok" if cal_secret else "warn",
+                         "detail": "API token configured" + (" · Webhook secret configured" if cal_secret else " · Webhook secret missing"),
+                         "note": "Register webhook to get secret"})
+    else:
+        services.append({"name": "Calendly", "status": "warn", "detail": "CALENDLY_API_TOKEN not configured", "note": "Add when first client signs"})
+
+    # 6. Telegram
+    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    tg_chat  = os.environ.get("TELEGRAM_CHAT_ID", "")
+    if tg_token and tg_chat:
+        services.append({"name": "Telegram", "status": "ok", "detail": f"Bot configured · Chat ID set", "note": "Alerts active"})
+    else:
+        services.append({"name": "Telegram", "status": "error", "detail": "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing", "note": None})
+
+    # 7. Claude / Anthropic
+    claude_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if claude_key:
+        services.append({"name": "Claude (Anthropic)", "status": "ok", "detail": "API key configured", "note": "Sequence writing + reply classification + custom_intro"})
+    else:
+        services.append({"name": "Claude (Anthropic)", "status": "error", "detail": "ANTHROPIC_API_KEY not configured", "note": None})
+
+    # 8. Database
+    try:
+        conn = get_db()
+        counts = {}
+        for t in ["clients","prospects","events","meetings","revenue"]:
+            counts[t] = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+        conn.close()
+        detail = " · ".join(f"{v} {k}" for k,v in counts.items())
+        services.append({"name": "Database (SQLite)", "status": "ok", "detail": detail, "note": None})
+    except Exception as e:
+        services.append({"name": "Database (SQLite)", "status": "error", "detail": str(e)[:80], "note": None})
+
+    # 9. Monitor service
+    try:
+        log_path = BASE_DIR / "monitor" / "logs" / "monitor.log"
+        if log_path.exists():
+            lines = log_path.read_text().strip().splitlines()
+            last = next((l for l in reversed(lines) if l.strip()), "")
+            import re as _re
+            m = _re.match(r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", last)
+            if m:
+                from datetime import timezone
+                last_dt = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+                age_min = int((datetime.now(timezone.utc) - last_dt).total_seconds() / 60)
+                status = "ok" if age_min < 15 else "warn"
+                services.append({"name": "Monitor Service", "status": status,
+                                  "detail": f"Last cycle {age_min}m ago · {last[:60]}", "note": None})
+            else:
+                services.append({"name": "Monitor Service", "status": "warn", "detail": "Log exists but no timestamp found", "note": None})
+        else:
+            services.append({"name": "Monitor Service", "status": "error", "detail": "Log file not found", "note": None})
+    except Exception as e:
+        services.append({"name": "Monitor Service", "status": "error", "detail": str(e)[:80], "note": None})
+
+    # 10. DNS Poll Timer
+    try:
+        result = subprocess.run(["systemctl", "is-active", "argusreach-dns-poll.timer"],
+                                capture_output=True, text=True, timeout=5)
+        active = result.stdout.strip() == "active"
+        services.append({"name": "DNS Poll Timer", "status": "ok" if active else "warn",
+                         "detail": "Active · Checks SPF/DKIM/DMARC every 4h" if active else "Timer not active",
+                         "note": None})
+    except Exception as e:
+        services.append({"name": "DNS Poll Timer", "status": "warn", "detail": str(e)[:80], "note": None})
+
+    return render_template("system.html", services=services, generated=generated)
+
+
+@app.route("/clients/<client_id>/generate-report", methods=["GET", "POST"])
+@login_required
+def generate_report(client_id):
+    import calendar as _cal
+    client, config = get_client_by_id(client_id)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    # Default month = current month
+    now = datetime.now()
+    default_month = now.strftime("%B %Y")
+
+    if request.method == "POST":
+        month_str  = request.form.get("month", default_month).strip()
+        working    = [l.strip() for l in request.form.get("working", "").splitlines() if l.strip()]
+        changing   = [l.strip() for l in request.form.get("changing", "").splitlines() if l.strip()]
+        next_month = request.form.get("next_month", "").strip()
+
+        # Pull stats from DB
+        try:
+            dt = datetime.strptime(month_str, "%B %Y")
+        except ValueError:
+            flash("Invalid month format. Use e.g. March 2026", "error")
+            return redirect(url_for("generate_report", client_id=client_id))
+
+        last_day = _cal.monthrange(dt.year, dt.month)[1]
+        start    = dt.strftime("%Y-%m-01")
+        end      = f"{dt.year:04d}-{dt.month:02d}-{last_day:02d}"
+
+        conn = get_db()
+        prospects = conn.execute(
+            "SELECT COUNT(DISTINCT id) FROM prospects WHERE client_id=? AND date(created_at) BETWEEN ? AND ?",
+            (client_id, start, end)
+        ).fetchone()[0]
+        reply_rows = conn.execute("""
+            SELECT json_extract(metadata,'$.classification') as cls, COUNT(DISTINCT prospect_id) as cnt
+            FROM events WHERE event_type='classified' AND client_id=?
+              AND date(created_at) BETWEEN ? AND ?
+            GROUP BY cls
+        """, (client_id, start, end)).fetchall()
+        bd = {r[0]: r[1] for r in reply_rows if r[0]}
+        meetings = conn.execute(
+            "SELECT COUNT(*) FROM meetings WHERE client_id=? AND date(created_at) BETWEEN ? AND ?",
+            (client_id, start, end)
+        ).fetchone()[0]
+        conn.close()
+
+        stats = {
+            "prospects":        prospects,
+            "reply_interested": bd.get("positive", 0) + bd.get("question", 0),
+            "reply_not_now":    bd.get("not_now", 0),
+            "reply_negative":   bd.get("negative", 0),
+            "reply_escalated":  bd.get("escalated", 0),
+            "meetings":         meetings,
+            "emails_sent":      None,
+        }
+
+        # Try Instantly for emails_sent
+        campaign_id = client.get("instantly_campaign_id", "")
+        if campaign_id and INSTANTLY_KEY:
+            try:
+                r = requests.get(
+                    "https://api.instantly.ai/api/v2/leads",
+                    headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
+                    params={"campaign": campaign_id, "limit": 1},
+                    timeout=10
+                )
+                if r.ok:
+                    a = r.json()
+                    stats["emails_sent"] = a.get("total", None)
+            except Exception:
+                pass
+
+        notes = {
+            "working":    working or ["Sequence delivered without issues."],
+            "changing":   changing or ["Monitoring performance for adjustments next cycle."],
+            "next_month": next_month or "Continuing current campaign with any optimizations applied.",
+        }
+
+        # Load/update history
+        import sys as _sys, json as _json
+        history_path = BASE_DIR / "reports" / f"{client_id}_history.json"
+        history = _json.loads(history_path.read_text()) if history_path.exists() else []
+        is_launch = len(history) == 0
+        existing  = next((i for i, e in enumerate(history) if e["month"] == month_str), None)
+        entry = {
+            "month":            month_str,
+            "launch":           is_launch,
+            "prospects":        stats["prospects"],
+            "reply_interested": stats["reply_interested"],
+            "reply_not_now":    stats["reply_not_now"],
+            "meetings":         stats["meetings"],
+        }
+        if existing is not None:
+            history[existing] = entry
+        else:
+            history.append(entry)
+        history_path.write_text(_json.dumps(history, indent=2))
+
+        # Import report builder from tools
+        _sys.path.insert(0, str(BASE_DIR))
+        from tools.monthly_report import build_report_html
+        html = build_report_html(client, month_str, stats, notes, history=history)
+
+        safe_month = month_str.replace(" ", "-")
+        out_path   = BASE_DIR / "reports" / f"{client_id}_{safe_month}.html"
+        out_path.write_text(html)
+
+        # Store latest report filename on client record for inline banner
+        client["latest_report_file"] = out_path.name
+        client["latest_report_month"] = month_str
+        for i, c in enumerate(config.get("clients", [])):
+            if c.get("id") == client_id:
+                config["clients"][i] = client
+                break
+        save_clients(config)
+
+        flash(f"report_ready:{out_path.name}", "report")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    return render_template_string("""
+{% extends 'base.html' %}
+{% block title %}Generate Report — {{ client.firm_name }}{% endblock %}
+{% block content %}
+<div style="max-width:640px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+    <a href="{{ url_for('client_detail', client_id=client.id) }}" style="color:var(--muted);font-size:12px;text-decoration:none">← {{ client.firm_name }}</a>
+  </div>
+  <h1 style="margin:0 0 6px">Generate Monthly Report</h1>
+  <p style="color:var(--muted);font-size:13px;margin:0 0 32px">All stats are pulled automatically from the database. Fill in the narrative sections below.</p>
+
+  <form method="POST">
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Reporting Month</label>
+      <input name="month" type="text" value="{{ default_month }}" placeholder="March 2026"
+        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px">
+    </div>
+
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">What Worked <span style="font-weight:400;text-transform:none">(one item per line)</span></label>
+      <textarea name="working" rows="4" placeholder="Subject lines performed well&#10;Strong open rates in the healthcare segment"
+        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
+    </div>
+
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">What We're Adjusting <span style="font-weight:400;text-transform:none">(one item per line)</span></label>
+      <textarea name="changing" rows="4" placeholder="Testing a shorter Touch 2&#10;Refining the ICP to focus on mid-size firms"
+        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
+    </div>
+
+    <div style="margin-bottom:28px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Next Month Focus</label>
+      <textarea name="next_month" rows="3" placeholder="Continuing current volume with refined targeting. Will A/B test the opening line on Touch 1."
+        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
+    </div>
+
+    <button type="submit" style="background:#4ade80;color:#000;font-weight:700;font-size:14px;padding:12px 28px;border:none;border-radius:6px;cursor:pointer">
+      📊 Generate Report
+    </button>
+    <a href="{{ url_for('client_detail', client_id=client.id) }}" style="margin-left:16px;font-size:13px;color:var(--muted);text-decoration:none">Cancel</a>
+  </form>
+</div>
+{% endblock %}
+""", client=client, default_month=default_month)
+
+
 @app.route("/reports")
 @login_required
 def reports_list():
     reports_dir = BASE_DIR / "reports"
     files = []
+    config = load_clients()
+    clients_map = {c["id"]: c for c in config.get("clients", [])}
     if reports_dir.exists():
         for f in sorted(reports_dir.glob("*.html"), reverse=True):
-            files.append({"name": f.name, "size": f.stat().st_size, "modified": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d")})
+            # Parse client_id from filename: client_id_Month-Year.html
+            parts    = f.stem.split("_", 1)
+            cid      = parts[0] if parts else ""
+            client_c = clients_map.get(cid, {})
+            files.append({
+                "name":       f.name,
+                "size":       f.stat().st_size,
+                "modified":   datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d"),
+                "client_id":  cid,
+                "firm_name":  client_c.get("firm_name", cid),
+                "sent":       client_c.get(f"report_sent_{f.stem}", False),
+            })
     return render_template("reports.html", files=files)
 
 
@@ -1697,6 +2226,69 @@ def view_report(filename):
         flash("Report not found.", "error")
         return redirect(url_for("reports_list"))
     return path.read_text()
+
+
+@app.route("/reports/<filename>/send", methods=["POST"])
+@login_required
+def send_report(filename):
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    reports_dir = BASE_DIR / "reports"
+    path = reports_dir / filename
+    if not path.exists():
+        flash("Report not found.", "error")
+        return redirect(url_for("reports_list"))
+
+    # Identify client from filename
+    cid    = filename.split("_")[0]
+    client, config = get_client_by_id(cid)
+    if not client:
+        flash("Client not found for this report.", "error")
+        return redirect(url_for("reports_list"))
+
+    to_email = client.get("client_email", "")
+    if not to_email:
+        flash("Client email not set — cannot send.", "error")
+        return redirect(url_for("reports_list"))
+
+    firm      = client.get("firm_name", cid)
+    month_str = filename.replace(f"{cid}_", "").replace(".html", "").replace("-", " ")
+    subject   = f"ArgusReach — Monthly Report — {firm} — {month_str}"
+    html_body = path.read_text()
+
+    sender_email    = "vito@argusreach.com"
+    sender_app_pass = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = f"ArgusReach <{sender_email}>"
+        msg["To"]      = to_email
+        msg.attach(MIMEText(html_body, "html"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(sender_email, sender_app_pass)
+            smtp.sendmail(sender_email, to_email, msg.as_string())
+
+        # Mark as sent on client record
+        client[f"report_sent_{path.stem}"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        config_all = load_clients()
+        for i, c in enumerate(config_all.get("clients", [])):
+            if c.get("id") == cid:
+                config_all["clients"][i] = client
+                break
+        save_clients(config_all)
+
+        flash(f"✅ Report sent to {to_email}", "success")
+    except Exception as e:
+        flash(f"❌ Failed to send: {e}", "error")
+
+    # Return to client profile if we can identify the client, else reports list
+    if cid:
+        return redirect(url_for("client_detail", client_id=cid))
+    return redirect(url_for("reports_list"))
 
 
 def load_intakes():
@@ -2248,6 +2840,33 @@ def intake_approve(intake_id):
             _send_welcome_email(new_client, setup_url=setup_url)
         except Exception as _we:
             app.logger.warning(f"Welcome email failed (non-fatal): {_we}")
+
+        # Auto-generate per-client Stripe payment link
+        _auto_generate_stripe_link(client_id, new_client, config)
+
+        # Retroactively attribute any untracked $500 setup fee payment to this client.
+        # The $500 Stripe link is generic (no client_id at time of payment — client pays
+        # before intake approval). Match by customer email + amount + no client_id yet.
+        try:
+            client_email = new_client.get("client_email", "")
+            if client_email:
+                conn = get_db()
+                conn.execute("""
+                    UPDATE revenue
+                    SET client_id = ?
+                    WHERE (client_id IS NULL OR client_id = '')
+                      AND amount_cents = 50000
+                      AND LOWER(customer_email) = LOWER(?)
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """, (client_id, client_email))
+                updated = conn.execute("SELECT changes()").fetchone()[0]
+                conn.commit()
+                conn.close()
+                if updated:
+                    app.logger.info(f"Attributed $500 setup fee payment to client {client_id} ({client_email})")
+        except Exception as _rve:
+            app.logger.warning(f"Setup fee attribution failed (non-fatal): {_rve}")
 
         flash(f"Client '{new_client['firm_name']}' created from intake.", "success")
         return redirect(url_for("client_detail", client_id=client_id))

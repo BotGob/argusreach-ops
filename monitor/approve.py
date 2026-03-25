@@ -154,12 +154,11 @@ def db_write_approval(entry, approved: bool):
                 'classification': report_classification,
                 'note': 'approved via portal/telegram',
             })
-            # Also log a classified event with the report classification so metrics bucket correctly
-            if classification == 'escalated':
-                log_event(cid, pid, 'classified', {
-                    'classification': 'positive',
-                    'note': 'escalation approved by Vito — counted as Interested',
-                })
+            # NOTE: do NOT log another 'classified' event here.
+            # The monitor already logged one when it first processed the email.
+            # Adding a second classified event (even with reclassification) causes
+            # the same prospect to be counted in two classification buckets,
+            # inflating total_replies in get_client_metrics().
             update_prospect_stage(pid, stage)
             log(f"[DB] logged draft_approved for {from_email} → stage: {stage}")
         else:

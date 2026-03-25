@@ -98,34 +98,100 @@ def search_apollo(client, limit=200):
         print("⚠️  No APOLLO_API_KEY set. Cannot search Apollo.")
         return []
 
-    # Parse ICP fields from client config
-    geography   = client.get("_target_geography", "")
-    titles      = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
-    vertical    = client.get("vertical", "")
+    # ── Parse ICP fields from client config ────────────────────────────────────
+    # Locations: textarea, one per line
+    locations_raw = client.get("_target_locations", "") or client.get("_target_geography", "")
+    locations = [l.strip() for l in locations_raw.splitlines() if l.strip()]
 
-    # Build Apollo people search payload
-    payload = {
-        "per_page": min(limit, 100),
-        "page": 1,
-        "person_titles": titles if titles else ["Doctor", "Physician", "Medical Director"],
-        "contact_email_status": ["verified", "likely to engage"],
+    # Titles: comma-separated — filter to actual job titles only (not company descriptors)
+    titles_raw = [t.strip() for t in client.get("_target_titles", "").split(",") if t.strip()]
+    titles = [t for t in titles_raw if len(t.split()) <= 4 and not any(
+        w in t.lower() for w in ["clinic", "firm", "office", "company", "practice", "services"]
+    )]
+
+    # Industry: comma-separated values from intake checkboxes
+    industries = [i.strip() for i in client.get("_target_industry", "").split(",") if i.strip()]
+    INDUSTRY_MAP = {
+        "healthcare":         ["hospital & health care", "medical practice", "health, wellness and fitness"],
+        "physical_therapy":   ["health, wellness and fitness", "medical practice"],
+        "accounting":         ["accounting"],
+        "legal":              ["law practice", "legal services"],
+        "real_estate":        ["real estate"],
+        "financial_services": ["financial services", "investment management", "wealth management"],
+        "insurance":          ["insurance"],
+        "banking":            ["banking", "financial services"],
+        "construction":       ["construction", "building materials"],
+        "technology":         ["computer software", "information technology and services"],
+        "marketing":          ["marketing and advertising", "public relations and communications"],
+        "retail":             ["retail"],
+        "hospitality":        ["hospitality", "restaurants", "food & beverages"],
+        "nonprofit":          ["nonprofit organization management"],
     }
+    industry_tags = []
+    for ind in industries:
+        industry_tags.extend(INDUSTRY_MAP.get(ind, []))
+    industry_tags = list(dict.fromkeys(industry_tags))  # dedupe, preserve order
 
-    # Add location if specified
-    if geography:
-        payload["person_locations"] = [geography]
+    # Seniority: comma-separated values from intake checkboxes
+    seniorities = [s.strip() for s in client.get("_target_seniority", "").split(",") if s.strip()]
+    SENIORITY_MAP = {
+        "owner_founder": ["owner", "founder", "partner", "c_suite"],
+        "c_suite":       ["c_suite", "founder"],
+        "vp_director":   ["vp", "director"],
+        "manager":       ["manager", "senior"],
+        "any":           [],
+    }
+    seniority_levels = []
+    if "any" not in seniorities:
+        for s in seniorities:
+            seniority_levels.extend(SENIORITY_MAP.get(s, []))
+        seniority_levels = list(dict.fromkeys(seniority_levels))
 
-    print(f"🔍 Searching Apollo: {titles} in {geography} (limit {limit})")
+    # Company size: comma-separated values from intake checkboxes
+    sizes = [s.strip() for s in client.get("_target_company_size", "").split(",") if s.strip()]
+    SIZE_MAP = {
+        "1-10":    "1,10",
+        "11-50":   "11,50",
+        "51-200":  "51,200",
+        "201-500": "201,500",
+    }
+    employee_ranges = [SIZE_MAP[s] for s in sizes if s in SIZE_MAP]
+
+    print(f"🔍 Searching Apollo:")
+    print(f"   Titles:     {titles or '(none — broad search)'}")
+    print(f"   Locations:  {locations}")
+    print(f"   Industries: {industries}")
+    print(f"   Seniority:  {seniorities or 'any'}")
+    print(f"   Sizes:      {sizes or 'any'}")
+    print(f"   Limit:      {limit}")
 
     contacts = []
+    seen_emails = set()
     page = 1
-    while len(contacts) < limit:
-        payload["page"] = page
+    max_pages = 20
+
+    while len(contacts) < limit and page <= max_pages:
+        payload = {
+            "per_page": 100,
+            "page": page,
+            "contact_email_status": ["verified", "likely to engage"],
+        }
+        if titles:
+            payload["person_titles"] = titles
+        if locations:
+            payload["person_locations"] = locations
+        if employee_ranges:
+            payload["organization_num_employees_ranges"] = employee_ranges
+        if industry_tags:
+            payload["q_organization_industry_tag_name"] = ", ".join(industry_tags)
+        if seniority_levels:
+            payload["person_seniorities"] = seniority_levels
+
         try:
             resp = requests.post(
                 "https://api.apollo.io/v1/mixed_people/search",
-                headers={"Content-Type": "application/json", "Cache-Control": "no-cache"},
-                json={**payload, "api_key": APOLLO_API_KEY},
+                headers={"Content-Type": "application/json", "X-Api-Key": APOLLO_API_KEY},
+                json=payload,
                 timeout=30
             )
             if resp.status_code == 429:
@@ -133,28 +199,32 @@ def search_apollo(client, limit=200):
                 time.sleep(60)
                 continue
             resp.raise_for_status()
-            data = resp.json()
-            people = data.get("people", [])
+            people = resp.json().get("people", [])
             if not people:
+                print(f"   Apollo returned no more results at page {page}")
                 break
             for p in people:
-                email = p.get("email", "")
+                email = p.get("email", "").lower().strip()
                 if not email or email == "email_not_unlocked@domain.com":
-                    continue  # Free plan — no email reveal
+                    continue
+                if email in seen_emails:
+                    continue
+                seen_emails.add(email)
                 contacts.append({
-                    "first_name":   p.get("first_name", ""),
-                    "last_name":    p.get("last_name", ""),
-                    "email":        email.lower().strip(),
-                    "company":      p.get("organization", {}).get("name", "") if p.get("organization") else "",
-                    "title":        p.get("title", ""),
-                    "city":         p.get("city", ""),
-                    "state":        p.get("state", ""),
-                    "linkedin_url": p.get("linkedin_url", ""),
+                    "first_name":                p.get("first_name", ""),
+                    "last_name":                 p.get("last_name", ""),
+                    "email":                     email,
+                    "company":                   (p.get("organization") or {}).get("name", ""),
+                    "title":                     p.get("title", ""),
+                    "city":                      p.get("city", ""),
+                    "state":                     p.get("state", ""),
+                    "linkedin_url":              p.get("linkedin_url", ""),
+                    "organization_website_url":  (p.get("organization") or {}).get("website_url", ""),
                 })
                 if len(contacts) >= limit:
                     break
             page += 1
-            time.sleep(1)  # Rate limit courtesy
+            time.sleep(1)
         except Exception as e:
             print(f"❌ Apollo error: {e}")
             break
@@ -259,7 +329,7 @@ def write_prospects_csv(contacts, client_id):
     """Write clean contact list to campaigns/<client_id>/prospects.csv"""
     out_path = CAMPAIGNS_DIR / client_id / "prospects.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = ["first_name", "last_name", "email", "company", "title", "city", "state", "linkedin_url"]
+    fieldnames = ["first_name", "last_name", "email", "company", "title", "city", "state", "linkedin_url", "organization_website_url"]
     with open(out_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
