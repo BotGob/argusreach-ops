@@ -2995,7 +2995,9 @@ def health():
     return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
 
+# Always init DB on startup — regardless of how the app is launched (systemd, gunicorn, direct)
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     print("🚀 ArgusReach Admin Portal starting on port 5056...")
     app.run(host="0.0.0.0", port=5056, debug=False)

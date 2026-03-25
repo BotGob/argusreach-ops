@@ -95,3 +95,18 @@
 2026-03-25 17:33:23 No active clients. Waiting...
 2026-03-25 17:33:25 Cycle complete. Next check in 10 min.
 
+2026-03-25 17:41:58 No active clients. Waiting...
+2026-03-25 17:42:00 Cycle complete. Next check in 10 min.
+
+2026-03-25 17:43:25 No active clients. Waiting...
+2026-03-25 17:43:28 Cycle complete. Next check in 10 min.
+
+2026-03-25 17:44:16 ArgusReach Monitor v2 starting
+2026-03-25 17:44:16 ArgusReach Monitor v2 started. Watching all active client inboxes, checking every 10 min.
+2026-03-25 17:44:16 No active clients. Waiting...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1767: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  run._last_sync = datetime.utcnow()
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1775: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  heartbeat_file.write_text(datetime.utcnow().isoformat())
+2026-03-25 17:44:18 Cycle complete. Next check in 10 min.
+
