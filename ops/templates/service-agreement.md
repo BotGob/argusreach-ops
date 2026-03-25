@@ -132,7 +132,7 @@ Signature: ___________________________
 
 Name: Vito Resciniti
 
-Title: Founder
+Title: Founder & CEO
 
 Date: ___________________________
 
@@ -155,5 +155,5 @@ Date: ___________________________
 - *The setup fee Stripe link is: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01*
 - *For HelloSign: upload this doc, set signature fields, send to client email from intake*
 - *LLC must be filed before you use this agreement in production — "Florida limited liability company" is the registered entity*
-- *Vito's title: use "Founder" until LLC is filed, then switch to "Managing Member" or "CEO"*
+- *Vito's title: "Founder & CEO"*
 - *[COUNTY]: Pinellas (St. Petersburg address)*
