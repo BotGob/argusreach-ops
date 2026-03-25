@@ -57,6 +57,7 @@ CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
 CAMPAIGNS_DIR = BASE_DIR / "campaigns"
 DNC_DIR       = BASE_DIR / "monitor" / "dnc"
 INTAKES_FILE  = BASE_DIR / "monitor" / "intakes" / "pending.json"
+UPLOADS_DIR   = BASE_DIR / "monitor" / "intakes" / "uploads"
 INSTANTLY_KEY  = os.environ.get("INSTANTLY_API_KEY", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "argusreach2026")
 _CRED_KEY      = os.environ.get("CREDENTIAL_ENCRYPTION_KEY", "")
@@ -660,6 +661,48 @@ def append_dnc(client_id, raw_entries):
         for e in new_entries:
             f.write(e + "\n")
     return len(new_entries)
+
+def parse_uploaded_file(file_storage):
+    """
+    Parse a CSV or Excel file upload into a list of rows (list of dicts).
+    Returns (rows, error_string). error_string is None on success.
+    """
+    import csv, io
+    filename = file_storage.filename.lower()
+    try:
+        if filename.endswith(".xlsx") or filename.endswith(".xls"):
+            try:
+                import openpyxl
+            except ImportError:
+                return [], "openpyxl not installed — Excel files not supported. Upload a CSV instead."
+            wb = openpyxl.load_workbook(file_storage, read_only=True, data_only=True)
+            ws = wb.active
+            rows = list(ws.iter_rows(values_only=True))
+            if not rows:
+                return [], "File is empty."
+            headers = [str(h).strip() if h is not None else f"col{i}" for i, h in enumerate(rows[0])]
+            return [dict(zip(headers, [str(c) if c is not None else "" for c in row])) for row in rows[1:]], None
+        else:
+            content = file_storage.read().decode("utf-8-sig", errors="replace")
+            reader = csv.DictReader(io.StringIO(content))
+            return [dict(row) for row in reader], None
+    except Exception as e:
+        return [], f"Could not parse file: {e}"
+
+def extract_dnc_from_rows(rows):
+    """Pull email addresses and domains from parsed file rows."""
+    import re
+    email_re = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+    domain_re = re.compile(r'^[a-z0-9.-]+\.[a-z]{2,}$')
+    entries = []
+    for row in rows:
+        for val in row.values():
+            v = str(val).strip().lower()
+            if email_re.match(v):
+                entries.append(v)
+            elif domain_re.match(v) and "." in v:
+                entries.append(v)
+    return list(set(entries))
 
 def prep_leads(client_id, raw_rows, warm=False):
     """
@@ -2343,10 +2386,22 @@ def intake():
             # Campaign
             "calendar_type":        f.get("calendar_type","google").strip(),
             "desired_action":       f.get("desired_action","book_call").strip(),
-            "has_existing_list":    f.get("has_existing_list","no").strip(),
             # Meta
             "notes":                f.get("notes","").strip(),
         }
+
+        # Handle file uploads (DNC file + existing contact list)
+        intake_id = submission["id"]
+        uploads_path = UPLOADS_DIR / intake_id
+        for field_name in ("dnc_file", "existing_list_file"):
+            uploaded = request.files.get(field_name)
+            if uploaded and uploaded.filename:
+                uploads_path.mkdir(parents=True, exist_ok=True)
+                ext = Path(uploaded.filename).suffix.lower() or ".csv"
+                save_path = uploads_path / f"{field_name}{ext}"
+                uploaded.save(str(save_path))
+                submission[f"_{field_name}_path"] = str(save_path)
+
         intakes = load_intakes()
         intakes.append(submission)
         save_intakes(intakes)
@@ -2817,13 +2872,55 @@ def intake_approve(intake_id):
         init_db()
         sync_client_from_config(new_client)
 
-        # Auto-load DNC emails/domains from intake using smart parser
+        # Auto-load DNC emails/domains from intake text field
         dnc_raw = intake.get("dnc_emails", "")
         if dnc_raw.strip():
             dnc_entries = parse_dnc_input(dnc_raw)
             if dnc_entries:
                 append_dnc(client_id, dnc_entries)
-                app.logger.info(f"Auto-loaded {len(dnc_entries)} DNC entries from intake for {client_id}")
+                app.logger.info(f"Auto-loaded {len(dnc_entries)} DNC entries from intake text for {client_id}")
+
+        # Auto-load DNC from uploaded file (if present)
+        dnc_file_path = intake.get("_dnc_file_path", "")
+        if dnc_file_path and Path(dnc_file_path).exists():
+            try:
+                with open(dnc_file_path, "rb") as fh:
+                    class _FakeStorage:
+                        filename = Path(dnc_file_path).name
+                        def read(self): return fh.read()
+                    rows, err = parse_uploaded_file(_FakeStorage())
+                if err:
+                    app.logger.warning(f"DNC file parse error for {client_id}: {err}")
+                else:
+                    file_entries = extract_dnc_from_rows(rows)
+                    if file_entries:
+                        append_dnc(client_id, file_entries)
+                        app.logger.info(f"Auto-loaded {len(file_entries)} DNC entries from uploaded file for {client_id}")
+            except Exception as e:
+                app.logger.warning(f"DNC file processing failed for {client_id}: {e}")
+
+        # Store existing contact list (if uploaded) — saved for Vito to review before launch
+        existing_list_path = intake.get("_existing_list_file_path", "")
+        if existing_list_path and Path(existing_list_path).exists():
+            try:
+                import shutil
+                dest_dir = CAMPAIGNS_DIR / client_id
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                dest = dest_dir / ("existing_contacts" + Path(existing_list_path).suffix)
+                shutil.copy2(existing_list_path, dest)
+                # Count rows for logging
+                with open(existing_list_path, "rb") as fh:
+                    class _FakeStorage2:
+                        filename = Path(existing_list_path).name
+                        def read(self): return fh.read()
+                    rows, err = parse_uploaded_file(_FakeStorage2())
+                row_count = len(rows) if not err else "?"
+                app.logger.info(f"Existing contact list saved for {client_id}: {row_count} rows → {dest}")
+                # Store path reference on client record
+                new_client["_existing_contacts_csv"] = str(dest)
+                save_clients(config)
+            except Exception as e:
+                app.logger.warning(f"Existing list processing failed for {client_id}: {e}")
 
         # Mark intake as approved
         for i in intakes:

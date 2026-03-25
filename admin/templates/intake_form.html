@@ -106,6 +106,11 @@
     .submit-wrap { margin-top: 48px; }
     .btn-submit { width: 100%; background: var(--green); color: #000; border: none; border-radius: 6px; padding: 15px 32px; font-size: 0.9rem; font-weight: 800; letter-spacing: -0.01em; cursor: pointer; transition: opacity 0.2s, transform 0.15s; }
     .btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .upload-zone { margin-top: 10px; border: 1.5px dashed var(--border2); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--bg3); }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--green); background: rgba(74,222,128,0.05); }
+    .upload-icon { font-size: 1.4rem; color: var(--sub); margin-bottom: 6px; }
+    .upload-label { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+    .upload-sub { font-size: 0.75rem; color: var(--sub); margin-top: 4px; }
     .submit-note { text-align: center; margin-top: 14px; font-size: 0.72rem; color: var(--muted); }
 
     /* Footer */
@@ -199,7 +204,7 @@
 
 <div class="form-wrap">
 
-  <form method="POST" action="/intake" autocomplete="off">
+  <form method="POST" action="/intake" autocomplete="off" enctype="multipart/form-data">
 
     <!-- ── SECTION 0: PLAN SELECTION ─────────────────────────────────── -->
     <div class="section-header">Your Plan</div>
@@ -377,6 +382,12 @@
         <span class="hint">The best way to protect a company: include their email domain (e.g. smithlaw.com or @smithlaw.com). This blocks every person at that company, not just the ones you know by name. Individual email addresses work too. One per line - a spreadsheet or CRM export is fine, we'll extract what we need.</span>
       </label>
       <textarea name="dnc_emails" placeholder="smithlaw.com&#10;firstnationalbank.com&#10;john@specificperson.com"></textarea>
+      <div class="upload-zone" id="dnc-zone" onclick="document.getElementById('dnc_file').click()">
+        <input type="file" id="dnc_file" name="dnc_file" accept=".csv,.xlsx,.xls" style="display:none" onchange="showFileName(this,'dnc-zone')">
+        <div class="upload-icon">↑</div>
+        <div class="upload-label">Or drag & drop a file <span style="color:var(--sub);">(CSV or Excel)</span></div>
+        <div class="upload-sub" id="dnc-zone-name">No file selected</div>
+      </div>
     </div>
 
 
@@ -466,12 +477,16 @@
     <!-- ── SECTION 7: ANYTHING ELSE ─────────────────────────────────── -->
     <div class="section-header">Anything Else</div>
     <div class="field">
-      <label>Do you have an existing contact list you'd like us to prioritize? <span style="color:#666;font-size:0.75rem;">(optional)</span></label>
-      <select name="has_existing_list">
-        <option value="no">No - start with cold prospecting</option>
-        <option value="yes_will_send">Yes - I'll email it to vito@argusreach.com</option>
-        <option value="yes_later">Yes - I'll email it to vito@argusreach.com before we start</option>
-      </select>
+      <label>Do you have an existing contact list you'd like us to prioritize? <span style="color:#666;font-size:0.75rem;">(optional)</span>
+        <span class="hint">Upload a CSV or Excel file with names, companies, and email addresses. We'll use these alongside (or instead of) our Apollo sourcing for your first campaign.</span>
+      </label>
+      <div class="upload-zone" id="list-zone" onclick="document.getElementById('existing_list_file').click()">
+        <input type="file" id="existing_list_file" name="existing_list_file" accept=".csv,.xlsx,.xls" style="display:none" onchange="showFileName(this,'list-zone')">
+        <div class="upload-icon">↑</div>
+        <div class="upload-label">Drag & drop or click to upload <span style="color:var(--sub);">(CSV or Excel)</span></div>
+        <div class="upload-sub" id="list-zone-name">No file selected</div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--sub);margin-top:10px;">Don't have it ready? Email it to <a href="mailto:vito@argusreach.com" style="color:var(--sub);">vito@argusreach.com</a> any time before launch — we'll add it before your campaign starts.</p>
     </div>
 
     <div class="field">
@@ -490,5 +505,29 @@
   Questions? Email <a href="mailto:vito@argusreach.com" style="color:var(--sub)">vito@argusreach.com</a> &nbsp;·&nbsp; © 2026 ArgusReach
 </footer>
 
+<script>
+function showFileName(input, zoneId) {
+  const zone = document.getElementById(zoneId);
+  const nameEl = zone.querySelector('.upload-sub');
+  if (input.files && input.files[0]) {
+    nameEl.textContent = input.files[0].name;
+    nameEl.style.color = 'var(--green)';
+  }
+}
+// Drag and drop support
+document.querySelectorAll('.upload-zone').forEach(zone => {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const input = zone.querySelector('input[type=file]');
+    if (e.dataTransfer.files.length) {
+      input.files = e.dataTransfer.files;
+      showFileName(input, zone.id);
+    }
+  });
+});
+</script>
 </body>
 </html>
