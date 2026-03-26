@@ -1318,3 +1318,55 @@
 2026-03-26 18:59:29 No active clients. Waiting...
 2026-03-26 18:59:31 Cycle complete. Next check in 10 min.
 
+2026-03-26 19:06:22 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 19:06:22 [ArgusReach] Checking inbox...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:885: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(days=1)).strftime('%d-%b-%Y')
+2026-03-26 19:06:23 [ArgusReach] 5 message(s) in last 24h.
+2026-03-26 19:06:23 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 19:06:24 [ArgusReach] Skipping automated sender: noreply@finit.tylertech.com
+2026-03-26 19:06:24 [ArgusReach] Skipping automated sender: support@apollo.io
+2026-03-26 19:06:25 [ArgusReach] Skipping — not a reply to our outreach: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 19:06:26 [ArgusReach] Skipping automated sender: notifications@e.link.com
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:256: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.utcnow()
+2026-03-26 19:06:29 Cycle complete. Next check in 10 min.
+
+2026-03-26 19:09:31 [ArgusReach] Checking inbox...
+2026-03-26 19:09:31 IMAP error ArgusReach: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-03-26 19:09:34 Cycle complete. Next check in 10 min.
+
+2026-03-26 19:16:29 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 19:16:29 [ArgusReach] Checking inbox...
+2026-03-26 19:16:30 [ArgusReach] 5 message(s) in last 24h.
+2026-03-26 19:16:30 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 19:16:30 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 19:16:30 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 19:16:31 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 19:16:31 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 19:16:34 Cycle complete. Next check in 10 min.
+
+2026-03-26 19:19:34 [ArgusReach] Checking inbox...
+2026-03-26 19:19:35 IMAP error ArgusReach: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-03-26 19:19:38 Cycle complete. Next check in 10 min.
+
+2026-03-26 19:26:34 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 19:26:34 [ArgusReach] Checking inbox...
+2026-03-26 19:26:35 [ArgusReach] 6 message(s) in last 24h.
+2026-03-26 19:26:35 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 19:26:35 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 19:26:36 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 19:26:36 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 19:26:36 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 19:26:37 [ArgusReach] Skipping automated sender: no-reply@accounts.google.com
+2026-03-26 19:26:40 Cycle complete. Next check in 10 min.
+
+2026-03-26 19:29:38 [ArgusReach] Checking inbox...
+2026-03-26 19:29:39 [ArgusReach] 6 message(s) in last 24h.
+2026-03-26 19:29:39 [ArgusReach] Skipping automated sender: noreply@finit.tylertech.com
+2026-03-26 19:29:39 [ArgusReach] Skipping automated sender: support@apollo.io
+2026-03-26 19:29:40 [ArgusReach] Skipping — not a reply to our outreach: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 19:29:40 [ArgusReach] Skipping automated sender: notifications@e.link.com
+2026-03-26 19:29:40 [ArgusReach] Skipping automated sender: no-reply@accounts.google.com
+2026-03-26 19:29:43 Cycle complete. Next check in 10 min.
+

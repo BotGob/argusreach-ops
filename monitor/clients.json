@@ -52,7 +52,7 @@
       "sequence": [
         {
           "subject": "{{firstName}} - physician referrals",
-          "body": "{{custom_intro}}\r\n\r\nMost PT owners in {{city}} rely on a few physicians who refer inconsistently - and building new referral relationships means outreach that never stops. That's time away from patients - and it's not sustainable.\r\n\r\nArgusReach handles it. We source verified physicians in your area, run systematic outreach in your name, and route interested referral sources straight to your calendar.\r\n\r\nYou focus on patients. We keep your pipeline full.\r\n\r\nWorth a quick call?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "body": "{{custom_intro}}\r\n\r\nMost PT Clinics in {{city}} rely on a few physicians who refer inconsistently - and building new referral relationships means outreach that never stops. That's time away from patients - and it's not sustainable.\r\n\r\nArgusReach handles it. We source verified physicians in your area, run systematic outreach in your name, and route interested referral sources straight to your calendar.\r\n\r\nYou focus on patients. We keep your pipeline full.\r\n\r\nWorth a quick call?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
           "delay_days": 0
         },
         {
@@ -62,7 +62,7 @@
         },
         {
           "subject": "Last one - {{companyName}}",
-          "body": "{{firstName}} - last one.\r\n\r\nYou built {{companyName}} to treat patients, not chase referrals. We handle the outreach completely - systematic, ongoing, running in the background while you focus on the work that actually matters.\r\n\r\nIf that is worth 15 minutes: https://calendly.com/vito-argusreach/30min\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "body": "{{firstName}} - last one.\r\n\r\n{{companyName}} was built to treat patients, not chase referrals. We handle the outreach completely - systematic, ongoing, running in the background while you focus on the work that actually matters.\r\n\r\nIf that is worth 15 minutes: https://calendly.com/vito-argusreach/30min\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
           "delay_days": 7
         }
       ],
@@ -90,7 +90,7 @@
       "_setup_token_expires": "2026-04-01T22:57:35.601260",
       "_setup_token_used": true,
       "stripe_payment_link": "https://buy.stripe.com/7sYaEWcaMf116VB3Rs5gc08",
-      "app_password": "gAAAAABpxGvoafUsrvSxaNp0KOQuCRTotJrWfKFldUHl0rP6ji5R-jnMmWVyO-cfNbEWRi-wZOOIkk3InJhcwTpXsRwDl5a3tblKgR-UDZNuQ0ScEhRR0RU=",
+      "app_password": "iqazgiljegbjwykw",
       "launch_ready_alerted": true,
       "_gate_check": {
         "checked_at": "2026-03-25 22:09 ET",

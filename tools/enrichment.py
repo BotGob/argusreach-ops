@@ -74,6 +74,27 @@ def _domain_confidence(email: str, website: str) -> str:
 
 # ── Per-contact enrichment ─────────────────────────────────────────────────────
 
+def _extract_body_text(html: str) -> str:
+    """
+    Extract meaningful body text from HTML — strips nav, footer, scripts, styles,
+    and collapses whitespace. Returns clean plain text focused on main content.
+    """
+    # Remove noisy structural sections
+    html = re.sub(r"<(nav|header|footer|aside)[^>]*>.*?</\1>", " ", html, flags=re.DOTALL | re.IGNORECASE)
+    html = re.sub(r"<(style|script)[^>]*>.*?</\1>", " ", html, flags=re.DOTALL | re.IGNORECASE)
+    # Strip remaining tags
+    text = re.sub(r"<[^>]+>", " ", html)
+    # Decode common entities
+    text = re.sub(r"&nbsp;", " ", text)
+    text = re.sub(r"&amp;", "&", text)
+    text = re.sub(r"&lt;", "<", text)
+    text = re.sub(r"&gt;", ">", text)
+    text = re.sub(r"&#\d+;", " ", text)
+    # Collapse whitespace
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
 _GENERIC_PHRASES = [
     "i noticed your company",
     "i came across your website",
@@ -118,18 +139,26 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
         print(f"  [enrich] {company}: domain=NO_MATCH → skip")
         return ""
 
-    # Step 2: Fetch homepage
+    # Step 2: Fetch website — try /about and /services for richer content
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
+    base = website.rstrip("/")
     snippet = ""
-    try:
-        resp = requests.get(
-            website, timeout=5,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"},
-            allow_redirects=True,
-        )
-        if resp.ok:
-            snippet = _strip_html(resp.text)[:500]
-    except Exception:
+
+    def _fetch_text(url: str) -> str:
+        try:
+            resp = requests.get(url, timeout=5, headers=headers, allow_redirects=True)
+            if resp.ok:
+                return _extract_body_text(resp.text)
+        except Exception:
+            pass
         return ""
+
+    # Try subpages first (richer signal), fall back to homepage
+    for path in ["/about", "/about-us", "/services", "/our-services", ""]:
+        text = _fetch_text(base + path)
+        if len(text) > 100:
+            snippet = text[:600]
+            break
 
     if not snippet:
         return ""
@@ -144,33 +173,42 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
     try:
         import anthropic as _anthropic
         aclient = _anthropic.Anthropic(api_key=api_key)
-        # Pull service context from client record if available
-        service_bridge = ""
+        # Pull Touch 1 body from client sequence (strips {{custom_intro}} placeholder)
+        touch1_body = ""
         if client:
+            sequence = client.get("sequence", [])
+            if sequence:
+                raw_body = sequence[0].get("body", "")
+                # Remove the {{custom_intro}} line — that's what we're writing
+                touch1_body = re.sub(r"\{\{custom_intro\}\}\s*", "", raw_body).strip()[:400]
+
+        # Build sequence context block
+        sequence_context = ""
+        if touch1_body:
+            sequence_context = (
+                f"The opener will appear at the top of this email body — "
+                f"write it so it flows naturally into this:\n\"{touch1_body}\"\n"
+                f"Match the tone. The opener should feel like the first sentence of the same email."
+            )
+        elif client:
             value_prop = client.get("_value_prop", "").strip()
-            desired_action = client.get("_desired_action", "").strip()
             if value_prop:
-                # Summarize in a few words what the client's service helps with
-                service_bridge = (
-                    f"The email is selling a service that helps practices like {company} "
-                    f"with: {value_prop[:200]}. "
-                    f"The opener should observe something specific about {company} "
-                    f"and bridge naturally toward that outcome — without pitching it directly."
+                sequence_context = (
+                    f"The email offers: {value_prop[:200]}. "
+                    f"Bridge the observation naturally toward that outcome."
                 )
-            elif desired_action:
-                service_bridge = f"The email's goal is to get the prospect to {desired_action}."
 
         prompt = (
-            f"Write a single natural sentence (20-30 words) to open a cold outreach email. "
+            f"Write a single natural sentence (20-30 words) to open a cold outreach email to {company}. "
             f"Start with 'I noticed' followed by something specific and genuine about {company} "
-            f"observed from their website. "
-            f"Context from their website: {snippet}. "
-            f"{service_bridge} "
-            f"Rules: "
-            f"(1) Reference the company or what they do — never the recipient by name. "
-            f"(2) The observation must be real and specific — not generic praise. "
-            f"(3) End with a natural bridge (e.g. '— and I think we could help you reach more of them') "
-            f"that connects what you noticed to the service outcome. "
+            f"from their website.\n\n"
+            f"Website context: {snippet}\n\n"
+            f"{sequence_context}\n\n"
+            f"Rules:\n"
+            f"(1) Reference the company or what they do — never the recipient by name.\n"
+            f"(2) The observation must be real and specific — not generic praise.\n"
+            f"(3) End with a bridge that connects what you noticed to the email's purpose "
+            f"(e.g. '— and I think we could help you reach more of them').\n"
             f"(4) Plain text only, end with a period."
         )
         msg = aclient.messages.create(
@@ -178,7 +216,9 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
             max_tokens=150,
             messages=[{"role": "user", "content": prompt}],
         )
-        result = msg.content[0].text.strip().rstrip(".!?")
+        result = msg.content[0].text.strip().rstrip("!?")
+        if not result.endswith("."):
+            result += "."
     except Exception:
         return ""
 
