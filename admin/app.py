@@ -2728,6 +2728,7 @@ def send_followup_email(client_id):
   </div>
 
   <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Your sending address is already warming up in the background — this takes 2–3 weeks. Once warmup is complete and everything above is done, I'll send you the subscription payment link to kick things off.</p>
+  <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Once you've added the DNS records, reviewed the sequence, and connected your calendar — just reply to this email and let me know. I'll confirm everything is verified on our end and we'll move to the next step.</p>
   <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Any questions, just reply here.</p>
 
   <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">

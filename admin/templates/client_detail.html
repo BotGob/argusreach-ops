@@ -52,15 +52,15 @@
 
   {# Compute current step (first incomplete) #}
   {% set steps = [
-    ('intake',    '✅', 'Intake Approved',     True,      'Intake form received and approved.'),
-    ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Client submits outreach email + app password via secure link.'),
-    ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Instantly warming up the sending account (2–3 weeks).'),
-    ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'DNS records + sequence draft + Calendly link sent to client.'),
-    ('dns',       '🔒', 'DNS Verified',         dns_ok,    'SPF, DKIM, DMARC passing for the outreach domain.'),
-    ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Client reviewed the sequence and gave the green light.'),
-    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Subscription Stripe payment confirmed.'),
-    ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Client calendar connected to Calendly booking page.'),
-    ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Campaign live in Instantly, monitor watching.'),
+    ('intake',    '✅', 'Intake Approved',     True,      'Auto — on form submit.'),
+    ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Auto — client submits via secure link.'),
+    ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Auto — starts when credentials received.'),
+    ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'Manual — Vito sends from portal.'),
+    ('dns',       '🔒', 'DNS Verified',         dns_ok,    'Auto — polled every 4h.'),
+    ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Manual — Vito checks after client confirms.'),
+    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto — Stripe webhook on payment.'),
+    ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Manual — Vito confirms after client connects.'),
+    ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Manual — Vito reviews draft in Instantly, then activates.'),
   ] %}
 
   {# Find active step index #}
@@ -85,6 +85,7 @@
           {% if done %}color:#4ade80{% elif is_active %}color:#fbbf24;font-weight:700{% else %}color:#475569{% endif %}">
           {{ label }}
         </div>
+        <div style="font-size:9px;margin-top:3px;line-height:1.2;color:#334155;text-align:center">{{ hint }}</div>
       </div>
       {% if not loop.last %}
       <div style="width:12px;height:2px;flex-shrink:0;margin-bottom:18px;
