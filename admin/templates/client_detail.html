@@ -413,7 +413,14 @@
   </details>
 
   {# ── Launch Form ── #}
-  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
+  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form"
+        onsubmit="
+          var src = document.querySelector('[name=use_csv]').value;
+          if (src === '1' && {{ prospects_csv_count }} === 0) {
+            alert('No CSV uploaded yet. Upload an Apollo export first, then launch.');
+            return false;
+          }
+        ">
     <input type="hidden" name="override" id="override-input" value="0">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
       <div>
