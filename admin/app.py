@@ -287,7 +287,7 @@ def _send_welcome_email(client: dict, setup_url: str = ""):
 <div style="max-width:580px;margin:0 auto;padding:40px 24px;">
 
   <div style="margin-bottom:32px;">
-    <span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
+    <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
   </div>
 
   <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first_name},</p>
@@ -1627,29 +1627,35 @@ def send_launch_email(client_id):
 <div style="max-width:580px;margin:0 auto;padding:40px 24px;">
 
   <div style="margin-bottom:32px;">
-    <span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
+    <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span>
   </div>
 
   <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first_name},</p>
 
-  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Good news - everything is in place:</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Good news - everything is in place. Here's where things stand:</p>
 
-  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your outreach email is authenticated and warmed up</p>
-  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your prospect list is built and verified</p>
-  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">\u2705 Your sequence is approved</p>
-  <p style="font-size:15px;line-height:1.7;margin:0 0 28px;">\u2705 Your booking link is live</p>
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:14px;line-height:1.8;color:#333;margin:0;">
+      \u2705 Your outreach email is authenticated and warmed up<br>
+      \u2705 Your prospect list is ready to go<br>
+      \u2705 Your sequence is written and approved<br>
+      \u2705 Your booking link is live
+    </p>
+  </div>
 
-  <p style="font-size:15px;line-height:1.7;margin:0 0 20px;">We're ready to launch. The only remaining step is your subscription payment to kick off your first month.</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">We're ready to launch. The only remaining step is your subscription payment to kick off your first month.</p>
 
-  <p style="font-size:16px;font-weight:700;margin:0 0 12px;">{plan_display}</p>
-  <p style="text-align:left;margin:0 0 28px;">
-    <a href="{payment_link}" style="background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">Pay Now \u2192</a>
-  </p>
+  <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
+    <p style="font-size:15px;font-weight:700;margin:0 0 12px;"><strong>{plan_display}</strong></p>
+    <p style="text-align:left;margin:0;">
+      <a href="{payment_link}" style="background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">Pay Now \u2192</a>
+    </p>
+  </div>
 
-  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Once payment is confirmed we'll activate your campaign and your first emails will go out within 24 hours.</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">Once payment is confirmed we'll activate your campaign and your first emails will go out within 24 hours. Any questions, just reply here.</p>
 
   <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
-    <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">\u2014 Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
+    <p style="font-size:14px;line-height:1.6;margin:0;color:#444;">Vito Resciniti<br>Founder, ArgusReach<br><a href="mailto:vito@argusreach.com" style="color:#000;">vito@argusreach.com</a></p>
   </div>
 
 </div>
@@ -2570,7 +2576,7 @@ def resend_setup_link(client_id):
     if app_pass:
         try:
             html = f"""<!DOCTYPE html><html><body style="font-family:Helvetica,Arial,sans-serif;color:#1a1a1a;max-width:580px;margin:0 auto;padding:40px 24px;">
-<div style="margin-bottom:32px;"><span style="font-size:14px;font-weight:800;">ArgusReach</span></div>
+<div style="margin-bottom:32px;"><span style="font-size:18px;font-weight:800;">ArgusReach</span></div>
 <p style="font-size:15px;line-height:1.7;">Hi {first_name},</p>
 <p style="font-size:15px;line-height:1.7;">Here's a new secure link to submit your outreach email credentials. The previous link has been deactivated.</p>
 <p style="font-size:15px;line-height:1.7;">This link expires in 7 days and can only be used once:</p>
@@ -2705,7 +2711,7 @@ def send_followup_email(client_id):
 <html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;">
 <div style="max-width:580px;margin:0 auto;padding:40px 24px;">
-  <div style="margin-bottom:32px;"><span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span></div>
+  <div style="margin-bottom:32px;"><span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;color:#000;">ArgusReach</span></div>
   <p style="font-size:15px;line-height:1.7;margin:0 0 16px;">Hi {first},</p>
   <p style="font-size:15px;line-height:1.7;margin:0 0 24px;">We're ready on our end. Here's everything you need to action before we go live.</p>
 

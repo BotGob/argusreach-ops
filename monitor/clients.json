@@ -4,7 +4,7 @@
     {
       "id": "argusreach",
       "active": false,
-      "onboarding_status": "warming_up",
+      "onboarding_status": "ready_to_launch",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
       "vertical": "B2BServices",
@@ -82,25 +82,26 @@
         "icp_reviewed": true,
         "dns_verified": true,
         "warmup_complete": true,
-        "payment_confirmed": false,
+        "payment_confirmed": true,
         "sequence_approved": true,
         "calendar_connected": true
       },
       "_setup_token": "Zd-JW_GkDAL7MK7fDqKDkNsXk1xTQ5mnYgd3dIYC4Qs",
       "_setup_token_expires": "2026-04-01T22:57:35.601260",
       "_setup_token_used": true,
-      "stripe_payment_link": "https://buy.stripe.com/fZubJ04Ikg554Nt1Jk5gc07",
+      "stripe_payment_link": "https://buy.stripe.com/7sYaEWcaMf116VB3Rs5gc08",
       "app_password": "gAAAAABpxGvoafUsrvSxaNp0KOQuCRTotJrWfKFldUHl0rP6ji5R-jnMmWVyO-cfNbEWRi-wZOOIkk3InJhcwTpXsRwDl5a3tblKgR-UDZNuQ0ScEhRR0RU=",
-      "launch_ready_alerted": false,
+      "launch_ready_alerted": true,
       "_gate_check": {
-        "checked_at": "2026-03-25 19:03 ET",
+        "checked_at": "2026-03-25 22:09 ET",
         "dns_pass": true,
         "warmup_score": null,
         "warmup_pass": false
       },
       "_credentials_received_at": "2026-03-25 07:12 PM ET",
       "followup_sent": true,
-      "calendly_event_slug": ""
+      "calendly_event_slug": "",
+      "launch_email_sent_at": "2026-03-25 10:13 PM ET"
     }
   ]
 }
