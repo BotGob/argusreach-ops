@@ -112,8 +112,10 @@
       <form method="POST" action="{{ url_for('send_followup_email', client_id=client.id) }}">
         <button class="btn btn-primary btn-sm">📨 Send Follow-up Email</button>
       </form>
-    {% elif ns.active_idx == 7 %}
+    {% elif ns.active_idx == 4 %}
       <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank" class="btn btn-primary btn-sm">📋 Get DNS Records</a>
+    {% elif ns.active_idx == 7 %}
+      <span style="font-size:12px;color:#64748b;padding:6px 12px;border-radius:6px;background:#1e293b;border:1px solid #334155">⏳ Waiting for Stripe payment webhook</span>
     {% endif %}
   </div>
   {% endif %}
