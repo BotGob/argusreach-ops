@@ -120,12 +120,13 @@ def _get_app_password(client: dict) -> str:
     raw = client.get('app_password', '')
     if not raw:
         return raw
-    if _FERNET_AVAILABLE and _CRED_KEY:
+    # Only attempt Fernet decrypt if value looks like ciphertext (starts with gAAAA)
+    if _FERNET_AVAILABLE and _CRED_KEY and raw.startswith('gAAAA'):
         try:
             f = _Fernet(_CRED_KEY.encode())
             return f.decrypt(raw.encode()).decode()
-        except Exception:
-            pass  # not encrypted or wrong key — return as-is
+        except Exception as e:
+            log(f"[WARN] Failed to decrypt app_password: {e} — falling back to plaintext")
     return raw
 
 # ── ARGS ──────────────────────────────────────────────────────────────────────

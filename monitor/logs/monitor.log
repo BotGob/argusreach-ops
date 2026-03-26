@@ -1626,3 +1626,35 @@
 2026-03-26 20:20:05 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
 2026-03-26 20:20:08 Cycle complete. Next check in 10 min.
 
+2026-03-26 20:27:12 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:27:12 [ArgusReach] Checking inbox...
+2026-03-26 20:27:13 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:27:13 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:27:13 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:27:15 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:27:15 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:27:18 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:30:08 [ArgusReach] Checking inbox...
+2026-03-26 20:30:08 IMAP error ArgusReach: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-03-26 20:30:11 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:37:18 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:37:18 [ArgusReach] Checking inbox...
+2026-03-26 20:37:19 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:37:19 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:37:19 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:37:21 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:37:21 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:37:24 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:40:11 [ArgusReach] Checking inbox...
+2026-03-26 20:40:12 IMAP error ArgusReach: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
+2026-03-26 20:40:15 Cycle complete. Next check in 10 min.
+
