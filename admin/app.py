@@ -84,7 +84,7 @@ def _decrypt_credential(value: str) -> str:
         f = _Fernet(_CRED_KEY.encode())
         return f.decrypt(value.encode()).decode()
     except Exception:
-        return value  # already plaintext or wrong key — return as-is
+        return value  # already plaintext or wrong key - return as-is
 
 
 def _generate_setup_token(client: dict) -> str:
@@ -105,7 +105,7 @@ def _setup_token_url(token: str) -> str:
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "argusreach-admin-secret-2026")
 
-# Session timeout — expire after 1 hour of inactivity
+# Session timeout - expire after 1 hour of inactivity
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
@@ -160,7 +160,7 @@ Business description: {client.get('_business_description','')}
 Value proposition: {client.get('_value_prop','')}
 Differentiator (what makes them different): {client.get('_differentiator','')}
 Client outcomes: {client.get('_outcomes','')}
-Voice sample (client's own words — use this as style guide for Touch 1): {client.get('_voice_sample','')}
+Voice sample (client's own words - use this as style guide for Touch 1): {client.get('_voice_sample','')}
 Target titles: {client.get('_target_titles','')}
 Target locations: {client.get('_target_locations','')}
 Target company size: {client.get('_target_company_size','')}
@@ -179,11 +179,11 @@ Here is everything you know about this client:
 {intake_context}
 
 Write a 3-touch cold email sequence. Rules:
-- Touch 1: Short cold intro (60-80 words max, not counting {{{{custom_intro}}}}). Touch 1 must start with {{{{custom_intro}}}} on its own line followed by a blank line. This variable will be populated at send time with a personalized opener based on the prospect's company. Write Touch 1 assuming {{{{custom_intro}}}} will provide the opening hook — so the rest of Touch 1 should flow naturally after a personalized sentence. Reference {{{{companyName}}}} and use {{{{city}}}} to make it feel locally relevant. If a voice sample is provided, use it as your style guide — preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
-- Touch 2: Follow-up 5 days later. Different angle — explain the mechanism or add a specific proof point. 50-70 words. Same signature.
+- Touch 1: Short cold intro (60-80 words max, not counting {{{{custom_intro}}}}). Touch 1 must start with {{{{custom_intro}}}} on its own line followed by a blank line. This variable will be populated at send time with a personalized opener based on the prospect's company. Write Touch 1 assuming {{{{custom_intro}}}} will provide the opening hook - so the rest of Touch 1 should flow naturally after a personalized sentence. Reference {{{{companyName}}}} and use {{{{city}}}} to make it feel locally relevant. If a voice sample is provided, use it as your style guide - preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
+- Touch 2: Follow-up 5 days later. Different angle - explain the mechanism or add a specific proof point. 50-70 words. Same signature.
 - Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. {f'End with the booking link as the CTA: {calendly}' if calendly else 'End with a soft CTA for a call.'} Same signature.
 - All touches: plain text only, no markdown, no bullet points, no em dashes (use hyphens), sound like a real human wrote it, not a template
-- Available personalization tags: {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} — use all three naturally across the 3 touches
+- Available personalization tags: {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} - use all three naturally across the 3 touches
 
 Respond with ONLY valid JSON in this exact format, no other text:
 {{
@@ -488,18 +488,18 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     meetings          = conn.execute("SELECT COUNT(*) FROM meetings WHERE client_id=?", (client_id,)).fetchone()[0]
     revenue           = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue WHERE client_id=?", (client_id,)).fetchone()[0]
     # Leads: use our DB prospect count (accurate even before Instantly analytics are available)
-    # Instantly analytics endpoint returns [] for DRAFT campaigns — DB is always correct
+    # Instantly analytics endpoint returns [] for DRAFT campaigns - DB is always correct
     leads_db          = conn.execute("SELECT COUNT(DISTINCT id) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
 
     breakdown     = {r[0]: r[1] for r in reply_rows if r[0]}
     # total_replies = unique prospects who replied (each prospect counted once regardless of how
-    # many classified events they have — avoids inflation from re-classifications)
+    # many classified events they have - avoids inflation from re-classifications)
     total_replies = conn.execute(
         "SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?",
         (client_id,)
-    ).fetchone()[0] if False else sum(breakdown.values())  # keep grouped sum for now — each prospect only has one classification event per message
+    ).fetchone()[0] if False else sum(breakdown.values())  # keep grouped sum for now - each prospect only has one classification event per message
 
     # Instantly analytics: emails_sent_count + emails_read_count (opens). DRAFT returns empty.
     # Use prefetched_analytics if provided (dashboard: 1 bulk call for all clients).
@@ -511,10 +511,10 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     a              = analytics.get(instantly_campaign_id or "", {})
     instantly_sent = a.get("emails_sent_count", 0)
     open_count     = a.get("emails_read_count", 0)
-    leads          = leads_db  # authoritative — DB never returns 0 for loaded prospects
+    leads          = leads_db  # authoritative - DB never returns 0 for loaded prospects
 
     # Report buckets: Interested = positive + question + approved escalations
-    # Approved escalations keep their 'escalated' classification tag — count them in interested
+    # Approved escalations keep their 'escalated' classification tag - count them in interested
     conn2 = get_db()
     approved_escalations = conn2.execute(
         "SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='draft_approved' "
@@ -552,7 +552,7 @@ def fetch_instantly_analytics(campaign_id=None):
     """Fetch Instantly campaign analytics.
 
     If campaign_id is given: fetches only that campaign (1 API call, used by client profile).
-    If None: fetches ALL campaigns with pagination (used by dashboard — call once, pass result down).
+    If None: fetches ALL campaigns with pagination (used by dashboard - call once, pass result down).
     Returns dict keyed by campaign_id.
     """
     if not INSTANTLY_KEY:
@@ -560,7 +560,7 @@ def fetch_instantly_analytics(campaign_id=None):
     headers = {"Authorization": f"Bearer {INSTANTLY_KEY}"}
     try:
         if campaign_id:
-            # Single campaign fetch — fast, exact
+            # Single campaign fetch - fast, exact
             r = requests.get(
                 "https://api.instantly.ai/api/v2/campaigns/analytics",
                 headers=headers, params={"id": campaign_id}, timeout=10
@@ -574,7 +574,7 @@ def fetch_instantly_analytics(campaign_id=None):
                 return {data["campaign_id"]: data}
             return {}
         else:
-            # Paginated bulk fetch — call once per dashboard load
+            # Paginated bulk fetch - call once per dashboard load
             result, skip = {}, 0
             while True:
                 r = requests.get(
@@ -715,7 +715,7 @@ def parse_uploaded_file(file_storage):
             try:
                 import openpyxl
             except ImportError:
-                return [], "openpyxl not installed — Excel files not supported. Upload a CSV instead."
+                return [], "openpyxl not installed - Excel files not supported. Upload a CSV instead."
             wb = openpyxl.load_workbook(file_storage, read_only=True, data_only=True)
             ws = wb.active
             rows = list(ws.iter_rows(values_only=True))
@@ -945,7 +945,7 @@ def client_detail(client_id):
         except Exception:
             pass
 
-    # Live warmup score from Instantly — check on every profile load, auto-gate at ≥85%
+    # Live warmup score from Instantly - check on every profile load, auto-gate at ≥85%
     warmup_live = {"score": None, "status": None, "error": None}
     outreach_email = client.get("outreach_email","")
     if outreach_email:
@@ -972,14 +972,14 @@ def client_detail(client_id):
                             save_clients(config2)
                             check_all_gates_and_alert(c2, lambda: save_clients(config2))
                             client["checklist"] = c2["checklist"]
-                            _notify_telegram(f"🌡️ *{client.get('firm_name')}* warmup hit {_score}/100 — gate auto-checked ✅")
+                            _notify_telegram(f"🌡️ *{client.get('firm_name')}* warmup hit {_score}/100 - gate auto-checked ✅")
                             app.logger.info(f"Warmup gate auto-checked for {client_id} (score={_score})")
                 else:
                     warmup_live["error"] = f"{outreach_email} not found in Instantly"
         except Exception as _we:
             warmup_live["error"] = str(_we)[:80]
 
-    # Monitor health check — read heartbeat timestamp
+    # Monitor health check - read heartbeat timestamp
     monitor_status = {"running": False, "last_seen": None, "age_minutes": None}
     heartbeat_file = BASE_DIR / "monitor" / "logs" / "monitor_heartbeat.txt"
     if heartbeat_file.exists():
@@ -1017,12 +1017,12 @@ def _push_sequence_to_instantly(client):
     """Push the client's current sequence to their Instantly campaign. Returns (ok, message)."""
     campaign_id = client.get("instantly_campaign_id","")
     if not campaign_id:
-        return False, "No campaign ID on file — launch a campaign first."
+        return False, "No campaign ID on file - launch a campaign first."
     seq_raw = client.get("sequence", [])
     if not seq_raw or not any(s.get("subject") for s in seq_raw):
-        return False, "Sequence is empty — write it in the portal first."
+        return False, "Sequence is empty - write it in the portal first."
 
-    # Convert to Instantly format — plain text only (HTML corrupts in Instantly editor)
+    # Convert to Instantly format - plain text only (HTML corrupts in Instantly editor)
     steps = []
     for i, s in enumerate(seq_raw):
         steps.append({
@@ -1045,7 +1045,7 @@ def _push_sequence_to_instantly(client):
         if r.ok:
             return True, f"Sequence pushed to Instantly ({len(steps)} touches)."
         else:
-            return False, f"Instantly API error: {r.status_code} — {r.text[:120]}"
+            return False, f"Instantly API error: {r.status_code} - {r.text[:120]}"
     except Exception as e:
         return False, f"Push failed: {str(e)[:120]}"
 
@@ -1134,7 +1134,7 @@ def client_go_live(client_id):
     if not client.get("app_password", "").strip():
         missing.append("email app password")
     if missing:
-        flash(f"❌ Cannot go live — missing: {', '.join(missing)}", "error")
+        flash(f"❌ Cannot go live - missing: {', '.join(missing)}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
     client["active"] = True
     client["onboarding_status"] = None
@@ -1315,7 +1315,7 @@ def campaign_launch(client_id):
         checklist     = client.get("checklist", {})
         missing_gates = [g for g in _ALL_GATES if not checklist.get(g)]
         if missing_gates:
-            flash(f"❌ Cannot launch — gates not green: {', '.join(missing_gates)}", "error")
+            flash(f"❌ Cannot launch - gates not green: {', '.join(missing_gates)}", "error")
             return redirect(url_for("client_detail", client_id=client_id))
 
     # Store log in a file so we can stream it
@@ -1330,7 +1330,7 @@ def campaign_launch(client_id):
             import importlib
             importlib.reload(mc)  # ensure fresh state
 
-            # Redirect stdout to log file — Telegram alerts still fire from within mc
+            # Redirect stdout to log file - Telegram alerts still fire from within mc
             sys.stdout = open(log_path, "a")
 
             mc.run_cycle(
@@ -1394,7 +1394,7 @@ def auto_check_gates(client_id):
                   "error": None}
 
     if not outreach_email:
-        dns_result["error"] = "No outreach email set — add it in Monitor & Client Settings first."
+        dns_result["error"] = "No outreach email set - add it in Monitor & Client Settings first."
     elif not _DNS_OK:
         dns_result["error"] = "dnspython not installed on server."
     else:
@@ -1419,7 +1419,7 @@ def auto_check_gates(client_id):
                     break
         except Exception:
             pass
-        # DKIM — try provider-specific selectors first, then common fallbacks
+        # DKIM - try provider-specific selectors first, then common fallbacks
         provider_selectors = {
             "google":    ["google"],
             "microsoft": ["selector1", "selector2"],
@@ -1477,7 +1477,7 @@ def auto_check_gates(client_id):
                 warmup_result["status"] = matched.get("status")
                 warmup_pass = score is not None and int(score) >= 85
             else:
-                warmup_result["error"] = f"Account {outreach_email} not found in Instantly — has it been added?"
+                warmup_result["error"] = f"Account {outreach_email} not found in Instantly - has it been added?"
         except Exception as e:
             warmup_result["error"] = str(e)[:120]
 
@@ -1548,24 +1548,24 @@ Add these records to your domain DNS ({domain}).
 Your IT person or domain registrar (GoDaddy, Cloudflare, Namecheap, etc.) can do this in ~10 minutes.
 
 ──────────────────────────────────────
-1. SPF — TXT record
+1. SPF - TXT record
    Name:  @  (or your root domain)
    Value: v=spf1 {spf_include} include:_spf.mlsend.com ~all
 
-   Note: If you already have an SPF record, ADD the include values to it — don't create a second SPF record.
+   Note: If you already have an SPF record, ADD the include values to it - don't create a second SPF record.
 
 ──────────────────────────────────────
-2. DKIM — generated by your email provider
+2. DKIM - generated by your email provider
    {dkim_instructions}
 
 ──────────────────────────────────────
-3. DMARC — TXT record
+3. DMARC - TXT record
    Name:  _dmarc.{domain}
    Value: v=DMARC1; p=none; rua=mailto:vito@argusreach.com
 
 ──────────────────────────────────────
 
-Once added, DNS propagates in a few hours. We verify everything on our end — no action needed from you after that.
+Once added, DNS propagates in a few hours. We verify everything on our end - no action needed from you after that.
 Questions? Reply to this email and we'll walk you through it.
 """
     return block, 200, {"Content-Type": "text/plain"}
@@ -1582,7 +1582,7 @@ def generate_payment_link(client_id):
 
     plan = client.get("plan", "starter")
 
-    # Price IDs for recurring subscription products — set in .env after creating products in Stripe
+    # Price IDs for recurring subscription products - set in .env after creating products in Stripe
     price_ids = {
         "starter": os.environ.get("STRIPE_PRICE_STARTER", ""),
         "growth":  os.environ.get("STRIPE_PRICE_GROWTH", ""),
@@ -1648,7 +1648,7 @@ def send_launch_email(client_id):
     checklist    = client.get("checklist", {})
     missing_gates = [g for g in _PRE_PAYMENT_GATES if not checklist.get(g)]
     if missing_gates:
-        flash(f"❌ Cannot send launch email — gates not yet green: {', '.join(missing_gates)}", "error")
+        flash(f"❌ Cannot send launch email - gates not yet green: {', '.join(missing_gates)}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     # Verify Stripe payment link
@@ -1715,7 +1715,7 @@ def send_launch_email(client_id):
 
     app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
     if not app_password:
-        flash("ARGUSREACH_GMAIL_APP_PASS not set — cannot send email.", "error")
+        flash("ARGUSREACH_GMAIL_APP_PASS not set - cannot send email.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     try:
@@ -2250,7 +2250,7 @@ def generate_report(client_id):
 
     return render_template_string("""
 {% extends 'base.html' %}
-{% block title %}Generate Report — {{ client.firm_name }}{% endblock %}
+{% block title %}Generate Report - {{ client.firm_name }}{% endblock %}
 {% block content %}
 <div style="max-width:640px">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
@@ -2351,12 +2351,12 @@ def send_report(filename):
 
     to_email = client.get("client_email", "")
     if not to_email:
-        flash("Client email not set — cannot send.", "error")
+        flash("Client email not set - cannot send.", "error")
         return redirect(url_for("reports_list"))
 
     firm      = client.get("firm_name", cid)
     month_str = filename.replace(f"{cid}_", "").replace(".html", "").replace("-", " ")
-    subject   = f"ArgusReach — Monthly Report — {firm} — {month_str}"
+    subject   = f"ArgusReach - Monthly Report - {firm} - {month_str}"
     html_body = path.read_text()
 
     sender_email    = "vito@argusreach.com"
@@ -2475,7 +2475,7 @@ def intake():
             f"Review at: https://admin.argusreach.com/intakes"
         )
 
-        # PRG pattern — redirect to GET so browser reload doesn't resubmit
+        # PRG pattern - redirect to GET so browser reload doesn't resubmit
         return redirect(url_for("intake_thanks", name=submission["contact_name"]))
 
     return render_template("intake_form.html")
@@ -2486,11 +2486,11 @@ def intake_thanks():
     return render_template("intake_thanks.html", name=name)
 
 
-# ── SECURE CREDENTIAL SETUP (public — token IS the auth) ─────────────────────
+# ── SECURE CREDENTIAL SETUP (public - token IS the auth) ─────────────────────
 
 @app.route("/setup/<token>", methods=["GET", "POST"])
 def setup_credentials(token):
-    """Client-facing secure credential submission. No login needed — token is the auth."""
+    """Client-facing secure credential submission. No login needed - token is the auth."""
     config  = load_clients()
     client  = next((c for c in config["clients"]
                     if c.get("_setup_token") == token and not c.get("_setup_token_used")), None)
@@ -2527,7 +2527,7 @@ def setup_credentials(token):
                                state="form", firm=firm, first_name=first_name,
                                provider=provider, token=token)
 
-    # POST — process submission
+    # POST - process submission
     outreach_email = request.form.get("outreach_email", "").strip().lower()
     app_password   = request.form.get("app_password", "").strip()
     confirm_pass   = request.form.get("confirm_password", "").strip()
@@ -2538,7 +2538,7 @@ def setup_credentials(token):
     if not app_password:
         errors.append("App password is required.")
     if app_password and confirm_pass and app_password != confirm_pass:
-        errors.append("App passwords don't match — please re-enter.")
+        errors.append("App passwords don't match - please re-enter.")
 
     if errors:
         return render_template("setup_credential.html",
@@ -2621,7 +2621,7 @@ def resend_setup_link(client_id):
 
     to_email = client.get("client_email", "")
     if not to_email:
-        flash("No client email on file — update it in settings first.", "error")
+        flash("No client email on file - update it in settings first.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     # Generate fresh token
@@ -2652,7 +2652,7 @@ def resend_setup_link(client_id):
             msg = MIMEMultipart("alternative")
             msg["From"]    = "Vito Resciniti | ArgusReach <vito@argusreach.com>"
             msg["To"]      = to_email
-            msg["Subject"] = f"New credential setup link — {firm_name}"
+            msg["Subject"] = f"New credential setup link - {firm_name}"
             msg.attach(MIMEText(html, "html"))
             with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
                 smtp.login("vito@argusreach.com", app_pass)
@@ -2661,10 +2661,10 @@ def resend_setup_link(client_id):
             _notify_telegram(f"🔗 New setup link sent to *{firm_name}* ({to_email})")
         except Exception as e:
             flash(f"Token regenerated but email failed: {e}", "error")
-            _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* — email failed, send manually:\n{setup_url}")
+            _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* - email failed, send manually:\n{setup_url}")
     else:
-        flash("Token regenerated. ARGUSREACH_GMAIL_APP_PASS not set — send link manually.", "error")
-        _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* — send manually:\n`{setup_url}`")
+        flash("Token regenerated. ARGUSREACH_GMAIL_APP_PASS not set - send link manually.", "error")
+        _notify_telegram(f"🔗 Setup token regenerated for *{firm_name}* - send manually:\n`{setup_url}`")
 
     return redirect(url_for("client_detail", client_id=client_id))
 
@@ -2689,22 +2689,22 @@ def send_followup_email(client_id):
     override  = request.form.get("override") == "1"
 
     if not to_email:
-        flash("No client email on file — update it in settings first.", "error")
+        flash("No client email on file - update it in settings first.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     if not client.get("outreach_email"):
-        flash("No outreach email on file — client must submit credentials first.", "error")
+        flash("No outreach email on file - client must submit credentials first.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     if not calendly:
-        flash("❌ No Calendly link set — add it in client settings before sending the follow-up email.", "error")
+        flash("❌ No Calendly link set - add it in client settings before sending the follow-up email.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     # DNS warning check
     dns_ok = checklist.get("dns_verified", False)
     dns_warning = "" if dns_ok else (
         "<div style='background:#2d1a00;border:1px solid #92400e;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#fbbf24'>"
-        "⚠️ <strong>DNS not yet verified</strong> — sending this email before DNS is set up is fine; "
+        "⚠️ <strong>DNS not yet verified</strong> - sending this email before DNS is set up is fine; "
         "it includes the DNS records for the client to add. Just make sure you paste the actual records in."
         "</div>"
     )
@@ -2719,13 +2719,13 @@ def send_followup_email(client_id):
             day_label = f"Sends {delay} day{'s' if delay != 1 else ''} after Touch {i}"
         seq_html += f"""
   <div style="background:#f9f9f9;border-left:3px solid #4ade80;padding:14px;margin-bottom:14px;border-radius:0 6px 6px 0;">
-    <p style="font-size:11px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em">Touch {i+1} — {day_label}</p>
+    <p style="font-size:11px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:.05em">Touch {i+1} - {day_label}</p>
     <p style="font-size:13px;font-weight:700;margin:0 0 8px;color:#111">Subject: {touch.get('subject','')}</p>
     <p style="font-size:13px;line-height:1.7;color:#333;margin:0;white-space:pre-wrap">{touch.get('body','')}</p>
   </div>"""
 
     if not seq_html:
-        seq_html = "<p style='color:#888;font-size:13px'>Sequence not yet written — add it in the portal before sending this email.</p>"
+        seq_html = "<p style='color:#888;font-size:13px'>Sequence not yet written - add it in the portal before sending this email.</p>"
 
     outreach_domain = client["outreach_email"].split("@")[-1] if "@" in client.get("outreach_email","") else "[your-domain.com]"
     provider = client.get("_email_provider","google")
@@ -2734,12 +2734,12 @@ def send_followup_email(client_id):
     if provider == "microsoft":
         dkim_row = """<tr style="border-bottom:1px solid #e5e5e5">
           <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">DKIM</td>
-          <td style="padding:10px 12px;font-size:12px;color:#333">2 CNAME records — get these from <strong>Microsoft 365 Admin Center → Settings → Domains → your domain → DNS records</strong>. Once added, enable DKIM in the Microsoft 365 Defender portal.</td>
+          <td style="padding:10px 12px;font-size:12px;color:#333">2 CNAME records - get these from <strong>Microsoft 365 Admin Center → Settings → Domains → your domain → DNS records</strong>. Once added, enable DKIM in the Microsoft 365 Defender portal.</td>
         </tr>"""
     else:
         dkim_row = """<tr style="border-bottom:1px solid #e5e5e5">
           <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">DKIM</td>
-          <td style="padding:10px 12px;font-size:12px;color:#333">1 TXT record — get this from <strong>Google Workspace Admin → Apps → Google Workspace → Gmail → Authenticate email → Generate new record</strong>. Copy the TXT name and value, add to your DNS.</td>
+          <td style="padding:10px 12px;font-size:12px;color:#333">1 TXT record - get this from <strong>Google Workspace Admin → Apps → Google Workspace → Gmail → Authenticate email → Generate new record</strong>. Copy the TXT name and value, add to your DNS.</td>
         </tr>"""
 
     dns_block = f"""<table style="width:100%;border-collapse:collapse;border:1px solid #e5e5e5;border-radius:6px;overflow:hidden;font-family:sans-serif">
@@ -2754,7 +2754,7 @@ def send_followup_email(client_id):
       <td style="padding:10px 12px;color:#888;font-size:12px;white-space:nowrap;vertical-align:top">SPF</td>
       <td style="padding:10px 12px;font-size:12px;color:#333">
         <strong>Host:</strong> @ &nbsp;&nbsp; <strong>Value:</strong> <code style="background:#f4f4f4;padding:1px 5px;border-radius:3px">v=spf1 {spf_include} ~all</code><br>
-        <span style="font-size:11px;color:#aaa">If you already have an SPF record, add the include value to it — don't create a second one.</span>
+        <span style="font-size:11px;color:#aaa">If you already have an SPF record, add the include value to it - don't create a second one.</span>
       </td>
     </tr>
     {dkim_row}
@@ -2767,7 +2767,7 @@ def send_followup_email(client_id):
     </tr>
   </tbody>
 </table>
-<p style="font-size:12px;color:#888;margin:8px 0 0;">Add these to <strong>{outreach_domain}</strong> at your DNS provider (GoDaddy, Cloudflare, Namecheap, etc.). Usually 10 minutes — DNS propagates within a few hours.</p>"""
+<p style="font-size:12px;color:#888;margin:8px 0 0;">Add these to <strong>{outreach_domain}</strong> at your DNS provider (GoDaddy, Cloudflare, Namecheap, etc.). Usually 10 minutes - DNS propagates within a few hours.</p>"""
 
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
@@ -2779,25 +2779,25 @@ def send_followup_email(client_id):
 
   <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
     <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>1. DNS records for your IT person</strong></p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Have whoever manages your domain add the following records. This ensures your outreach emails land in inboxes — not spam. Should take about 10 minutes on their end, then a few hours to propagate.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Have whoever manages your domain add the following records. This ensures your outreach emails land in inboxes - not spam. Should take about 10 minutes on their end, then a few hours to propagate.</p>
     {dns_block}
   </div>
 
   <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:28px;">
-    <p style="font-size:15px;font-weight:700;margin:0 0 12px;"><strong>2. Your outreach sequence — please review</strong></p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;">These are the three emails we'll send on your behalf. Read through and reply with any edits — or just say "looks good" and we're ready.</p>
+    <p style="font-size:15px;font-weight:700;margin:0 0 12px;"><strong>2. Your outreach sequence - please review</strong></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;">These are the three emails we'll send on your behalf. Read through and reply with any edits - or just say "looks good" and we're ready.</p>
     {seq_html}
     <p style="font-size:12px;color:#aaa;margin:4px 0 0;">Each email is personalized with the recipient's name, company, and a custom opening line written specifically for their practice.</p>
   </div>
 
   <div style="border-left:3px solid #4ade80;padding-left:16px;margin-bottom:32px;">
     <p style="font-size:15px;font-weight:700;margin:0 0 8px;"><strong>3. Connect your calendar</strong></p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 12px;">We've set up your booking page. Click the link below and connect your calendar — takes about 2 minutes. Interested prospects will book directly onto your calendar from here.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 12px;">We've set up your booking page. Click the link below and connect your calendar - takes about 2 minutes. Interested prospects will book directly onto your calendar from here.</p>
     <p style="text-align:left;margin:0;"><a href="{calendly}" style="background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">Connect Your Calendar →</a></p>
   </div>
 
-  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Your sending address is already warming up in the background — this takes 2–3 weeks. Once warmup is complete and everything above is done, I'll send you the subscription payment link to kick things off.</p>
-  <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Once you've added the DNS records, reviewed the sequence, and connected your calendar — just reply to this email and let me know. I'll confirm everything is verified on our end and we'll move to the next step.</p>
+  <p style="font-size:15px;line-height:1.7;margin:0 0 8px;">Your sending address is already warming up in the background - this takes 2–3 weeks. Once warmup is complete and everything above is done, I'll send you the subscription payment link to kick things off.</p>
+  <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Once you've added the DNS records, reviewed the sequence, and connected your calendar - just reply to this email and let me know. I'll confirm everything is verified on our end and we'll move to the next step.</p>
   <p style="font-size:15px;line-height:1.7;margin:16px 0 0;">Any questions, just reply here.</p>
 
   <div style="margin-top:40px;padding-top:24px;border-top:1px solid #e5e5e5;">
@@ -2807,14 +2807,14 @@ def send_followup_email(client_id):
 
     app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
     if not app_password:
-        flash("ARGUSREACH_GMAIL_APP_PASS not set — cannot send email.", "error")
+        flash("ARGUSREACH_GMAIL_APP_PASS not set - cannot send email.", "error")
         return redirect(url_for("client_detail", client_id=client_id))
 
     try:
         msg = MIMEMultipart("alternative")
         msg["From"]    = "Vito Resciniti | ArgusReach <vito@argusreach.com>"
         msg["To"]      = to_email
-        msg["Subject"] = f"Your sequence + next setup steps — {firm}"
+        msg["Subject"] = f"Your sequence + next setup steps - {firm}"
         msg.attach(MIMEText(html, "html"))
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
             smtp.login("vito@argusreach.com", app_password)
@@ -2826,7 +2826,7 @@ def send_followup_email(client_id):
                 c["followup_sent"] = True
                 break
         save_clients(config2)
-        _notify_telegram(f"📨 Follow-up email sent to *{to_email}* for *{firm}*\n{'⚠️ DNS not verified — records in email for client to add' if not dns_ok else '✅ DNS verified'}")
+        _notify_telegram(f"📨 Follow-up email sent to *{to_email}* for *{firm}*\n{'⚠️ DNS not verified - records in email for client to add' if not dns_ok else '✅ DNS verified'}")
         flash(f"Follow-up email sent to {to_email}.", "success")
     except Exception as e:
         flash(f"Email failed: {e}", "error")
@@ -2869,8 +2869,8 @@ def intake_approve(intake_id):
             "mode":                  "draft_approval",
             "firm_name":             intake["firm_name"],
             "vertical":              intake["vertical"],
-            "plan":                  plan,  # from approval form — Vito can override intake value
-            "outreach_email":        "",   # set during credential submission — NEVER default to vito@argusreach.com
+            "plan":                  plan,  # from approval form - Vito can override intake value
+            "outreach_email":        "",   # set during credential submission - NEVER default to vito@argusreach.com
             "sender_name":           f.get("sender_name", intake.get("sender_name","")).strip(),
             "title":                 f.get("title", intake.get("sender_title","")).strip(),
             "client_email":          intake["contact_email"],
@@ -2888,7 +2888,7 @@ def intake_approve(intake_id):
             "_intake_id":            intake_id,
             "_contact_name":         intake.get("contact_name",""),
             "_contact_title":        intake.get("contact_title",""),
-            # NOTE: no second "plan" key here — form value above is the authoritative source
+            # NOTE: no second "plan" key here - form value above is the authoritative source
             "_meeting_format":        intake.get("meeting_format","any"),
             "_office_address":        intake.get("office_address",""),
             "_success_story":        intake.get("success_story",""),
@@ -2936,7 +2936,7 @@ def intake_approve(intake_id):
             },
         }
 
-        # Auto-generate sequence from intake data — visible immediately when Vito opens client
+        # Auto-generate sequence from intake data - visible immediately when Vito opens client
         new_client["sequence"] = _generate_sequence_from_intake(new_client)
 
         config["clients"].append(new_client)
@@ -2995,7 +2995,7 @@ def intake_approve(intake_id):
         _auto_generate_stripe_link(client_id, new_client, config)
 
         # Retroactively attribute any untracked $500 setup fee payment to this client.
-        # The $500 Stripe link is generic (no client_id at time of payment — client pays
+        # The $500 Stripe link is generic (no client_id at time of payment - client pays
         # before intake approval). Match by customer email + amount + no client_id yet.
         try:
             client_email = new_client.get("client_email", "")
@@ -3076,7 +3076,7 @@ def health():
     return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
 
-# Always init DB on startup — regardless of how the app is launched (systemd, gunicorn, direct)
+# Always init DB on startup - regardless of how the app is launched (systemd, gunicorn, direct)
 init_db()
 
 if __name__ == "__main__":

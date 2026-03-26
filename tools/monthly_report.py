@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ArgusReach — Monthly Client Report Generator
+ArgusReach - Monthly Client Report Generator
 Usage: python3 monthly_report.py --client pt_tampa_bay_test --month "March 2026"
        python3 monthly_report.py --client pt_tampa_bay_test --month "March 2026" --preview
 
@@ -129,7 +129,7 @@ def pull_instantly_analytics(campaign_id):
 
 
 def pull_instantly_sent(campaign_id):
-    """Legacy wrapper — returns emails_sent_count only."""
+    """Legacy wrapper - returns emails_sent_count only."""
     return pull_instantly_analytics(campaign_id).get('sent')
 
 
@@ -242,7 +242,7 @@ def build_report_html(client, month, stats, notes, history=None):
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ArgusReach — Monthly Report — {month}</title>
+<title>ArgusReach - Monthly Report - {month}</title>
 </head>
 <body style="margin:0;padding:0;background:#f9fafb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 
@@ -420,7 +420,7 @@ def main():
     if not to_email and not args.preview:
         to_email = input(f"Recipient email for {client['firm_name']}: ").strip()
 
-    print(f"\n📊 Building report for: {client['firm_name']} — {args.month}")
+    print(f"\n📊 Building report for: {client['firm_name']} - {args.month}")
     print("  Pulling stats from DB...")
 
     # Pull all stats automatically
@@ -470,10 +470,10 @@ def main():
     print(f"💾 Saved: {out_path}")
 
     if args.preview:
-        print("👁  Preview mode — not sent.")
+        print("👁  Preview mode - not sent.")
         return
 
-    subject = f"ArgusReach — Monthly Report — {client['firm_name']} — {args.month}"
+    subject = f"ArgusReach - Monthly Report - {client['firm_name']} - {args.month}"
     send_report(client, to_email, subject, html)
 
 

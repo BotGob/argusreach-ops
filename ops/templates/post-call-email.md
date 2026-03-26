@@ -12,7 +12,7 @@ Great talking with you today. Based on our conversation, I think there's a real 
 Here are your three next steps:
 
 **1. Service agreement**
-[HelloSign link — hellosign.com → Templates → New Template → upload service-agreement.md → set signature fields → save]
+[HelloSign link - hellosign.com → Templates → New Template → upload service-agreement.md → set signature fields → save]
 
 **2. Setup fee ($500 one-time)**
 [Stripe link: https://buy.stripe.com/bJe6oG7Uw8CD1Bh9bM5gc01]
@@ -24,7 +24,7 @@ Once all three are completed, you'll receive a welcome email from me with everyt
 
 Any questions, just reply here.
 
-— Vito Resciniti
+- Vito Resciniti
 Founder, ArgusReach
 vito@argusreach.com
 
