@@ -171,7 +171,7 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
             f"(2) The observation must be real and specific — not generic praise. "
             f"(3) End with a natural bridge (e.g. '— and I think we could help you reach more of them') "
             f"that connects what you noticed to the service outcome. "
-            f"(4) Plain text only, no punctuation at end."
+            f"(4) Plain text only, end with a period."
         )
         msg = aclient.messages.create(
             model="claude-haiku-4-5",
