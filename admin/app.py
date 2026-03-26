@@ -470,8 +470,13 @@ def get_client_by_id(client_id):
             return c, config
     return None, config
 
-def get_client_metrics(client_id, instantly_campaign_id=None):
-    """Single source of truth for all client metrics. Use everywhere."""
+def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analytics=None):
+    """Single source of truth for all client metrics. Use everywhere.
+
+    prefetched_analytics: pass the result of fetch_instantly_analytics() when calling
+    for multiple clients (e.g. dashboard) to avoid one API call per client.
+    If None, fetches only this client's campaign from Instantly (client profile page).
+    """
     conn = get_db()
     reply_rows = conn.execute("""
         SELECT json_extract(metadata,'$.classification') as cls, COUNT(DISTINCT prospect_id) as cnt
@@ -497,7 +502,12 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
     ).fetchone()[0] if False else sum(breakdown.values())  # keep grouped sum for now — each prospect only has one classification event per message
 
     # Instantly analytics: emails_sent_count + emails_read_count (opens). DRAFT returns empty.
-    analytics      = fetch_instantly_analytics()
+    # Use prefetched_analytics if provided (dashboard: 1 bulk call for all clients).
+    # Otherwise fetch only this campaign (client profile: targeted single-campaign fetch).
+    if prefetched_analytics is not None:
+        analytics = prefetched_analytics
+    else:
+        analytics = fetch_instantly_analytics(campaign_id=instantly_campaign_id or None)
     a              = analytics.get(instantly_campaign_id or "", {})
     instantly_sent = a.get("emails_sent_count", 0)
     open_count     = a.get("emails_read_count", 0)
@@ -538,13 +548,51 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
         "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
     }
 
-def fetch_instantly_analytics():
+def fetch_instantly_analytics(campaign_id=None):
+    """Fetch Instantly campaign analytics.
+
+    If campaign_id is given: fetches only that campaign (1 API call, used by client profile).
+    If None: fetches ALL campaigns with pagination (used by dashboard — call once, pass result down).
+    Returns dict keyed by campaign_id.
+    """
     if not INSTANTLY_KEY:
         return {}
+    headers = {"Authorization": f"Bearer {INSTANTLY_KEY}"}
     try:
-        r = requests.get("https://api.instantly.ai/api/v2/campaigns/analytics",
-                         headers={"Authorization": f"Bearer {INSTANTLY_KEY}"}, timeout=10)
-        return {c["campaign_id"]: c for c in r.json()} if r.ok else {}
+        if campaign_id:
+            # Single campaign fetch — fast, exact
+            r = requests.get(
+                "https://api.instantly.ai/api/v2/campaigns/analytics",
+                headers=headers, params={"id": campaign_id}, timeout=10
+            )
+            if not r.ok:
+                return {}
+            data = r.json()
+            if isinstance(data, list):
+                return {c["campaign_id"]: c for c in data if c.get("campaign_id")}
+            elif isinstance(data, dict) and data.get("campaign_id"):
+                return {data["campaign_id"]: data}
+            return {}
+        else:
+            # Paginated bulk fetch — call once per dashboard load
+            result, skip = {}, 0
+            while True:
+                r = requests.get(
+                    "https://api.instantly.ai/api/v2/campaigns/analytics",
+                    headers=headers, params={"limit": 100, "skip": skip}, timeout=15
+                )
+                if not r.ok:
+                    break
+                page = r.json()
+                if not isinstance(page, list) or not page:
+                    break
+                for c in page:
+                    if c.get("campaign_id"):
+                        result[c["campaign_id"]] = c
+                if len(page) < 100:
+                    break
+                skip += 100
+            return result
     except:
         return {}
 
@@ -779,7 +827,7 @@ def dashboard():
 
     client_stats = []
     for c in clients:
-        m = get_client_metrics(c["id"], c.get("instantly_campaign_id",""))
+        m = get_client_metrics(c["id"], c.get("instantly_campaign_id",""), prefetched_analytics=analytics)
         client_stats.append({
             "id":               c["id"],
             "name":             c.get("firm_name", c["id"]),
