@@ -697,7 +697,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             print(f"❌ No prospects CSV found")
             raise SystemExit(1)
         with open(csv_path) as f:
-            contacts = list(csv.DictReader(f))
+            contacts = normalize_apollo_csv(list(csv.DictReader(f)))
         print(f"📂 Loaded {len(contacts)} contacts from CSV (skip_apollo mode)")
         # Still apply DNC filter
         dnc = load_dnc(client_id)
@@ -870,3 +870,49 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ── Apollo CSV column normalizer ──────────────────────────────────────────────
+def normalize_apollo_csv(rows):
+    """
+    Map Apollo UI export column names to our internal contact dict format.
+    Apollo exports: First Name, Last Name, Email, Title, Company, Company City,
+                    Company State, LinkedIn Url, Website / Company Website Url
+    Also handles CSVs already in our internal format (first_name, email, etc.)
+    """
+    COL_MAP = {
+        # Apollo UI export names → internal keys
+        "first name":        "first_name",
+        "last name":         "last_name",
+        "email":             "email",
+        "title":             "title",
+        "company":           "company",
+        "company name":      "company",
+        "company city":      "city",
+        "city":              "city",
+        "company state":     "state",
+        "state":             "state",
+        "linkedin url":      "linkedin_url",
+        "linkedin":          "linkedin_url",
+        "website":           "organization_website_url",
+        "company website":   "organization_website_url",
+        "company website url": "organization_website_url",
+        "organization_website_url": "organization_website_url",
+        # already-internal passthrough
+        "first_name":        "first_name",
+        "last_name":         "last_name",
+        "organization_website": "organization_website_url",
+    }
+    normalized = []
+    for row in rows:
+        n = {}
+        for raw_key, val in row.items():
+            mapped = COL_MAP.get(raw_key.strip().lower())
+            if mapped and mapped not in n:
+                n[mapped] = val.strip() if val else ""
+        # Ensure required keys exist
+        for k in ("first_name","last_name","email","company","title","city","state","linkedin_url","organization_website_url"):
+            n.setdefault(k, "")
+        if n.get("email"):
+            normalized.append(n)
+    return normalized

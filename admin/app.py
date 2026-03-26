@@ -1001,6 +1001,17 @@ def client_detail(client_id):
         except Exception:
             pass
 
+    # Count uploaded prospects CSV if it exists
+    csv_path = BASE_DIR / "campaigns" / client_id / "prospects.csv"
+    prospects_csv_count = 0
+    if csv_path.exists():
+        try:
+            import csv as _csv
+            with open(csv_path) as _f:
+                prospects_csv_count = sum(1 for _ in _csv.DictReader(_f))
+        except Exception:
+            pass
+
     return render_template("client_detail.html",
         client=client,
         dnc_count=len(dnc),
@@ -1011,6 +1022,7 @@ def client_detail(client_id):
         monitor_status=monitor_status,
         warmup_live=warmup_live,
         now=datetime.now(),
+        prospects_csv_count=prospects_csv_count,
     )
 
 
@@ -1286,6 +1298,50 @@ def campaign_toggle(client_id, campaign_id):
     return redirect(url_for("client_detail", client_id=client_id))
 
 
+@app.route("/clients/<client_id>/upload-prospects", methods=["POST"])
+@login_required
+def upload_prospects(client_id):
+    """Upload an Apollo CSV export as the prospect list for the next campaign launch."""
+    client, _ = get_client_by_id(client_id)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+
+    f = request.files.get("prospects_csv")
+    if not f or not f.filename.endswith(".csv"):
+        flash("Please upload a .csv file.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    import csv as csvmod, io
+    out_dir = BASE_DIR / "campaigns" / client_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "prospects.csv"
+
+    content = f.read().decode("utf-8-sig")  # strip BOM if present
+    reader = csvmod.DictReader(io.StringIO(content))
+    rows = list(reader)
+
+    # Normalize Apollo column names → internal format
+    sys.path.insert(0, str(BASE_DIR / "tools"))
+    import monthly_cycle as mc
+    import importlib; importlib.reload(mc)
+    normalized = mc.normalize_apollo_csv(rows)
+
+    if not normalized:
+        flash("No valid contacts found in CSV (missing email column?)", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+
+    # Write in internal format
+    fieldnames = ["first_name","last_name","email","company","title","city","state","linkedin_url","organization_website_url"]
+    with open(out_path, "w", newline="") as out_f:
+        writer = csvmod.DictWriter(out_f, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(normalized)
+
+    flash(f"✅ {len(normalized)} prospects uploaded and ready. Hit 'Build & Launch Campaign (CSV mode)' to proceed.", "success")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/clients/<client_id>/launch", methods=["POST"])
 @login_required
 def campaign_launch(client_id):
@@ -1304,6 +1360,7 @@ def campaign_launch(client_id):
         return redirect(url_for("dashboard"))
 
     month = request.form.get("month", "").strip()
+    skip_apollo = request.form.get("use_csv") == "1"
     skip_verify = not bool(os.environ.get("NEVERBOUNCE_API_KEY", ""))
 
     if not month:
@@ -1338,7 +1395,7 @@ def campaign_launch(client_id):
                 client_id=client_id,
                 month_name=month,
                 dry_run=False,
-                skip_apollo=False,
+                skip_apollo=skip_apollo,
                 skip_verify=skip_verify,
             )
 
@@ -1362,7 +1419,8 @@ def campaign_launch(client_id):
     t = threading.Thread(target=run_in_background, daemon=True)
     t.start()
 
-    flash(f"Campaign launch started for {month}. Building leads and creating campaign now - check progress below.", "success")
+    mode_label = "CSV upload" if skip_apollo else "Apollo API"
+    flash(f"Campaign launch started for {month} ({mode_label}). Building leads and creating campaign — check progress below.", "success")
     return redirect(url_for("client_detail", client_id=client_id) + "?launch=1")
 
 
@@ -2055,12 +2113,12 @@ def system_status():
         services.append({"name": "Calendly", "status": "warn", "detail": "CALENDLY_API_TOKEN not configured", "note": "Add when first client signs"})
 
     # 6. Telegram
-    tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
-    tg_chat  = os.environ.get("TELEGRAM_CHAT_ID", "")
+    tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN", "8588914878:AAEQnZNXWx9_j2llD-Yw0sWwjegXu-pruCk")
+    tg_chat  = os.environ.get("ARGUSREACH_CHAT_ID", "-1003821840813")
     if tg_token and tg_chat:
-        services.append({"name": "Telegram", "status": "ok", "detail": f"Bot configured · Chat ID set", "note": "Alerts active"})
+        services.append({"name": "Telegram", "status": "ok", "detail": "Bot configured · Alerts active", "note": None})
     else:
-        services.append({"name": "Telegram", "status": "error", "detail": "TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing", "note": None})
+        services.append({"name": "Telegram", "status": "error", "detail": "ARGUSREACH_BOT_TOKEN or ARGUSREACH_CHAT_ID missing", "note": None})
 
     # 7. Claude / Anthropic
     claude_key = os.environ.get("ANTHROPIC_API_KEY", "")

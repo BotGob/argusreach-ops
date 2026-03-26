@@ -378,6 +378,41 @@
   </div>
   {% endif %}
 
+  {# ── ICP / Apollo Search Reference ── #}
+  {% set locs = client._target_locations.split('\n') | map('trim') | select | list if client._target_locations else [] %}
+  {% set titles = client._target_titles.split(',') | map('trim') | select | list if client._target_titles else [] %}
+  {% set sizes = client._target_company_size.split(',') | map('trim') | select | list if client._target_company_size else [] %}
+  <details style="margin-bottom:16px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px 16px">
+    <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">📋 Apollo Search Filters (use these each month)</summary>
+    <div style="margin-top:10px;font-size:12px;color:#94a3b8;line-height:1.8">
+      <div><span style="color:#475569">Titles:</span> {{ titles | join(', ') or '—' }}</div>
+      <div><span style="color:#475569">Industry:</span> {{ client._target_industry | replace('_',' ') | title or '—' }}</div>
+      <div><span style="color:#475569">Seniority:</span> {{ client._target_seniority | replace('_',' ') | replace(',',' · ') or '—' }}</div>
+      <div><span style="color:#475569">Company size:</span> {{ sizes | join(', ') or '—' }} employees</div>
+      <div><span style="color:#475569">Locations:</span> {{ locs | join(' · ') or '—' }}</div>
+      <div><span style="color:#475569">Target contacts/mo:</span> {{ client.contacts_per_month or 200 }}</div>
+    </div>
+  </details>
+
+  {# ── CSV Upload (manual Apollo export) ── #}
+  {% set csv_path = 'campaigns/' + client.id + '/prospects.csv' %}
+  {% set csv_exists = prospects_csv_count is defined and prospects_csv_count > 0 %}
+  <details style="margin-bottom:16px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px">
+    <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">
+      📤 Upload Apollo CSV Export
+      {% if prospects_csv_count %}<span style="color:#4ade80;margin-left:8px">✓ {{ prospects_csv_count }} prospects ready</span>{% endif %}
+    </summary>
+    <div style="margin-top:10px">
+      <p style="font-size:11px;color:#475569;margin:0 0 10px">Export from Apollo using the filters above, then upload here. All columns are auto-mapped — upload the raw Apollo CSV as-is.</p>
+      <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="file" name="prospects_csv" accept=".csv" required
+               style="font-size:12px;color:#94a3b8;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px">
+        <button type="submit" class="btn btn-ghost btn-sm" style="font-size:12px">Upload</button>
+      </form>
+    </div>
+  </details>
+
+  {# ── Launch Form ── #}
   <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form">
     <input type="hidden" name="override" id="override-input" value="0">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
@@ -390,6 +425,13 @@
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Lead Limit</label>
         <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="1" max="1000"
                style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:90px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <label style="font-size:12px;color:#64748b">Lead Source</label>
+        <select name="use_csv" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:6px;font-size:13px">
+          <option value="0">Apollo API (auto)</option>
+          <option value="1" {% if prospects_csv_count %}selected{% endif %}>Uploaded CSV</option>
+        </select>
       </div>
       <button type="submit" id="launch-btn" class="btn btn-primary"
               style="background:#4ade80;color:#0f172a;font-weight:700{% if not all_gates %};opacity:0.45;cursor:not-allowed{% endif %}"
