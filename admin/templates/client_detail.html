@@ -404,11 +404,36 @@
     </summary>
     <div style="margin-top:10px">
       <p style="font-size:11px;color:#475569;margin:0 0 10px">Export from Apollo using the filters above, then upload here. All columns are auto-mapped — upload the raw Apollo CSV as-is.</p>
-      <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <input type="file" name="prospects_csv" accept=".csv" required
-               style="font-size:12px;color:#94a3b8;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px">
+      <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" id="csv-upload-form">
+        <div id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()"
+             style="border:2px dashed #334155;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:8px">
+          <div style="font-size:12px;color:#475569">Drag &amp; drop your CSV here, or <span style="color:#4ade80">click to browse</span></div>
+          <div id="csv-file-name" style="font-size:11px;color:#4ade80;margin-top:6px;display:none"></div>
+        </div>
+        <input type="file" id="csv-file-input" name="prospects_csv" accept=".csv" required style="display:none">
         <button type="submit" class="btn btn-ghost btn-sm" style="font-size:12px">Upload</button>
       </form>
+      <script>
+        (function() {
+          var dz = document.getElementById('csv-drop-zone');
+          var inp = document.getElementById('csv-file-input');
+          var lbl = document.getElementById('csv-file-name');
+          inp.addEventListener('change', function() {
+            if (inp.files[0]) { lbl.textContent = inp.files[0].name; lbl.style.display='block'; dz.style.borderColor='#4ade80'; }
+          });
+          dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='#4ade80'; });
+          dz.addEventListener('dragleave', function() { dz.style.borderColor='#334155'; });
+          dz.addEventListener('drop', function(e) {
+            e.preventDefault();
+            var f = e.dataTransfer.files[0];
+            if (f && f.name.endsWith('.csv')) {
+              var dt = new DataTransfer(); dt.items.add(f);
+              inp.files = dt.files;
+              lbl.textContent = f.name; lbl.style.display='block'; dz.style.borderColor='#4ade80';
+            } else { dz.style.borderColor='#ef4444'; setTimeout(function(){dz.style.borderColor='#334155';},1500); }
+          });
+        })();
+      </script>
     </div>
   </details>
 
