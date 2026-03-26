@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated 2026-03-23 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-26 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -209,8 +209,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
           <span style="color:#a78bfa;font-weight:600;">CLIENT CHECKLIST:</span><br>
           <span style="color:#a78bfa;">☐</span> Creates outreach email (real mailbox, NOT alias — Google Workspace or M365, ~$6-8/mo)<br>
           <span style="color:#a78bfa;">☐</span> Generates app password → submits outreach email + app password via secure one-time token link (Fernet-encrypted at rest; link provided in welcome email or sent separately by Vito)<br>
-          <span style="color:#a78bfa;">☐</span> Sends DNC list (emails/domains) if applicable<br>
-          <span style="color:#a78bfa;">☐</span> Sends warm leads if applicable<br>
+          <span style="color:#a78bfa;">☐</span> DNC list collected at intake (text + file upload) — auto-processed on approval<br>
           <span style="color:#a78bfa;">☐</span> Forwards DNS records to IT → IT adds SPF/DKIM/DMARC (~10 min)<br>
           <span style="color:#a78bfa;">☐</span> Connects calendar to their Calendly booking link (~2 min)<br>
           <span style="color:#a78bfa;">☐</span> Reviews sequence draft → replies approved or with edits (one round max)<br>
@@ -1210,3 +1209,14 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 
 </body>
 </html>
+<!-- CHANGELOG 2026-03-26
+- Warm/existing contact list removed from product entirely — DNC-only framing
+- DNC collected at intake (text + file upload) — auto-processed on approval
+- sender_name + sender_title added to intake form (required) — feeds sequence writing
+- Calendly link added to intake approval form (Vito sets it up, pastes before approving)
+- Touch 3 now includes Calendly booking link as CTA for all new clients
+- Pipeline step order: Intake → Creds → Warmup → Follow-up Email → DNS → Seq Approved → Calendar → Payment → Launch
+- Launch email gated on PRE_PAYMENT_GATES (5 gates, no payment) — payment comes AFTER launch email
+- ArgusReach LLC filed 2026-03-25 — pending Active status
+- Self-campaign live: ArgusReach targeting PT clinics, Tampa Bay, Starter 200/mo
+-->
