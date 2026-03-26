@@ -1348,7 +1348,7 @@ def campaign_launch(client_id):
             with open(log_path, "a") as f:
                 f.write(f"\n✅ DONE - Campaign created as DRAFT in Instantly. Review sequence and leads, then activate.\n")
                 f.write("__COMPLETE__\n")
-        except Exception as e:
+        except BaseException as e:
             try:
                 if sys.stdout != orig_stdout:
                     sys.stdout.close()
@@ -1356,7 +1356,7 @@ def campaign_launch(client_id):
                 pass
             sys.stdout = orig_stdout
             with open(log_path, "a") as f:
-                f.write(f"\n❌ ERROR: {e}\n")
+                f.write(f"\n❌ ERROR: {type(e).__name__}: {e}\n")
                 f.write("__COMPLETE__\n")
 
     t = threading.Thread(target=run_in_background, daemon=True)
@@ -2000,8 +2000,8 @@ def system_status():
     apollo_key = os.environ.get("APOLLO_API_KEY", "")
     if apollo_key:
         try:
-            r = requests.post("https://api.apollo.io/v1/auth/health",
-                              json={"api_key": apollo_key}, timeout=8)
+            r = requests.get("https://api.apollo.io/v1/auth/health",
+                             headers={"X-Api-Key": apollo_key, "Cache-Control": "no-cache"}, timeout=8)
             if r.ok and r.json().get("is_logged_in"):
                 services.append({"name": "Apollo", "status": "ok", "detail": "Authenticated · Prospect sourcing active", "note": "Upgrade to Basic ($49/mo) at first client"})
             else:
@@ -2055,7 +2055,7 @@ def system_status():
         services.append({"name": "Calendly", "status": "warn", "detail": "CALENDLY_API_TOKEN not configured", "note": "Add when first client signs"})
 
     # 6. Telegram
-    tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    tg_token = os.environ.get("ARGUSREACH_BOT_TOKEN", os.environ.get("TELEGRAM_BOT_TOKEN", ""))
     tg_chat  = os.environ.get("TELEGRAM_CHAT_ID", "")
     if tg_token and tg_chat:
         services.append({"name": "Telegram", "status": "ok", "detail": f"Bot configured · Chat ID set", "note": "Alerts active"})

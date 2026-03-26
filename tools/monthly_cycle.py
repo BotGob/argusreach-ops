@@ -667,7 +667,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
     client = get_client(client_id)
     if not client:
         print(f"❌ Client '{client_id}' not found")
-        sys.exit(1)
+        raise SystemExit(1)
 
     firm   = client["firm_name"]
 
@@ -695,7 +695,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             csv_path = CAMPAIGNS_DIR / client_id / "prospects.csv"
         if not csv_path.exists():
             print(f"❌ No prospects CSV found")
-            sys.exit(1)
+            raise SystemExit(1)
         with open(csv_path) as f:
             contacts = list(csv.DictReader(f))
         print(f"📂 Loaded {len(contacts)} contacts from CSV (skip_apollo mode)")
@@ -760,7 +760,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
 
         if not contacts:
             print("⚠️  No clean contacts after all filtering rounds.")
-            sys.exit(0)
+            raise SystemExit(0)
 
         if len(contacts) < target:
             print(f"⚠️  Could only source {len(contacts)}/{target} contacts after {round_num} rounds — proceeding with what we have")
@@ -798,7 +798,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
         else:
             print("❌ No sequence found in portal or Instantly.")
             print("   Save and push the approved sequence in the portal, then re-run the cycle.")
-            sys.exit(1)
+            raise SystemExit(1)
 
     if not dry_run:
         # ── Step 5: Create campaign ───────────────────────────────────────────
