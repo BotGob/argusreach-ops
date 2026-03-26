@@ -497,3 +497,17 @@
 2026-03-26 02:25:31 No active clients. Waiting...
 2026-03-26 02:25:33 Cycle complete. Next check in 10 min.
 
+2026-03-26 02:32:22 No active clients. Waiting...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1762: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-26 02:32:23 Cycle complete. Next check in 10 min.
+
+2026-03-26 02:35:33 No active clients. Waiting...
+2026-03-26 02:35:36 Cycle complete. Next check in 10 min.
+
+2026-03-26 02:42:23 No active clients. Waiting...
+2026-03-26 02:42:25 Cycle complete. Next check in 10 min.
+
+2026-03-26 02:45:36 No active clients. Waiting...
+2026-03-26 02:45:38 Cycle complete. Next check in 10 min.
+
