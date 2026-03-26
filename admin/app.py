@@ -1010,6 +1010,7 @@ def client_detail(client_id):
         conn_status=conn_status,
         monitor_status=monitor_status,
         warmup_live=warmup_live,
+        now=datetime.now(),
     )
 
 

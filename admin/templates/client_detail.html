@@ -383,7 +383,7 @@
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
       <div>
         <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Campaign Month</label>
-        <input type="text" name="month" placeholder="April 2026" required
+        <input type="text" name="month" placeholder="{{ now.strftime('%B %Y') }}" value="{{ now.strftime('%B %Y') }}" required
                style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:140px">
       </div>
       <div>
