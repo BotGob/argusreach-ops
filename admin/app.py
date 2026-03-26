@@ -181,7 +181,7 @@ Here is everything you know about this client:
 Write a 3-touch cold email sequence. Rules:
 - Touch 1: Short cold intro (60-80 words max, not counting {{{{custom_intro}}}}). Touch 1 must start with {{{{custom_intro}}}} on its own line followed by a blank line. This variable will be populated at send time with a personalized opener based on the prospect's company. Write Touch 1 assuming {{{{custom_intro}}}} will provide the opening hook — so the rest of Touch 1 should flow naturally after a personalized sentence. Reference {{{{companyName}}}} and use {{{{city}}}} to make it feel locally relevant. If a voice sample is provided, use it as your style guide — preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
 - Touch 2: Follow-up 5 days later. Different angle — explain the mechanism or add a specific proof point. 50-70 words. Same signature.
-- Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. Same signature.
+- Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. {f'End with the booking link as the CTA: {calendly}' if calendly else 'End with a soft CTA for a call.'} Same signature.
 - All touches: plain text only, no markdown, no bullet points, no em dashes (use hyphens), sound like a real human wrote it, not a template
 - Available personalization tags: {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} — use all three naturally across the 3 touches
 
@@ -2805,7 +2805,7 @@ def intake_approve(intake_id):
             "sender_name":           f.get("sender_name", intake.get("sender_name","")).strip(),
             "title":                 f.get("title", intake.get("sender_title","")).strip(),
             "client_email":          intake["contact_email"],
-            "calendly_link":         intake.get("calendly_link","").strip(),
+            "calendly_link":         f.get("calendly_link","").strip() or intake.get("calendly_link","").strip(),
             "instantly_campaign_id": "",
             "campaign_name":         "",
             "contacts_per_month":    int(f.get("contacts_per_month", contacts_map.get(plan, 200))),

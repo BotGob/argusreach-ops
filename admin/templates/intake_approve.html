@@ -101,6 +101,13 @@
       </div>
 
       <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Booking Link
+          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">The booking link created specifically for this client. Included in Touch 3 CTA and reply drafts. Set up in Calendly first, then paste here.</span>
+        </label>
+        <input name="calendly_link" value="{{ form.get('calendly_link', '') }}" placeholder="https://calendly.com/argusreach/client-name">
+      </div>
+
+      <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Internal Positioning Note
           <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">How ArgusReach should frame itself in outreach for this client. Any context not captured in the intake.</span>
         </label>
