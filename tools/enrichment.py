@@ -145,10 +145,11 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "") -> str:
         import anthropic as _anthropic
         aclient = _anthropic.Anthropic(api_key=api_key)
         prompt = (
-            f"Write a single natural sentence (15-25 words) to open a cold email to "
-            f"{first_name} at {company}. "
-            f"Use this recent context from their website: {snippet}. "
-            f"Make it specific and relevant, not generic. Plain text only, no punctuation at end"
+            f"Write a single natural sentence (15-25 words) to open a cold email. "
+            f"Start with 'I noticed' followed by something specific about {company} from their website. "
+            f"Context from their website: {snippet}. "
+            f"Rules: reference the company name or what they do — never reference the recipient by name. "
+            f"Be specific, not generic. Plain text only, no punctuation at end."
         )
         msg = aclient.messages.create(
             model="claude-haiku-4-5",
