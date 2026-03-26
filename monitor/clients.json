@@ -51,19 +51,19 @@
       "_dns_provider": "",
       "sequence": [
         {
-          "subject": "Physician referrals for {{companyName}}",
-          "body": "{{custom_intro}}\r\n\r\nMost PT owners in {{city}} rely on 2-3 physicians who refer inconsistently. We work with clinics like yours to build a deeper pipeline - identifying PCPs and specialists who actually want to refer, then handling all the outreach and relationship management in your name.\r\n\r\nYou focus on patients. We keep your referral pipeline full.\r\n\r\nQuick call to see if this makes sense for {{companyName}}?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "subject": "{{firstName}} - physician referrals",
+          "body": "{{custom_intro}}\r\n\r\nMost PT owners in {{city}} rely on a few physicians who refer inconsistently - and building new referral relationships means outreach that never stops. That's time away from patients - and it's not sustainable.\r\n\r\nArgusReach handles it. We source verified physicians in your area, run systematic outreach in your name, and route interested referral sources straight to your calendar.\r\n\r\nYou focus on patients. We keep your pipeline full.\r\n\r\nWorth a quick call?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
           "delay_days": 0
         },
         {
-          "subject": "Re: Physician referrals for {{companyName}}",
-          "body": "{{firstName}} - just wanted to follow up. Here's how this actually works: we source verified physician contacts in your area, write personalized outreach in your voice, manage every reply, and only loop you in when someone's actually interested in meeting.\r\n\r\nOur clients typically see 2-5 qualified meetings per month with physicians open to referring.\r\n\r\nWorth a conversation?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
-          "delay_days": 3
+          "subject": "Re: {{firstName}} - physician referrals",
+          "body": "{{firstName}} - just wanted to follow up. Full transparency - this email was sent through ArgusReach. That's how we found {{companyName}}, personalized this message, and landed in your inbox. That's exactly what we'd build for your physician outreach.\r\n\r\nHere's how it works: we source verified physician contacts in your area, write outreach in your name, manage every reply, and any physician who's interested books directly on your calendar.\r\n\r\nWorth a conversation?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "delay_days": 5
         },
         {
           "subject": "Last one - {{companyName}}",
-          "body": "{{firstName}} - I'll keep this short. If building physician relationships sounds valuable but you're too swamped to handle it yourself, we should talk. If not, no hard feelings.\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
-          "delay_days": 6
+          "body": "{{firstName}} - last one.\r\n\r\nYou built {{companyName}} to treat patients, not chase referrals. We handle the outreach completely - systematic, ongoing, running in the background while you focus on the work that actually matters.\r\n\r\nIf that is worth 15 minutes: https://calendly.com/vito-argusreach/30min\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "delay_days": 7
         }
       ],
       "schedule": {
@@ -83,7 +83,7 @@
         "dns_verified": true,
         "warmup_complete": true,
         "payment_confirmed": false,
-        "sequence_approved": false,
+        "sequence_approved": true,
         "calendar_connected": true
       },
       "_setup_token": "Zd-JW_GkDAL7MK7fDqKDkNsXk1xTQ5mnYgd3dIYC4Qs",

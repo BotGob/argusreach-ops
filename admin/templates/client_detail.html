@@ -58,8 +58,8 @@
     ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'Manual — Vito sends from portal.'),
     ('dns',       '🔒', 'DNS Verified',         dns_ok,    'Auto — polled every 4h.'),
     ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Manual — Vito checks after client confirms.'),
-    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto — Stripe webhook on payment.'),
     ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Manual — Vito confirms after client connects.'),
+    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto — Stripe webhook on payment.'),
     ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Manual — Vito reviews draft in Instantly, then activates.'),
   ] %}
 

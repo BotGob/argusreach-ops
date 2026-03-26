@@ -354,6 +354,7 @@ def _notify_telegram(msg: str):
 # ── ALL-GATES HELPERS ─────────────────────────────────────────────────────────
 
 _ALL_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "payment_confirmed", "sequence_approved", "calendar_connected")
+_PRE_PAYMENT_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "sequence_approved", "calendar_connected")
 
 
 def check_all_gates_and_alert(client, save_fn):
@@ -1592,9 +1593,9 @@ def send_launch_email(client_id):
         flash("Client not found.", "error")
         return redirect(url_for("dashboard"))
 
-    # Verify all 6 gates
+    # Verify all pre-payment gates (payment comes AFTER this email)
     checklist    = client.get("checklist", {})
-    missing_gates = [g for g in _ALL_GATES if not checklist.get(g)]
+    missing_gates = [g for g in _PRE_PAYMENT_GATES if not checklist.get(g)]
     if missing_gates:
         flash(f"❌ Cannot send launch email — gates not yet green: {', '.join(missing_gates)}", "error")
         return redirect(url_for("client_detail", client_id=client_id))
