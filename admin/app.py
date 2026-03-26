@@ -496,10 +496,11 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
         (client_id,)
     ).fetchone()[0] if False else sum(breakdown.values())  # keep grouped sum for now — each prospect only has one classification event per message
 
-    # Instantly analytics: emails_sent_count only (unreliable for leads_count, DRAFT returns empty)
+    # Instantly analytics: emails_sent_count + emails_read_count (opens). DRAFT returns empty.
     analytics      = fetch_instantly_analytics()
     a              = analytics.get(instantly_campaign_id or "", {})
     instantly_sent = a.get("emails_sent_count", 0)
+    open_count     = a.get("emails_read_count", 0)
     leads          = leads_db  # authoritative — DB never returns 0 for loaded prospects
 
     # Report buckets: Interested = positive + question + approved escalations
@@ -532,6 +533,8 @@ def get_client_metrics(client_id, instantly_campaign_id=None):
         "revenue_cents":     revenue,
         "revenue":           f"${revenue/100:,.2f}",
         "prospects_tracked": prospects_tracked,
+        "open_count":        open_count,
+        "open_rate":         f"{(open_count/instantly_sent*100):.1f}%" if instantly_sent > 0 else "—",
         "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
     }
 
@@ -2121,21 +2124,32 @@ def generate_report(client_id):
             "reply_escalated":  bd.get("escalated", 0),
             "meetings":         meetings,
             "emails_sent":      None,
+            "open_count":       None,
+            "open_rate":        None,
         }
 
-        # Try Instantly for emails_sent
+        # Pull emails_sent + open_count from Instantly analytics
         campaign_id = client.get("instantly_campaign_id", "")
         if campaign_id and INSTANTLY_KEY:
             try:
                 r = requests.get(
-                    "https://api.instantly.ai/api/v2/leads",
+                    "https://api.instantly.ai/api/v2/campaigns/analytics",
                     headers={"Authorization": f"Bearer {INSTANTLY_KEY}"},
-                    params={"campaign": campaign_id, "limit": 1},
+                    params={"id": campaign_id},
                     timeout=10
                 )
                 if r.ok:
-                    a = r.json()
-                    stats["emails_sent"] = a.get("total", None)
+                    data = r.json()
+                    a = {}
+                    if isinstance(data, list):
+                        a = next((x for x in data if x.get("campaign_id") == campaign_id), {})
+                    elif isinstance(data, dict):
+                        a = data.get(campaign_id, data)
+                    sent = a.get("emails_sent_count") or 0
+                    opens = a.get("emails_read_count") or 0
+                    stats["emails_sent"] = sent or None
+                    stats["open_count"]  = opens or None
+                    stats["open_rate"]   = f"{opens/sent*100:.1f}%" if sent > 0 else None
             except Exception:
                 pass
 

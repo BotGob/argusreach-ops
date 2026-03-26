@@ -96,10 +96,11 @@ def pull_db_stats(client_id, month_str):
     }
 
 
-def pull_instantly_sent(campaign_id):
-    """Pull total emails sent for a campaign from Instantly analytics API."""
+def pull_instantly_analytics(campaign_id):
+    """Pull emails_sent_count + emails_read_count (opens) from Instantly analytics API.
+    Returns dict with 'sent' and 'open_count', or empty dict on failure."""
     if not INSTANTLY_API_KEY or not campaign_id:
-        return None
+        return {}
     try:
         resp = requests.get(
             'https://api.instantly.ai/api/v2/campaigns/analytics',
@@ -108,24 +109,28 @@ def pull_instantly_sent(campaign_id):
             timeout=15
         )
         if not resp.ok:
-            return None
+            return {}
         data = resp.json()
-        # Analytics endpoint returns a list or dict depending on whether id param was passed
+        a = {}
         if isinstance(data, list):
-            for item in data:
-                if item.get('campaign_id') == campaign_id:
-                    return item.get('emails_sent_count', None)
-            return None
+            a = next((x for x in data if x.get('campaign_id') == campaign_id), {})
         elif isinstance(data, dict):
-            # Single campaign response
-            if data.get('campaign_id') == campaign_id:
-                return data.get('emails_sent_count', None)
-            # May be keyed by campaign_id
-            item = data.get(campaign_id, {})
-            return item.get('emails_sent_count', None)
+            a = data if data.get('campaign_id') == campaign_id else data.get(campaign_id, {})
+        sent  = a.get('emails_sent_count') or 0
+        opens = a.get('emails_read_count') or 0
+        return {
+            'sent':       sent or None,
+            'open_count': opens or None,
+            'open_rate':  f"{opens/sent*100:.1f}%" if sent > 0 else None,
+        }
     except Exception as e:
         print(f"  ⚠️  Instantly analytics error: {e}")
-    return None
+    return {}
+
+
+def pull_instantly_sent(campaign_id):
+    """Legacy wrapper — returns emails_sent_count only."""
+    return pull_instantly_analytics(campaign_id).get('sent')
 
 
 # ── History ────────────────────────────────────────────────────────────────────
@@ -200,6 +205,8 @@ def build_report_html(client, month, stats, notes, history=None):
 
     prospects  = stats['prospects']
     sent       = stats.get('emails_sent', '—')
+    open_count = stats.get('open_count')
+    open_rate  = stats.get('open_rate')
     interested = stats['reply_interested']
     not_now    = stats['reply_not_now']
     meetings   = stats['meetings']
@@ -208,13 +215,22 @@ def build_report_html(client, month, stats, notes, history=None):
     changing_items = ''.join(f'<li style="margin-bottom:8px;color:#374151;">{c}</li>' for c in notes['changing'])
     timeline_html  = build_timeline_html(history or [])
 
+    open_rate_cell = f"""
+        <td style="width:12px;"></td>
+        <td style="background:#f9fafb;border-radius:6px;padding:16px 20px;">
+          <div style="font-size:1.75rem;font-weight:800;color:#111827;letter-spacing:-0.03em;">{open_rate}</div>
+          <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">Open rate ({open_count} opens)</div>
+        </td>""" if open_rate else ''
+
     sent_row = f"""
       <tr>
         <td style="background:#f9fafb;border-radius:6px;padding:16px 20px;">
           <div style="font-size:1.75rem;font-weight:800;color:#111827;letter-spacing:-0.03em;">{sent}</div>
           <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">Emails sent</div>
         </td>
-        <td style="width:12px;"></td>
+        {open_rate_cell}
+      </tr>
+      <tr>
         <td style="background:#f9fafb;border-radius:6px;padding:16px 20px;">
           <div style="font-size:1.75rem;font-weight:800;color:#111827;letter-spacing:-0.03em;">{not_now}</div>
           <div style="font-size:0.78rem;color:#6b7280;margin-top:2px;">Follow up later</div>
@@ -410,14 +426,19 @@ def main():
     # Pull all stats automatically
     stats = pull_db_stats(args.client, args.month)
 
-    # Pull emails sent from Instantly
+    # Pull emails sent + open rate from Instantly
     campaign_id = client.get('instantly_campaign_id', '')
     if campaign_id:
-        print("  Pulling emails sent from Instantly...")
-        stats['emails_sent'] = pull_instantly_sent(campaign_id)
-        print(f"  ✅ Instantly: {stats['emails_sent']} emails sent")
+        print("  Pulling analytics from Instantly...")
+        inst = pull_instantly_analytics(campaign_id)
+        stats['emails_sent'] = inst.get('sent')
+        stats['open_count']  = inst.get('open_count')
+        stats['open_rate']   = inst.get('open_rate')
+        print(f"  ✅ Instantly: {stats['emails_sent']} sent, {stats['open_rate'] or '—'} open rate")
     else:
         stats['emails_sent'] = None
+        stats['open_count']  = None
+        stats['open_rate']   = None
 
     # Get narrative from Vito
     notes = prompt_narrative(client, stats)
