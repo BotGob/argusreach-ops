@@ -812,7 +812,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             add_sending_account(campaign_id, client["outreach_email"])
 
         # ── Step 7: Enrich contacts with personalized intros ─────────────────
-        contacts = enrich_contacts(contacts)
+        contacts = enrich_contacts(contacts, client=client)
 
         # ── Step 7b: Load contacts with personalization fields ────────────────
         load_to_instantly(contacts, campaign_id, dry_run=dry_run, client_id=client_id)

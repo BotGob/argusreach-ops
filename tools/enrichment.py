@@ -83,7 +83,7 @@ _GENERIC_PHRASES = [
 ]
 
 
-def enrich_contact(contact: dict, anthropic_api_key: str = "") -> str:
+def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = None) -> str:
     """
     Fetch a contact's company website and generate a personalized 1-sentence
     cold-email opener using Claude Haiku.
@@ -144,12 +144,34 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "") -> str:
     try:
         import anthropic as _anthropic
         aclient = _anthropic.Anthropic(api_key=api_key)
+        # Pull service context from client record if available
+        service_bridge = ""
+        if client:
+            value_prop = client.get("_value_prop", "").strip()
+            desired_action = client.get("_desired_action", "").strip()
+            if value_prop:
+                # Summarize in a few words what the client's service helps with
+                service_bridge = (
+                    f"The email is selling a service that helps practices like {company} "
+                    f"with: {value_prop[:200]}. "
+                    f"The opener should observe something specific about {company} "
+                    f"and bridge naturally toward that outcome — without pitching it directly."
+                )
+            elif desired_action:
+                service_bridge = f"The email's goal is to get the prospect to {desired_action}."
+
         prompt = (
-            f"Write a single natural sentence (15-25 words) to open a cold email. "
-            f"Start with 'I noticed' followed by something specific about {company} from their website. "
+            f"Write a single natural sentence (20-30 words) to open a cold outreach email. "
+            f"Start with 'I noticed' followed by something specific and genuine about {company} "
+            f"observed from their website. "
             f"Context from their website: {snippet}. "
-            f"Rules: reference the company name or what they do — never reference the recipient by name. "
-            f"Be specific, not generic. Plain text only, no punctuation at end."
+            f"{service_bridge} "
+            f"Rules: "
+            f"(1) Reference the company or what they do — never the recipient by name. "
+            f"(2) The observation must be real and specific — not generic praise. "
+            f"(3) End with a natural bridge (e.g. '— and I think we could help you reach more of them') "
+            f"that connects what you noticed to the service outcome. "
+            f"(4) Plain text only, no punctuation at end."
         )
         msg = aclient.messages.create(
             model="claude-haiku-4-5",
@@ -169,16 +191,17 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "") -> str:
     return result
 
 
-def enrich_contacts(contacts: list, anthropic_api_key: str = "") -> list:
+def enrich_contacts(contacts: list, anthropic_api_key: str = "", client: dict = None) -> list:
     """
     Enrich each contact with a personalized `custom_intro` opener.
     Adds key `custom_intro` to each contact dict (empty string on failure).
     Rate-limited to 0.3s between requests.
+    Pass `client` dict to ground intros in the client's service/value prop.
     """
     total = len(contacts)
     print(f"✨ Enriching {total} contacts with personalized intros...")
     for i, contact in enumerate(contacts, 1):
-        contact["custom_intro"] = enrich_contact(contact, anthropic_api_key)
+        contact["custom_intro"] = enrich_contact(contact, anthropic_api_key, client=client)
         if i % 10 == 0 or i == total:
             filled = sum(1 for c in contacts[:i] if c.get("custom_intro"))
             print(f"   {i}/{total} enriched ({filled} with intros so far)")
