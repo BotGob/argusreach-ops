@@ -16,8 +16,8 @@ Filed sunbiz.org. Order ID 264427972. Pending "Active" status (1-3 business days
 ### 3. HelloSign — free account
 Service agreement signing. Required before first paid client signs.
 
-### 4. Instantly.ai — confirm Growth upgrade ($47/mo)
-Trial expired March 23. Free trial has API access (confirmed) but sending limits apply. Upgrade before first paying client.
+### ~~4. Instantly.ai — Growth upgrade~~ ✅ DONE 2026-03-26
+Upgraded to Growth plan (monthly, ~$59/mo). Renews 2026-04-26. Campaign sending active.
 
 ### 5. Apollo.io — upgrade to Basic ($49/mo) when first client signs
 Free tier (50 exports/mo) is insufficient for 200+ contacts/month.
