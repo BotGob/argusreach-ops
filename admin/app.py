@@ -161,6 +161,10 @@ Value proposition: {client.get('_value_prop','')}
 Differentiator (what makes them different): {client.get('_differentiator','')}
 Client outcomes: {client.get('_outcomes','')}
 Voice sample (client's own words - use this as style guide for Touch 1): {client.get('_voice_sample','')}
+Who they want to get in front of (in their own words): {client.get('_target_who','')}
+Their ideal client/customer: {client.get('_ideal_client','')}
+How they currently get new business: {client.get('_current_biz_source','')}
+Biggest challenge with getting new business: {client.get('_biggest_challenge','')}
 Target titles: {client.get('_target_titles','')}
 Target locations: {client.get('_target_locations','')}
 Target company size: {client.get('_target_company_size','')}
@@ -177,6 +181,14 @@ Email signature to append: {sig}
 Here is everything you know about this client:
 
 {intake_context}
+
+IMPORTANT CONTEXT FOR WRITING:
+- The prospect receiving this email is someone the client wants to get in front of (see "Who they want to get in front of" above)
+- Write as if you deeply understand the client's business and their prospect's world
+- If "Who they want to get in front of" is filled in, use that exact framing - not generic "referral sources" or "physicians"
+- If "Biggest challenge" is filled in, the sequence should speak directly to that pain - ideally in Touch 1
+- If "How they currently get new business" suggests they rely on word of mouth or a few key relationships, acknowledge that dynamic in the copy
+- Voice sample (if provided) is the most important style guide - preserve their exact tone and phrasing
 
 Write a 3-touch cold email sequence. Rules:
 - Touch 1: Short cold intro (60-80 words max, not counting {{{{custom_intro}}}}). Touch 1 must start with {{{{custom_intro}}}} on its own line followed by a blank line. This variable will be populated at send time with a personalized opener based on the prospect's company. Write Touch 1 assuming {{{{custom_intro}}}} will provide the opening hook - so the rest of Touch 1 should flow naturally after a personalized sentence. Reference {{{{companyName}}}} and use {{{{city}}}} to make it feel locally relevant. If a voice sample is provided, use it as your style guide - preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
@@ -2494,6 +2506,10 @@ def intake():
             "target_industry":      ",".join(request.form.getlist("target_industry")),
             "target_seniority":     ",".join(request.form.getlist("target_seniority")),
             "target_company_size":  ",".join(request.form.getlist("target_company_size")),
+            "target_who":           f.get("target_who","").strip(),
+            "ideal_client":         f.get("ideal_client","").strip(),
+            "current_biz_source":   f.get("current_biz_source","").strip(),
+            "biggest_challenge":    f.get("biggest_challenge","").strip(),
             "dnc_notes":            f.get("dnc_notes","").strip(),
             "dnc_emails":           f.get("dnc_emails","").strip(),
             "icp_summary":          f.get("icp_summary","").strip(),
@@ -2967,6 +2983,10 @@ def intake_approve(intake_id):
             "_target_seniority":     intake.get("target_seniority",""),
             "_target_company_size":  intake.get("target_company_size",""),
             "_desired_action":       intake.get("desired_action","book_call"),
+            "_target_who":           intake.get("target_who",""),
+            "_ideal_client":         intake.get("ideal_client",""),
+            "_current_biz_source":   intake.get("current_biz_source",""),
+            "_biggest_challenge":    intake.get("biggest_challenge",""),
             "_has_existing_list":    intake.get("has_existing_list","no"),
             "_website":              intake.get("website",""),
             "_email_provider":       intake.get("email_provider","google"),

@@ -1658,3 +1658,916 @@
 2026-03-26 20:40:12 IMAP error ArgusReach: b'[AUTHENTICATIONFAILED] Invalid credentials (Failure)'
 2026-03-26 20:40:15 Cycle complete. Next check in 10 min.
 
+2026-03-26 20:47:24 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:47:24 [ArgusReach] Checking inbox...
+2026-03-26 20:47:25 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:47:25 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:47:25 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:47:25 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:47:30 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:50:15 [ArgusReach] Checking inbox...
+2026-03-26 20:50:15 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:50:16 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:50:16 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:50:16 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:50:16 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:50:17 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:50:17 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:50:20 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:57:30 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:57:30 [ArgusReach] Checking inbox...
+2026-03-26 20:57:30 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:57:31 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:57:31 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:57:31 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:57:35 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:00:20 [ArgusReach] Checking inbox...
+2026-03-26 21:00:20 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:00:21 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:00:21 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:00:21 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:00:21 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:00:22 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:00:22 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:00:24 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:07:35 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:07:35 [ArgusReach] Checking inbox...
+2026-03-26 21:07:37 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:07:37 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:07:37 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:07:38 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:07:38 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:07:42 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:10:24 [ArgusReach] Checking inbox...
+2026-03-26 21:10:25 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:10:25 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:10:26 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:10:26 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:10:27 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:10:27 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:10:27 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:10:30 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:17:43 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:17:43 [ArgusReach] Checking inbox...
+2026-03-26 21:17:43 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:17:43 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:17:44 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:17:44 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:17:48 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:20:30 [ArgusReach] Checking inbox...
+2026-03-26 21:20:30 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:20:31 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:20:31 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:20:31 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:20:32 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:20:32 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:20:32 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:20:35 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:27:48 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:27:48 [ArgusReach] Checking inbox...
+2026-03-26 21:27:49 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:27:50 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:27:50 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:27:50 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:27:52 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:27:55 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:30:35 [ArgusReach] Checking inbox...
+2026-03-26 21:30:35 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:30:36 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:30:36 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:30:36 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:30:37 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:30:37 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:30:37 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:30:40 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:37:55 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:37:55 [ArgusReach] Checking inbox...
+2026-03-26 21:37:56 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:37:56 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:37:56 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:37:57 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:37:57 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: notifications@e.link.com
+
+2026-03-26 20:07:02 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:07:02 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:07:03 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:07:03 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:07:06 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:17:07 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:17:07 [ArgusReach] Checking inbox...
+2026-03-26 20:17:07 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:17:08 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:17:08 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:17:08 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:17:08 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:17:09 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:17:09 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:17:09 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:17:12 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:27:12 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:27:12 [ArgusReach] Checking inbox...
+2026-03-26 20:27:13 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:27:13 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:27:13 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:27:14 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:27:15 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:27:15 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:27:18 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:37:18 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:37:18 [ArgusReach] Checking inbox...
+2026-03-26 20:37:19 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:37:19 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:37:19 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:37:20 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:37:21 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:37:21 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:37:24 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:47:24 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:47:24 [ArgusReach] Checking inbox...
+2026-03-26 20:47:25 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:47:25 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:47:25 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:47:25 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:47:26 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:47:30 Cycle complete. Next check in 10 min.
+
+2026-03-26 20:57:30 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 20:57:30 [ArgusReach] Checking inbox...
+2026-03-26 20:57:30 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 20:57:31 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 20:57:31 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 20:57:31 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 20:57:32 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 20:57:35 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:07:35 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:07:35 [ArgusReach] Checking inbox...
+2026-03-26 21:07:37 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:07:37 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:07:37 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:07:38 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:07:38 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:07:39 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:07:42 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:17:43 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:17:43 [ArgusReach] Checking inbox...
+2026-03-26 21:17:43 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:17:43 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:17:44 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:17:44 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:17:45 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:17:48 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:27:48 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:27:48 [ArgusReach] Checking inbox...
+2026-03-26 21:27:49 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:27:50 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:27:50 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:27:50 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:27:51 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:27:52 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:27:55 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:37:55 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:37:55 [ArgusReach] Checking inbox...
+2026-03-26 21:37:56 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:37:56 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:37:56 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:37:57 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:37:57 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:38:01 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:40:40 [ArgusReach] Checking inbox...
+2026-03-26 21:40:41 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:40:41 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:40:41 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:40:42 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:40:42 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:40:42 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:40:42 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:40:45 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:48:02 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:48:02 [ArgusReach] Checking inbox...
+2026-03-26 21:48:02 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:48:03 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:48:03 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:48:03 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:48:05 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:48:08 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:50:45 [ArgusReach] Checking inbox...
+2026-03-26 21:50:46 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:50:46 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:50:46 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:50:47 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:50:47 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:50:47 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:50:47 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:50:50 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:58:09 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:58:09 [ArgusReach] Checking inbox...
+2026-03-26 21:58:09 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:58:10 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:58:10 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:58:10 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:58:14 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:00:50 [ArgusReach] Checking inbox...
+2026-03-26 22:00:51 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:00:51 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:00:51 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:00:52 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:00:52 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:00:52 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:00:52 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:00:55 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:08:14 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:08:14 [ArgusReach] Checking inbox...
+2026-03-26 22:08:15 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:08:16 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:08:16 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:08:16 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:08:20 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:10:55 [ArgusReach] Checking inbox...
+2026-03-26 22:11:01 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:11:02 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:11:02 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:11:02 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:11:03 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:11:03 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:11:03 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:11:06 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:18:21 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:18:21 [ArgusReach] Checking inbox...
+2026-03-26 22:18:21 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:18:22 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:18:22 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:18:22 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:18:26 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:21:06 [ArgusReach] Checking inbox...
+2026-03-26 22:21:07 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:21:07 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:21:07 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:21:08 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:21:08 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:21:08 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:21:08 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:21:11 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:28:26 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:28:26 [ArgusReach] Checking inbox...
+2026-03-26 22:28:27 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:28:27 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:28:32 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:31:11 [ArgusReach] Checking inbox...
+2026-03-26 22:31:12 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:31:12 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:31:12 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:31:13 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:31:13 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:31:13 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:31:14 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:31:16 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:38:32 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:38:32 [ArgusReach] Checking inbox...
+2026-03-26 22:38:33 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:38:33 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:38:34 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:38:34 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:38:38 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:41:16 [ArgusReach] Checking inbox...
+2026-03-26 22:41:17 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:41:17 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:41:18 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:41:18 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:41:18 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:41:18 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:41:19 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:41:21 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:48:38 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:48:38 [ArgusReach] Checking inbox...
+2026-03-26 22:48:39 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:48:40 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:48:44 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:51:21 [ArgusReach] Checking inbox...
+2026-03-26 22:51:22 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:51:22 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:51:23 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:51:23 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:51:24 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:51:24 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:51:24 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:51:27 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:58:44 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:58:44 [ArgusReach] Checking inbox...
+2026-03-26 22:58:45 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:58:45 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:58:45 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:58:46 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:58:46 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:58:50 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:01:27 [ArgusReach] Checking inbox...
+2026-03-26 23:01:28 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:01:28 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:01:28 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:01:29 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:01:29 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:01:29 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:01:30 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:01:32 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:08:50 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:08:50 [ArgusReach] Checking inbox...
+2026-03-26 23:08:51 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:08:51 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:08:51 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:08:53 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:08:53 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:08:56 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:11:32 [ArgusReach] Checking inbox...
+2026-03-26 23:11:33 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:11:33 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:11:34 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:11:34 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:11:34 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:11:34 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:11:35 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:11:37 Cycle complete. Next check in 10 min.
+
+
+2026-03-26 21:37:58 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:38:01 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:48:02 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:48:02 [ArgusReach] Checking inbox...
+2026-03-26 21:48:02 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:48:03 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:48:03 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:48:03 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:48:04 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:48:05 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:48:08 Cycle complete. Next check in 10 min.
+
+2026-03-26 21:58:09 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 21:58:09 [ArgusReach] Checking inbox...
+2026-03-26 21:58:09 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 21:58:10 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 21:58:10 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 21:58:10 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 21:58:11 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 21:58:14 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:08:14 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:08:14 [ArgusReach] Checking inbox...
+2026-03-26 22:08:15 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:08:16 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:08:16 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:08:16 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:08:17 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:08:20 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:18:21 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:18:21 [ArgusReach] Checking inbox...
+2026-03-26 22:18:21 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:18:22 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:18:22 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:18:22 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:18:23 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:18:26 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:28:26 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:28:26 [ArgusReach] Checking inbox...
+2026-03-26 22:28:27 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:28:27 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:28:28 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:28:29 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:28:32 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:38:32 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:38:32 [ArgusReach] Checking inbox...
+2026-03-26 22:38:33 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:38:33 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:38:34 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:38:34 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:38:35 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:38:38 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:48:38 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:48:38 [ArgusReach] Checking inbox...
+2026-03-26 22:48:39 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:48:40 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:48:40 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:48:41 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:48:44 Cycle complete. Next check in 10 min.
+
+2026-03-26 22:58:44 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 22:58:44 [ArgusReach] Checking inbox...
+2026-03-26 22:58:45 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 22:58:45 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 22:58:45 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 22:58:46 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 22:58:46 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 22:58:47 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 22:58:50 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:08:50 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:08:50 [ArgusReach] Checking inbox...
+2026-03-26 23:08:51 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:08:51 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:08:51 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:08:52 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:08:53 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:08:53 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:08:56 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:18:56 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)2026-03-26 23:18:56 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:18:56 [ArgusReach] Checking inbox...
+2026-03-26 23:18:57 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:18:57 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:18:58 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:19:00 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:19:00 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:19:03 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:21:37 [ArgusReach] Checking inbox...
+2026-03-26 23:21:40 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:21:40 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:21:40 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:21:41 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:21:41 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:21:41 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:21:42 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:21:45 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:29:03 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:29:03 [ArgusReach] Checking inbox...
+2026-03-26 23:29:04 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:29:04 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:29:04 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:29:05 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:29:05 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:29:09 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:31:45 [ArgusReach] Checking inbox...
+2026-03-26 23:31:46 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:31:46 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:31:46 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:31:47 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:31:47 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:31:47 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:31:48 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:31:50 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:39:10 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:39:10 [ArgusReach] Checking inbox...
+2026-03-26 23:39:10 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:39:11 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:39:11 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:39:11 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:39:12 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:39:12 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:39:13 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:39:14 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:39:17 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:41:50 [ArgusReach] Checking inbox...
+2026-03-26 23:41:51 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:41:51 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:41:52 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:41:52 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:41:52 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:41:52 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:41:53 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:41:55 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:49:17 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:49:17 [ArgusReach] Checking inbox...
+2026-03-26 23:49:18 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:49:18 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:49:18 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:49:20 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:49:20 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:49:23 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:51:55 [ArgusReach] Checking inbox...
+2026-03-26 23:51:56 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:51:56 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:51:56 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:51:57 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:51:57 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:51:57 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:51:57 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:52:00 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:59:23 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:59:23 [ArgusReach] Checking inbox...
+2026-03-26 23:59:24 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:59:25 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:59:25 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:59:25 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:59:27 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:59:30 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:02:00 [ArgusReach] Checking inbox...
+2026-03-27 00:02:01 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:02:01 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:02:01 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:02:01 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:02:02 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:02:02 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:02:05 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:09:30 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:09:30 [ArgusReach] Checking inbox...
+2026-03-27 00:09:31 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:09:32 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:09:33 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:09:33 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:09:36 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:12:05 [ArgusReach] Checking inbox...
+2026-03-27 00:12:05 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:12:06 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:12:06 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:12:06 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:12:06 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:12:07 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:12:09 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:19:36 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:19:36 [ArgusReach] Checking inbox...
+2026-03-27 00:19:37 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:19:37 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:19:39 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:19:41 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:22:09 [ArgusReach] Checking inbox...
+2026-03-27 00:22:10 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:22:10 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:22:11 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:22:11 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:22:11 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:22:11 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:22:14 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:29:42 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:29:42 [ArgusReach] Checking inbox...
+2026-03-27 00:29:42 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:29:43 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:29:44 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:29:44 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:29:47 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:32:14 [ArgusReach] Checking inbox...
+2026-03-27 00:32:15 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:32:15 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:32:15 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:32:15 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:32:15 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:32:16 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:32:18 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:39:47 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:39:47 [ArgusReach] Checking inbox...
+2026-03-27 00:39:48 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:39:49 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:39:49 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:39:49 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:39:50 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:39:50 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:39:51 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:39:53 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:42:18 [ArgusReach] Checking inbox...
+2026-03-27 00:42:19 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:42:19 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:42:19 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:42:20 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:42:20 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:42:20 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:42:23 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:49:54 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:49:54 [ArgusReach] Checking inbox...
+2026-03-27 00:49:55 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:49:55 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:49:55 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:49:55 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:49:56 [ArgusReach] Skipping duplicate: notifications@e.link.com
+
+2026-03-26 23:18:56 [ArgusReach] Checking inbox...
+2026-03-26 23:18:57 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:18:57 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:18:58 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:18:59 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:19:00 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:19:00 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:19:03 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:29:03 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:29:03 [ArgusReach] Checking inbox...
+2026-03-26 23:29:04 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:29:04 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:29:04 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:29:05 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:29:05 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:29:06 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:29:09 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:39:10 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:39:10 [ArgusReach] Checking inbox...
+2026-03-26 23:39:10 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:39:11 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:39:11 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:39:11 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:39:12 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:39:12 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:39:13 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:39:14 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:39:17 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:49:17 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:49:17 [ArgusReach] Checking inbox...
+2026-03-26 23:49:18 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:49:18 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:49:18 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:49:19 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:49:20 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:49:20 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:49:23 Cycle complete. Next check in 10 min.
+
+2026-03-26 23:59:23 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-26 23:59:23 [ArgusReach] Checking inbox...
+2026-03-26 23:59:24 [ArgusReach] 7 message(s) in last 24h.
+2026-03-26 23:59:25 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-26 23:59:25 [ArgusReach] Skipping duplicate: noreply@finit.tylertech.com
+2026-03-26 23:59:25 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-26 23:59:26 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-26 23:59:27 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-26 23:59:30 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:09:30 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:09:30 [ArgusReach] Checking inbox...
+2026-03-27 00:09:31 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:09:32 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:09:32 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:09:33 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:09:33 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:09:36 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:19:36 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:19:36 [ArgusReach] Checking inbox...
+2026-03-27 00:19:37 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:19:37 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:19:38 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:19:39 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:19:41 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:29:42 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:29:42 [ArgusReach] Checking inbox...
+2026-03-27 00:29:42 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:29:43 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:29:43 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:29:44 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:29:44 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:29:47 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:39:47 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:39:47 [ArgusReach] Checking inbox...
+2026-03-27 00:39:48 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:39:49 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:39:49 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:39:49 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:39:50 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:39:50 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:39:51 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:39:53 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:49:54 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:49:54 [ArgusReach] Checking inbox...
+2026-03-27 00:49:55 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:49:55 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 00:49:55 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:49:55 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:49:56 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:49:56 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com2026-03-27 00:49:56 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:49:56 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:49:59 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:52:23 [ArgusReach] Checking inbox...
+2026-03-27 00:52:23 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 00:52:24 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 00:52:24 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 00:52:24 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 00:52:24 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 00:52:25 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 00:52:27 Cycle complete. Next check in 10 min.
+
+2026-03-27 00:59:59 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 00:59:59 [ArgusReach] Checking inbox...
+2026-03-27 01:00:00 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 01:00:00 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 01:00:01 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 01:00:01 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 01:00:01 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 01:00:01 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 01:00:02 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 01:00:03 Cycle complete. Next check in 10 min.
+
+2026-03-27 01:02:27 [ArgusReach] Checking inbox...
+2026-03-27 01:02:28 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 01:02:28 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 01:02:29 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 01:02:29 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 01:02:29 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 01:02:29 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 01:02:32 Cycle complete. Next check in 10 min.
+
+2026-03-27 01:10:03 [CampaignValidation] ✓ ArgusReach → 'ArgusReach — ArgusReach — March 2026' (fb7ebd23-2dce-42c2-87ac-c492b036a48b)
+2026-03-27 01:10:03 [ArgusReach] Checking inbox...
+2026-03-27 01:10:11 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 01:10:11 [ProspectFilter] ArgusReach — 22 known prospects loaded
+2026-03-27 01:10:12 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 01:10:14 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 01:10:16 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 01:10:17 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 01:10:18 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 01:10:19 Cycle complete. Next check in 10 min.
+
+2026-03-27 01:12:32 [ArgusReach] Checking inbox...
+2026-03-27 01:12:33 [ArgusReach] 5 message(s) in last 24h.
+2026-03-27 01:12:33 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-03-27 01:12:34 [ArgusReach] Skipping duplicate: invoice+statements+acct_1JO8bKB3VEKBA0yg@stripe.com
+2026-03-27 01:12:34 [ArgusReach] Skipping duplicate: notifications@e.link.com
+2026-03-27 01:12:35 [ArgusReach] Skipping duplicate: no-reply@accounts.google.com
+2026-03-27 01:12:36 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-03-27 01:12:38 Cycle complete. Next check in 10 min.
+
