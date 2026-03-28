@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Intakes — ArgusReach Admin{% endblock %}
+{% block title %}Intakes - ArgusReach Admin{% endblock %}
 {% block content %}
 
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
@@ -21,6 +21,7 @@
       <th>Firm</th>
       <th>Contact</th>
       <th>Vertical</th>
+      <th>Plan</th>
       <th>Geography</th>
       <th>Action</th>
     </tr></thead>
@@ -31,7 +32,14 @@
       <td><strong>{{ intake.firm_name }}</strong><br><span style="font-size:11px;color:#64748b">{{ intake.website or '' }}</span></td>
       <td>{{ intake.contact_name }}<br><a href="mailto:{{ intake.contact_email }}" style="font-size:11px;color:#60a5fa">{{ intake.contact_email }}</a></td>
       <td><span style="font-size:11px;background:#1e2535;padding:2px 8px;border-radius:12px">{{ intake.vertical }}</span></td>
-      <td style="font-size:12px;color:#94a3b8">{{ (intake.get('target_locations','') or '')[:40] }}{% if (intake.get('target_locations','') or '')|length > 40 %}…{% endif %}</td>
+      <td>
+        {% set plan = intake.get('plan','') %}
+        {% set plan_colors = {'starter':'#60a5fa','growth':'#4ade80','scale':'#f59e0b'} %}
+        {% if plan %}
+        <span style="font-size:11px;color:{{ plan_colors.get(plan,'#94a3b8') }};font-weight:600">{{ plan|upper }}</span>
+        {% else %}-{% endif %}
+      </td>
+      <td style="font-size:12px;color:#94a3b8">{{ (intake.get('target_locations','') or '')[:40] }}{% if (intake.get('target_locations','') or '')|length > 40 %}...{% endif %}</td>
       <td>
         <a href="{{ url_for('intake_approve', intake_id=intake.id) }}" class="btn btn-primary btn-sm">Review & Approve</a>
         <form method="POST" action="{{ url_for('intake_dismiss', intake_id=intake.id) }}" style="display:inline;margin-left:6px">

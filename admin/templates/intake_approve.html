@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Review Intake — ArgusReach Admin{% endblock %}
+{% block title %}Review Intake - ArgusReach Admin{% endblock %}
 {% block content %}
 
-<h1>Review Intake — {{ intake.firm_name }}</h1>
+<h1>Review Intake - {{ intake.firm_name }}</h1>
 <p class="subtitle">Submitted {{ intake.submitted_at | to_et }} · {{ intake.contact_name }} · {{ intake.contact_email }}</p>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
@@ -29,10 +29,12 @@
       ('Ideal Prospect', intake.get('icp_summary','')),
       ('Business Description', intake.get('business_description','')),
       ('Differentiator', intake.get('differentiator','')),
-      ('Outcomes', intake.get('outcomes','')),
-      ('Best Referral Sources', intake.get('best_referral_sources','')),
-      ('Prior Outreach', intake.get('prior_outreach','')),
-      ('Success Story', intake.get('success_story','')),
+      ('Success Story / Best Result', intake.get('success_story','')),
+      ('Desired Action (what prospect should do)', intake.get('desired_action','')),
+      ('Who They Want to Reach', intake.get('target_who','')),
+      ('Ideal Client / Customer', intake.get('ideal_client','')),
+      ('Current Business Source', intake.get('current_biz_source','')),
+      ('Biggest Challenge', intake.get('biggest_challenge','')),
       ('Biggest Objection', intake.get('prospect_objection','')),
       ('Value Proposition', intake.get('value_prop','')),
       ('Voice Sample', intake.get('voice_sample','')),
@@ -40,7 +42,6 @@
       ('DNC Emails / Domains', intake.get('dnc_emails','')),
       ('DNC Notes', intake.get('dnc_notes','')),
       ('Compliance Note', intake.get('compliance_note','')),
-      ('Desired Action', intake.get('desired_action','')),
       ('Sender Name', intake.get('sender_name','')),
       ('Sender Title', intake.get('sender_title','')),
       ('How They Heard', intake.get('how_heard','')),
@@ -70,9 +71,9 @@
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Plan *</label>
         <select name="plan" id="plan_select" onchange="updateContacts(this.value)" required>
           {% set selected_plan = form.get('plan') or intake.get('plan') or 'starter' %}
-          <option value="starter" {% if selected_plan=='starter' %}selected{% endif %}>Starter — $750/mo (200 contacts)</option>
-          <option value="growth" {% if selected_plan=='growth' %}selected{% endif %}>Growth — $1,500/mo (500 contacts)</option>
-          <option value="scale" {% if selected_plan=='scale' %}selected{% endif %}>Scale — $2,500/mo (1,000 contacts)</option>
+          <option value="starter" {% if selected_plan=='starter' %}selected{% endif %}>Starter - $750/mo (200 contacts)</option>
+          <option value="growth" {% if selected_plan=='growth' %}selected{% endif %}>Growth - $1,500/mo (500 contacts)</option>
+          <option value="scale" {% if selected_plan=='scale' %}selected{% endif %}>Scale - $2,500/mo (1,000 contacts)</option>
         </select>
         <div style="font-size:10px;color:#4ade80;margin-top:3px">↑ Pre-filled from client's intake selection</div>
       </div>
@@ -85,7 +86,7 @@
 
       <div style="margin-bottom:14px">
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Outreach Email Address
-          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">Leave blank — client submits their dedicated outreach email + app password via the secure credential form after the welcome email. Do not set this here.</span>
+          <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">Leave blank - client submits their dedicated outreach email + app password via the secure credential form after the welcome email. Do not set this here.</span>
         </label>
         <input name="outreach_email" value="" placeholder="Set via credential form after welcome email" style="opacity:0.5">
       </div>
@@ -111,7 +112,7 @@
         <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Internal Positioning Note
           <span style="font-weight:400;font-size:10px;color:#475569;display:block;margin-top:2px">How ArgusReach should frame itself in outreach for this client. Any context not captured in the intake.</span>
         </label>
-        <textarea name="positioning_note" style="min-height:70px" placeholder="e.g. Client is in a competitive market with 3 other PT practices on the same block. Lead with speed and communication — those are their real differentiators.">{{ form.get('positioning_note', '') }}</textarea>
+        <textarea name="positioning_note" style="min-height:70px" placeholder="e.g. Client is in a competitive market with 3 similar firms. Lead with their specific differentiator - speed, specialization, or client outcomes. Note any compliance constraints or tone considerations.">{{ form.get('positioning_note', '') }}</textarea>
       </div>
 
       <button type="submit" class="btn btn-primary" style="width:100%">✅ Create Client from Intake</button>

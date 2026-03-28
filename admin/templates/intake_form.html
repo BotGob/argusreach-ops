@@ -213,7 +213,7 @@
         <span class="hint">This determines your monthly prospect volume. You can upgrade at any time.</span>
       </label>
       <select name="plan" required>
-        <option value="">— Select your plan —</option>
+        <option value="">- Select your plan -</option>
         <option value="starter">Starter - $750/mo · 200 prospects/month</option>
         <option value="growth">Growth - $1,500/mo · 500 prospects/month</option>
         <option value="scale">Scale - $2,500/mo · 1,000 prospects/month</option>
@@ -241,7 +241,7 @@
     <div class="field">
       <label>Industry / Vertical <span class="req">*</span></label>
       <select name="vertical" required onchange="document.getElementById('vertical_other_wrap').style.display=this.value==='Other'?'block':'none'">
-        <option value="">— Select —</option>
+        <option value="">- Select -</option>
         <option value="Healthcare">Healthcare / Medical</option>
         <option value="ProfessionalServices">Professional Services (legal, finance, accounting)</option>
         <option value="B2BServices">B2B Services</option>
@@ -282,12 +282,12 @@
     <div class="grid2">
       <div class="field">
         <label>Outreach emails should appear to be from <span class="req">*</span>
-          <span class="hint">The name prospects will see in their inbox. Usually the owner or lead clinician — whoever has the most credibility with your target audience.</span>
+          <span class="hint">The name prospects will see in their inbox. Usually the owner or lead clinician - whoever has the most credibility with your target audience.</span>
         </label>
         <input name="sender_name" required placeholder="Dr. Michael Smith">
       </div>
       <div class="field">
-        <label>Their title — as it should appear in the email signature <span class="req">*</span>
+        <label>Their title - as it should appear in the email signature <span class="req">*</span>
           <span class="hint">How they'd sign off in a professional email. This flows directly into every outreach email we send.</span>
         </label>
         <input name="sender_title" required placeholder="Doctor of Physical Therapy, Owner">
@@ -358,7 +358,7 @@
       <textarea name="target_titles" required placeholder="Commercial bankers, business attorneys, financial advisors, insurance brokers, commercial real estate agents - anyone who regularly works with small business owners"></textarea>
     </div>
     <div class="field">
-      <label>Seniority level — who makes the decision? <span class="req">*</span>
+      <label>Seniority level - who makes the decision? <span class="req">*</span>
         <span class="hint">Select all that apply. We target people at this level when building your prospect list.</span>
       </label>
       <div class="checkbox-grid">
@@ -385,14 +385,14 @@
 
     <div class="field">
       <label>Who are you trying to get in front of? <span class="req">*</span>
-        <span class="hint">In plain language — who is your ideal contact? Don't worry about job titles yet. Think about who actually has the authority to send you business or become a client. The more specific, the better your outreach will be.</span>
+        <span class="hint">In plain language - who is your ideal contact? Don't worry about job titles yet. Think about who actually has the authority to send you business or become a client. The more specific, the better your outreach will be.</span>
       </label>
       <textarea name="target_who" required placeholder="Independent orthopedic surgeons and sports medicine physicians in the Tampa area who see post-surgical rehab patients. We want to be their go-to referral for physical therapy."></textarea>
     </div>
 
     <div class="field">
       <label>Describe your ideal client or customer <span class="req">*</span>
-        <span class="hint">Who is the best fit for what you do? Think about the clients you love working with — what do they have in common? This shapes who we target and what we say about you.</span>
+        <span class="hint">Who is the best fit for what you do? Think about the clients you love working with - what do they have in common? This shapes who we target and what we say about you.</span>
       </label>
       <textarea name="ideal_client" required placeholder="Small to mid-size PT clinics (1-3 locations) that are clinically excellent but haven't systematized their referral pipeline. Owners who are hands-on and care deeply about patient outcomes - not PE-backed groups chasing volume."></textarea>
     </div>
@@ -423,7 +423,7 @@
       <label>Do-Not-Contact list - email addresses or domains <span style="color:#666;font-size:0.75rem;">(optional)</span>
         <span class="hint">The best way to protect a company: include their email domain (e.g. smithlaw.com or @smithlaw.com). This blocks every person at that company, not just the ones you know by name. Individual email addresses work too. One per line - a spreadsheet or CRM export is fine, we'll extract what we need.</span>
       </label>
-      <textarea name="dnc_emails" placeholder="smithlaw.com&#10;firstnationalbank.com&#10;john@specificperson.com"></textarea>
+      <textarea name="dnc_emails" placeholder="smithlaw.com&#10;@firstnationalbank.com&#10;john@specificperson.com"></textarea>
       <div class="upload-zone" id="dnc-zone" onclick="document.getElementById('dnc_file').click()">
         <input type="file" id="dnc_file" name="dnc_file" accept=".csv,.xlsx,.xls" style="display:none" onchange="showFileName(this,'dnc-zone')">
         <div class="upload-icon">↑</div>
@@ -465,6 +465,21 @@
 
 
     <div class="field">
+      <label>When a prospect responds with interest - what's the ideal next step? <span class="req">*</span>
+        <span class="hint">This shapes how we word every reply and what your outreach is ultimately driving toward.</span>
+      </label>
+      <select name="desired_action" required>
+        <option value="">- Select -</option>
+        <option value="book_call">Schedule a discovery or intro call</option>
+        <option value="referral_relationship">Start a referral relationship - they send clients/patients to you</option>
+        <option value="meeting">Meet in person or on video to explore working together</option>
+        <option value="demo">See a product demo</option>
+        <option value="proposal">Receive a proposal or quote</option>
+        <option value="partnership">Explore a formal partnership or referral agreement</option>
+      </select>
+    </div>
+
+    <div class="field">
       <label>When a prospect says yes - how do you prefer to meet? <span class="req">*</span>
         <span class="hint">This determines how we word the reply and what your Calendly booking link is set up for.</span>
       </label>
@@ -490,7 +505,7 @@
         <span class="hint">We set up a booking link for you - prospects click it to schedule directly on your calendar. We just need to know which calendar system you use so we can connect it.</span>
       </label>
       <select name="calendar_type" required>
-        <option value="">— Select —</option>
+        <option value="">- Select -</option>
         <option value="google">Google Calendar (Gmail / Google Workspace)</option>
         <option value="outlook">Outlook / Microsoft 365</option>
         <option value="apple">Apple Calendar (iCloud)</option>
@@ -501,7 +516,7 @@
     <div class="section-header">Outreach Email Setup</div>
     <div class="field">
       <label>What email platform does your business use? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">You'll set up a dedicated outreach email on your domain (e.g. outreach@yourdomain.com) — we'll walk you through it step by step. Knowing your provider helps us send you the exact instructions.</span>
+        <span class="hint">You'll set up a dedicated outreach email on your domain (e.g. outreach@yourdomain.com) - we'll walk you through it step by step. Knowing your provider helps us send you the exact instructions.</span>
       </label>
       <select name="email_provider">
         <option value="google">Google Workspace (Gmail for business)</option>
@@ -511,7 +526,7 @@
     </div>
     <div class="field">
       <label>Who is your IT contact or DNS provider? <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Usually GoDaddy, Cloudflare, Namecheap, or your web hosting company. We'll send you the exact records to forward to them — takes about 5 minutes on their end.</span>
+        <span class="hint">Usually GoDaddy, Cloudflare, Namecheap, or your web hosting company. We'll send you the exact records to forward to them - takes about 5 minutes on their end.</span>
       </label>
       <input name="dns_provider" placeholder="GoDaddy, Cloudflare, Namecheap, or IT contact name/email">
     </div>

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ client.firm_name }} — ArgusReach Admin{% endblock %}
+{% block title %}{{ client.firm_name }} - ArgusReach Admin{% endblock %}
 {% block content %}
 
 {% set cl   = client.get('checklist', {}) %}
@@ -43,7 +43,7 @@
   </span>
 </div>
 <p class="subtitle" style="margin-bottom:20px">
-  {{ client.vertical }} · {{ client.outreach_email or '— no outreach email yet' }} · {{ client.get('client_email','') }}
+  {{ client.vertical }} · {{ client.outreach_email or '- no outreach email yet' }} · {{ client.get('client_email','') }}
 </p>
 
 {# ── PROGRESS PIPELINE ───────────────────────────────────────────── #}
@@ -53,15 +53,15 @@
 
   {# Compute current step (first incomplete) #}
   {% set steps = [
-    ('intake',    '✅', 'Intake Approved',     True,      'Auto — on form submit.'),
-    ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Auto — client submits via secure link.'),
-    ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Auto — starts when credentials received.'),
-    ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'Manual — Vito sends from portal.'),
-    ('dns',       '🔒', 'DNS Verified',         dns_ok,    'Auto — polled every 4h.'),
-    ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Manual — Vito checks after client confirms.'),
-    ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Manual — Vito confirms after client connects.'),
-    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto — Stripe webhook on payment.'),
-    ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Manual — Vito reviews draft in Instantly, then activates.'),
+    ('intake',    '✅', 'Intake Approved',     True,      'Auto - on form submit.'),
+    ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Auto - client submits via secure link.'),
+    ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Auto - starts when credentials received.'),
+    ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'Manual - Vito sends from portal.'),
+    ('dns',       '🔒', 'DNS Verified',         dns_ok,    'Auto - polled every 4h.'),
+    ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Manual - Vito checks after client confirms.'),
+    ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Manual - Vito confirms after client connects.'),
+    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto - Stripe webhook on payment.'),
+    ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Manual - Vito reviews draft in Instantly, then activates.'),
   ] %}
 
   {# Find active step index #}
@@ -102,7 +102,7 @@
   <div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <div>
       <div style="font-size:11px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Next step</div>
-      <div style="font-size:13px;color:#e2e8f0">{{ cur[2] }} — {{ cur[4] }}</div>
+      <div style="font-size:13px;color:#e2e8f0">{{ cur[2] }} - {{ cur[4] }}</div>
     </div>
     {# Contextual action button #}
     {% if ns.active_idx == 1 %}
@@ -183,7 +183,7 @@
   </div>
   <span style="font-size:13px;font-weight:700;color:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %}">{{ ws }}/100</span>
   <span style="font-size:12px;color:var(--muted)">{% if ws >= 85 %}✅ Ready to launch{% elif ws >= 60 %}Getting there{% else %}Still warming{% endif %}</span>
-  {% if warmup_live.status == 0 %}<span style="font-size:11px;color:#f87171">⚠️ Warmup is OFF in Instantly — enable it</span>{% endif %}
+  {% if warmup_live.status == 0 %}<span style="font-size:11px;color:#f87171">⚠️ Warmup is OFF in Instantly - enable it</span>{% endif %}
 </div>
 {% endif %}
 
@@ -191,7 +191,7 @@
 {% if creds_ok %}
 <div style="background:#052e16;border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
   <div style="font-size:12px;color:#4ade80">
-    🔐 Credentials received — {{ client._credentials_received_at }}
+    🔐 Credentials received - {{ client._credentials_received_at }}
     <span style="color:#475569;margin-left:8px">{{ client.get('outreach_email','') }}</span>
   </div>
   {% if conn_status %}
@@ -224,7 +224,7 @@
     {% endif %}
   </div>
   {% if not monitor_status.running %}
-  <span style="font-size:11px;color:#f87171">Monitor hasn't checked in for {{ monitor_status.age_minutes or '?' }} minutes — may need restart</span>
+  <span style="font-size:11px;color:#f87171">Monitor hasn't checked in for {{ monitor_status.age_minutes or '?' }} minutes - may need restart</span>
   {% endif %}
 </div>
 {% endif %}
@@ -318,7 +318,7 @@
       <button type="submit" name="push_instantly" value="0" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save</button>
       {% if client.instantly_campaign_id %}
       <button type="submit" name="push_instantly" value="1" class="btn btn-primary btn-sm">💾 Save &amp; Push to Instantly</button>
-      <span style="font-size:11px;color:var(--muted)">Updates the sequence in your Instantly DRAFT campaign. Safe — doesn't affect lead-level personalization.</span>
+      <span style="font-size:11px;color:var(--muted)">Updates the sequence in your Instantly DRAFT campaign. Safe - doesn't affect lead-level personalization.</span>
       {% endif %}
     </div>
   </form>
@@ -341,19 +341,19 @@
   </div>
 
   <div id="override-warning" style="display:none;background:#2d0a0a;border:1px solid #ef444433;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#f87171">
-    ⚠️ <strong>Override active</strong> — gate checks bypassed. For testing only. Do not use on real clients.
+    ⚠️ <strong>Override active</strong> - gate checks bypassed. For testing only. Do not use on real clients.
   </div>
 
   {# Checklist #}
   <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
     <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">Pre-Launch Checklist</div>
     {% set checklist_items = [
-      ('icp_reviewed',       '✅ ICP reviewed — titles, locations, and industry look right'),
-      ('dns_verified',       '🔒 DNS verified — SPF, DKIM, DMARC passing'),
-      ('warmup_complete',    '🌡️ Warmup complete — sending account score ≥ 85% in Instantly' ~ (' (' ~ warmup_live.score|string ~ '/100)' if warmup_live.score is not none else ' (checking...)')),
+      ('icp_reviewed',       '✅ ICP reviewed - titles, locations, and industry look right'),
+      ('dns_verified',       '🔒 DNS verified - SPF, DKIM, DMARC passing'),
+      ('warmup_complete',    '🌡️ Warmup complete - sending account score ≥ 85% in Instantly' ~ (' (' ~ warmup_live.score|string ~ '/100)' if warmup_live.score is not none else ' (checking...)')),
       ('payment_confirmed',  '💳 Subscription payment confirmed in Stripe'),
       ('sequence_approved',  '✉️ Sequence approved by client'),
-      ('calendar_connected', '📅 Calendar connected — Calendly event live'),
+      ('calendar_connected', '📅 Calendar connected - Calendly event live'),
     ] %}
     {% for key, label in checklist_items %}
     <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer">
@@ -369,7 +369,7 @@
   {% if client.get('instantly_campaign_id') and not client.active %}
   <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
     <div>
-      <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:3px">Campaign in Instantly — DRAFT</div>
+      <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:3px">Campaign in Instantly - DRAFT</div>
       <div style="font-size:12px;color:#64748b">Review sequence in Instantly, activate it, then click here.</div>
     </div>
     <form method="POST" action="{{ url_for('client_go_live', client_id=client.id) }}">
@@ -385,11 +385,11 @@
   <details style="margin-bottom:16px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px 16px">
     <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">📋 Apollo Search Filters (use these each month)</summary>
     <div style="margin-top:10px;font-size:12px;color:#94a3b8;line-height:1.8">
-      <div><span style="color:#475569">Titles:</span> {{ titles | join(', ') or '—' }}</div>
-      <div><span style="color:#475569">Industry:</span> {{ client._target_industry | replace('_',' ') | title or '—' }}</div>
-      <div><span style="color:#475569">Seniority:</span> {{ client._target_seniority | replace('_',' ') | replace(',',' · ') or '—' }}</div>
-      <div><span style="color:#475569">Company size:</span> {{ sizes | join(', ') or '—' }} employees</div>
-      <div><span style="color:#475569">Locations:</span> {{ locs | join(' · ') or '—' }}</div>
+      <div><span style="color:#475569">Titles:</span> {{ titles | join(', ') or '-' }}</div>
+      <div><span style="color:#475569">Industry:</span> {{ client._target_industry | replace('_',' ') | title or '-' }}</div>
+      <div><span style="color:#475569">Seniority:</span> {{ client._target_seniority | replace('_',' ') | replace(',',' · ') or '-' }}</div>
+      <div><span style="color:#475569">Company size:</span> {{ sizes | join(', ') or '-' }} employees</div>
+      <div><span style="color:#475569">Locations:</span> {{ locs | join(' · ') or '-' }}</div>
       <div><span style="color:#475569">Target contacts/mo:</span> {{ client.contacts_per_month or 200 }}</div>
     </div>
   </details>
@@ -403,7 +403,7 @@
       {% if prospects_csv_count %}<span style="color:#4ade80;margin-left:8px">✓ {{ prospects_csv_count }} prospects ready</span>{% endif %}
     </summary>
     <div style="margin-top:10px">
-      <p style="font-size:11px;color:#475569;margin:0 0 10px">Export from Apollo using the filters above, then upload here. All columns are auto-mapped — upload the raw Apollo CSV as-is.</p>
+      <p style="font-size:11px;color:#475569;margin:0 0 10px">Export from Apollo using the filters above, then upload here. All columns are auto-mapped - upload the raw Apollo CSV as-is.</p>
       <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" id="csv-upload-form">
         <div id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()"
              style="border:2px dashed #334155;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:8px">
@@ -472,7 +472,7 @@
       </button>
     </div>
     {% if not all_gates %}
-    <p style="font-size:11px;color:#475569;margin-top:8px" id="gates-hint">All 6 checklist items must be checked to launch — or enable test override above.</p>
+    <p style="font-size:11px;color:#475569;margin-top:8px" id="gates-hint">All 6 checklist items must be checked to launch - or enable test override above.</p>
     {% endif %}
   </form>
 
@@ -503,9 +503,9 @@
       <tbody>
         {% for c in client.campaigns %}
         <tr style="border-bottom:1px solid #0f172a">
-          <td style="padding:6px 8px;font-weight:600">{{ c.campaign_name or '—' }}</td>
+          <td style="padding:6px 8px;font-weight:600">{{ c.campaign_name or '-' }}</td>
           <td style="padding:6px 8px;font-family:monospace;color:#94a3b8;font-size:11px">{{ c.instantly_campaign_id[:16] }}…</td>
-          <td style="padding:6px 8px;color:#94a3b8">{{ c.launch_date or '—' }}</td>
+          <td style="padding:6px 8px;color:#94a3b8">{{ c.launch_date or '-' }}</td>
           <td style="padding:6px 8px">{% if c.active %}<span style="color:#22c55e">● Active</span>{% else %}<span style="color:#64748b">⏸ Paused</span>{% endif %}</td>
           <td style="padding:6px 8px">
             <form method="POST" action="{{ url_for('campaign_toggle', client_id=client.id, campaign_id=c.instantly_campaign_id) }}" style="display:inline">
@@ -606,7 +606,7 @@
     <strong style="color:#64748b">Client ID:</strong> {{ client.id }} ·
     <strong style="color:#64748b">Plan:</strong> {{ client.plan }} ·
     <strong style="color:#64748b">Contacts/mo:</strong> {{ client.contacts_per_month }} ·
-    <strong style="color:#64748b">Client Email:</strong> {{ client.get('client_email','—') }}
+    <strong style="color:#64748b">Client Email:</strong> {{ client.get('client_email','-') }}
   </div>
   </div>
 </details>
@@ -621,8 +621,8 @@
     {% for ev in events %}
     <tr>
       <td style="color:#64748b;font-size:12px">{{ ev.created_at | to_et }}</td>
-      <td>{% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e'} %}{% set c = colors.get(ev.event_type, '#94a3b8') %}<span class="badge" style="background:{{ c }}22;color:{{ c }};border:1px solid {{ c }}44">{{ ev.event_type }}</span></td>
-      <td style="font-size:12px">{{ ev.email or '—' }}</td>
+      <td>{% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e','draft_rejected':'#ef4444','unsubscribed':'#64748b'} %}{% set labels = {'reply_sent':'Reply Sent','meeting_booked':'Meeting Booked','draft_queued':'Draft Queued','classified':'Reply Received','draft_approved':'Draft Approved','draft_rejected':'Draft Ignored','unsubscribed':'Unsubscribed'} %}{% set c = colors.get(ev.event_type, '#94a3b8') %}<span class="badge" style="background:{{ c }}22;color:{{ c }};border:1px solid {{ c }}44">{{ labels.get(ev.event_type, ev.event_type) }}</span></td>
+      <td style="font-size:12px">{{ ev.email or '-' }}</td>
       <td style="font-size:12px;color:#64748b">{% if ev.metadata %}{{ ev.metadata|tojson|truncate(80) }}{% endif %}</td>
     </tr>
     {% endfor %}
@@ -693,13 +693,13 @@ function runAutoVerify() {
     .then(r => r.json()).then(data => {
       btn.disabled = false; btn.textContent = '🔍 Auto-verify DNS & Warmup';
       const dns = data.dns || {}, warm = data.warmup || {};
-      const score = warm.score !== null && warm.score !== undefined ? warm.score : '—';
-      let html = `<div style="font-weight:700;color:#e2e8f0;margin-bottom:8px">Results — ${data.checked_at||''}</div>`;
+      const score = warm.score !== null && warm.score !== undefined ? warm.score : '-';
+      let html = `<div style="font-weight:700;color:#e2e8f0;margin-bottom:8px">Results - ${data.checked_at||''}</div>`;
       html += `<div style="margin-bottom:6px;color:${data.dns_pass?'#4ade80':'#f87171'}"><b>DNS:</b> ${data.dns_pass?'✅ All passing':'❌ Issues found'}<br>`;
       html += `<span style="color:${dns.spf?'#4ade80':'#f87171'}">SPF: ${dns.spf?'✅':'❌'}</span> &nbsp;`;
       html += `<span style="color:${dns.dmarc?'#4ade80':'#f87171'}">DMARC: ${dns.dmarc?'✅':'❌'}</span> &nbsp;`;
       html += `<span style="color:${dns.dkim?'#4ade80':'#f87171'}">DKIM: ${dns.dkim?'✅':'❌'}</span></div>`;
-      html += `<div style="color:${data.warmup_pass?'#4ade80':'#f87171'}"><b>Warmup:</b> ${data.warmup_pass?'✅':'❌'} Score: ${score}${score!=='—'?'/100':''} (need ≥85%)`;
+      html += `<div style="color:${data.warmup_pass?'#4ade80':'#f87171'}"><b>Warmup:</b> ${data.warmup_pass?'✅':'❌'} Score: ${score}${score!=='-'?'/100':''} (need ≥85%)`;
       if (warm.error) html += `<br><span style="color:#f87171;font-size:11px">⚠️ ${warm.error}</span>`;
       html += '</div>';
       if (data.dns_pass || data.warmup_pass) {

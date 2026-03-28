@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — ArgusReach Admin{% endblock %}
+{% block title %}Dashboard - ArgusReach Admin{% endblock %}
 {% block content %}
 
 <h1>Dashboard</h1>
-<p class="subtitle">{{ generated }} · Live data — Instantly API pulled on every load</p>
+<p class="subtitle">{{ generated }} · Live data - Instantly API pulled on every load</p>
 
 <div class="cards">
   <div class="card"><div class="card-label">Active Clients</div><div class="card-value">{{ clients|selectattr('active')|list|length }}</div></div>
@@ -50,12 +50,16 @@
         {% set os = c.get('onboarding_status','email_setup') %}
         {% if os == 'email_setup' %}
           <span style="font-size:11px;color:#60a5fa">📬 Email setup</span>
+        {% elif os == 'dns_pending' %}
+          <span style="font-size:11px;color:#fbbf24">🔍 DNS pending</span>
         {% elif os == 'warming_up' %}
           <span style="font-size:11px;color:#4ade80">🔥 Warming up</span>
         {% elif os == 'pending_review' %}
           <span style="font-size:11px;color:#facc15">👀 Review</span>
         {% elif os == 'ready_to_launch' %}
           <span style="font-size:11px;color:#fb923c">🚀 Launch ready</span>
+        {% elif os == 'offboarding' %}
+          <span style="font-size:11px;color:#f87171">⛔ Offboarding</span>
         {% else %}
           <span class="badge badge-gray">Paused</span>
         {% endif %}
@@ -77,7 +81,7 @@
     <td><a href="{{ url_for('client_detail', client_id=c.id) }}" class="btn btn-ghost btn-sm">View</a></td>
   </tr>
   {% else %}
-  <tr><td colspan="11" style="text-align:center;color:#64748b;padding:32px">No clients yet — <a href="{{ url_for('client_new') }}">add one</a></td></tr>
+  <tr><td colspan="11" style="text-align:center;color:#64748b;padding:32px">No clients yet - <a href="{{ url_for('client_new') }}">add one</a></td></tr>
   {% endfor %}
   </tbody>
 </table>

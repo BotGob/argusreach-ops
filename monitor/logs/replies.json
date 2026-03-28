@@ -1,1 +1,31 @@
-[]
+[
+  {
+    "ts": "2026-03-27T19:11:54.801603",
+    "client": "argusreach",
+    "prospect": "beboldperformance@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Courtney,\n\nPerfect - Wednesday morning works great. Grab a time here and I will give you a call:\n\nhttps://calendly.com/vito-argusreach/30min\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": false,
+    "notes": "High-intent prospect from wellness/PT vertical confirmed interest and proposed meeting time.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-27T19:12:00.367843",
+    "client": "argusreach",
+    "prospect": "beboldperformance@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Courtney,\n\nPerfect - Wednesday morning works great. Grab a time that suits you here:\n\nhttps://calendly.com/vito-argusreach/30min\n\nLooking forward to it.\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": false,
+    "notes": "Qualified prospect ready to book - high-intent reply with specific availability offered.",
+    "test_mode": false
+  },
+  {
+    "ts": "2026-03-27T19:50:29.011594",
+    "client": "argusreach",
+    "prospect": "beboldperformance@gmail.com",
+    "classification": "positive",
+    "draft_preview": "Courtney,\n\nReally glad to hear it - grab a time that works best for you!\n\nhttps://calendly.com/vito-argusreach/30min\n\nLooking forward to it.\n\nVito Resciniti\nFounder, ArgusReach",
+    "sent": true,
+    "notes": "approved by Vito"
+  }
+]

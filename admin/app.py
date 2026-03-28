@@ -193,7 +193,7 @@ IMPORTANT CONTEXT FOR WRITING:
 Write a 3-touch cold email sequence. Rules:
 - Touch 1: Short cold intro (60-80 words max, not counting {{{{custom_intro}}}}). Touch 1 must start with {{{{custom_intro}}}} on its own line followed by a blank line. This variable will be populated at send time with a personalized opener based on the prospect's company. Write Touch 1 assuming {{{{custom_intro}}}} will provide the opening hook - so the rest of Touch 1 should flow naturally after a personalized sentence. Reference {{{{companyName}}}} and use {{{{city}}}} to make it feel locally relevant. If a voice sample is provided, use it as your style guide - preserve their tone and phrasing. End with a single soft CTA (quick call?). Append the email signature exactly as provided.
 - Touch 2: Follow-up 5 days later. Different angle - explain the mechanism or add a specific proof point. 50-70 words. Same signature.
-- Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. {f'End with the booking link as the CTA: {calendly}' if calendly else 'End with a soft CTA for a call.'} Same signature.
+- Touch 3: Final short close 5 days after Touch 2. 25-35 words. Respectful, leaves door open. The CTA should match the desired action: if desired_action is 'referral_relationship' frame it as staying in touch for when timing is right; if 'book_call' or 'meeting' use {f'the booking link: {calendly}' if calendly else 'a soft call CTA'}; if 'demo' offer a quick demo; if 'proposal' offer to send one. Same signature.
 - All touches: plain text only, no markdown, no bullet points, no em dashes (use hyphens), sound like a real human wrote it, not a template
 - Available personalization tags: {{{{firstName}}}}, {{{{companyName}}}}, {{{{city}}}} - use all three naturally across the 3 touches
 
@@ -439,6 +439,17 @@ def login_required(f):
     return decorated
 
 
+@app.context_processor
+def inject_nav_counts():
+    """Inject pending intake count into all templates for the nav badge."""
+    try:
+        intakes = load_intakes()
+        pending_intakes = sum(1 for i in intakes if i.get("status") == "pending")
+    except Exception:
+        pending_intakes = 0
+    return {"nav_pending_intakes": pending_intakes}
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -556,8 +567,8 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
         "revenue":           f"${revenue/100:,.2f}",
         "prospects_tracked": prospects_tracked,
         "open_count":        open_count,
-        "open_rate":         f"{(open_count/instantly_sent*100):.1f}%" if instantly_sent > 0 else "—",
-        "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "—",
+        "open_rate":         "N/A",
+        "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "-",
     }
 
 def fetch_instantly_analytics(campaign_id=None):
@@ -807,6 +818,16 @@ def prep_leads(client_id, raw_rows, warm=False):
 
 # ── ROUTES ────────────────────────────────────────────────────────────────────
 
+@app.route("/clients")
+@login_required
+def clients_list():
+    """Clients overview - all clients with status and quick links."""
+    config = load_clients()
+    clients = [c for c in config.get("clients", [])
+               if not c.get("id","").startswith("_") and "example" not in c.get("id","")]
+    return render_template("clients_list.html", clients=clients)
+
+
 @app.route("/")
 @login_required
 def dashboard():
@@ -847,7 +868,7 @@ def dashboard():
             "plan":             c.get("plan",""),
             "active":           c.get("active", False),
             "onboarding_status": c.get("onboarding_status", "email_setup"),
-            "campaign_name":    c.get("campaign_name","—"),
+            "campaign_name":    c.get("campaign_name","-"),
             **m,
         })
 
@@ -1168,7 +1189,7 @@ def client_go_live(client_id):
         client["launch_date"] = datetime.now(zoneinfo.ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
     save_clients(config)
     # Notify via Telegram
-    notify(f"🟢 *{client.get('firm_name')}* is now LIVE - monitor is watching, campaign active.")
+    _notify_telegram(f"🟢 *{client.get('firm_name')}* is now LIVE - monitor is watching, campaign active.")
     flash(f"✅ {client.get('firm_name')} is live. Monitor is now watching for replies.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
@@ -1201,7 +1222,7 @@ def client_offboard(client_id):
     save_clients(config)
 
     firm = client.get("firm_name", client_id)
-    notify(
+    _notify_telegram(
         f"⛔ *{firm}* marked for offboarding.\n\n"
         f"Manual steps:\n"
         f"1. Pause/deactivate campaign in Instantly\n"
@@ -1380,7 +1401,7 @@ def campaign_launch(client_id):
         return redirect(url_for("client_detail", client_id=client_id))
 
     # ── Server-side gate check (UI disable is not enough) ────────────────────
-    test_override = request.form.get("test_override") == "1"
+    test_override = request.form.get("override") == "1"
     if not test_override:
         checklist     = client.get("checklist", {})
         missing_gates = [g for g in _ALL_GATES if not checklist.get(g)]
@@ -1432,7 +1453,7 @@ def campaign_launch(client_id):
     t.start()
 
     mode_label = "CSV upload" if skip_apollo else "Apollo API"
-    flash(f"Campaign launch started for {month} ({mode_label}). Building leads and creating campaign — check progress below.", "success")
+    flash(f"Campaign launch started for {month} ({mode_label}). Building leads and creating campaign - check progress below.", "success")
     return redirect(url_for("client_detail", client_id=client_id) + "?launch=1")
 
 
@@ -1732,9 +1753,9 @@ def send_launch_email(client_id):
     first_name   = contact_name.split()[0] if contact_name else "there"
     plan         = client.get("plan", "starter")
     plan_display = {
-        "starter": "Starter \u2014 $750/mo",
-        "growth":  "Growth \u2014 $1,500/mo",
-        "scale":   "Scale \u2014 $2,500/mo",
+        "starter": "Starter - $750/mo",
+        "growth":  "Growth - $1,500/mo",
+        "scale":   "Scale - $2,500/mo",
     }.get(plan, f"{plan.title()} Plan")
     to_email = client.get("client_email", "")
     firm     = client.get("firm_name", "")
@@ -1920,14 +1941,14 @@ def campaigns():
     for c in clients:
         cid = c.get("instantly_campaign_id","")
         a = analytics.get(cid, {})
-        instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"—")
+        instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"-")
         registered_ids.add(cid)
         m = get_client_metrics(c["id"], cid)
         rows.append({
             "client_id":        c["id"],
             "firm":             c.get("firm_name",""),
             "campaign_id":      cid,
-            "campaign_name":    c.get("campaign_name","—"),
+            "campaign_name":    c.get("campaign_name","-"),
             "client_active":    c.get("active", False),
             "instantly_status": instantly_status,
             "mismatch":         (c.get("active") and instantly_status != "ACTIVE") or
@@ -2267,8 +2288,10 @@ def generate_report(client_id):
                     sent = a.get("emails_sent_count") or 0
                     opens = a.get("emails_read_count") or 0
                     stats["emails_sent"] = sent or None
-                    stats["open_count"]  = opens or None
-                    stats["open_rate"]   = f"{opens/sent*100:.1f}%" if sent > 0 else None
+                    # open tracking suppressed by default (hurts deliverability).
+                    # enable per-client with track_opens: true in clients.json.
+                    stats["open_count"]  = None
+                    stats["open_rate"]   = None
             except Exception:
                 pass
 
@@ -2494,7 +2517,7 @@ def intake():
             # What they do
             "business_description": f.get("business_description","").strip(),
             "differentiator":       f.get("differentiator","").strip(),
-            "outcomes":             f.get("outcomes","").strip(),
+            "outcomes":             f.get("success_story","").strip(),
             # Targeting
             "plan":                 f.get("plan","starter").strip(),
             "meeting_format":       ",".join(request.form.getlist("meeting_format")),

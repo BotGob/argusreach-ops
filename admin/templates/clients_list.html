@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Clients - ArgusReach Admin{% endblock %}
+{% block content %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+  <div>
+    <h1>Clients</h1>
+    <p class="subtitle">{{ clients|length }} total client{{ 's' if clients|length != 1 }}</p>
+  </div>
+  <a href="{{ url_for('client_new') }}" class="btn btn-primary">+ Add Client</a>
+</div>
+
+{% if clients %}
+<table>
+  <thead><tr>
+    <th>Firm</th>
+    <th>Vertical</th>
+    <th>Plan</th>
+    <th>Status</th>
+    <th>Outreach Email</th>
+    <th>Launch Date</th>
+    <th></th>
+  </tr></thead>
+  <tbody>
+  {% for c in clients %}
+  {% set os = c.get('onboarding_status','email_setup') %}
+  <tr>
+    <td>
+      <a href="{{ url_for('client_detail', client_id=c.id) }}" style="font-weight:600;color:#fff">{{ c.get('firm_name', c.id) }}</a>
+      <div style="font-size:11px;color:#475569;font-family:'JetBrains Mono',monospace;margin-top:2px">{{ c.id }}</div>
+    </td>
+    <td style="font-size:12px;color:#94a3b8">{{ c.get('vertical','') }}</td>
+    <td>
+      <span style="font-size:11px;background:#1e293b;color:#64748b;padding:2px 8px;border-radius:20px;border:1px solid #334155">
+        {{ c.get('plan','').upper() }}
+      </span>
+    </td>
+    <td>
+      {% if c.get('active') %}
+        <span class="badge badge-green">● Live</span>
+      {% elif os == 'email_setup' %}
+        <span style="font-size:11px;color:#60a5fa">📬 Email setup</span>
+      {% elif os == 'dns_pending' %}
+        <span style="font-size:11px;color:#fbbf24">🔍 DNS pending</span>
+      {% elif os == 'warming_up' %}
+        <span style="font-size:11px;color:#4ade80">🔥 Warming up</span>
+      {% elif os == 'pending_review' %}
+        <span style="font-size:11px;color:#facc15">👀 Review</span>
+      {% elif os == 'ready_to_launch' %}
+        <span style="font-size:11px;color:#fb923c">🚀 Ready to launch</span>
+      {% elif os == 'offboarding' %}
+        <span style="font-size:11px;color:#f87171">⛔ Offboarding</span>
+      {% else %}
+        <span class="badge badge-gray">⏸ Paused</span>
+      {% endif %}
+    </td>
+    <td style="font-size:12px;color:#64748b;font-family:'JetBrains Mono',monospace">
+      {{ c.get('outreach_email','') or '<span style="color:#334155">not set</span>'|safe }}
+    </td>
+    <td style="font-size:12px;color:#64748b">{{ c.get('launch_date','') or '-' }}</td>
+    <td><a href="{{ url_for('client_detail', client_id=c.id) }}" class="btn btn-ghost btn-sm">View</a></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="section" style="text-align:center;padding:48px;color:#64748b">
+  <div style="font-size:32px;margin-bottom:12px">👤</div>
+  No clients yet.<br>
+  <a href="{{ url_for('client_new') }}" class="btn btn-primary btn-sm" style="margin-top:16px;display:inline-flex">+ Add First Client</a>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Campaigns — ArgusReach Admin{% endblock %}
+{% block title %}Campaigns - ArgusReach Admin{% endblock %}
 {% block content %}
 
 <h1>Campaign Status</h1>
@@ -18,8 +18,8 @@
     <th title="Reply emails sent by ArgusReach on client's behalf">Replies Sent</th>
     <th title="Total emails sent (sequence + replies)"><b>Total Sent</b></th>
     <th title="Replies received from prospects">Replies In</th>
-    <th title="Reply breakdown: positive / not now / negative">Breakdown</th>
-    <th title="Drafts rejected — no reply sent">Ignored</th>
+    <th title="Reply breakdown: interested / not now / negative">Breakdown</th>
+    <th title="Drafts rejected - no reply sent">Ignored</th>
     <th>⚠</th>
   </tr></thead>
   <tbody>
@@ -45,11 +45,11 @@
     <td>{{ r.replies_received }}</td>
     <td style="font-size:12px;white-space:nowrap">
       {% if r.replies_received %}
-        <span style="color:#4ade80">✅ {{ r.reply_positive }}</span>
+        <span style="color:#4ade80">🙋 {{ r.reply_interested }}</span>
         <span style="color:#facc15;margin-left:6px">🕐 {{ r.reply_not_now }}</span>
         <span style="color:#f87171;margin-left:6px">❌ {{ r.reply_negative }}</span>
         {% if r.reply_escalated %}<span style="color:#fb923c;margin-left:6px">🚨 {{ r.reply_escalated }}</span>{% endif %}
-      {% else %}—{% endif %}
+      {% else %}-{% endif %}
     </td>
     <td style="color:#64748b">{{ r.replies_ignored }}</td>
     <td>{% if r.id_invalid %}🚨 Invalid Campaign ID{% elif r.mismatch %}⚠️ Status Mismatch{% endif %}</td>

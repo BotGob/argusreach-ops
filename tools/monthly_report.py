@@ -205,8 +205,11 @@ def build_report_html(client, month, stats, notes, history=None):
 
     prospects  = stats['prospects']
     sent       = stats.get('emails_sent', '—')
-    open_count = stats.get('open_count')
-    open_rate  = stats.get('open_rate')
+    # Open tracking suppressed by default — tracking pixels hurt deliverability.
+    # Enable per-client with track_opens: true in clients.json.
+    _track_opens = client.get('track_opens', False)
+    open_count = stats.get('open_count') if _track_opens else None
+    open_rate  = stats.get('open_rate')  if _track_opens else None
     interested = stats['reply_interested']
     not_now    = stats['reply_not_now']
     meetings   = stats['meetings']

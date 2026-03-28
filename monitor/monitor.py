@@ -1155,31 +1155,50 @@ def process_client(client, processed_ids):
             log_reply(cid, from_email, classification, draft, sent,
                       result.get('notify_reason', ''))
 
-            # ── CLIENT BOOKING ALERT: for positive replies, notify client to watch their calendar
+            # ── CLIENT BOOKING ALERT + FOLLOW-UP TIMER: for positive replies
             client_email = client.get('client_email', '')
             if classification == 'positive' and sent and client_email and not TEST_MODE:
                 try:
                     prospect_display = from_name if from_name else from_email
                     booking_alert = (
                         f"Hi,\n\n"
-                        f"Quick heads up — we just sent a reply to {prospect_display} ({from_email}) "
-                        f"on your behalf and included your booking link.\n\n"
-                        f"They indicated interest, so you may see a meeting land on your calendar soon.\n\n"
-                        f"Please reply to this email or log in to confirm when the meeting is officially booked. "
-                        f"This helps us track your results accurately.\n\n"
-                        f"If the meeting doesn't materialize within a few days, no action needed — "
-                        f"we'll continue the follow-up sequence.\n\n"
-                        f"— ArgusReach"
+                        f"Quick heads up - we just sent a reply to {prospect_display} ({from_email}) "
+                        f"on your behalf with your booking link included.\n\n"
+                        f"They indicated interest - you may see a meeting land on your calendar soon. "
+                        f"No action needed on your end.\n\n"
+                        f"- ArgusReach"
                     )
                     _send_email(
                         client['outreach_email'], _get_app_password(client),
                         'ArgusReach', client_email,
-                        f"[ArgusReach] Heads up — {prospect_display} may be booking",
+                        f"[ArgusReach] Heads up - {prospect_display} may be booking",
                         booking_alert
                     )
                     log(f"{label} Booking alert sent to client ({client_email}) re: {from_email}")
                 except Exception as _be:
                     log(f"{label} Booking alert failed (non-fatal): {_be}")
+
+            # ── SET FOLLOW-UP TIMER: if positive reply sent, set 3-business-day follow-up
+            # in case prospect doesn't book. Monitor will auto-nudge if no Calendly booking received.
+            if classification == 'positive' and sent and _DB_ENABLED:
+                try:
+                    from datetime import date as _date, timedelta as _td
+                    def _add_biz_days(d, n):
+                        while n > 0:
+                            d += _td(days=1)
+                            if d.weekday() < 5:
+                                n -= 1
+                        return d
+                    fu_date = _add_biz_days(_date.today(), 3).isoformat()
+                    _pid_pos = upsert_prospect(
+                        cid,
+                        email_to_campaign.get(from_email.lower(), client.get('instantly_campaign_id', '')),
+                        from_email, '', '', '', 'positive'
+                    )
+                    _set_follow_up_date(_pid_pos, fu_date)
+                    log(f"{label} Follow-up timer set for {from_email} - nudge if no booking by {fu_date}")
+                except Exception as _fe:
+                    log(f"{label} Follow-up timer set failed (non-fatal): {_fe}")
 
             # ── DB: record prospect + events
             if _DB_ENABLED:
@@ -1323,9 +1342,27 @@ Return ONLY the email body text, no subject line, no commentary."""
         return None
 
 
+def _has_calendly_booking(client_id, prospect_email):
+    """Check if a Calendly booking was received for this prospect."""
+    if not _DB_ENABLED:
+        return False
+    try:
+        conn = _get_db()
+        row = conn.execute(
+            "SELECT id FROM meetings WHERE client_id=? AND prospect_email=? LIMIT 1",
+            (client_id, prospect_email.lower())
+        ).fetchone()
+        conn.close()
+        return row is not None
+    except Exception:
+        return False
+
+
 def check_due_followups():
-    """Alert when OOO or not-now prospects have hit their follow-up date.
-    Generates a re-engagement draft and queues it for approval."""
+    """Alert when prospects have hit their follow-up date.
+    - positive (no booking): auto-send nudge from client outreach email, no approval needed
+    - not_now / OOO: draft re-engagement, queue for approval
+    """
     if not _DB_ENABLED:
         return
     try:
@@ -1343,6 +1380,42 @@ def check_due_followups():
             fname = prospect.get('first_name', '') or email
             stage = prospect.get('stage', '')
             log(f"[Follow-up] {email} ({cid}) is due for follow-up (was: {stage})")
+
+            # ── POSITIVE NO-BOOKING: check if they actually booked via Calendly
+            if stage == 'positive':
+                if _has_calendly_booking(cid, email):
+                    log(f"[Follow-up] {email} already booked - skipping nudge")
+                    _mark_follow_up_sent(prospect['id'])
+                    continue
+                # No booking — queue draft for Vito's approval. NEVER auto-send.
+                client = client_map.get(cid)
+                if client:
+                    calendly_link = client.get('calendly_link', '')
+                    nudge = (
+                        f"Hi {fname},\n\n"
+                        f"Just wanted to make sure my last email didn't get buried - "
+                        f"still happy to connect if the timing works.\n\n"
+                        f"{calendly_link}\n\n"
+                        f"{client.get('sender_name', '')}\n"
+                        f"{client.get('title', 'Founder')}, {client.get('firm_name', '')}"
+                    )
+                    approval_id, is_new = queue_pending(
+                        client, email, fname,
+                        f"Re: follow-up — {fname}",
+                        nudge, 'positive'
+                    )
+                    if is_new:
+                        notify(
+                            f"📬 *Follow-up Nudge Ready for Review* - {client.get('firm_name', cid)}\n"
+                            f"👤 {fname} `{email}`\n"
+                            f"Previously interested but hasn't booked yet. Draft queued — approve or edit before sending.\n"
+                            f"Approval ID: `{approval_id}`"
+                        )
+                        log(f"[Follow-up] Nudge draft queued for approval: {email} ({cid})")
+                    else:
+                        log(f"[Follow-up] Nudge already pending for {email} — skipping duplicate")
+                _mark_follow_up_sent(prospect['id'])
+                continue
 
             client = client_map.get(cid)
             draft  = None
