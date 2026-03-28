@@ -2223,9 +2223,6 @@ def generate_report(client_id):
 
     if request.method == "POST":
         month_str  = request.form.get("month", default_month).strip()
-        working    = [l.strip() for l in request.form.get("working", "").splitlines() if l.strip()]
-        changing   = [l.strip() for l in request.form.get("changing", "").splitlines() if l.strip()]
-        next_month = request.form.get("next_month", "").strip()
 
         # Pull stats from DB
         try:
@@ -2295,12 +2292,6 @@ def generate_report(client_id):
             except Exception:
                 pass
 
-        notes = {
-            "working":    working or ["Sequence delivered without issues."],
-            "changing":   changing or ["Monitoring performance for adjustments next cycle."],
-            "next_month": next_month or "Continuing current campaign with any optimizations applied.",
-        }
-
         # Load/update history
         import sys as _sys, json as _json
         history_path = BASE_DIR / "reports" / f"{client_id}_history.json"
@@ -2324,7 +2315,7 @@ def generate_report(client_id):
         # Import report builder from tools
         _sys.path.insert(0, str(BASE_DIR))
         from tools.monthly_report import build_report_html
-        html = build_report_html(client, month_str, stats, notes, history=history)
+        html = build_report_html(client, month_str, stats, history=history)
 
         safe_month = month_str.replace(" ", "-")
         out_path   = BASE_DIR / "reports" / f"{client_id}_{safe_month}.html"
@@ -2351,31 +2342,13 @@ def generate_report(client_id):
     <a href="{{ url_for('client_detail', client_id=client.id) }}" style="color:var(--muted);font-size:12px;text-decoration:none">← {{ client.firm_name }}</a>
   </div>
   <h1 style="margin:0 0 6px">Generate Monthly Report</h1>
-  <p style="color:var(--muted);font-size:13px;margin:0 0 32px">All stats are pulled automatically from the database. Fill in the narrative sections below.</p>
+  <p style="color:var(--muted);font-size:13px;margin:0 0 32px">All stats are pulled automatically. Just confirm the month and generate.</p>
 
   <form method="POST">
-    <div style="margin-bottom:20px">
+    <div style="margin-bottom:28px">
       <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Reporting Month</label>
       <input name="month" type="text" value="{{ default_month }}" placeholder="March 2026"
         style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px">
-    </div>
-
-    <div style="margin-bottom:20px">
-      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">What Worked <span style="font-weight:400;text-transform:none">(one item per line)</span></label>
-      <textarea name="working" rows="4" placeholder="Subject lines performed well&#10;Strong open rates in the healthcare segment"
-        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
-    </div>
-
-    <div style="margin-bottom:20px">
-      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">What We're Adjusting <span style="font-weight:400;text-transform:none">(one item per line)</span></label>
-      <textarea name="changing" rows="4" placeholder="Testing a shorter Touch 2&#10;Refining the ICP to focus on mid-size firms"
-        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
-    </div>
-
-    <div style="margin-bottom:28px">
-      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Next Month Focus</label>
-      <textarea name="next_month" rows="3" placeholder="Continuing current volume with refined targeting. Will A/B test the opening line on Touch 1."
-        style="width:100%;background:var(--bg2);border:1px solid #334155;border-radius:6px;padding:10px 14px;color:var(--text);font-size:14px;resize:vertical;font-family:inherit"></textarea>
     </div>
 
     <button type="submit" style="background:#4ade80;color:#000;font-weight:700;font-size:14px;padding:12px 28px;border:none;border-radius:6px;cursor:pointer">
