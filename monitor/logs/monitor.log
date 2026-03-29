@@ -12802,3 +12802,27 @@
   heartbeat_file.write_text(datetime.utcnow().isoformat())
 2026-03-29 15:24:17 Cycle complete. Next check in 10 min.
 
+2026-03-29 15:34:17 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:34:17 [ArgusReach] Checking inbox...
+2026-03-29 15:34:17 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:34:17 [ArgusReach] Checking inbox...
+2026-03-29 15:34:18 [ArgusReach] No messages in last 24h.
+2026-03-29 15:34:18 [ArgusReach] No messages in last 24h.
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1901: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-29 15:34:21 Cycle complete. Next check in 10 min.
+
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1901: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-29 15:34:21 Cycle complete. Next check in 10 min.
+
+2026-03-29 15:44:22 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:44:22 [ArgusReach] Checking inbox...
+2026-03-29 15:44:22 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:44:22 [ArgusReach] Checking inbox...
+2026-03-29 15:44:22 [ArgusReach] No messages in last 24h.
+2026-03-29 15:44:23 [ArgusReach] No messages in last 24h.
+2026-03-29 15:44:27 Cycle complete. Next check in 10 min.
+
+2026-03-29 15:44:27 Cycle complete. Next check in 10 min.
+

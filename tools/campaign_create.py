@@ -82,9 +82,11 @@ def get_client(client_id):
 
 
 def campaign_name(client):
-    """Enforced naming convention: ArgusReach — [Firm] — [Mon YYYY]"""
-    month = datetime.now().strftime("%B %Y")
-    return f"ArgusReach — {client['firm_name']} — {month}"
+    """Enforced naming convention: ArgusReach — [ICP/Firm] — [Mon YYYY]
+    Uses vertical/ICP label when available to avoid 'ArgusReach — ArgusReach —' for self-campaigns."""
+    month     = datetime.now().strftime("%B %Y")
+    icp_label = client.get("vertical") or client.get("icp_label") or client["firm_name"]
+    return f"ArgusReach — {icp_label} — {month}"
 
 
 # ── GUARDS ────────────────────────────────────────────────────────────────────
