@@ -149,11 +149,11 @@ def db_write_approval(entry, approved: bool):
                 'original_classification': classification,
                 'approved_by': 'vito',
                 'approved_at': datetime.utcnow().isoformat(),
-            })
+            }, campaign_id=campaign_id)
             log_event(cid, pid, 'reply_sent', {
                 'classification': report_classification,
                 'note': 'approved via portal/telegram',
-            })
+            }, campaign_id=campaign_id)
             # NOTE: do NOT log another 'classified' event here.
             # The monitor already logged one when it first processed the email.
             # Adding a second classified event (even with reclassification) causes
@@ -166,7 +166,7 @@ def db_write_approval(entry, approved: bool):
                 'classification': classification,
                 'rejected_by': 'vito',
                 'rejected_at': datetime.utcnow().isoformat(),
-            })
+            }, campaign_id=campaign_id)
             # On rejection, keep whatever stage they're at — don't advance
             log(f"[DB] logged draft_rejected for {from_email} (stage unchanged)")
     except Exception as e:

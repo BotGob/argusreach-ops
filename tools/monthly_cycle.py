@@ -65,24 +65,50 @@ def get_client(client_id):
             return c
     return None
 
-def save_client_campaign(client_id, campaign_id, campaign_name):
-    """Update clients.json with new campaign ID and name, then mirror to DB."""
+def save_client_campaign(client_id, campaign_id, campaign_name, month_name=""):
+    """Update clients.json with new campaign ID and name, then mirror to DB.
+    Also adds the new campaign to the campaigns array (multi-campaign support)."""
     data = load_all_clients()
     updated_client = None
     for c in data.get("clients", []):
         if c["id"] == client_id:
+            # Update legacy root fields (backward compat)
             c["instantly_campaign_id"] = campaign_id
             c["campaign_name"]         = campaign_name
             c["active"]                = False   # stays inactive until Vito hits GO
+
+            # Add to campaigns array (multi-campaign support)
+            new_entry = {
+                "instantly_campaign_id": campaign_id,
+                "campaign_name":         campaign_name,
+                "icp_label":             c.get("vertical", ""),
+                "prospects_csv":         f"campaigns/{client_id}/prospects_{month_name.lower().replace(' ','_')}.csv" if month_name else f"campaigns/{client_id}/prospects.csv",
+                "launch_date":           datetime.now().strftime("%Y-%m-%d"),
+                "active":                True,
+            }
+            if "campaigns" not in c:
+                c["campaigns"] = []
+            existing_ids = {x.get("instantly_campaign_id") for x in c["campaigns"]}
+            if campaign_id not in existing_ids:
+                c["campaigns"].append(new_entry)
+
             updated_client = c
             break
     CLIENTS_FILE.write_text(json.dumps(data, indent=2))
-    # Mirror update to DB so clients table stays in sync
+    # Mirror update to DB
     if updated_client:
         try:
             sys.path.insert(0, str(BASE_DIR))
-            from db.database import sync_client_from_config
+            from db.database import sync_client_from_config, upsert_campaign
             sync_client_from_config(updated_client)
+            upsert_campaign(
+                client_id=client_id,
+                instantly_campaign_id=campaign_id,
+                name=campaign_name,
+                icp_label=updated_client.get("vertical", ""),
+                status="draft",
+                launch_date=datetime.now().strftime("%Y-%m-%d"),
+            )
         except Exception as e:
             print(f"⚠️  DB sync after campaign save failed (non-fatal): {e}")
 
@@ -625,32 +651,44 @@ def check_all_clients():
         return
 
     for client in clients:
-        cid         = client["id"]
-        firm        = client["firm_name"]
-        campaign_id = client.get("instantly_campaign_id", "")
-        if not campaign_id:
-            continue
+        cid  = client["id"]
+        firm = client["firm_name"]
 
-        stats = get_completion_stats(cid, campaign_id)
-        total = stats["total"]
-        pct   = stats["pct"]
+        # Loop ALL campaigns (multi-campaign aware)
+        client_campaigns = client.get("campaigns") or [{
+            "instantly_campaign_id": client.get("instantly_campaign_id", ""),
+            "campaign_name": client.get("campaign_name", ""),
+            "active": True,
+        }]
+        active_campaigns = [c for c in client_campaigns if c.get("active") and c.get("instantly_campaign_id")]
 
-        print(f"{firm}: {stats['completed']}/{total} complete ({pct}%)")
-
-        if pct >= 75 and total >= 10:
-            if already_alerted(cid, campaign_id):
-                print(f"  → Alert already sent, skipping")
+        for camp in active_campaigns:
+            campaign_id   = camp.get("instantly_campaign_id", "")
+            campaign_name = camp.get("campaign_name", campaign_id[:8])
+            if not campaign_id:
                 continue
 
-            mark_cycle_alerted(cid, campaign_id)
-            notify(
-                f"📅 *Campaign Winding Down — {firm}*\n\n"
-                f"{stats['completed']}/{total} contacts have completed the sequence ({pct}%).\n\n"
-                f"Time to build next month's batch.\n"
-                f"Run: `python3 tools/monthly_cycle.py --client {cid} --month \"[Next Month]\"` "
-                f"to build and load the next campaign automatically."
-            )
-            print(f"  ⚠️  Alert sent — campaign is {pct}% complete")
+            stats = get_completion_stats(cid, campaign_id)
+            total = stats["total"]
+            pct   = stats["pct"]
+
+            label = f"{firm} / {campaign_name}" if len(active_campaigns) > 1 else firm
+            print(f"{label}: {stats['completed']}/{total} complete ({pct}%)")
+
+            if pct >= 75 and total >= 10:
+                if already_alerted(cid, campaign_id):
+                    print(f"  → Alert already sent, skipping")
+                    continue
+
+                mark_cycle_alerted(cid, campaign_id)
+                notify(
+                    f"📅 *Campaign Winding Down — {firm}*\n\n"
+                    f"*{campaign_name}*: {stats['completed']}/{total} contacts have completed the sequence ({pct}%).\n\n"
+                    f"Time to build next month's batch.\n"
+                    f"Run: `python3 tools/monthly_cycle.py --client {cid} --month \"[Next Month]\"` "
+                    f"to build and load the next campaign automatically."
+                )
+                print(f"  ⚠️  Alert sent — campaign is {pct}% complete")
 
 # ── Main pipeline ─────────────────────────────────────────────────────────────
 def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_verify=False):
@@ -818,7 +856,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
         load_to_instantly(contacts, campaign_id, dry_run=dry_run, client_id=client_id)
 
         # ── Step 8: Update clients.json ───────────────────────────────────────
-        save_client_campaign(client_id, campaign_id, campaign_name)
+        save_client_campaign(client_id, campaign_id, campaign_name, month_name)
 
         # ── Step 9: Alert Vito ────────────────────────────────────────────────
         msg = (

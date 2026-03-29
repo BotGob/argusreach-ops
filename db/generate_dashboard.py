@@ -27,10 +27,14 @@ def fetch_stats():
 
     clients = conn.execute("""
         SELECT c.id, c.name, c.vertical, c.plan, c.status,
-               ca.leads_count, ca.emails_sent, ca.replies, ca.opens
+               COALESCE(SUM(ca.leads_count),0)  AS leads_count,
+               COALESCE(SUM(ca.emails_sent),0)  AS emails_sent,
+               COALESCE(SUM(ca.replies),0)       AS replies,
+               COALESCE(SUM(ca.opens),0)         AS opens
         FROM clients c
         LEFT JOIN campaigns ca ON ca.client_id = c.id
         WHERE c.status = 'active'
+        GROUP BY c.id
         ORDER BY c.name
     """).fetchall()
 
