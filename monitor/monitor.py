@@ -1109,7 +1109,17 @@ def process_client(client, processed_ids):
                      'negative': '🚫', 'ooo': '🏖', 'other': '⚠️'}.get(classification, '📬')
 
             if is_new_notification:
-                campaign_name = client.get('campaign_name', '')
+                # Resolve campaign name from per-prospect campaign_id (multi-campaign aware)
+                _reply_campaign_id = email_to_campaign.get(from_email.lower(), '')
+                campaign_name = ''
+                if _reply_campaign_id:
+                    # Look up name from campaigns array, fall back to root campaign_name
+                    for _camp in client.get('campaigns', []):
+                        if _camp.get('instantly_campaign_id') == _reply_campaign_id:
+                            campaign_name = _camp.get('campaign_name', '')
+                            break
+                if not campaign_name:
+                    campaign_name = client.get('campaign_name', '')
                 confidence = result.get('confidence')
                 if confidence is not None:
                     try:
@@ -1467,43 +1477,46 @@ def check_campaign_cycles(clients):
     state = load_state()
 
     for client in clients:
-        cid         = client['id']
-        firm        = client.get('firm_name', cid)
-        campaign_id = client.get('instantly_campaign_id', '')
-        if not campaign_id:
-            continue
-        key = f"{cid}:{campaign_id}"
-        if key in state:
-            continue  # Already alerted for this campaign
+        cid  = client['id']
+        firm = client.get('firm_name', cid)
+        # Loop ALL active campaigns (multi-campaign aware)
+        for _camp in get_client_campaigns(client):
+            campaign_id = _camp.get('instantly_campaign_id', '')
+            if not campaign_id:
+                continue
+            key = f"{cid}:{campaign_id}"
+            if key in state:
+                continue  # Already alerted for this campaign
 
-        try:
-            conn  = get_db()
-            total = conn.execute(
-                "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=?",
-                (cid, campaign_id)
-            ).fetchone()[0]
-            done  = conn.execute(
-                "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=? AND stage=?",
-                (cid, campaign_id, 'sequence_complete')
-            ).fetchone()[0]
-            conn.close()
+            try:
+                conn  = get_db()
+                total = conn.execute(
+                    "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=?",
+                    (cid, campaign_id)
+                ).fetchone()[0]
+                done  = conn.execute(
+                    "SELECT COUNT(*) FROM prospects WHERE client_id=? AND campaign_id=? AND stage=?",
+                    (cid, campaign_id, 'sequence_complete')
+                ).fetchone()[0]
+                conn.close()
 
-            if total < 10:
-                continue  # Not enough data yet
-            pct = done / total * 100
-            if pct >= 75:
-                state[key] = datetime.utcnow().isoformat()
-                save_state(state)
-                log(f"[Cycle] {firm}: {done}/{total} ({pct:.0f}%) complete — alerting")
-                notify(
-                    f"📅 *Campaign Winding Down — {firm}*\n\n"
-                    f"{done}/{total} contacts have completed the sequence ({pct:.0f}%).\n\n"
-                    f"Time to build next month's batch.\n"
-                    f"I'll handle it automatically — just confirm the next month name.\n\n"
-                    f"Reply: *CYCLE {cid} [Month Year]* (e.g. CYCLE {cid} April 2026)"
-                )
-        except Exception as e:
-            log(f"[Cycle] Check failed for {cid} (non-fatal): {e}")
+                if total < 10:
+                    continue  # Not enough data yet
+                pct = done / total * 100
+                if pct >= 75:
+                    state[key] = datetime.utcnow().isoformat()
+                    save_state(state)
+                    camp_label = _camp.get('campaign_name', campaign_id[:8])
+                    log(f"[Cycle] {firm} / {camp_label}: {done}/{total} ({pct:.0f}%) complete — alerting")
+                    notify(
+                        f"📅 *Campaign Winding Down — {firm}*\n\n"
+                        f"*{camp_label}*: {done}/{total} contacts have completed the sequence ({pct:.0f}%).\n\n"
+                        f"Time to build next month's batch.\n"
+                        f"I'll handle it automatically — just confirm the next month name.\n\n"
+                        f"Reply: *CYCLE {cid} [Month Year]* (e.g. CYCLE {cid} April 2026)"
+                    )
+            except Exception as e:
+                log(f"[Cycle] Check failed for {cid}/{campaign_id[:8]} (non-fatal): {e}")
 
 
 def _auto_activate_client(client_id, campaign_id, firm_name):
@@ -1564,54 +1577,62 @@ def sync_instantly_stages(clients):
         5: 'bounced',
     }
     for client in clients:
-        cid         = client['id']
-        campaign_id = client.get('instantly_campaign_id', '')
-        if not campaign_id:
-            continue
-        try:
-            page_cursor = None
-            processed   = 0
-            while True:
-                # Use GET /api/v2/leads with campaign param — /leads/list does NOT reliably
-                # filter by campaign (returns workspace-level leads per MEMORY.md)
-                params = {'campaign': campaign_id, 'limit': 100}
-                if page_cursor:
-                    params['starting_after'] = page_cursor
-                resp = requests.get(
-                    'https://api.instantly.ai/api/v2/leads',
-                    headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
-                    params=params, timeout=20
-                )
-                if resp.status_code != 200:
-                    break
-                data  = resp.json()
-                leads = data.get('items', [])
-                if not leads:
-                    break
-                for lead in leads:
-                    status = lead.get('status')
-                    email  = lead.get('email', '').lower().strip()
-                    if not email or status not in STAGE_MAP:
-                        continue
-                    new_stage = STAGE_MAP[status]
-                    pid = _prospect_id(cid, email)
-                    try:
-                        update_prospect_stage(pid, new_stage)
-                    except Exception:
-                        pass
-                    # Add bounced/unsubscribed to DNC
-                    if status in (4, 5):
-                        add_dnc(cid, email)
-                    processed += 1
-                # Pagination
-                if not data.get('next_starting_after'):
-                    break
-                page_cursor = data['next_starting_after']
+        cid = client['id']
+        # Loop ALL active campaigns (multi-campaign aware)
+        for _camp in get_client_campaigns(client):
+            campaign_id = _camp.get('instantly_campaign_id', '')
+            if not campaign_id:
+                continue
+            _sync_one_campaign_stages(cid, campaign_id)
 
-            if processed:
-                log(f"[Sync] {cid}: updated {processed} prospect stages from Instantly")
-        except Exception as e:
-            log(f"[Sync] Stage sync failed for {cid} (non-fatal): {e}")
+
+def _sync_one_campaign_stages(cid, campaign_id):
+    """Sync Instantly lead statuses to DB for a single campaign."""
+    STAGE_MAP = {6: 'sequence_complete', 4: 'unsubscribed', 5: 'bounced'}
+    try:
+        page_cursor = None
+        processed   = 0
+        while True:
+            # Use GET /api/v2/leads with campaign param — /leads/list does NOT reliably
+            # filter by campaign (returns workspace-level leads per MEMORY.md)
+            params = {'campaign': campaign_id, 'limit': 100}
+            if page_cursor:
+                params['starting_after'] = page_cursor
+            resp = requests.get(
+                'https://api.instantly.ai/api/v2/leads',
+                headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
+                params=params, timeout=20
+            )
+            if resp.status_code != 200:
+                break
+            data  = resp.json()
+            leads = data.get('items', [])
+            if not leads:
+                break
+            for lead in leads:
+                status = lead.get('status')
+                email  = lead.get('email', '').lower().strip()
+                if not email or status not in STAGE_MAP:
+                    continue
+                new_stage = STAGE_MAP[status]
+                pid = _prospect_id(cid, email)
+                try:
+                    update_prospect_stage(pid, new_stage)
+                except Exception:
+                    pass
+                # Add bounced/unsubscribed to DNC
+                if status in (4, 5):
+                    add_dnc(cid, email)
+                processed += 1
+            # Pagination
+            if not data.get('next_starting_after'):
+                break
+            page_cursor = data['next_starting_after']
+
+        if processed:
+            log(f"[Sync] {cid}/{campaign_id[:8]}: updated {processed} prospect stages from Instantly")
+    except Exception as e:
+        log(f"[Sync] Stage sync failed for {cid}/{campaign_id[:8]} (non-fatal): {e}")
 
 
 def check_campaign_completions(clients):
@@ -1635,52 +1656,53 @@ def check_campaign_completions(clients):
     changed = False
 
     for client in clients:
-        cid         = client['id']
-        firm        = client.get('firm_name', cid)
-        campaign_id = client.get('instantly_campaign_id', '')
-        campaign_name = client.get('campaign_name', campaign_id)
+        cid  = client['id']
+        firm = client.get('firm_name', cid)
 
-        if not campaign_id:
-            continue
-        if campaign_id in alerted:
-            continue  # Already alerted — skip silently
+        # Loop ALL active campaigns (multi-campaign aware)
+        for _camp in get_client_campaigns(client):
+            campaign_id   = _camp.get('instantly_campaign_id', '')
+            campaign_name = _camp.get('campaign_name', campaign_id)
 
-        try:
-            resp = requests.get(
-                f'https://api.instantly.ai/api/v2/campaigns/{campaign_id}',
-                headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
-                timeout=10
-            )
-            if resp.status_code != 200:
-                log(f"[CampaignComplete] API error for {firm} ({campaign_id}): {resp.status_code}")
+            if not campaign_id:
                 continue
+            if campaign_id in alerted:
+                continue  # Already alerted — skip silently
 
-            data = resp.json()
-            status = data.get('status', -1)
-            # Use API campaign name if we don't have one locally
-            api_name = data.get('name', campaign_name)
+            try:
+                resp = requests.get(
+                    f'https://api.instantly.ai/api/v2/campaigns/{campaign_id}',
+                    headers={'Authorization': f'Bearer {INSTANTLY_API_KEY}'},
+                    timeout=10
+                )
+                if resp.status_code != 200:
+                    log(f"[CampaignComplete] API error for {firm} ({campaign_id}): {resp.status_code}")
+                    continue
 
-            if status != 3:
-                continue  # Not completed — skip
+                data = resp.json()
+                status = data.get('status', -1)
+                api_name = data.get('name', campaign_name)
 
-            # Completed and not yet alerted — fire alert
-            log(f"[CampaignComplete] Campaign completed: {firm} — {api_name} ({campaign_id})")
-            notify(
-                f"🏁 *Campaign Complete — {firm}*\n\n"
-                f"All prospects have been reached for the current campaign.\n\n"
-                f"*Campaign:* {api_name}\n"
-                f"*Client:* {firm}\n\n"
-                f"Next steps:\n"
-                f"• Reply with campaign details to build the next batch\n"
-                f"• Or close out the campaign if the client is offboarding\n\n"
-                f"Run: `python3 tools/monthly_cycle.py --client {cid} --month \"Month YYYY\"` to launch the next cycle."
-            )
+                if status != 3:
+                    continue  # Not completed — skip
 
-            alerted.append(campaign_id)
-            changed = True
+                log(f"[CampaignComplete] Campaign completed: {firm} — {api_name} ({campaign_id})")
+                notify(
+                    f"🏁 *Campaign Complete — {firm}*\n\n"
+                    f"All prospects have been reached for the current campaign.\n\n"
+                    f"*Campaign:* {api_name}\n"
+                    f"*Client:* {firm}\n\n"
+                    f"Next steps:\n"
+                    f"• Reply with campaign details to build the next batch\n"
+                    f"• Or close out the campaign if the client is offboarding\n\n"
+                    f"Run: `python3 tools/monthly_cycle.py --client {cid} --month \"Month YYYY\"` to launch the next cycle."
+                )
 
-        except Exception as e:
-            log(f"[CampaignComplete] Error checking {firm} (non-fatal): {e}")
+                alerted.append(campaign_id)
+                changed = True
+
+            except Exception as e:
+                log(f"[CampaignComplete] Error checking {firm}/{campaign_id[:8]} (non-fatal): {e}")
 
     if changed:
         try:
@@ -1768,17 +1790,23 @@ def validate_all_campaign_ids(clients: list) -> list[str]:
         return []
 
     for c in clients:
-        cid = c.get("instantly_campaign_id", "")
         firm = c.get("firm_name", c.get("id", "?"))
-        if not cid:
+        # Validate ALL campaigns in the campaigns array (multi-campaign aware)
+        client_campaigns = get_client_campaigns(c)
+        if not client_campaigns or not any(x.get('instantly_campaign_id') for x in client_campaigns):
             errors.append(f"{firm}: no campaign ID set")
-        elif cid not in live_ids:
-            errors.append(
-                f"{firm}: campaign ID '{cid}' NOT FOUND in Instantly. "
-                f"Valid IDs: {list(live_ids.keys())}"
-            )
-        else:
-            log(f"[CampaignValidation] ✓ {firm} → '{live_ids[cid]}' ({cid})")
+            continue
+        for camp in client_campaigns:
+            cid = camp.get('instantly_campaign_id', '')
+            if not cid:
+                continue
+            if cid not in live_ids:
+                errors.append(
+                    f"{firm}: campaign ID '{cid}' NOT FOUND in Instantly. "
+                    f"Valid IDs: {list(live_ids.keys())}"
+                )
+            else:
+                log(f"[CampaignValidation] ✓ {firm} / {camp.get('campaign_name', cid[:8])} → '{live_ids[cid]}'")
     return errors
 
 def load_clients():
