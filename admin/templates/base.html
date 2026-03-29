@@ -185,16 +185,13 @@ details > summary::-webkit-details-marker { display: none; }
   <a href="{{ url_for('dashboard') }}"    class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
   <a href="{{ url_for('clients_list') }}" class="{{ 'active' if request.endpoint in ['clients_list','client_detail','client_new'] }}">Clients</a>
   <a href="{{ url_for('intakes_list') }}" class="{{ 'active' if request.endpoint in ['intakes_list','intake_approve'] }}">Intakes{% if nav_pending_intakes %} <span style="background:#f59e0b;color:#000;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:3px">{{ nav_pending_intakes }}</span>{% endif %}</a>
-  <a href="{{ url_for('campaigns') }}"    class="{{ 'active' if request.endpoint == 'campaigns' }}">Campaigns</a>
-  <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
-  <a href="{{ url_for('stats') }}"        class="{{ 'active' if request.endpoint == 'stats' }}">Revenue</a>
   <a href="{{ url_for('pipeline') }}"     class="{{ 'active' if request.endpoint == 'pipeline' }}">Pipeline</a>
-  <a href="{{ url_for('marketing_assets') }}" class="{{ 'active' if request.endpoint == 'marketing_assets' }}">Marketing</a>
-  <a href="{{ url_for('system_status') }}" class="{{ 'active' if request.endpoint == 'system_status' }}">System</a>
-  <a href="{{ url_for('flowchart') }}"    class="{{ 'active' if request.endpoint == 'flowchart' }}" style="color:#334155">Flowchart</a>
-  <a href="{{ url_for('backlog') }}"      class="{{ 'active' if request.endpoint == 'backlog' }}" style="color:#334155">Backlog</a>
+  <a href="{{ url_for('stats') }}"        class="{{ 'active' if request.endpoint == 'stats' }}">Revenue</a>
+  <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
   <div class="nav-right">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">ADMIN</span>
+    <a href="{{ url_for('marketing_assets') }}" style="font-size:12px;color:var(--muted)" class="{{ 'active' if request.endpoint == 'marketing_assets' }}">Marketing</a>
+    <a href="{{ url_for('system_status') }}"    style="font-size:12px;color:var(--muted)" class="{{ 'active' if request.endpoint == 'system_status' }}">System</a>
+    <span style="color:#1e293b">|</span>
     <a href="{{ url_for('logout') }}" style="color:var(--muted);font-size:12px">Logout</a>
   </div>
 </nav>

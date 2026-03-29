@@ -1333,6 +1333,152 @@ def client_update(client_id):
     return redirect(url_for("client_detail", client_id=client_id))
 
 
+@app.route("/clients/<client_id>/campaigns/new", methods=["GET", "POST"])
+@login_required
+def campaign_wizard(client_id):
+    """Multi-step wizard: ICP → Claude sequence draft → approve → upload CSV → launch."""
+    config = load_clients()
+    client = next((c for c in config.get("clients", []) if c["id"] == client_id), None)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("clients_list"))
+
+    from datetime import datetime as _dt
+
+    step = 1
+    form = {}
+    sequence = None
+
+    if request.method == "POST":
+        step = int(request.form.get("step", 1))
+        form = {k: v for k, v in request.form.items() if k != "step"}
+
+        # ── STEP 1 → generate sequence ──────────────────────────────────
+        if step == 1:
+            action = request.form.get("action", "generate")
+            icp_label   = form.get("icp_label", "").strip()
+            target_titles = form.get("target_titles", "").strip()
+
+            # Build a synthetic client dict with campaign-specific context for sequence gen
+            seq_client = dict(client)
+            seq_client["vertical"]               = icp_label
+            seq_client["_target_titles"]         = target_titles
+            seq_client["_target_locations"]      = form.get("target_locations", "")
+            seq_client["_target_company_size"]   = form.get("target_company_size", "")
+            seq_client["_value_prop"]            = form.get("value_prop", client.get("_value_prop",""))
+            seq_client["_differentiator"]        = form.get("differentiator", client.get("_differentiator",""))
+            seq_client["_target_who"]            = f"{target_titles} at {icp_label} companies"
+            seq_client["_ideal_client"]          = icp_label
+            seq_client["tone"]                   = form.get("tone", client.get("tone","warm-professional"))
+            seq_client["compliance_note"]        = form.get("compliance_note", client.get("compliance_note",""))
+
+            try:
+                sequence = _generate_sequence_from_intake(seq_client)
+            except Exception as e:
+                app.logger.warning(f"[Wizard] Sequence gen failed: {e}")
+                sequence = [
+                    {"subject": f"Quick question — {icp_label}", "body": "[Edit this draft]", "delay_days": 0},
+                    {"subject": "Following up", "body": "[Edit this draft]", "delay_days": 5},
+                    {"subject": "Last note", "body": "[Edit this draft]", "delay_days": 5},
+                ]
+
+            step = 2
+            return render_template("campaign_wizard.html",
+                client=client, step=step, form=form, sequence=sequence, now=_dt.now())
+
+        # ── STEP 2 → approve or regenerate ─────────────────────────────
+        if step == 2:
+            action = request.form.get("action", "approve")
+            if action == "regenerate":
+                # Re-run step 1 generation with same inputs
+                seq_client = dict(client)
+                seq_client["vertical"]               = form.get("icp_label","")
+                seq_client["_target_titles"]         = form.get("target_titles","")
+                seq_client["_target_locations"]      = form.get("target_locations","")
+                seq_client["_target_company_size"]   = form.get("target_company_size","")
+                seq_client["_value_prop"]            = form.get("value_prop","")
+                seq_client["_differentiator"]        = form.get("differentiator","")
+                seq_client["_target_who"]            = f"{form.get('target_titles','')} at {form.get('icp_label','')} companies"
+                seq_client["_ideal_client"]          = form.get("icp_label","")
+                seq_client["tone"]                   = form.get("tone","warm-professional")
+                seq_client["compliance_note"]        = form.get("compliance_note","")
+                try:
+                    sequence = _generate_sequence_from_intake(seq_client)
+                except Exception:
+                    sequence = [{"subject":"","body":"","delay_days":0},{"subject":"","body":"","delay_days":5},{"subject":"","body":"","delay_days":5}]
+                return render_template("campaign_wizard.html",
+                    client=client, step=2, form=form, sequence=sequence, now=_dt.now())
+
+            # Approved — collect edited sequence back into form dict for step 3
+            form["t1_subject"] = request.form.get("t1_subject","")
+            form["t1_body"]    = request.form.get("t1_body","")
+            form["t1_delay"]   = "0"
+            form["t2_subject"] = request.form.get("t2_subject","")
+            form["t2_body"]    = request.form.get("t2_body","")
+            form["t2_delay"]   = request.form.get("t2_delay","5")
+            form["t3_subject"] = request.form.get("t3_subject","")
+            form["t3_body"]    = request.form.get("t3_body","")
+            form["t3_delay"]   = request.form.get("t3_delay","5")
+            step = 3
+            return render_template("campaign_wizard.html",
+                client=client, step=3, form=form, sequence=None, now=_dt.now())
+
+        # ── STEP 3 → save sequence + upload CSV + launch ────────────────
+        if step == 3:
+            # Save the approved sequence to client record
+            sequence_data = [
+                {"subject": form.get("t1_subject",""), "body": form.get("t1_body",""), "delay_days": 0},
+                {"subject": form.get("t2_subject",""), "body": form.get("t2_body",""), "delay_days": int(form.get("t2_delay",5))},
+                {"subject": form.get("t3_subject",""), "body": form.get("t3_body",""), "delay_days": int(form.get("t3_delay",5))},
+            ]
+
+            # Update ICP fields on client for this campaign
+            for c in config.get("clients", []):
+                if c["id"] == client_id:
+                    c["sequence"]              = sequence_data
+                    c["_target_titles"]        = form.get("target_titles", c.get("_target_titles",""))
+                    c["_target_locations"]     = form.get("target_locations", c.get("_target_locations",""))
+                    c["_target_company_size"]  = form.get("target_company_size", c.get("_target_company_size",""))
+                    c["vertical"]              = form.get("icp_label", c.get("vertical",""))
+                    c["contacts_per_month"]    = int(form.get("lead_limit", c.get("contacts_per_month", 200)))
+                    # Mark sequence approved for this campaign
+                    if "checklist" not in c:
+                        c["checklist"] = {}
+                    c["checklist"]["sequence_approved"] = True
+                    break
+
+            save_clients(config)
+
+            # Handle CSV upload — save to campaign-specific path
+            icp_slug = form.get("icp_label","campaign").lower().replace(" ","_").replace("/","_")
+            csv_rel  = f"campaigns/{client_id}/prospects_{icp_slug}.csv"
+            csv_abs  = BASE_DIR / csv_rel
+            csv_abs.parent.mkdir(parents=True, exist_ok=True)
+
+            uploaded = request.files.get("prospects_csv")
+            if uploaded and uploaded.filename.endswith(".csv"):
+                uploaded.save(str(csv_abs))
+                app.logger.info(f"[Wizard] Saved prospect CSV: {csv_abs}")
+            else:
+                flash("Please upload an Apollo CSV to continue.", "error")
+                return render_template("campaign_wizard.html",
+                    client=client, step=3, form=form, sequence=None, now=_dt.now())
+
+            # Now trigger campaign launch using existing pipeline
+            month_name = form.get("month", _dt.now().strftime("%B %Y"))
+            lead_limit = int(form.get("lead_limit", client.get("contacts_per_month", 200)))
+
+            return redirect(url_for("campaign_launch", client_id=client_id,
+                                    month=month_name, limit=lead_limit,
+                                    use_csv="1", csv_path=csv_rel,
+                                    icp_label=form.get("icp_label",""),
+                                    _from_wizard="1") + "?launch=1")
+
+    # GET — show step 1
+    return render_template("campaign_wizard.html",
+        client=client, step=1, form={}, sequence=None, now=_dt.now())
+
+
 @app.route("/clients/<client_id>/campaigns/add", methods=["POST"])
 @login_required
 def campaign_add(client_id):
@@ -1471,9 +1617,13 @@ def campaign_launch(client_id):
         flash("Client not found.", "error")
         return redirect(url_for("dashboard"))
 
-    month = request.form.get("month", "").strip()
-    skip_apollo = request.form.get("use_csv") == "1"
+    month = (request.form.get("month") or request.args.get("month", "")).strip()
+    skip_apollo = (request.form.get("use_csv") or request.args.get("use_csv", "0")) == "1"
     skip_verify = not bool(os.environ.get("NEVERBOUNCE_API_KEY", ""))
+    # Wizard params: custom CSV path and ICP label for multi-campaign support
+    _wizard_csv_path = request.args.get("csv_path") or request.form.get("csv_path", "")
+    _wizard_icp_label = request.args.get("icp_label") or request.form.get("icp_label", "")
+    _from_wizard = bool(request.args.get("_from_wizard"))
 
     if not month:
         flash("Month is required.", "error")

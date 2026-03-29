@@ -123,21 +123,38 @@
 </div>
 {% endif %}
 
-{# ── QUICK ACTIONS ───────────────────────────────────────────────── #}
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+{# ── ACTIVE CLIENT ACTIONS ───────────────────────────────────────── #}
+{% if client.active %}
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
+  <a href="{{ url_for('generate_report', client_id=client.id) }}" class="btn btn-ghost btn-sm">📊 Monthly Report</a>
+  <form method="POST" action="{{ url_for('client_offboard', client_id=client.id) }}"
+        onsubmit="return confirm('Offboard {{ client.firm_name }}? Campaign pauses, data preserved.')">
+    <button class="btn btn-ghost btn-sm" style="color:#ef4444;border-color:#ef444433">⛔ Offboard</button>
+  </form>
+</div>
+{% endif %}
+
+{# ── PRE-LAUNCH ACTIONS (non-active only) ────────────────────────── #}
+{% if not client.active %}
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+  {% if not creds_ok %}
+  <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
+    <button class="btn btn-primary btn-sm">🔗 Send Credential Link</button>
+  </form>
+  {% endif %}
   {% if creds_ok %}
   <form method="POST" action="{{ url_for('send_followup_email', client_id=client.id) }}">
     <button class="btn btn-ghost btn-sm" style="{% if not dns_ok %}border-color:#f59e0b;color:#f59e0b{% endif %}">
-      📨 {% if dns_ok %}Send Follow-up Email{% else %}Send Follow-up Email ⚠️ DNS unverified{% endif %}
+      📨 Send Follow-up Email{% if not dns_ok %} ⚠️{% endif %}
     </button>
   </form>
-  {% endif %}
-  <button id="auto-verify-btn" onclick="runAutoVerify()" class="btn btn-ghost btn-sm">🔍 Auto-verify DNS &amp; Warmup</button>
+  <button id="auto-verify-btn" onclick="runAutoVerify()" class="btn btn-ghost btn-sm">🔍 Verify DNS &amp; Warmup</button>
   <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank" class="btn btn-ghost btn-sm">📋 DNS Records</a>
+  {% endif %}
   {% if not payment_ok %}
-    <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}">
-      <button class="btn btn-ghost btn-sm">💳 {% if client.get('stripe_payment_link') %}View{% else %}Generate{% endif %} Payment Link</button>
-    </form>
+  <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}">
+    <button class="btn btn-ghost btn-sm">💳 {% if client.get('stripe_payment_link') %}View{% else %}Generate{% endif %} Payment Link</button>
+  </form>
   {% endif %}
   {% if pre_payment_gates and client.get('stripe_payment_link') %}
     {% if client.get('launch_email_sent_at') %}
@@ -150,28 +167,10 @@
       </form>
     {% endif %}
   {% endif %}
-  {% if not creds_ok %}
-  <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
-    <button class="btn btn-ghost btn-sm">🔗 Send Credential Link</button>
-  </form>
-  {% endif %}
-  {% if client.active %}
-  <a href="{{ url_for('generate_report', client_id=client.id) }}" class="btn btn-ghost btn-sm">📊 Generate Monthly Report</a>
-  {% endif %}
-  {% if client.active %}
-  <form method="POST" action="{{ url_for('client_offboard', client_id=client.id) }}"
-        onsubmit="return confirm('Offboard {{ client.firm_name }}? Campaign pauses, data preserved.')">
-    <button class="btn btn-ghost btn-sm" style="color:#ef4444;border-color:#ef444433">⛔ Offboard</button>
-  </form>
-  {% endif %}
 </div>
-
-{# DNS warning on follow-up email button #}
-{% if not dns_ok and creds_ok %}
-<div id="auto-verify-result" style="display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.7"></div>
-{% else %}
-<div id="auto-verify-result" style="display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.7"></div>
 {% endif %}
+
+<div id="auto-verify-result" style="display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.7"></div>
 
 {# ── WARMUP SCORE BAR ────────────────────────────────────────────── #}
 {% if creds_ok and warmup_live.score is not none %}
@@ -330,7 +329,8 @@
   {% endif %}
 </div>
 
-{# ── LAUNCH SECTION ──────────────────────────────────────────────── #}
+{# ── LAUNCH SECTION (pre-launch only) ───────────────────────────── #}
+{% if not client.active %}
 <div class="section" style="margin-bottom:24px;border:1px solid {% if all_gates %}rgba(74,222,128,0.3){% else %}rgba(74,222,128,0.08){% endif %}">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
     <div class="section-title" style="margin:0">🚀 Launch Campaign</div>
@@ -481,14 +481,17 @@
     <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></pre>
   </div>
 </div>
+{% endif %}{# end not client.active #}
 
-{# ── CAMPAIGNS LIST ──────────────────────────────────────────────── #}
-{% if client.campaigns or client.instantly_campaign_id %}
+{# ── CAMPAIGNS ───────────────────────────────────────────────────── #}
 <div class="section" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-    <div class="section-title" style="margin:0">📊 Campaigns</div>
-    {% set cc = campaigns_metrics|length if campaigns_metrics else (1 if client.instantly_campaign_id else 0) %}
-    <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="section-title" style="margin:0">📊 Campaigns</div>
+      {% set cc = campaigns_metrics|length if campaigns_metrics else (1 if client.instantly_campaign_id else 0) %}
+      <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
+    </div>
+    <a href="{{ url_for('campaign_wizard', client_id=client.id) }}" class="btn btn-primary btn-sm">➕ New Campaign</a>
   </div>
 
   {# ── CONSOLIDATED SUMMARY (only shown when 2+ campaigns) #}
@@ -543,21 +546,17 @@
     </div>
   {% endif %}
 
-  {# ── ADD CAMPAIGN FORM #}
-  <details><summary style="font-size:12px;color:#4ade80;cursor:pointer;padding:6px 0">+ Add Campaign</summary>
-    <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:12px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label><input name="campaign_name" style="font-size:12px"></div>
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">ICP Label (e.g. "PT Clinics" or "RIA Advisors")</label><input name="icp_label" placeholder="e.g. RIA Advisors" style="font-size:12px"></div>
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label><input name="launch_date" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospects CSV path</label><input name="prospects_csv" style="font-size:12px"></div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-sm">Add Campaign</button>
+  {# ── LINK EXISTING CAMPAIGN (manual fallback) #}
+  <details style="margin-top:4px"><summary style="font-size:11px;color:#334155;cursor:pointer;padding:4px 0">Already have an Instantly campaign ID? Link it manually</summary>
+    <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Instantly Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Campaign Name</label><input name="campaign_name" style="font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">ICP Label</label><input name="icp_label" placeholder="e.g. RIA Advisors" style="font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Launch Date</label><input name="launch_date" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
+      <div style="grid-column:1/-1"><button type="submit" class="btn btn-ghost btn-sm">Link Campaign</button></div>
     </form>
   </details>
 </div>
-{% endif %}
 
 {# ── SECONDARY SECTIONS ──────────────────────────────────────────── #}
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">

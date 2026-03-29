@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block title %}New Campaign — {{ client.firm_name }}{% endblock %}
+{% block content %}
+
+<div style="max-width:760px">
+
+{# ── BREADCRUMB ── #}
+<div style="font-size:12px;color:#475569;margin-bottom:20px">
+  <a href="{{ url_for('clients_list') }}" style="color:#475569">Clients</a>
+  <span style="margin:0 6px">›</span>
+  <a href="{{ url_for('client_detail', client_id=client.id) }}" style="color:#475569">{{ client.firm_name }}</a>
+  <span style="margin:0 6px">›</span>
+  <span style="color:#94a3b8">New Campaign</span>
+</div>
+
+<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4ade80;margin-bottom:8px;font-family:'JetBrains Mono',monospace">New Campaign Wizard</div>
+<h1 style="margin:0 0 6px">{{ client.firm_name }}</h1>
+<p class="subtitle">Define who you're targeting, review the sequence draft, upload leads, and launch.</p>
+
+{# ── STEPS INDICATOR ── #}
+{% set step = step|default(1)|int %}
+<div style="display:flex;gap:0;margin-bottom:32px">
+  {% for s, label in [(1,'ICP & Target'),(2,'Sequence'),(3,'Leads & Launch')] %}
+  <div style="display:flex;align-items:center;flex:1">
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+      <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+        {% if step > s %}background:#052e16;border:2px solid #4ade80;color:#4ade80
+        {% elif step == s %}background:rgba(74,222,128,0.1);border:2px solid #4ade80;color:#4ade80
+        {% else %}background:#1e293b;border:2px solid #334155;color:#475569{% endif %}">
+        {% if step > s %}✓{% else %}{{ s }}{% endif %}
+      </div>
+      <div style="font-size:11px;margin-top:5px;
+        {% if step == s %}color:#4ade80;font-weight:700{% elif step > s %}color:#4ade80{% else %}color:#475569{% endif %}">
+        {{ label }}
+      </div>
+    </div>
+    {% if not loop.last %}
+    <div style="height:2px;flex:0 0 40px;margin-bottom:18px;
+      {% if step > s %}background:#4ade80{% else %}background:#1e293b{% endif %}"></div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{# ════════════════════════════════════════════════════════════ STEP 1 ══ #}
+{% if step == 1 %}
+<form method="POST" action="{{ url_for('campaign_wizard', client_id=client.id) }}">
+  <input type="hidden" name="step" value="1">
+
+  <div class="section" style="margin-bottom:20px">
+    <div class="section-title">🎯 Who Are We Targeting?</div>
+    <div class="form-row" style="margin-bottom:14px">
+      <div class="form-group" style="margin:0">
+        <label>ICP Label *</label>
+        <input name="icp_label" placeholder="e.g. RIA Advisors, PT Clinics, Insurance Brokers" required value="{{ form.get('icp_label','') }}">
+        <div style="font-size:11px;color:#475569;margin-top:4px">Short name shown in portal and reports.</div>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Campaign Month *</label>
+        <input name="month" placeholder="{{ now.strftime('%B %Y') }}" value="{{ form.get('month', now.strftime('%B %Y')) }}" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Target Job Titles *</label>
+      <input name="target_titles" placeholder="e.g. Owner, Principal, Registered Investment Advisor, Wealth Manager" required value="{{ form.get('target_titles','') }}">
+      <div style="font-size:11px;color:#475569;margin-top:4px">Comma-separated. These go directly into Apollo filters.</div>
+    </div>
+    <div class="form-group">
+      <label>Target Locations</label>
+      <input name="target_locations" placeholder="e.g. Tampa Bay, FL · Orlando, FL · Miami, FL" value="{{ form.get('target_locations','') }}">
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label>Company Size (employees)</label>
+        <input name="target_company_size" placeholder="e.g. 1-10, 1-50" value="{{ form.get('target_company_size','') }}">
+        <div style="font-size:11px;color:#475569;margin-top:4px">Leave blank for all sizes.</div>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Lead Limit</label>
+        <input type="number" name="lead_limit" value="{{ form.get('lead_limit', client.contacts_per_month or 200) }}" min="1" max="1000">
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-bottom:20px">
+    <div class="section-title">✍️ Sequence Context</div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:14px">Help Claude write the right sequence. The more context, the better the draft.</p>
+    <div class="form-group">
+      <label>What problem does {{ client.firm_name }} solve for this audience?</label>
+      <textarea name="value_prop" rows="3" placeholder="e.g. Independent RIAs struggle to fill their pipeline with qualified business owner meetings. We handle the prospecting so they can focus on managing assets." value="">{{ form.get('value_prop', client.get('_value_prop','')) }}</textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="margin:0">
+        <label>What makes {{ client.firm_name }} different?</label>
+        <textarea name="differentiator" rows="2" placeholder="e.g. Done-for-you, no long-term contracts, results in 30 days.">{{ form.get('differentiator', client.get('_differentiator','')) }}</textarea>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Tone</label>
+        <select name="tone">
+          <option value="warm-professional" {% if form.get('tone','warm-professional') == 'warm-professional' %}selected{% endif %}>Warm-professional</option>
+          <option value="direct" {% if form.get('tone') == 'direct' %}selected{% endif %}>Direct</option>
+          <option value="conversational" {% if form.get('tone') == 'conversational' %}selected{% endif %}>Conversational</option>
+          <option value="formal" {% if form.get('tone') == 'formal' %}selected{% endif %}>Formal</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Any compliance notes or restrictions for this campaign?</label>
+      <input name="compliance_note" placeholder="e.g. Cannot mention specific returns or performance claims." value="{{ form.get('compliance_note', client.get('compliance_note','')) }}">
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center">
+    <button type="submit" class="btn btn-primary">Generate Sequence Draft →</button>
+    <a href="{{ url_for('client_detail', client_id=client.id) }}" class="btn btn-ghost">Cancel</a>
+    <span style="font-size:12px;color:#475569">Claude will write a 3-touch sequence based on these inputs.</span>
+  </div>
+</form>
+{% endif %}
+
+{# ════════════════════════════════════════════════════════════ STEP 2 ══ #}
+{% if step == 2 %}
+<form method="POST" action="{{ url_for('campaign_wizard', client_id=client.id) }}">
+  <input type="hidden" name="step" value="2">
+  {# Pass ICP data through #}
+  {% for key in ['icp_label','month','target_titles','target_locations','target_company_size','lead_limit','value_prop','differentiator','tone','compliance_note'] %}
+  <input type="hidden" name="{{ key }}" value="{{ form.get(key,'') }}">
+  {% endfor %}
+
+  <div class="section" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin:0">✉️ Sequence Draft</div>
+      <span style="font-size:11px;background:#1e3a5f;color:#60a5fa;padding:3px 10px;border-radius:20px;border:1px solid #2563eb44">AI Draft — review and edit before approving</span>
+    </div>
+    <p style="font-size:12px;color:#64748b;margin-bottom:16px">Edit any touch below. When you're happy, click Approve Sequence.</p>
+
+    {% set seq = sequence if sequence else [{},{},{}] %}
+    {% for i, touch in [(1, seq[0] if seq|length > 0 else {}),(2, seq[1] if seq|length > 1 else {}),(3, seq[2] if seq|length > 2 else {})] %}
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;color:#4ade80;letter-spacing:.08em;text-transform:uppercase">Touch {{ i }}</span>
+        {% if i == 1 %}
+        <span style="font-size:11px;color:#64748b">Sends on launch day</span>
+        {% else %}
+        <span style="font-size:11px;color:#64748b">Sends
+          <input type="number" name="t{{ i }}_delay" value="{{ touch.get('delay_days', 5) }}" min="1" max="30"
+                 style="width:40px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:11px;text-align:center">
+          days after Touch {{ i-1 }}</span>
+        {% endif %}
+      </div>
+      <input type="text" name="t{{ i }}_subject" value="{{ touch.get('subject','') }}" placeholder="Subject line"
+             style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;margin-bottom:8px">
+      <textarea name="t{{ i }}_body" rows="6"
+                style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;line-height:1.5;resize:vertical">{{ touch.get('body','') }}</textarea>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button type="submit" name="action" value="approve" class="btn btn-primary">Approve Sequence → Upload Leads</button>
+    <button type="submit" name="action" value="regenerate" class="btn btn-ghost">🔄 Regenerate</button>
+    <a href="{{ url_for('campaign_wizard', client_id=client.id) }}" class="btn btn-ghost">← Back</a>
+  </div>
+</form>
+{% endif %}
+
+{# ════════════════════════════════════════════════════════════ STEP 3 ══ #}
+{% if step == 3 %}
+<form method="POST" action="{{ url_for('campaign_wizard', client_id=client.id) }}"
+      enctype="multipart/form-data" id="launch-form"
+      onsubmit="
+        if (!document.getElementById('wizard-csv-input').files[0]) {
+          alert('Upload an Apollo CSV first.');
+          return false;
+        }
+      ">
+  <input type="hidden" name="step" value="3">
+  {# Pass all data through as hidden fields #}
+  {% for key in ['icp_label','month','target_titles','target_locations','target_company_size','lead_limit','value_prop','differentiator','tone','compliance_note'] %}
+  <input type="hidden" name="{{ key }}" value="{{ form.get(key,'') }}">
+  {% endfor %}
+  {% for i in [1,2,3] %}
+  <input type="hidden" name="t{{ i }}_subject" value="{{ form.get('t'~i~'_subject','') }}">
+  <input type="hidden" name="t{{ i }}_body"    value="{{ form.get('t'~i~'_body','') }}">
+  <input type="hidden" name="t{{ i }}_delay"   value="{{ form.get('t'~i~'_delay', 5 if i > 1 else 0) }}">
+  {% endfor %}
+
+  {# Sequence summary (read-only) #}
+  <div class="section" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="section-title" style="margin:0">✉️ Sequence Approved</div>
+      <span style="font-size:11px;background:#052e16;color:#4ade80;border:1px solid #166534;padding:3px 10px;border-radius:20px">✅ Ready</span>
+    </div>
+    {% for i in [1,2,3] %}
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:10px 14px;margin-bottom:8px">
+      <div style="font-size:10px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Touch {{ i }}</div>
+      <div style="font-size:12px;font-weight:600;color:#e2e8f0;margin-bottom:2px">{{ form.get('t'~i~'_subject','') }}</div>
+      <div style="font-size:11px;color:#475569">{{ form.get('t'~i~'_body','')[:120] }}{% if form.get('t'~i~'_body','') | length > 120 %}…{% endif %}</div>
+    </div>
+    {% endfor %}
+    <a href="{{ url_for('campaign_wizard', client_id=client.id) }}?edit_seq=1" style="font-size:11px;color:#64748b">← Edit sequence</a>
+  </div>
+
+  {# Apollo filters reference #}
+  <div class="section" style="margin-bottom:20px">
+    <div class="section-title">📋 Apollo Filters for This Campaign</div>
+    <div style="font-size:12px;color:#94a3b8;line-height:1.9;background:#0f172a;border-radius:6px;padding:12px 14px">
+      <div><span style="color:#475569">ICP:</span> {{ form.get('icp_label','') }}</div>
+      <div><span style="color:#475569">Titles:</span> {{ form.get('target_titles','') }}</div>
+      <div><span style="color:#475569">Locations:</span> {{ form.get('target_locations','-') }}</div>
+      <div><span style="color:#475569">Company size:</span> {{ form.get('target_company_size','-') }}</div>
+      <div><span style="color:#475569">Lead limit:</span> {{ form.get('lead_limit', client.contacts_per_month or 200) }}</div>
+    </div>
+    <p style="font-size:11px;color:#475569;margin-top:10px">Export from Apollo using these filters, then upload the CSV below.</p>
+  </div>
+
+  {# CSV upload #}
+  <div class="section" style="margin-bottom:20px">
+    <div class="section-title">📤 Upload Apollo CSV</div>
+    <div id="wizard-drop-zone" onclick="document.getElementById('wizard-csv-input').click()"
+         style="border:2px dashed #334155;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:10px">
+      <div style="font-size:13px;color:#64748b">Drag &amp; drop your CSV, or <span style="color:#4ade80">click to browse</span></div>
+      <div id="wizard-file-name" style="font-size:12px;color:#4ade80;margin-top:6px;display:none"></div>
+    </div>
+    <input type="file" id="wizard-csv-input" name="prospects_csv" accept=".csv" style="display:none">
+  </div>
+
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button type="submit" id="wizard-launch-btn" class="btn btn-primary" style="background:#4ade80;color:#0f172a;font-weight:800">
+      🚀 Build &amp; Launch Campaign
+    </button>
+    <span style="font-size:12px;color:#475569">DNC filter · NeverBounce · custom intros · Instantly draft — all automatic.</span>
+  </div>
+
+  <div id="wizard-launch-log" style="display:none;margin-top:16px">
+    <div style="font-size:12px;color:#64748b;margin-bottom:6px">Launch Progress</div>
+    <pre id="wizard-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></pre>
+  </div>
+</form>
+{% endif %}
+
+</div>
+
+<script>
+// CSV drop zone
+(function(){
+  var dz = document.getElementById('wizard-drop-zone');
+  var inp = document.getElementById('wizard-csv-input');
+  var lbl = document.getElementById('wizard-file-name');
+  if (!dz) return;
+  inp.addEventListener('change', function() {
+    if (inp.files[0]) { lbl.textContent = '✅ ' + inp.files[0].name; lbl.style.display='block'; dz.style.borderColor='#4ade80'; }
+  });
+  dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='#4ade80'; });
+  dz.addEventListener('dragleave', function() { dz.style.borderColor='#334155'; });
+  dz.addEventListener('drop', function(e) {
+    e.preventDefault();
+    var f = e.dataTransfer.files[0];
+    if (f && f.name.endsWith('.csv')) {
+      var dt = new DataTransfer(); dt.items.add(f);
+      inp.files = dt.files;
+      lbl.textContent = '✅ ' + f.name; lbl.style.display='block'; dz.style.borderColor='#4ade80';
+    }
+  });
+})();
+
+// Launch log polling (step 3 post)
+{% if request.args.get('launch') %}
+(function(){
+  document.getElementById('wizard-launch-log').style.display = 'block';
+  var logText = document.getElementById('wizard-log-text');
+  function poll() {
+    fetch('{{ url_for("campaign_launch_log", client_id=client.id) }}')
+      .then(r => r.text()).then(txt => {
+        logText.textContent = txt; logText.scrollTop = logText.scrollHeight;
+        if (!txt.includes('__COMPLETE__')) setTimeout(poll, 2000);
+        else { logText.textContent = txt.replace('__COMPLETE__','').trim(); }
+      });
+  }
+  poll();
+})();
+{% endif %}
+</script>
+
+{% endblock %}
