@@ -12758,3 +12758,47 @@
   heartbeat_file.write_text(datetime.utcnow().isoformat())
 2026-03-29 15:11:50 Cycle complete. Next check in 10 min.
 
+2026-03-29 15:21:51 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:21:51 [ArgusReach] Checking inbox...
+2026-03-29 15:21:51 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:21:51 [ArgusReach] Checking inbox...
+2026-03-29 15:21:51 [ArgusReach] No messages in last 24h.
+2026-03-29 15:21:52 [ArgusReach] No messages in last 24h.
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1864: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-29 15:21:55 Cycle complete. Next check in 10 min.
+
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1864: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
+2026-03-29 15:21:55 Cycle complete. Next check in 10 min.
+
+2026-03-29 15:24:12 ArgusReach Monitor v2 starting
+2026-03-29 15:24:12 ArgusReach Monitor v2 started. Watching all active client inboxes, checking every 10 min.
+2026-03-29 15:24:12 ArgusReach Monitor v2 starting
+2026-03-29 15:24:12 ArgusReach Monitor v2 started. Watching all active client inboxes, checking every 10 min.
+2026-03-29 15:24:12 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:24:12 [ArgusReach] Checking inbox...
+2026-03-29 15:24:12 [CampaignValidation] ✓ ArgusReach / ArgusReach — ArgusReach — March 2026 → 'ArgusReach — ArgusReach — March 2026'
+2026-03-29 15:24:12 [ArgusReach] Checking inbox...
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:911: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(days=1)).strftime('%d-%b-%Y')
+2026-03-29 15:24:12 [ArgusReach] No messages in last 24h.
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:911: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  since_date = (datetime.utcnow() - timedelta(days=1)).strftime('%d-%b-%Y')
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:257: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.utcnow()
+2026-03-29 15:24:13 [ArgusReach] No messages in last 24h.
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:257: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  now = datetime.utcnow()
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1906: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  run._last_sync = datetime.utcnow()
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1914: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  heartbeat_file.write_text(datetime.utcnow().isoformat())
+2026-03-29 15:24:16 Cycle complete. Next check in 10 min.
+
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1906: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  run._last_sync = datetime.utcnow()
+/home/argus/.openclaw/workspace/argusreach/monitor/monitor.py:1914: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  heartbeat_file.write_text(datetime.utcnow().isoformat())
+2026-03-29 15:24:17 Cycle complete. Next check in 10 min.
+

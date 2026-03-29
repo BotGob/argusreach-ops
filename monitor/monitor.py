@@ -310,8 +310,28 @@ def load_pending():
 def save_pending(pending):
     PENDING_FILE.write_text(json.dumps(pending, indent=2))
 
+def _resolve_campaign(client, from_email, email_to_campaign):
+    """Return (campaign_id, campaign_name) for a specific prospect email.
+    Uses email_to_campaign lookup (built from Instantly API per-campaign).
+    Falls back to root client fields for legacy single-campaign clients.
+    """
+    cid = email_to_campaign.get(from_email.lower(), '')
+    if cid:
+        for camp in client.get('campaigns', []):
+            if camp.get('instantly_campaign_id') == cid:
+                return cid, camp.get('campaign_name', '')
+    # Fallback
+    return client.get('instantly_campaign_id', ''), client.get('campaign_name', '')
+
+
 def queue_pending(client, from_email, from_name, subject, draft, classification,
-                  in_reply_to=None, references=None, confidence=None):
+                  in_reply_to=None, references=None, confidence=None,
+                  campaign_id=None, campaign_name=None):
+    """Queue a reply for Vito's approval.
+
+    campaign_id / campaign_name: per-prospect campaign context from email_to_campaign lookup.
+    Falls back to root client fields if not provided (legacy / single-campaign clients).
+    """
     pending = load_pending()
     # Dedup: if entry already exists for this prospect, update silently — do NOT re-notify
     is_new = True
@@ -320,12 +340,17 @@ def queue_pending(client, from_email, from_name, subject, draft, classification,
         log(f"[{client['firm_name']}] Pending entry already exists for {from_email} — updating silently, no duplicate alert")
         pending.pop(existing_idx)
         is_new = False  # suppress Telegram re-notification
+
+    # Resolve per-prospect campaign context (multi-campaign aware)
+    resolved_campaign_id   = campaign_id   or client.get('instantly_campaign_id', '')
+    resolved_campaign_name = campaign_name or client.get('campaign_name', '')
+
     entry = {
         'id': f"{client['id']}:{from_email}:{int(time.time())}",
         'client_id':             client['id'],
         'firm_name':             client['firm_name'],
-        'campaign_name':         client.get('campaign_name', ''),
-        'instantly_campaign_id': client.get('instantly_campaign_id', ''),
+        'campaign_name':         resolved_campaign_name,
+        'instantly_campaign_id': resolved_campaign_id,
         'client_email':          client.get('client_email', ''),
         'outreach_email':        client['outreach_email'],
         # app_password intentionally NOT stored here — looked up from clients.json at send time
@@ -1005,9 +1030,11 @@ def process_client(client, processed_ids):
             # ── ESCALATION — human must review, no auto-response ever
             if escalate:
                 # Save to pending_approvals so Gob can read body and draft a response
+                _cid, _cname = _resolve_campaign(client, from_email, email_to_campaign)
                 esc_id, esc_is_new = queue_pending(client, from_email, from_name, subject,
                                        draft='', classification='escalated',
-                                       in_reply_to=message_id, references=references)
+                                       in_reply_to=message_id, references=references,
+                                       campaign_id=_cid, campaign_name=_cname)
                 # Overwrite draft field with the raw email body so it's readable
                 pending = load_pending()
                 for entry in pending:
@@ -1079,9 +1106,11 @@ def process_client(client, processed_ids):
                         else:
                             log(f"[TEST] Would send removal ack to {from_email}")
                     elif client['mode'] == 'draft_approval':
+                        _cid, _cname = _resolve_campaign(client, from_email, email_to_campaign)
                         approval_id, is_new_notification = queue_pending(client, from_email, from_name,
                                                     subject, draft, classification,
-                                                    in_reply_to=message_id, references=references)
+                                                    in_reply_to=message_id, references=references,
+                                                    campaign_id=_cid, campaign_name=_cname)
                         log(f"{label} Negative queued for approval (draft_approval mode): {from_email}")
 
                 elif client['mode'] == 'automated':
@@ -1099,10 +1128,12 @@ def process_client(client, processed_ids):
                         log(f"[TEST] Would auto-send to {from_email}")
 
                 elif client['mode'] == 'draft_approval':
+                    _cid, _cname = _resolve_campaign(client, from_email, email_to_campaign)
                     approval_id, is_new_notification = queue_pending(client, from_email, from_name,
                                                 subject, draft, classification,
                                                 in_reply_to=message_id, references=references,
-                                                confidence=result.get('confidence'))
+                                                confidence=result.get('confidence'),
+                                                campaign_id=_cid, campaign_name=_cname)
 
             # ── TELEGRAM NOTIFICATION
             emoji = {'positive': '🎯', 'question': '❓', 'not_now': '📅',
@@ -1409,10 +1440,13 @@ def check_due_followups():
                         f"{client.get('sender_name', '')}\n"
                         f"{client.get('title', 'Founder')}, {client.get('firm_name', '')}"
                     )
+                    _fu_cid = prospect.get('campaign_id', '')
+                    _fu_cname = next((c.get('campaign_name','') for c in client.get('campaigns',[]) if c.get('instantly_campaign_id') == _fu_cid), client.get('campaign_name',''))
                     approval_id, is_new = queue_pending(
                         client, email, fname,
                         f"Re: follow-up — {fname}",
-                        nudge, 'positive'
+                        nudge, 'positive',
+                        campaign_id=_fu_cid, campaign_name=_fu_cname
                     )
                     if is_new:
                         notify(
@@ -1436,10 +1470,13 @@ def check_due_followups():
 
             if client and draft:
                 # Queue draft for Vito's approval
+                _fu_cid2 = prospect.get('campaign_id', '')
+                _fu_cname2 = next((c.get('campaign_name','') for c in client.get('campaigns',[]) if c.get('instantly_campaign_id') == _fu_cid2), client.get('campaign_name',''))
                 approval_id, is_new = queue_pending(
                     client, email, fname,
                     f"Re: follow-up — {fname}",
-                    draft, 'not_now'
+                    draft, 'not_now',
+                    campaign_id=_fu_cid2, campaign_name=_fu_cname2
                 )
                 notify(
                     f"📅 *Follow-up Due* — {client.get('firm_name', cid)}\n"
