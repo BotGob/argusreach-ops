@@ -189,7 +189,6 @@ details > summary::-webkit-details-marker { display: none; }
   <a href="{{ url_for('stats') }}"        class="{{ 'active' if request.endpoint == 'stats' }}">Revenue</a>
   <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
   <a href="{{ url_for('flowchart') }}"    class="{{ 'active' if request.endpoint in ['flowchart','flowchart_data'] }}">Operations</a>
-  <a href="{{ url_for('backlog') }}"      class="{{ 'active' if request.endpoint == 'backlog' }}">Backlog</a>
   <div class="nav-right">
     <a href="{{ url_for('marketing_assets') }}" style="font-size:12px;color:var(--muted)" class="{{ 'active' if request.endpoint == 'marketing_assets' }}">Marketing</a>
     <a href="{{ url_for('system_status') }}"    style="font-size:12px;color:var(--muted)" class="{{ 'active' if request.endpoint == 'system_status' }}">System</a>
