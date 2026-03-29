@@ -90,7 +90,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 <body>
 
 <h1>ArgusReach — Master Operations Flowchart</h1>
-<div class="sub">Full system view · Updated 2026-03-26 · Internal reference only</div>
+<div class="sub">Full system view · Updated 2026-03-29 · Internal reference only</div>
 
 <!-- ROLES -->
 <div class="roles">
@@ -663,9 +663,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">Free</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Apollo.io — Paid Required</div>
-      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Returns verified personal emails (firstname@domain.com) — not generic info@ addresses. Free plan (50 credits/mo) insufficient for client campaigns — only web-scraped generic emails available. Paid Basic ($49/mo) required before first client launch. Upgrade to Professional ($99/mo) at 3+ simultaneous clients. Supplemented with CAFR + EMMA public records for government/RIA verticals.</div>
-      <div class="tool-cost">Free now → $49/mo at first client launch</div>
+      <div class="tool-name">Apollo.io ⏳ Upgrade Needed</div>
+      <div class="tool-role">Lead sourcing. Search by title, industry, geo. Returns verified personal emails (firstname@domain.com) — not generic info@ addresses. Free plan (50 credits/mo) currently active — 25/50 credits used. Paid Basic ($49/mo, 1,200 exports/mo) required before RIA campaign launch. Upgrade to Professional ($99/mo) at 3+ simultaneous clients. Supplemented with SEC IAPD (firm AUM/registration data) + CAFR + EMMA public records for government/RIA verticals.</div>
+      <div class="tool-cost">Free now (25/50 credits used) → $49/mo Basic at RIA launch</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">NeverBounce ✅ CONNECTED</div>
@@ -703,8 +703,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div class="tool-cost">~$0.03–0.30/campaign</div>
     </div>
     <div class="tool-card">
-      <div class="tool-name">Admin Portal ✅ LIVE</div>
-      <div class="tool-role">Internal operations hub at admin.argusreach.com (port 5056, password-protected). Tabs: Dashboard, Clients, Prospects, Meetings, Revenue, Replies, Intakes, Reports, DNC. Intake form at admin.argusreach.com/intake (public, client-facing). Multi-campaign support per client. Meeting logging, DNC management, lead upload, monthly report generation. <strong>IMAP status:</strong> portal shows live IMAP connection status per client — 🟢 connected or 🔴 failed/bad password — checked on each monitor cycle. Bad password triggers a smart alert to Vito.</div>
+      <div class="tool-name">Admin Portal ✅ LIVE — Updated 2026-03-29</div>
+      <div class="tool-role">Internal operations hub at admin.argusreach.com (port 5056, password-protected). Nav: Dashboard, Clients, Intakes, Pipeline, Revenue, Reports, Operations, Backlog. Intake form at admin.argusreach.com/intake (public, client-facing). <strong>Multi-campaign support per client (live 2026-03-29)</strong>: each client can run multiple simultaneous campaigns from one sending email — per-campaign and consolidated metrics shown. <strong>Campaign Wizard (live 2026-03-29)</strong>: ➕ New Campaign button on any client page → 3-step wizard: ICP/target form → Claude auto-writes 3-touch sequence → Vito approves/edits → upload Apollo CSV → full pipeline (DNC, NeverBounce, intros, Instantly). IMAP status per client shown on dashboard. All timestamps in Eastern Time.</div>
       <div class="tool-cost">Free (self-hosted)</div>
     </div>
     <div class="tool-card">
@@ -759,8 +759,8 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
     </div>
     <div class="tool-card">
       <div class="tool-name">Instantly.ai ✅ Growth Plan Active</div>
-      <div class="tool-role">Email campaign sending, domain warm-up, sequence automation, stop_on_reply, blocklist API. API key live in monitor/.env. Free trial expired Mar 23 — confirm Growth upgrade ($47/mo) is active. Without Growth, warmup is capped and sending limits apply. Growth = 5,000 emails/mo, 1,000 contacts — sufficient for first 1-2 clients.</div>
-      <div class="tool-cost">$47/mo (Growth) — confirm upgrade completed</div>
+      <div class="tool-role">Email campaign sending, domain warm-up, sequence automation, stop_on_reply, blocklist API. API key live in monitor/.env. Growth plan confirmed active 2026-03-26, renews 2026-04-26 (~$59/mo). Growth = 5,000 emails/mo, 1,000 contacts — sufficient for first 1-2 clients. Multi-campaign fully supported: one sending email can power multiple simultaneous campaigns via campaigns array.</div>
+      <div class="tool-cost">~$59/mo (Growth) — renews 2026-04-26</div>
     </div>
     <div class="tool-card">
       <div class="tool-name">Hostinger VPS ⚠️ Renews Mar 19</div>
@@ -847,12 +847,20 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#fb923c;margin-bottom:14px;">⚠ Vito — Action Required</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#fbbf24;font-size:0.7rem;flex-shrink:0;">⏳</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Instantly.ai — Growth Plan ✅ Active</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Upgraded 2026-03-26. Renews 2026-04-26 (~$59/mo). Growth = 5,000 emails/mo, 1,000 contacts.</div></div>
+          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">🔴</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">Apollo.io — upgrade to Basic ($49/mo) before RIA campaign</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free plan has 25/50 credits remaining. Basic = $49/mo, 1,200 exports/mo — needed before pulling 100-200 RIA leads. Upgrade at apollo.io.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fbbf24;font-size:0.7rem;flex-shrink:0;">⏳</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#fbbf24;">Apollo.io — upgrade to Professional ($99/mo) when first client signs</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free plan (50 credits/mo) is insufficient for client campaigns. Professional = $99/mo, 12,000 credits/year — covers all plan tiers. Upgrade same time as Instantly.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fbbf24;">ArgusReach self-campaign (PT Clinics) — ready to launch</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Check sequence_approved + payment_confirmed in portal (skip real payment — self-campaign), then hit Create Campaign → review DRAFT in Instantly → activate.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fbbf24;font-size:0.7rem;flex-shrink:0;">⏳</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fbbf24;">RIA campaign — run New Campaign Wizard after Apollo upgrade</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Open ArgusReach client page → ➕ New Campaign → ICP: "RIA Advisors", titles: Owner/Principal/RIA/Wealth Manager, 1-10 employees, FL. Claude writes sequence. Upload Apollo CSV. Launch.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#fbbf24;font-size:0.7rem;flex-shrink:0;">⏳</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#fbbf24;">ArgusReach LLC — confirm Active on sunbiz.org</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Filed 2026-03-25. Should show Active within a few business days. Then get EIN at irs.gov (free). Then open business bank account.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
@@ -860,19 +868,15 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;">✅</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Calendly — resolved, staying on free Basic plan</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free tier sufficient for MVP (1 event type, unlimited bookings). Upgrade to $10/mo when ready for webhook → database auto-log. Not blocking anything.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Instantly.ai — Growth Plan ✅ Active</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Upgraded 2026-03-26. Renews 2026-04-26 (~$59/mo). Growth = 5,000 emails/mo, 1,000 contacts.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Identify 4 more warm contacts to pitch ArgusReach</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Creekside is #1. Who else in your network runs a professional services firm? Use vito-first-outreach.md.</div></div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">HelloSign — free account</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">For sending service agreements to clients.</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">HelloSign — account created</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Free tier = 3 signature requests/month. For sending service agreements to clients.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
-          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;">→</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">LLC filing — ArgusReach LLC</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">sunbiz.org · $125 · Florida. Then get EIN at irs.gov (free).</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">NeverBounce — API key live</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Connected in monitor/.env. Pay-as-you-go $0.008/credit. Runs automatically inside campaign_create.py.</div></div>
         </div>
       </div>
     </div>
@@ -882,28 +886,32 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
       <div style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#60a5fa;margin-bottom:14px;">⏳ Gob — Build Backlog</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">NEXT</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#fb923c;">Wire first real client into clients.json</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">When Creekside (or any client) signs: add to clients.json, test IMAP, import prospect list, confirm Instantly campaign has stop_on_reply=true.</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Multi-campaign support per client — LIVE 2026-03-29</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">One client record can run multiple simultaneous campaigns from the same sending email. Per-campaign and consolidated metrics. campaigns array in clients.json + DB campaigns table. monitor.py, monthly_cycle.py, approve.py all multi-campaign aware.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
           <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Data infrastructure + Admin Portal — fully live</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">SQLite DB (db/database.py), Instantly hourly sync, webhook server (hooks.argusreach.com — Stripe + Calendly), admin portal (admin.argusreach.com — password protected). All internal tools behind login. Dashboard removed from public site. Monitor writes to DB on every classification.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">New Campaign Wizard — LIVE 2026-03-29</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">3-step portal wizard: ICP/target form → Claude writes sequence → Vito approves → upload Apollo CSV → full pipeline. Accessible via ➕ New Campaign button on any client page.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#fb923c;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">NEXT</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Webhook server live ✅ — Stripe + Calendly connected</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">hooks.argusreach.com live on nginx + SSL. Stripe webhook registered + secret in .env (2026-03-17). Calendly webhook registered (2026-03-18). Payments and bookings auto-log to DB.</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Portal UI overhaul — LIVE 2026-03-29</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Nav cut from 11 to 8 items. Quick Actions bar removed (redundant). Active vs. pre-launch views cleaned up. Launch section hidden when client already running. Confusing duplicate buttons removed.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Instantly campaign creation script</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Create + configure Instantly campaigns via API. Build once first real client is ready to launch.</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">11 bugs fixed — 2026-03-24 (2 audit passes)</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Double DB event logging, sync_instantly_stages wrong endpoint, app_password plaintext in pending_approvals.json, booking alert HTML in plain text body, sequence push wrapping plain text in HTML, campaign naming mismatch (em dashes vs hyphens), NeverBounce timeout 10min→20min, duplicate plan key in intake_approve, outreach_email defaulting to vito@argusreach.com, _PRICE_PLAN_MAP missing $500 setup fee, leads metric always 0 for DRAFT campaigns.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">MED</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">ArgusReach self-prospecting domain warm-up</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Set up outreach@mail.argusreach.com in Instantly, start warm-up. Use for ArgusReach's own cold outreach to find clients. Start when first client signs.</div></div>
+          <span style="color:#4ade80;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">✅</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#4ade80;">Data infrastructure + Admin Portal — fully live</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">SQLite DB (db/database.py), Instantly hourly sync, webhook server (hooks.argusreach.com — Stripe + Calendly), admin portal (admin.argusreach.com — password protected). All internal tools behind login. Monitor writes to DB on every classification.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">FUTURE</span>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Client-facing dashboard</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Internal ops dashboard exists. Client version needs per-client filtering + simple auth. Build once first paying client is live.</div></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
           <span style="color:#3a3a3a;font-size:0.7rem;flex-shrink:0;font-family:'JetBrains Mono',monospace;">FUTURE</span>
-          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Client-facing dashboard</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">Internal ops dashboard exists (db/dashboard.html). Client version needs per-client filtering + simple auth. Build once first client is live.</div></div>
+          <div><div style="font-size:0.78rem;font-weight:600;color:#f0f0f0;">Bitcoin payment acceptance</div><div style="font-size:0.68rem;color:#777;margin-top:2px;">BTCPay Server or similar. Post-MVP.</div></div>
         </div>
       </div>
     </div>
@@ -924,7 +932,7 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">HelloSign / HelloSign</span> — No digital signature capability. Service agreement cannot be formally executed. (Vito action: set up free tier on HelloSign.)</div>
         <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Client-Facing Onboarding Guide</span> — No document exists telling the client what THEY need to do: buy domain, buy Google Workspace, provide access, set up Calendly. The internal checklist exists but nothing is client-ready.</div>
         <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Campaign Creation — Fully Automated</span> — campaign_create.py handles everything: creates Instantly campaign, loads sequence, enriches and loads leads (with auto-personalization), and sends Telegram pre-launch checklist to Vito. No manual steps required.</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#f87171;font-weight:700;">Instantly Sequence Copy (PT Tampa Bay)</span> — Current test campaign sequence says "mental health practices" — wrong vertical. Must be rewritten before any real prospect is enrolled. (Backlog #5a)</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ PT Campaign Sequence — Fixed 2026-03-29</span> — Campaign renamed to "ArgusReach — PT Clinics — March 2026". Wrong-vertical text replaced. Sequence approved and loaded in Instantly.</div>
       </div>
     </div>
 
@@ -934,8 +942,9 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
         <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Webhook Server — LIVE</span> — hooks.argusreach.com live on nginx + SSL. Stripe + Calendly both registered and connected (2026-03-17/18). Payments and bookings auto-log to DB.</div>
         <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Meetings Booked — SOLVED</span> — ArgusReach owns the Calendly account with per-client event types. Each client connects their calendar to their event type. Webhook fires on every booking regardless of client. Upgrade to Standard ($10/mo) when first client signs.</div>
         <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ DNC List System — LIVE</span> — Global DNC (monitor/dnc/global.txt) + per-client DNC files. Cross-referenced on every lead upload and every unsubscribe. Instantly global blocklist also updated on every negative reply.</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Apollo Paid + NeverBounce</span> — Free Apollo tier gives generic info@ emails only. Paid ($49/mo) required for personal emails by title. NeverBounce required to verify list before loading. Neither is active yet. (Vito action)</div>
-        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#4ade80;font-weight:700;">Instantly Growth Active</span> — Upgraded 2026-03-26. Renews 2026-04-26 (~$59/mo).</div>
+        <div style="font-size:0.75rem;color:#ccc;"><span style="color:#fbbf24;font-weight:700;">Apollo Paid</span> — Free tier (25/50 credits remaining). Basic ($49/mo) required before RIA campaign launch for personal emails by title. Vito action: upgrade at apollo.io.</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ Instantly Growth Active</span> — Upgraded 2026-03-26. Renews 2026-04-26 (~$59/mo).</div>
+        <div style="font-size:0.75rem;color:#4ade80;"><span style="color:#4ade80;font-weight:700;">✅ NeverBounce — API key live</span> — Connected and running automatically inside campaign_create.py.</div>
       </div>
     </div>
 
@@ -953,6 +962,38 @@ h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.04em; color: var(--
 </div>
 
 <!-- RECENT CHANGES LOG -->
+<div style="margin-bottom:40px;">
+  <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#4ade80;margin-bottom:16px;">Recent Changes — 2026-03-29 (Multi-Campaign + Portal Overhaul)</h2>
+  <div style="background:#0a1f0f;border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+    <div style="font-size:0.72rem;color:#4ade80;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Multi-Campaign Architecture</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">campaigns array</span> — clients.json migrated to support multiple campaigns per client. Legacy instantly_campaign_id preserved for backward compat. campaigns array is source of truth.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">DB: campaigns table</span> — upsert_campaign(), get_campaigns_for_client(), get_campaign_metrics(), get_client_consolidated_metrics() all added to database.py.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">events table</span> — campaign_id column added (migration-safe). All event writes now include campaign attribution across monitor.py, approve.py, monthly_cycle.py.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">monitor.py</span> — 5 bugs fixed: Telegram alerts now show per-campaign name, validate_all_campaign_ids loops all campaigns, sync_instantly_stages loops all campaigns, check_campaign_cycles loops all campaigns, check_campaign_completions loops all campaigns. Added _resolve_campaign() helper as single source of truth for per-prospect campaign attribution.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">generate_dashboard.py</span> — Fixed LEFT JOIN duplicate rows (GROUP BY + SUM aggregation).</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">DNC shared at client_id level</span> — intentional by design. An unsubscribe blocks across all campaigns for that client. Legally sound. Zero audience overlap between PT and RIA targets.</div>
+    <div style="font-size:0.72rem;color:#4ade80;font-family:'JetBrains Mono',monospace;margin-top:12px;margin-bottom:8px;">Campaign Wizard</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">New route: /clients/&lt;id&gt;/campaigns/new</span> — 3-step wizard accessible via ➕ New Campaign button on any client page.</div>
+    <div style="font-size:0.75rem;color:#888;">• Step 1: ICP label, target titles, locations, company size, value prop, tone, compliance note.</div>
+    <div style="font-size:0.75rem;color:#888;">• Step 2: Claude auto-writes 3-touch sequence from ICP inputs. Vito edits/approves inline or hits Regenerate.</div>
+    <div style="font-size:0.75rem;color:#888;">• Step 3: Apollo filters shown for reference. CSV upload. Launch button → DNC filter + NeverBounce + auto-personalization + Instantly campaign creation all automatic.</div>
+    <div style="font-size:0.72rem;color:#4ade80;font-family:'JetBrains Mono',monospace;margin-top:12px;margin-bottom:8px;">Portal UI Overhaul</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">Nav</span> — Cut from 11 to 8 items. Primary: Dashboard, Clients, Intakes, Pipeline, Revenue, Reports, Operations, Backlog. Utility (right side): Marketing, System. Flowchart renamed Operations.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">Client detail</span> — Removed redundant Quick Actions bar. Active clients: Monthly Report + Offboard only. Pre-launch: contextual buttons only. Launch Campaign section hidden when client.active. ➕ New Campaign button in Campaigns section header.</div>
+    <div style="font-size:0.75rem;color:#888;">• <span style="color:#4ade80;font-weight:600;">Manual "Add Campaign" form</span> demoted to collapsed fallback (for linking existing Instantly IDs). Wizard is primary path.</div>
+    <div style="font-size:0.72rem;color:#4ade80;font-family:'JetBrains Mono',monospace;margin-top:12px;margin-bottom:8px;">RIA Campaign — Planned</div>
+    <div style="font-size:0.75rem;color:#888;">• ICP: Independent RIAs, 1-5 person shops (&lt;$200M AUM), FL or national, business owners only. Titles: Owner, Principal, Registered Investment Advisor, Wealth Manager.</div>
+    <div style="font-size:0.75rem;color:#888;">• Source: SEC IAPD for firm AUM/registration data → Apollo for contact emails. Two-step approach for accuracy.</div>
+    <div style="font-size:0.75rem;color:#888;">• Sequence angle: peer credibility via Vito's PWM background in NYC. Draft responses campaign-agnostic (Calendly only, never describe specific service).</div>
+    <div style="font-size:0.75rem;color:#888;">• Blocked on: Apollo Basic upgrade ($49/mo). Ready to run once upgraded.</div>
+    <div style="font-size:0.72rem;color:#4ade80;font-family:'JetBrains Mono',monospace;margin-top:12px;margin-bottom:8px;">Compliance + Infrastructure</div>
+    <div style="font-size:0.75rem;color:#888;">• ArgusReach LLC filed 2026-03-25 (sunbiz.org) — pending Active status.</div>
+    <div style="font-size:0.75rem;color:#888;">• Compliance approval received 2026-03-25. Cleared to operate.</div>
+    <div style="font-size:0.75rem;color:#888;">• System wiped clean: test data removed, DB deleted and recreated fresh.</div>
+    <div style="font-size:0.75rem;color:#888;">• Intake form: added sender_name + sender_title (required). Removed warm/existing contact list ingestion. Added DNC file upload (CSV/Excel) — auto-processed at intake approval.</div>
+  </div>
+</div>
+
 <div style="margin-bottom:40px;">
   <h2 style="font-size:0.65rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#777;margin-bottom:16px;">Recent Changes — 2026-03-20 (Process Hardening + Client Funnel)</h2>
   <div style="background:#161616;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:6px;">
