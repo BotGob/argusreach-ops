@@ -61,3 +61,10 @@ Bland.ai / Vapi.ai — call positive replies within minutes. Trigger: 3+ clients
 
 ### 15. Calendly API auto-detection
 Auto-check "Calendar Connected" gate when client connects calendar via Calendly API. Requires Calendly OAuth or client API token. Manual checkbox fine for now.
+
+## #[next] — Gmail/free provider DNS bypass
+If client's outreach email is @gmail.com, @outlook.com, @yahoo.com (any free provider):
+- Auto-pass DNS gate with label "✅ Managed by Gmail" instead of checking domain records
+- dns_poll.py should skip these clients
+- Portal checklist should show bypass state, not pending
+Context: app password + SMTP + Instantly warmup all work fine on free Gmail. Only consequence is DNS gate stuck at pending permanently, blocking launch.

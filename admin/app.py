@@ -2055,6 +2055,83 @@ def flowchart_data():
     return "<p>Flowchart not found.</p>", 404
 
 
+@app.route("/marketing")
+@login_required
+def marketing_assets():
+    assets = {
+        "Main Site": [
+            {"name": "Homepage",        "url": "https://argusreach.com",           "desc": "Main landing page - hero, demo, pricing, how it works"},
+            {"name": "How It Works",    "url": "https://argusreach.com/workflow",  "desc": "Full step-by-step process breakdown - who does what and when"},
+            {"name": "FAQ",             "url": "https://argusreach.com/faq",       "desc": "Common questions on compliance, results, pricing, process"},
+            {"name": "One-Pager",       "url": "https://argusreach.com/overview",  "desc": "Condensed pitch page - good for email attachments and quick reads"},
+            {"name": "Privacy Policy",  "url": "https://argusreach.com/privacy",   "desc": "Privacy policy"},
+        ],
+        "Vertical Pages": [
+            {"name": "Financial Advisors",       "url": "https://argusreach.com/ria",         "desc": "RIA/advisor landing page - HNW, business owners, pre-retirees"},
+            {"name": "Physical Therapy",         "url": "https://argusreach.com/pt",          "desc": "PT practice landing page - physician referral outreach"},
+            {"name": "PT Workflow Detail",       "url": "https://argusreach.com/workflow-pt", "desc": "PT-specific step-by-step process page"},
+        ],
+        "Client-Specific": [
+            {"name": "Advanced Medical of Florida", "url": "https://argusreach.com/amf", "desc": "Custom proposal page for AMF - multi-specialty physician referral outreach"},
+        ],
+        "Intake & Ops": [
+            {"name": "Client Intake Form", "url": "https://admin.argusreach.com/intake", "desc": "Public intake form - share after discovery call once agreement is signed"},
+            {"name": "Admin Portal",       "url": "https://admin.argusreach.com",        "desc": "Internal only"},
+        ],
+    }
+    return render_template_string("""
+{% extends 'base.html' %}
+{% block title %}Marketing Assets{% endblock %}
+{% block content %}
+<div style="max-width:860px">
+  <div style="margin-bottom:28px">
+    <h1 style="margin:0 0 6px">Marketing Assets</h1>
+    <p style="color:var(--muted);font-size:13px;margin:0">All pages, links, and materials. Click to copy a URL or open it.</p>
+  </div>
+
+  {% for category, items in assets.items() %}
+  <div style="margin-bottom:36px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)">{{ category }}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      {% for item in items %}
+      <div style="display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px 18px;">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:3px">{{ item.name }}</div>
+          <div style="font-size:12px;color:var(--muted)">{{ item.desc }}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0;align-items:center">
+          <code style="font-size:11px;color:var(--muted);background:var(--bg3);padding:4px 10px;border-radius:4px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.url }}</code>
+          <button onclick="copyUrl('{{ item.url }}', this)"
+            style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-size:12px;font-weight:600;padding:6px 14px;border-radius:4px;cursor:pointer;white-space:nowrap">
+            Copy
+          </button>
+          <a href="{{ item.url }}" target="_blank"
+            style="background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:12px;padding:6px 14px;border-radius:4px;text-decoration:none;white-space:nowrap">
+            Open ↗
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function copyUrl(url, btn) {
+  navigator.clipboard.writeText(url).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.color = '#4ade80';
+    btn.style.borderColor = 'rgba(74,222,128,0.4)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; btn.style.borderColor = ''; }, 1800);
+  });
+}
+</script>
+{% endblock %}
+""", assets=assets)
+
+
 @app.route("/backlog")
 @login_required
 def backlog():

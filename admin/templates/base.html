@@ -189,6 +189,7 @@ details > summary::-webkit-details-marker { display: none; }
   <a href="{{ url_for('reports_list') }}" class="{{ 'active' if request.endpoint == 'reports_list' }}">Reports</a>
   <a href="{{ url_for('stats') }}"        class="{{ 'active' if request.endpoint == 'stats' }}">Revenue</a>
   <a href="{{ url_for('pipeline') }}"     class="{{ 'active' if request.endpoint == 'pipeline' }}">Pipeline</a>
+  <a href="{{ url_for('marketing_assets') }}" class="{{ 'active' if request.endpoint == 'marketing_assets' }}">Marketing</a>
   <a href="{{ url_for('system_status') }}" class="{{ 'active' if request.endpoint == 'system_status' }}">System</a>
   <a href="{{ url_for('flowchart') }}"    class="{{ 'active' if request.endpoint == 'flowchart' }}" style="color:#334155">Flowchart</a>
   <a href="{{ url_for('backlog') }}"      class="{{ 'active' if request.endpoint == 'backlog' }}" style="color:#334155">Backlog</a>
