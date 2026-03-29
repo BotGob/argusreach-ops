@@ -2271,7 +2271,18 @@ def stats_data():
 @app.route("/flowchart")
 @login_required
 def flowchart():
-    return render_template("flowchart.html")
+    """Render master-flowchart.html inline — extract body content and styles, inject into portal."""
+    import re as _re
+    path = BASE_DIR / "ops" / "master-flowchart.html"
+    if not path.exists():
+        return render_template("flowchart.html")
+    raw = path.read_text()
+    # Extract <style> blocks from <head>
+    styles = "\n".join(_re.findall(r"<style[^>]*>(.*?)</style>", raw, _re.DOTALL))
+    # Extract <body> content
+    body_match = _re.search(r"<body[^>]*>(.*?)</body>", raw, _re.DOTALL)
+    body = body_match.group(1).strip() if body_match else raw
+    return render_template("flowchart.html", inline_styles=styles, inline_body=body)
 
 
 @app.route("/flowchart/data")
