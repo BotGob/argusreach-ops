@@ -50,7 +50,9 @@ sys.path.insert(0, str(BASE_DIR))
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from db.database import get_db, init_db, sync_client_from_config
+from db.database import (get_db, init_db, sync_client_from_config,
+                         upsert_campaign, get_campaigns_for_client,
+                         get_campaign_metrics, get_client_consolidated_metrics)
 from db.generate_dashboard import fetch_stats, render as render_stats_html
 
 CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
@@ -114,6 +116,46 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 def make_session_permanent():
     """Make session permanent so PERMANENT_SESSION_LIFETIME applies."""
     session.permanent = True
+
+def migrate_clients_campaigns():
+    """Startup migration: ensure every client that has instantly_campaign_id also
+    has a campaigns array. Idempotent - safe to run on every startup."""
+    try:
+        config = load_clients()
+        changed = False
+        for client in config.get("clients", []):
+            if not client.get("campaigns") and client.get("instantly_campaign_id"):
+                client["campaigns"] = [{
+                    "instantly_campaign_id": client["instantly_campaign_id"],
+                    "campaign_name":         client.get("campaign_name", ""),
+                    "icp_label":             client.get("vertical", ""),
+                    "prospects_csv":         client.get("prospects_csv", f"campaigns/{client['id']}/prospects.csv"),
+                    "launch_date":           client.get("launch_date", ""),
+                    "active":                True,
+                }]
+                changed = True
+                app.logger.info(f"[Migration] Added campaigns array to client: {client['id']}")
+            # Also sync each campaign to DB campaigns table
+            for camp in client.get("campaigns", []):
+                cid = camp.get("instantly_campaign_id", "")
+                if cid:
+                    try:
+                        upsert_campaign(
+                            client_id=client["id"],
+                            instantly_campaign_id=cid,
+                            name=camp.get("campaign_name", ""),
+                            icp_label=camp.get("icp_label", ""),
+                            status="active" if client.get("active") else "draft",
+                            launch_date=camp.get("launch_date", ""),
+                            prospects_csv=camp.get("prospects_csv", ""),
+                        )
+                    except Exception as _e:
+                        app.logger.warning(f"[Migration] DB sync failed for {cid}: {_e}")
+        if changed:
+            save_clients(config)
+    except Exception as e:
+        app.logger.warning(f"[Migration] migrate_clients_campaigns failed (non-fatal): {e}")
+
 
 @app.template_filter("to_et")
 def to_et_filter(dt_str):
@@ -1045,11 +1087,33 @@ def client_detail(client_id):
         except Exception:
             pass
 
+    # Per-campaign metrics for multi-campaign view
+    campaigns_list = client.get("campaigns", [])
+    if not campaigns_list and client.get("instantly_campaign_id"):
+        campaigns_list = [{"instantly_campaign_id": client["instantly_campaign_id"],
+                           "campaign_name": client.get("campaign_name", ""),
+                           "icp_label": client.get("vertical", ""),
+                           "active": True}]
+    campaigns_metrics = []
+    for camp in campaigns_list:
+        cid = camp.get("instantly_campaign_id", "")
+        if cid:
+            cm = get_campaign_metrics(cid, client_id)
+            cm["campaign_name"] = camp.get("campaign_name", cid[:16] + "...")
+            cm["icp_label"]     = camp.get("icp_label", "")
+            cm["active"]        = camp.get("active", True)
+            campaigns_metrics.append(cm)
+
+    campaign_ids = [c.get("instantly_campaign_id") for c in campaigns_list if c.get("instantly_campaign_id")]
+    consolidated_metrics = get_client_consolidated_metrics(client_id, campaign_ids)
+
     return render_template("client_detail.html",
         client=client,
         dnc_count=len(dnc),
         lead_count=lead_count,
         metrics=metrics,
+        campaigns_metrics=campaigns_metrics,
+        consolidated_metrics=consolidated_metrics,
         events=[dict(e) for e in events],
         conn_status=conn_status,
         monitor_status=monitor_status,
@@ -1283,6 +1347,7 @@ def campaign_add(client_id):
     new_campaign = {
         "instantly_campaign_id": f.get("instantly_campaign_id", "").strip(),
         "campaign_name":         f.get("campaign_name", "").strip(),
+        "icp_label":             f.get("icp_label", "").strip(),
         "prospects_csv":         f.get("prospects_csv", "").strip(),
         "launch_date":           f.get("launch_date", "").strip(),
         "active":                True,
@@ -1306,6 +1371,20 @@ def campaign_add(client_id):
     client["launch_date"]           = new_campaign["launch_date"]
 
     save_clients(config)
+
+    # Sync to DB campaigns table
+    try:
+        upsert_campaign(
+            client_id=client_id,
+            instantly_campaign_id=new_campaign["instantly_campaign_id"],
+            name=new_campaign["campaign_name"],
+            icp_label=new_campaign["icp_label"],
+            launch_date=new_campaign["launch_date"],
+            prospects_csv=new_campaign["prospects_csv"],
+        )
+    except Exception as _e:
+        app.logger.warning(f"campaign_add DB sync failed: {_e}")
+
     flash(f"Campaign '{new_campaign['campaign_name'] or new_campaign['instantly_campaign_id']}' added.", "success")
     return redirect(url_for("client_detail", client_id=client_id))
 
@@ -3230,6 +3309,7 @@ def health():
 
 # Always init DB on startup - regardless of how the app is launched (systemd, gunicorn, direct)
 init_db()
+migrate_clients_campaigns()
 
 if __name__ == "__main__":
     print("🚀 ArgusReach Admin Portal starting on port 5056...")

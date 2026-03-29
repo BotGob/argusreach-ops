@@ -484,57 +484,79 @@
 
 {# ── CAMPAIGNS LIST ──────────────────────────────────────────────── #}
 {% if client.campaigns or client.instantly_campaign_id %}
-<details class="section" style="margin-bottom:20px">
-  <summary style="font-size:13px;font-weight:600;color:#94a3b8;cursor:pointer;padding:4px 0;list-style:none">
-    🔗 Campaigns
-    {% set cc = client.campaigns|length if client.campaigns else (1 if client.instantly_campaign_id else 0) %}
-    <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px;margin-left:8px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
-  </summary>
-  <div style="margin-top:12px">
-  {% if client.campaigns %}
-    <table style="width:100%;font-size:12px;border-collapse:collapse;margin-bottom:12px">
-      <thead><tr style="color:#64748b;border-bottom:1px solid #1e293b">
-        <th style="text-align:left;padding:6px 8px">Name</th>
-        <th style="text-align:left;padding:6px 8px">ID</th>
-        <th style="text-align:left;padding:6px 8px">Launch</th>
-        <th style="text-align:left;padding:6px 8px">Status</th>
-        <th style="padding:6px 8px"></th>
-      </tr></thead>
-      <tbody>
-        {% for c in client.campaigns %}
-        <tr style="border-bottom:1px solid #0f172a">
-          <td style="padding:6px 8px;font-weight:600">{{ c.campaign_name or '-' }}</td>
-          <td style="padding:6px 8px;font-family:monospace;color:#94a3b8;font-size:11px">{{ c.instantly_campaign_id[:16] }}…</td>
-          <td style="padding:6px 8px;color:#94a3b8">{{ c.launch_date or '-' }}</td>
-          <td style="padding:6px 8px">{% if c.active %}<span style="color:#22c55e">● Active</span>{% else %}<span style="color:#64748b">⏸ Paused</span>{% endif %}</td>
-          <td style="padding:6px 8px">
-            <form method="POST" action="{{ url_for('campaign_toggle', client_id=client.id, campaign_id=c.instantly_campaign_id) }}" style="display:inline">
-              <button type="submit" style="font-size:11px;background:none;border:1px solid #334155;color:#94a3b8;padding:2px 8px;border-radius:4px;cursor:pointer">{{ 'Pause' if c.active else 'Activate' }}</button>
-            </form>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="section" style="margin-bottom:20px">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+    <div class="section-title" style="margin:0">📊 Campaigns</div>
+    {% set cc = campaigns_metrics|length if campaigns_metrics else (1 if client.instantly_campaign_id else 0) %}
+    <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
+  </div>
+
+  {# ── CONSOLIDATED SUMMARY (only shown when 2+ campaigns) #}
+  {% if campaigns_metrics|length > 1 %}
+  <div style="background:#0d2137;border:1px solid #1e4070;border-radius:8px;padding:14px;margin-bottom:16px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#60a5fa;margin-bottom:10px">All Campaigns - Consolidated</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">{{ consolidated_metrics.leads }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Leads</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">{{ consolidated_metrics.emails_sent }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Sent</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">{{ consolidated_metrics.reply_interested }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Interested</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#facc15">{{ consolidated_metrics.reply_not_now }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Not Now</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#f87171">{{ consolidated_metrics.reply_negative }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Removed</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#a855f7">{{ consolidated_metrics.meetings }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Meetings</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#60a5fa">{{ consolidated_metrics.reply_rate }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Reply Rate</div></div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ── PER-CAMPAIGN CARDS #}
+  {% if campaigns_metrics %}
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+    {% for cm in campaigns_metrics %}
+    <div style="background:#0f172a;border:1px solid {% if cm.active %}#1e3a5f{% else %}#1e293b{% endif %};border-radius:8px;padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#e2e8f0">{{ cm.campaign_name }}</div>
+          {% if cm.icp_label %}<div style="font-size:11px;color:#64748b;margin-top:2px">{{ cm.icp_label }}</div>{% endif %}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          {% if cm.active %}<span style="font-size:11px;color:#22c55e;background:#052e1622;padding:2px 8px;border-radius:20px;border:1px solid #22c55e44">● Active</span>{% else %}<span style="font-size:11px;color:#64748b;background:#1e293b;padding:2px 8px;border-radius:20px;border:1px solid #33415544">⏸ Paused</span>{% endif %}
+          <form method="POST" action="{{ url_for('campaign_toggle', client_id=client.id, campaign_id=cm.campaign_id) }}" style="display:inline">
+            <button type="submit" style="font-size:11px;background:none;border:1px solid #334155;color:#94a3b8;padding:2px 8px;border-radius:4px;cursor:pointer">{{ 'Pause' if cm.active else 'Activate' }}</button>
+          </form>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#fff">{{ cm.leads }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Leads</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">{{ cm.emails_sent }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Sent</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">{{ cm.reply_interested }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Interested</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#facc15">{{ cm.reply_not_now }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Not Now</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#f87171">{{ cm.reply_negative }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Removed</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#60a5fa">{{ cm.reply_rate }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Reply Rate</div></div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;font-family:monospace;color:#334155">{{ cm.campaign_id[:32] }}...</div>
+    </div>
+    {% endfor %}
+    </div>
   {% elif client.instantly_campaign_id %}
     <div style="background:#0f172a;border-radius:6px;padding:12px;margin-bottom:12px;font-size:12px">
       <div style="font-weight:600;margin-bottom:4px">{{ client.campaign_name or 'Campaign' }}</div>
       <div style="font-family:monospace;color:#64748b;font-size:11px">{{ client.instantly_campaign_id }}</div>
     </div>
   {% endif %}
+
+  {# ── ADD CAMPAIGN FORM #}
   <details><summary style="font-size:12px;color:#4ade80;cursor:pointer;padding:6px 0">+ Add Campaign</summary>
     <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:12px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
         <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Instantly Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
         <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label><input name="campaign_name" style="font-size:12px"></div>
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">ICP Label (e.g. "PT Clinics" or "RIA Advisors")</label><input name="icp_label" placeholder="e.g. RIA Advisors" style="font-size:12px"></div>
         <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label><input name="launch_date" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
-        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospects CSV</label><input name="prospects_csv" style="font-size:12px"></div>
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospects CSV path</label><input name="prospects_csv" style="font-size:12px"></div>
       </div>
-      <button type="submit" class="btn btn-primary btn-sm">Add</button>
+      <button type="submit" class="btn btn-primary btn-sm">Add Campaign</button>
     </form>
   </details>
-  </div>
-</details>
+</div>
 {% endif %}
 
 {# ── SECONDARY SECTIONS ──────────────────────────────────────────── #}

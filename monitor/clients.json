@@ -101,7 +101,17 @@
       "_credentials_received_at": "2026-03-25 07:12 PM ET",
       "followup_sent": true,
       "calendly_event_slug": "",
-      "launch_email_sent_at": "2026-03-25 10:13 PM ET"
+      "launch_email_sent_at": "2026-03-25 10:13 PM ET",
+      "campaigns": [
+        {
+          "instantly_campaign_id": "fb7ebd23-2dce-42c2-87ac-c492b036a48b",
+          "campaign_name": "ArgusReach \u2014 ArgusReach \u2014 March 2026",
+          "icp_label": "B2BServices",
+          "prospects_csv": "campaigns/argusreach/prospects.csv",
+          "launch_date": "2026-03-26",
+          "active": true
+        }
+      ]
     }
   ]
 }

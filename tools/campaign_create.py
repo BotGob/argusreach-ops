@@ -325,14 +325,30 @@ def main():
 
     # 7. Update clients.json with new campaign_id and campaign_name
     print("\n[ UPDATING CLIENTS.JSON ]")
+    launch_date_str = datetime.now().strftime("%Y-%m-%d")
     for c in config.get("clients", []):
         if c.get("id") == client_id:
             c["instantly_campaign_id"] = campaign_id
             c["campaign_name"] = name
-            c["launch_date"] = datetime.now().strftime("%Y-%m-%d")
+            c["launch_date"] = launch_date_str
+            # Add to campaigns array (multi-campaign support)
+            new_campaign_entry = {
+                "instantly_campaign_id": campaign_id,
+                "campaign_name":         name,
+                "icp_label":             c.get("vertical", ""),
+                "prospects_csv":         c.get("prospects_csv", f"campaigns/{client_id}/prospects.csv"),
+                "launch_date":           launch_date_str,
+                "active":                True,
+            }
+            if "campaigns" not in c:
+                c["campaigns"] = []
+            # Avoid duplicates
+            existing_ids = {x.get("instantly_campaign_id") for x in c["campaigns"]}
+            if campaign_id not in existing_ids:
+                c["campaigns"].append(new_campaign_entry)
             break
     save_clients(config)
-    print(f"   ✅ clients.json updated with campaign_id: {campaign_id}")
+    print(f"   ✅ clients.json updated with campaign_id: {campaign_id} (campaigns array updated)")
 
     # 8. Register in DB
     print("\n[ REGISTERING IN DATABASE ]")
