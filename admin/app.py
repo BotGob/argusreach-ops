@@ -41,7 +41,7 @@ except ImportError:
     _CRYPTO_OK = False
 from dotenv import load_dotenv
 from flask import (Flask, Response, flash, redirect, render_template,
-                   request, send_file, session, url_for)
+                   render_template_string, request, send_file, session, url_for)
 
 BASE_DIR = Path(__file__).parent.parent
 load_dotenv(BASE_DIR / "monitor" / ".env")
