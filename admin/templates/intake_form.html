@@ -233,10 +233,10 @@
       </div>
     </div>
     <div class="field">
-      <label>Business Address <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">City and state is fine - used for geographic targeting</span>
+      <label>Business Address <span class="req">*</span>
+        <span class="hint">Required for CAN-SPAM compliance — every outreach email must include a physical address. City and state is fine if you don't want to list a full street address.</span>
       </label>
-      <input name="business_address" placeholder="Tampa, FL">
+      <input name="business_address" required placeholder="Tampa, FL">
     </div>
     <div class="field">
       <label>Industry / Vertical <span class="req">*</span></label>
@@ -327,6 +327,28 @@
       <textarea name="prospect_objection" placeholder="Most people say they're happy with their current provider and aren't looking to switch. Or they say they don't have the bandwidth to onboard a new vendor right now."></textarea>
     </div>
 
+    <div class="field">
+      <label>How do you currently get new business? <span class="req">*</span>
+        <span class="hint">Be honest - this helps us frame the outreach around what you're trying to change or grow. There are no wrong answers.</span>
+      </label>
+      <select name="current_biz_source" required>
+        <option value="">Select one</option>
+        <option value="word_of_mouth">Almost entirely word of mouth / referrals</option>
+        <option value="existing_relationships">A handful of key relationships that drive most of it</option>
+        <option value="inbound_marketing">Inbound (website, SEO, ads)</option>
+        <option value="cold_outreach">Some cold outreach but not systematic</option>
+        <option value="nothing_systematic">Nothing systematic - it's inconsistent</option>
+        <option value="mix">A mix of the above</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>What's your biggest challenge with getting new business right now? <span class="req">*</span>
+        <span class="hint">What keeps you up at night about your pipeline? The more specific you are here, the more directly our outreach will speak to your prospects' same frustrations.</span>
+      </label>
+      <textarea name="biggest_challenge" required placeholder="We rely on two orthopedic groups for 70% of our referrals. If either of those relationships changes, we're in trouble. We've never built a systematic way to develop new referral sources."></textarea>
+    </div>
+
     <!-- ── SECTION 4: WHO WE'RE TARGETING ───────────────────────────── -->
     <div class="section-header">Who We're Targeting For You</div>
     <div class="field">
@@ -400,28 +422,6 @@
     </div>
 
     <div class="field">
-      <label>How do you currently get new business? <span class="req">*</span>
-        <span class="hint">Be honest - this helps us frame the outreach around what you're trying to change or grow. There are no wrong answers.</span>
-      </label>
-      <select name="current_biz_source" required>
-        <option value="">Select one</option>
-        <option value="word_of_mouth">Almost entirely word of mouth / referrals</option>
-        <option value="existing_relationships">A handful of key relationships that drive most of it</option>
-        <option value="inbound_marketing">Inbound (website, SEO, ads)</option>
-        <option value="cold_outreach">Some cold outreach but not systematic</option>
-        <option value="nothing_systematic">Nothing systematic - it's inconsistent</option>
-        <option value="mix">A mix of the above</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label>What's your biggest challenge with getting new business right now? <span class="req">*</span>
-        <span class="hint">What keeps you up at night about your pipeline? The more specific you are here, the more directly our outreach will speak to your prospects' same frustrations.</span>
-      </label>
-      <textarea name="biggest_challenge" required placeholder="We rely on two orthopedic groups for 70% of our referrals. If either of those relationships changes, we're in trouble. We've never built a systematic way to develop new referral sources."></textarea>
-    </div>
-
-    <div class="field">
       <label>Do-Not-Contact list - email addresses or domains <span style="color:#666;font-size:0.75rem;">(optional)</span>
         <span class="hint">The best way to protect a company: include their email domain (e.g. smithlaw.com or @smithlaw.com). This blocks every person at that company, not just the ones you know by name. Individual email addresses work too. One per line - a spreadsheet or CRM export is fine, we'll extract what we need.</span>
       </label>
@@ -459,10 +459,10 @@
       </select>
     </div>
     <div class="field">
-      <label>Words, phrases, or claims to NEVER use <span style="color:#666;font-size:0.75rem;">(optional)</span>
-        <span class="hint">Compliance constraints, things that don't fit your brand, anything that could create legal risk.</span>
+      <label>Compliance requirements & copy restrictions <span style="color:#666;font-size:0.75rem;">(optional)</span>
+        <span class="hint">Any formal compliance requirements (SEC, FINRA, state licensing), words or claims to never use, or anything that could create legal or reputational risk. If your firm has a compliance team, note that here — we'll flag the sequences for their review before launch.</span>
       </label>
-      <textarea name="compliance_note" placeholder="Do not promise specific results or savings figures. Do not say 'best' or 'top-rated.' Do not mention our fees - we handle that in the discovery call. Do not use the word 'guarantee.'"></textarea>
+      <textarea name="compliance_note" placeholder="RIA registered with SEC - no performance claims, no guarantees, no specific investment recommendations. Sequences must be submitted to our CCO before launch.&#10;&#10;OR: No specific restrictions - just avoid anything that sounds like a guarantee or promises specific results."></textarea>
     </div>
 
 
