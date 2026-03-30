@@ -1274,24 +1274,40 @@ def process_client(client, processed_ids):
                     log(f"DB write error (non-fatal): {_dbe}")
 
         mail.logout()
+        # Successful cycle — reset consecutive failure counter
+        _consecutive_failures[client['id']] = 0
 
     except imaplib.IMAP4.error as e:
         err_str = str(e).lower()
         log(f"IMAP error {firm}: {e}")
         if 'authenticate' in err_str or 'invalid credentials' in err_str or 'login' in err_str:
+            # Auth errors always alert immediately
+            _consecutive_failures[client['id']] = 0
             notify(f"🔐 *{firm}* — bad app password\nIMAP authentication failed for `{client.get('outreach_email','')}`\nAsk the client to resubmit credentials via the portal resend link.")
         else:
-            notify(f"⚠️ *{firm}* IMAP error: `{str(e)[:150]}`")
+            _consecutive_failures[client['id']] = _consecutive_failures.get(client['id'], 0) + 1
+            if _consecutive_failures[client['id']] >= 2:
+                notify(f"⚠️ *{firm}* IMAP error: `{str(e)[:150]}`")
+            else:
+                log(f"[{firm}] IMAP error (consecutive={_consecutive_failures[client['id']]}, suppressed until 2nd): {e}")
         _write_connection_status(client['id'], 'error', str(e)[:200])
     except Exception as e:
         log(f"Error processing {firm}: {e}")
-        notify(f"⚠️ *{firm}* monitor error: `{str(e)[:150]}`")
+        _consecutive_failures[client['id']] = _consecutive_failures.get(client['id'], 0) + 1
+        if _consecutive_failures[client['id']] >= 2:
+            notify(f"⚠️ *{firm}* monitor error: `{str(e)[:150]}`")
+        else:
+            log(f"[{firm}] Monitor error (consecutive={_consecutive_failures[client['id']]}, suppressed until 2nd): {e}")
         _write_connection_status(client['id'], 'error', str(e)[:200])
 
     return new_processed
 
 # ── DAILY DIGEST ──────────────────────────────────────────────────────────────
 _last_digest_day = None
+
+# ── CONSECUTIVE FAILURE TRACKING ──────────────────────────────────────────────
+# Only alert after 2+ consecutive failures per client — suppresses one-off timeouts
+_consecutive_failures: dict = {}  # client_id -> int
 
 def check_stale_pending():
     """Re-alert if any pending approvals have been sitting unreviewed for 4+ hours.
