@@ -7,7 +7,7 @@
       "onboarding_status": "live",
       "mode": "draft_approval",
       "firm_name": "ArgusReach",
-      "vertical": "B2BServices",
+      "vertical": "Investment Advisors ",
       "plan": "starter",
       "outreach_email": "vito@argusreach.com",
       "sender_name": "Vito Resciniti",
@@ -16,7 +16,7 @@
       "calendly_link": "https://calendly.com/vito-argusreach/30min",
       "instantly_campaign_id": "fb7ebd23-2dce-42c2-87ac-c492b036a48b",
       "campaign_name": "ArgusReach \u2014 PT Clinics \u2014 March 2026",
-      "contacts_per_month": 200,
+      "contacts_per_month": 42,
       "launch_date": "2026-03-26",
       "icp_summary": "",
       "tone": "warm-professional",
@@ -30,8 +30,8 @@
       "_office_address": "",
       "_success_story": "",
       "_prospect_objection": "I already have good referral relationships\" \u2014 most PT owners rely on 2-3 physicians who refer inconsistently. The question isn't whether your current relationships are good, it's whether your pipeline is deep enough that losing one referral source wouldn't hurt.",
-      "_target_locations": "Tampa, FL\r\nSt. Petersburg, FL\r\nClearwater, FL\r\nBrandon, FL\r\nWesley Chapel, FL\r\nBradenton, FL\r\nSarasota, FL\r\nLargo, FL\r\nPalm Harbor, FL",
-      "_target_titles": "Physical Therapist Owner, PT Owner, Clinic Owner, Practice Owner, Founder, Practice Manager, Physical Therapist",
+      "_target_locations": "Florida ",
+      "_target_titles": "Owner, Principal, Founder, Registered Investment Advisor, Wealth Manager, Managing Director",
       "_value_prop": "PT clinic growth runs on physician referrals \u2014 but building those relationships means cold outreach, follow-ups, and relationship management that takes time away from what you actually do best: treating patients. You didn't go to school for sales. ArgusReach handles all of it. We identify the right PCPs, orthopedic surgeons, and sports medicine doctors in your area, reach out in your name with personalized emails, and get meetings on your calendar with physicians who are open to referring. You stay focused on patients and clinical excellence. We keep your pipeline full.",
       "_differentiator": "Most outreach tools hand you a platform and wish you luck. We run the entire operation. We build the list, write the emails in your voice, manage every reply, and only bring you into the conversation when someone is actually interested. Every email is personalized to the specific practice we're reaching out to \u2014 our system reads their website and writes a custom opening line before anything sends. You never touch a cold lead.",
       "_outcomes": "New physician referral relationships. 2-5 meetings per month with PCPs and specialists in your area who are open to a referral conversation. A referral pipeline that keeps growing even when you're busy with patients.",
@@ -43,7 +43,7 @@
       "_dnc_emails": "deepblue-inv.com\r\nadvanced medical of Florida",
       "_target_industry": "physical_therapy",
       "_target_seniority": "owner_founder,manager,any",
-      "_target_company_size": "1-10,11-50",
+      "_target_company_size": "1-10",
       "_desired_action": "book_call",
       "_has_existing_list": "no",
       "_website": "https://www.argusreach.com/",
@@ -51,18 +51,18 @@
       "_dns_provider": "",
       "sequence": [
         {
-          "subject": "{{firstName}} - physician referrals",
-          "body": "{{custom_intro}}\r\n\r\nMost PT Clinics in {{city}} rely on a few physicians who refer inconsistently - and building new referral relationships means outreach that never stops. That's time away from patients - and it's not sustainable.\r\n\r\nArgusReach handles it. We source verified physicians in your area, run systematic outreach in your name, and route interested referral sources straight to your calendar.\r\n\r\nYou focus on patients. We keep your pipeline full.\r\n\r\nWorth a quick call?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "subject": "growing {{companyName}}",
+          "body": "{{custom_intro}}\r\n\r\nThe busier you get serving existing clients, the harder it is to add new ones - not because of capability, but because there are only so many hours in the day.\r\n\r\nWe handle the front end entirely. We source qualified business owners in {{city}}, reach out in your name with personalized emails, and only bring you in when someone is actually interested in talking.\r\n\r\nThis email is a live example of exactly that system working.\r\n\r\nWorth 15 minutes to see if it fits?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
           "delay_days": 0
         },
         {
-          "subject": "Re: {{firstName}} - physician referrals",
-          "body": "{{firstName}} - just wanted to follow up. Full transparency - this email was sent through ArgusReach. That's how we found {{companyName}}, personalized this message, and landed in your inbox. That's exactly what we'd build for your physician outreach.\r\n\r\nHere's how it works: we source verified physician contacts in your area, write outreach in your name, manage every reply, and any physician who's interested books directly on your calendar.\r\n\r\nWorth a conversation?\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "subject": "re: growing {{companyName}}",
+          "body": "Following up on my note, {{firstName}}.\r\n\r\nI spent years on the private wealth management side in NYC and the institutional side here in Florida - portfolio management, investment strategy. I've watched great advisors hit a ceiling not from lack of skill but because business development never makes it to the top of the priority list when client work fills the calendar.\r\n\r\nThat's the problem we solve. No new hires, no cold calls, no cold emails on your end - just qualified meetings showing up on your calendar so you can do what you're already good at.\r\n\r\nHappy to show you exactly how it works for a firm like {{companyName}}.\r\n\r\nVito Resciniti\r\nFounder, ArgusReach\r\nhttps://calendly.com/vito-argusreach/30min\r\n",
           "delay_days": 5
         },
         {
-          "subject": "Last one - {{companyName}}",
-          "body": "{{firstName}} - last one.\r\n\r\n{{companyName}} was built to treat patients, not chase referrals. We handle the outreach completely - systematic, ongoing, running in the background while you focus on the work that actually matters.\r\n\r\nIf that is worth 15 minutes: https://calendly.com/vito-argusreach/30min\r\n\r\nVito Resciniti\r\nFounder, ArgusReach",
+          "subject": "last note",
+          "body": "Last note, {{firstName}} - I know the timing may just not be right.\r\n\r\nIf growing your book is on the radar for later this year, happy to reconnect then.\r\n\r\nVito Resciniti\r\nFounder, ArgusReach\r\nhttps://calendly.com/vito-argusreach/30min\r\n",
           "delay_days": 7
         }
       ],
@@ -110,8 +110,37 @@
           "prospects_csv": "campaigns/argusreach/prospects.csv",
           "launch_date": "2026-03-26",
           "active": true
+        },
+        {
+          "icp_label": "RIA Advisors",
+          "vertical": "RIA",
+          "instantly_campaign_id": "1328f93f-20cb-4836-a695-4e7099966e48",
+          "campaign_name": "ArgusReach \u2014 RIA Advisors \u2014 April 2026",
+          "sequence_approved": true,
+          "active": true,
+          "created_at": "2026-03-30T00:00:50.283711",
+          "checklist": {
+            "sequence_approved": true
+          },
+          "sequence": [
+            {
+              "subject": "growing {{companyName}}",
+              "body": "{{custom_intro}}\n\nThe busier you get serving existing clients, the harder it is to add new ones - not because of capability, but because there are only so many hours in the day.\n\nWe handle the front end entirely. We source qualified business owners in {{city}}, reach out in your name with personalized emails, and only bring you in when someone is actually interested in talking.\n\nThis email is a live example of exactly that system working.\n\nWorth 15 minutes to see if it fits?\n\nVito Resciniti\nFounder, ArgusReach"
+            },
+            {
+              "subject": "re: growing {{companyName}}",
+              "body": "Following up on my note, {{firstName}}.\n\nI spent years on the private wealth management side in NYC and the institutional side here in Florida. I've watched great advisors hit a ceiling not from lack of skill but because business development never makes it to the top of the priority list when client work fills the calendar.\n\nThat's the problem we solve. No new hires, no cold calls, no cold emails on your end - just qualified meetings showing up on your calendar so you can do what you're already good at.\n\nHappy to show you exactly how it works for a firm like {{companyName}}.\n\nVito Resciniti\nFounder, ArgusReach\nhttps://calendly.com/vito-argusreach/30min"
+            },
+            {
+              "subject": "last note",
+              "body": "Last note, {{firstName}} - I know the timing may just not be right.\n\nIf growing your book is on the radar for later this year, happy to reconnect then.\n\nVito Resciniti\nFounder, ArgusReach\nhttps://calendly.com/vito-argusreach/30min"
+            }
+          ],
+          "status": "active"
         }
-      ]
+      ],
+      "latest_report_file": "argusreach_March-2026.html",
+      "latest_report_month": "March 2026"
     }
   ]
 }
