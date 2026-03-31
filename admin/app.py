@@ -356,7 +356,9 @@ def _send_welcome_email(client: dict, setup_url: str = ""):
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;"><strong>Important:</strong> this needs to be a real mailbox, not an email alias or forwarding address. An alias won't work - we need a full account with its own login credentials.</p>
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Create a new user/mailbox through your existing Google Workspace or Microsoft 365 account (usually $6-$8/mo for an additional user). Don't have Google Workspace or Microsoft 365 yet? Let us know and we'll point you in the right direction.</p>
     <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;"><strong>One more thing:</strong> once the account is set up, go into Gmail (or Outlook) settings and disable the auto-signature. Our sequences include your name and signature already - if Gmail adds its own on top, it looks inconsistent. Takes 30 seconds: Gmail → Settings → General → Signature → set to "No signature".</p>
-    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Once the account is ready, submit your credentials using the secure link below - it's encrypted end-to-end and the link expires after use:</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Once the email account is set up, you'll need to generate an <strong>app password</strong> - this is a separate password that lets ArgusReach send and monitor emails on your behalf without touching your main account login. It takes about 5 minutes.</p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 16px;">Follow our step-by-step guide here: <a href="https://www.argusreach.com/app-password-guide" style="color:#000;font-weight:700;">App Password Setup Guide →</a></p>
+    <p style="font-size:14px;line-height:1.7;color:#444;margin:0 0 10px;">Then submit your outreach email address and app password using the secure link below - it's encrypted end-to-end and the link expires after use:</p>
     {"<p style='text-align:left;margin:16px 0;'><a href='" + setup_url + "' style='background:#000;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;'>Submit Email Credentials Securely →</a></p><p style='font-size:12px;color:#888;margin:0;'>This link expires in 7 days and can only be used once. If it expires, just reply and we'll send a new one.</p>" if setup_url else "<p style='font-size:14px;color:#444;margin:0;'>Once ready, reply to this email with your outreach address and we'll send you a secure submission link.</p>"}
   </div>
 
@@ -1459,6 +1461,9 @@ def campaign_wizard(client_id):
             if uploaded and uploaded.filename.endswith(".csv"):
                 uploaded.save(str(csv_abs))
                 app.logger.info(f"[Wizard] Saved prospect CSV: {csv_abs}")
+            elif csv_abs.exists():
+                # CSV already on server (e.g. pre-merged by Gob) — use it directly
+                app.logger.info(f"[Wizard] Using existing CSV on server: {csv_abs}")
             else:
                 flash("Please upload an Apollo CSV to continue.", "error")
                 return render_template("campaign_wizard.html",
@@ -1684,6 +1689,16 @@ def campaign_launch(client_id):
     mode_label = "CSV upload" if skip_apollo else "Apollo API"
     flash(f"Campaign launch started for {month} ({mode_label}). Building leads and creating campaign - check progress below.", "success")
     return redirect(url_for("client_detail", client_id=client_id) + "?launch=1")
+
+
+@app.route("/download/ria-prospects")
+@login_required
+def download_ria_prospects():
+    """Temporary download endpoint for RIA prospects CSV."""
+    path = BASE_DIR / "campaigns" / "argusreach" / "prospects_ria_advisors.csv"
+    if path.exists():
+        return send_file(str(path), as_attachment=True, download_name="ria_prospects.csv", mimetype="text/csv")
+    return "File not found", 404
 
 
 @app.route("/clients/<client_id>/launch/log")
