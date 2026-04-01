@@ -571,13 +571,19 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     # Instantly analytics: emails_sent_count + emails_read_count (opens). DRAFT returns empty.
     # Use prefetched_analytics if provided (dashboard: 1 bulk call for all clients).
     # Otherwise fetch only this campaign (client profile: targeted single-campaign fetch).
+    # instantly_campaign_id may be a string or list of strings (multi-campaign clients).
+    if isinstance(instantly_campaign_id, str):
+        campaign_ids = [instantly_campaign_id] if instantly_campaign_id else []
+    else:
+        campaign_ids = [c for c in (instantly_campaign_id or []) if c]
     if prefetched_analytics is not None:
         analytics = prefetched_analytics
     else:
-        analytics = fetch_instantly_analytics(campaign_id=instantly_campaign_id or None)
-    a              = analytics.get(instantly_campaign_id or "", {})
-    instantly_sent = a.get("emails_sent_count", 0)
-    open_count     = a.get("emails_read_count", 0)
+        # Fetch all campaigns in bulk (covers multi-campaign clients)
+        analytics = fetch_instantly_analytics()
+    # Sum analytics across all campaign IDs for this client
+    instantly_sent = sum(analytics.get(cid, {}).get("emails_sent_count", 0) for cid in campaign_ids)
+    open_count     = sum(analytics.get(cid, {}).get("emails_read_count", 0) for cid in campaign_ids)
     leads          = leads_db  # authoritative - DB never returns 0 for loaded prospects
 
     # Report buckets: Interested = positive + question + approved escalations
@@ -904,7 +910,22 @@ def dashboard():
 
     client_stats = []
     for c in clients:
-        m = get_client_metrics(c["id"], c.get("instantly_campaign_id",""), prefetched_analytics=analytics)
+        # Collect all campaign IDs: top-level + any in campaigns array
+        all_cids = list({
+            cid for cid in
+            [c.get("instantly_campaign_id","")] +
+            [cam.get("instantly_campaign_id","") for cam in c.get("campaigns",[])]
+            if cid
+        })
+        m = get_client_metrics(c["id"], all_cids, prefetched_analytics=analytics)
+        # Build display name covering all campaigns
+        _camp_names = list(dict.fromkeys(
+            n for n in
+            [cam.get("campaign_name","") for cam in c.get("campaigns",[])] +
+            [c.get("campaign_name","")]
+            if n
+        ))
+        _camp_display = " + ".join(_camp_names) if _camp_names else "-"
         client_stats.append({
             "id":               c["id"],
             "name":             c.get("firm_name", c["id"]),
@@ -912,7 +933,7 @@ def dashboard():
             "plan":             c.get("plan",""),
             "active":           c.get("active", False),
             "onboarding_status": c.get("onboarding_status", "email_setup"),
-            "campaign_name":    c.get("campaign_name","-"),
+            "campaign_name":    _camp_display,
             **m,
         })
 
@@ -1011,7 +1032,14 @@ def client_detail(client_id):
     """, (client_id,)).fetchall()
     conn.close()
 
-    metrics = get_client_metrics(client_id, client.get("instantly_campaign_id",""))
+    # Collect all campaign IDs for this client
+    _all_cids = list({
+        cid for cid in
+        [client.get("instantly_campaign_id","")] +
+        [cam.get("instantly_campaign_id","") for cam in client.get("campaigns",[])]
+        if cid
+    })
+    metrics = get_client_metrics(client_id, _all_cids)
 
     # Load connection status from monitor
     conn_status_file = BASE_DIR / "monitor" / "logs" / "connection_status.json"
@@ -2183,22 +2211,37 @@ def campaigns():
     rows = []
     registered_ids = set()
     for c in clients:
-        cid = c.get("instantly_campaign_id","")
-        a = analytics.get(cid, {})
-        instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"-")
-        registered_ids.add(cid)
-        m = get_client_metrics(c["id"], cid)
-        rows.append({
-            "client_id":        c["id"],
-            "firm":             c.get("firm_name",""),
-            "campaign_id":      cid,
-            "campaign_name":    c.get("campaign_name","-"),
-            "client_active":    c.get("active", False),
-            "instantly_status": instantly_status,
-            "mismatch":         (c.get("active") and instantly_status != "ACTIVE") or
-                                (not c.get("active") and instantly_status == "ACTIVE"),
-            **m,
-        })
+        # Build full list of campaigns: prefer campaigns[] array, fall back to top-level
+        all_campaigns = c.get("campaigns", [])
+        if not all_campaigns and c.get("instantly_campaign_id"):
+            all_campaigns = [{"instantly_campaign_id": c["instantly_campaign_id"],
+                              "campaign_name": c.get("campaign_name",""),
+                              "active": c.get("active", False)}]
+        # Collect all campaign IDs for aggregate metrics
+        all_cids = list({cam.get("instantly_campaign_id","") for cam in all_campaigns if cam.get("instantly_campaign_id")})
+        # Also include top-level in case it's not in the array
+        if c.get("instantly_campaign_id") and c["instantly_campaign_id"] not in all_cids:
+            all_cids.append(c["instantly_campaign_id"])
+        m_agg = get_client_metrics(c["id"], all_cids)
+        # One row per campaign
+        for cam in all_campaigns:
+            cid = cam.get("instantly_campaign_id","")
+            if not cid:
+                continue
+            a = analytics.get(cid, {})
+            instantly_status = {0:"DRAFT",1:"ACTIVE",2:"COMPLETED"}.get(a.get("campaign_status",-1),"-")
+            registered_ids.add(cid)
+            rows.append({
+                "client_id":        c["id"],
+                "firm":             c.get("firm_name",""),
+                "campaign_id":      cid,
+                "campaign_name":    cam.get("campaign_name","") or cid,
+                "client_active":    c.get("active", False),
+                "instantly_status": instantly_status,
+                "mismatch":         (c.get("active") and instantly_status != "ACTIVE") or
+                                    (not c.get("active") and instantly_status == "ACTIVE"),
+                **m_agg,
+            })
 
     # Unregistered campaigns - pull live list and cross-reference
     unregistered = []

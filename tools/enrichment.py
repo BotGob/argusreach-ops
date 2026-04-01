@@ -182,34 +182,41 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
                 # Remove the {{custom_intro}} line — that's what we're writing
                 touch1_body = re.sub(r"\{\{custom_intro\}\}\s*", "", raw_body).strip()[:400]
 
-        # Build sequence context block
-        sequence_context = ""
+        # Campaign angle — what this email is ultimately about
+        campaign_angle = ""
+        if client:
+            campaign_angle = (
+                client.get("_value_prop", "")
+                or client.get("_business_description", "")
+                or ""
+            ).strip()[:250]
+
+        # First line that follows {{custom_intro}} in the email
+        first_line_after = ""
         if touch1_body:
-            sequence_context = (
-                f"The opener will appear at the top of this email body — "
-                f"write it so it flows naturally into this:\n\"{touch1_body}\"\n"
-                f"Match the tone. The opener should feel like the first sentence of the same email."
-            )
-        elif client:
-            value_prop = client.get("_value_prop", "").strip()
-            if value_prop:
-                sequence_context = (
-                    f"The email offers: {value_prop[:200]}. "
-                    f"Bridge the observation naturally toward that outcome."
-                )
+            for line in touch1_body.split("\n"):
+                line = line.strip()
+                if line:
+                    first_line_after = line
+                    break
+
+        # Build prompt parts
+        angle_line = f"This email is about: {campaign_angle}\n\n" if campaign_angle else ""
+        next_line = first_line_after or touch1_body[:150]
 
         prompt = (
-            f"Write a single natural sentence (20-30 words) to open a cold outreach email to {company}. "
-            f"Start with 'I noticed' followed by something specific and genuine about {company} "
-            f"from their website.\n\n"
-            f"Website context: {snippet}\n\n"
-            f"{sequence_context}\n\n"
-            f"Rules:\n"
-            f"(1) Reference the company or what they do — never the recipient by name.\n"
-            f"(2) The observation must be real and specific — not generic praise.\n"
-            f"(3) End with a bridge that connects what you noticed to the email's purpose "
-            f"(e.g. '— and I think we could help you reach more of them').\n"
-            f"(4) Plain text only, end with a period."
+            f"{angle_line}"
+            f"The sentence you write will appear at the very start of a cold email to {first_name} at {company}. "
+            f"The very next line of the email (which follows immediately after your sentence) is:\n"
+            f"\"{next_line}\"\n\n"
+            f"About {company} (from their website): {snippet[:400]}\n\n"
+            f"Write exactly one sentence. Use one specific fact about {company} from the website. "
+            f"The sentence must read as the natural first line of that email so that when the next line follows, "
+            f"it feels like one continuous paragraph. "
+            f"Do not say 'I noticed', 'I came across', 'I see that', or use any bridge phrase. "
+            f"Do not infer challenges or feelings. No em dashes. No bullet points. No options. "
+            f"Plain text only. End with a period. 15-25 words maximum. "
+            f"Output the sentence and nothing else."
         )
         msg = aclient.messages.create(
             model="claude-haiku-4-5",

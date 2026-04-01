@@ -168,12 +168,7 @@
 {% if step == 3 %}
 <form method="POST" action="{{ url_for('campaign_wizard', client_id=client.id) }}"
       enctype="multipart/form-data" id="launch-form"
-      onsubmit="
-        if (!document.getElementById('wizard-csv-input').files[0]) {
-          alert('Upload an Apollo CSV first.');
-          return false;
-        }
-      ">
+      onsubmit="">
   <input type="hidden" name="step" value="3">
   {# Pass all data through as hidden fields #}
   {% for key in ['icp_label','month','target_titles','target_locations','target_company_size','lead_limit','value_prop','differentiator','tone','compliance_note'] %}
@@ -216,7 +211,9 @@
 
   {# CSV upload #}
   <div class="section" style="margin-bottom:20px">
-    <div class="section-title">📤 Upload Apollo CSV</div>
+    <div class="section-title">📤 Prospect CSV</div>
+    {% set icp_slug = form.get('icp_label','campaign').lower().replace(' ','_') %}
+    {% set csv_exists = (base_dir ~ '/campaigns/' ~ client.id ~ '/prospects_' ~ icp_slug ~ '.csv') %}
     <div id="wizard-drop-zone" onclick="document.getElementById('wizard-csv-input').click()"
          style="border:2px dashed #334155;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:10px">
       <div style="font-size:13px;color:#64748b">Drag &amp; drop your CSV, or <span style="color:#4ade80">click to browse</span></div>

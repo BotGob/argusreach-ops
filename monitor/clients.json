@@ -141,6 +141,105 @@
       ],
       "latest_report_file": "argusreach_March-2026.html",
       "latest_report_month": "March 2026"
+    },
+    {
+      "id": "argusreach_pt_2",
+      "active": false,
+      "onboarding_status": "ready_to_launch",
+      "mode": "draft_approval",
+      "firm_name": "ArgusReach PT 2",
+      "vertical": "B2BServices",
+      "plan": "starter",
+      "outreach_email": "vito@argusreach.com",
+      "sender_name": "Vito Resciniti",
+      "title": "Founder",
+      "client_email": "vresciniti27@gmail.com",
+      "calendly_link": "https://calendly.com/vito-argusreach/30min",
+      "instantly_campaign_id": "",
+      "campaign_name": "",
+      "contacts_per_month": 200,
+      "launch_date": "",
+      "icp_summary": "",
+      "tone": "warm-professional",
+      "compliance_note": "",
+      "positioning_note": "",
+      "prospects_csv": "campaigns/argusreach_pt_2/prospects.csv",
+      "_intake_id": "20260330230222_pt2",
+      "_contact_name": "Vito Resciniti",
+      "_contact_title": "CEO",
+      "_meeting_format": "phone",
+      "_office_address": "",
+      "_success_story": "",
+      "_prospect_objection": "I already have good referral relationships\" \u2014 most PT owners rely on 2-3 physicians who refer inconsistently. The question isn't whether your current relationships are good, it's whether your pipeline is deep enough that losing one referral source wouldn't hurt.",
+      "_target_locations": "Tampa, FL\r\nSt. Petersburg, FL\r\nClearwater, FL\r\nBrandon, FL\r\nWesley Chapel, FL\r\nBradenton, FL\r\nSarasota, FL\r\nLargo, FL\r\nPalm Harbor, FL",
+      "_target_titles": "Physical Therapist Owner, PT Owner, Clinic Owner, Practice Owner, Founder, Practice Manager, Physical Therapist",
+      "_value_prop": "PT clinic growth runs on physician referrals \u2014 but building those relationships means cold outreach, follow-ups, and relationship management that takes time away from what you actually do best: treating patients. You didn't go to school for sales. ArgusReach handles all of it. We identify the right PCPs, orthopedic surgeons, and sports medicine doctors in your area, reach out in your name with personalized emails, and get meetings on your calendar with physicians who are open to referring. You stay focused on patients and clinical excellence. We keep your pipeline full.",
+      "_differentiator": "Most outreach tools hand you a platform and wish you luck. We run the entire operation. We build the list, write the emails in your voice, manage every reply, and only bring you into the conversation when someone is actually interested. Every email is personalized to the specific practice we're reaching out to \u2014 our system reads their website and writes a custom opening line before anything sends. You never touch a cold lead.",
+      "_outcomes": "New physician referral relationships. 2-5 meetings per month with PCPs and specialists in your area who are open to a referral conversation. A referral pipeline that keeps growing even when you're busy with patients.",
+      "_voice_sample": "",
+      "_business_description": "ArgusReach is a done-for-you outbound prospecting service for professional practices. PT clinic owners are busy \u2014 treating patients, managing staff, dealing with insurance, staying current on techniques. Business development shouldn't be one more thing on their plate. We handle everything: sourcing verified contacts, writing personalized outreach in your voice, managing every reply, and routing interested prospects straight to your calendar. Our clients show up to qualified meetings. We handle everything before the conversation.",
+      "_sender_name": "Vito@argusreach.com",
+      "_sender_title": "Founder, ArgusReach",
+      "_dnc_notes": "",
+      "_dnc_emails": "deepblue-inv.com\r\nadvanced medical of Florida",
+      "_target_industry": "physical_therapy",
+      "_target_seniority": "owner_founder,manager,any",
+      "_target_company_size": "1-10,11-50",
+      "_desired_action": "book_call",
+      "_target_who": "",
+      "_ideal_client": "",
+      "_current_biz_source": "",
+      "_biggest_challenge": "",
+      "_has_existing_list": "no",
+      "_website": "https://www.argusreach.com/",
+      "_email_provider": "google",
+      "_dns_provider": "",
+      "sequence": [
+        {
+          "subject": "Physician referrals for {{companyName}}",
+          "body": "Hi {{firstName}},\r\n\r\n{{custom_intro}} Most PT clinics in {{city}} rely on a few physicians who refer inconsistently - and building new referral relationships means outreach that never stops. That's time away from patients - and it's not sustainable. \r\n\r\nArgusReach handles it. We source verified physicians in your area, run systematic outreach in your name, and route interested referral sources straight to your calendar. You focus on patients. We keep your pipeline full. \r\n\r\nWorth a quick call? \r\nVito Resciniti Founder, \r\nArgusReach",
+          "delay_days": 0
+        },
+        {
+          "subject": "Re: Physician referrals for {{companyName}}",
+          "body": "{{firstName}} - just wanted to follow up. \r\n\r\nFull transparency - this email was sent through ArgusReach. That's how we found {{companyName}}, personalized this message, and landed in your inbox. \r\n\r\nThat's exactly what we'd build for your physician outreach. Here's how it works: we source verified physician contacts in your area, write outreach in your name, manage every reply, and any physician who's interested books directly on your calendar. Worth a conversation? \r\n\r\nVito Resciniti Founder, \r\nArgusReach",
+          "delay_days": 5
+        },
+        {
+          "subject": "Last one - {{companyName}}",
+          "body": "{{firstName}} - last one. \r\n\r\n{{companyName}} was built to treat patients, not chase referrals. We handle the outreach completely - systematic, ongoing, running in the background while you focus on the work that actually matters.\r\n\r\nIf that is worth 30 minutes: https://calendly.com/vito-argusreach/30min \r\n\r\nVito Resciniti Founder, \r\nArgusReach",
+          "delay_days": 7
+        }
+      ],
+      "schedule": {
+        "timezone": "America/New_York",
+        "start_hour": 8,
+        "end_hour": 17,
+        "send_days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday"
+        ]
+      },
+      "checklist": {
+        "icp_reviewed": true,
+        "dns_verified": true,
+        "warmup_complete": true,
+        "payment_confirmed": true,
+        "sequence_approved": true,
+        "calendar_connected": true
+      },
+      "_setup_token": "E2n-i8ZRa1wuTWUmwau5vJPYi1BnCsPuXM2OJyydE00",
+      "_setup_token_expires": "2026-04-06T23:15:43.214345",
+      "_setup_token_used": true,
+      "stripe_payment_link": "https://buy.stripe.com/eVq6oGa2E6uvgwb0Fg5gc09",
+      "app_password": "gAAAAABpywXbt2gEl_0hRQrCJSLWj0Bss7oBhWpkjR_Mn87FSZ7134vlFP7-9NvaU8BOGuMZPSM2klytHVRdqNQiSog3wMt5ea5whBE3sGkDDmO-Ez6u5e0=",
+      "_credentials_received_at": "2026-03-30 07:23 PM ET",
+      "launch_ready_alerted": true,
+      "followup_sent": true,
+      "launch_email_sent_at": "2026-03-30 07:27 PM ET"
     }
   ]
 }
