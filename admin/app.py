@@ -584,7 +584,9 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     # Sum analytics across all campaign IDs for this client
     instantly_sent = sum(analytics.get(cid, {}).get("emails_sent_count", 0) for cid in campaign_ids)
     open_count     = sum(analytics.get(cid, {}).get("emails_read_count", 0) for cid in campaign_ids)
-    leads          = leads_db  # authoritative - DB never returns 0 for loaded prospects
+    # Use DB as primary source; fall back to instantly_sent as a floor if DB is missing prospects
+    # (e.g. if DB pre-load failed during campaign creation)
+    leads          = max(leads_db, instantly_sent)
 
     # Report buckets: Interested = positive + question + approved escalations
     # Approved escalations keep their 'escalated' classification tag - count them in interested
@@ -918,14 +920,15 @@ def dashboard():
             if cid
         })
         m = get_client_metrics(c["id"], all_cids, prefetched_analytics=analytics)
-        # Build display name covering all campaigns
-        _camp_names = list(dict.fromkeys(
-            n for n in
-            [cam.get("campaign_name","") for cam in c.get("campaigns",[])] +
-            [c.get("campaign_name","")]
-            if n
+        # Build compact display using ICP labels (shorter than full campaign names)
+        _camp_labels = list(dict.fromkeys(
+            (cam.get("icp_label") or cam.get("campaign_name","")).strip()
+            for cam in c.get("campaigns",[])
+            if (cam.get("icp_label") or cam.get("campaign_name","")).strip()
         ))
-        _camp_display = " + ".join(_camp_names) if _camp_names else "-"
+        if not _camp_labels and c.get("campaign_name"):
+            _camp_labels = [c["campaign_name"]]
+        _camp_display = " + ".join(_camp_labels) if _camp_labels else "-"
         client_stats.append({
             "id":               c["id"],
             "name":             c.get("firm_name", c["id"]),

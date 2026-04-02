@@ -106,7 +106,7 @@
         {
           "instantly_campaign_id": "fb7ebd23-2dce-42c2-87ac-c492b036a48b",
           "campaign_name": "ArgusReach - PT",
-          "icp_label": "B2BServices",
+          "icp_label": "PT Clinics",
           "prospects_csv": "campaigns/argusreach/prospects.csv",
           "launch_date": "2026-03-26",
           "active": true
