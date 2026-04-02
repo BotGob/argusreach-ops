@@ -554,9 +554,10 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     rejected          = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='draft_rejected' AND client_id=?", (client_id,)).fetchone()[0]
     meetings          = conn.execute("SELECT COUNT(*) FROM meetings WHERE client_id=?", (client_id,)).fetchone()[0]
     revenue           = conn.execute("SELECT COALESCE(SUM(amount_cents),0) FROM revenue WHERE client_id=?", (client_id,)).fetchone()[0]
-    # Leads: use our DB prospect count (accurate even before Instantly analytics are available)
-    # Instantly analytics endpoint returns [] for DRAFT campaigns - DB is always correct
-    leads_db          = conn.execute("SELECT COUNT(DISTINCT id) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
+    # Leads: sum contacts per campaign (not DISTINCT by email across campaigns).
+    # A contact in campaign A AND campaign B counts as 2 leads — correct for reporting.
+    # DISTINCT id within each campaign still prevents double-counting within a single campaign.
+    leads_db          = conn.execute("SELECT COUNT(*) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
 
@@ -584,9 +585,8 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     # Sum analytics across all campaign IDs for this client
     instantly_sent = sum(analytics.get(cid, {}).get("emails_sent_count", 0) for cid in campaign_ids)
     open_count     = sum(analytics.get(cid, {}).get("emails_read_count", 0) for cid in campaign_ids)
-    # Use DB as primary source; fall back to instantly_sent as a floor if DB is missing prospects
-    # (e.g. if DB pre-load failed during campaign creation)
-    leads          = max(leads_db, instantly_sent)
+    # DB is authoritative for leads. Instantly sent count is a separate metric.
+    leads          = leads_db
 
     # Report buckets: Interested = positive + question + approved escalations
     # Approved escalations keep their 'escalated' classification tag - count them in interested

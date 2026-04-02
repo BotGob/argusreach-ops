@@ -30759,3 +30759,39 @@
 2026-04-02 00:39:39 [ArgusReach] Skipping duplicate: payments-noreply@google.com
 2026-04-02 00:39:42 Cycle complete. Next check in 10 min.
 
+2026-04-02 00:49:20 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 00:49:20 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 00:49:20 [ArgusReach] Checking inbox...
+2026-04-02 00:49:21 [ArgusReach] 2 message(s) in last 24h.
+2026-04-02 00:49:21 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 00:49:21 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 00:49:22 [ArgusReach] Skipping warmup email from: annabelle.rohankeebler2@sowaagencyblacksite.co — Annabelle, let's share ideas | 3WXDVXJ BA6F65B
+2026-04-02 00:49:25 Cycle complete. Next check in 10 min.
+
+2026-04-02 00:49:42 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 00:49:42 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 00:49:42 [ArgusReach] Checking inbox...
+2026-04-02 00:49:43 [ArgusReach] 2 message(s) in last 24h.
+2026-04-02 00:49:44 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 00:49:44 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 00:49:44 [ArgusReach] Skipping warmup email from: annabelle.rohankeebler2@sowaagencyblacksite.co — Annabelle, let's share ideas | 3WXDVXJ BA6F65B
+2026-04-02 00:49:48 Cycle complete. Next check in 10 min.
+
+2026-04-02 00:59:25 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 00:59:25 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 00:59:25 [ArgusReach] Checking inbox...
+2026-04-02 00:59:26 [ArgusReach] 2 message(s) in last 24h.
+2026-04-02 00:59:27 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 00:59:27 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 00:59:27 [ArgusReach] Skipping duplicate: annabelle.rohankeebler2@sowaagencyblacksite.co
+2026-04-02 00:59:30 Cycle complete. Next check in 10 min.
+
+2026-04-02 00:59:48 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 00:59:48 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 00:59:48 [ArgusReach] Checking inbox...
+2026-04-02 00:59:49 [ArgusReach] 2 message(s) in last 24h.
+2026-04-02 00:59:49 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 00:59:49 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 00:59:49 [ArgusReach] Skipping duplicate: annabelle.rohankeebler2@sowaagencyblacksite.co
+2026-04-02 00:59:52 Cycle complete. Next check in 10 min.
+
