@@ -204,8 +204,20 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
         angle_line = f"This email is about: {campaign_angle}\n\n" if campaign_angle else ""
         next_line = first_line_after or touch1_body[:150]
 
+        # Who the client is reaching out to (grounds the intro in the relationship context)
+        target_who = ""
+        if client:
+            target_who = (
+                client.get("_target_who", "")
+                or client.get("_target_titles", "")
+                or ""
+            ).strip()[:150]
+
+        target_line = f"This email is being sent by someone who works with {target_who} - use this to make the observation feel relevant to that relationship.\n\n" if target_who else ""
+
         prompt = (
             f"{angle_line}"
+            f"{target_line}"
             f"The sentence you write will appear at the very start of a cold email to {first_name} at {company}. "
             f"The very next line of the email (which follows immediately after your sentence) is:\n"
             f"\"{next_line}\"\n\n"

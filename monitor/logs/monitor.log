@@ -36920,3 +36920,35 @@
 2026-04-02 22:33:14 [ArgusReach] Skipping duplicate: payments-noreply@google.com
 2026-04-02 22:33:17 Cycle complete. Next check in 10 min.
 
+2026-04-02 22:43:13 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 22:43:13 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 22:43:13 [ArgusReach] Checking inbox...
+2026-04-02 22:43:13 [ArgusReach] 1 message(s) in last 24h.
+2026-04-02 22:43:14 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 22:43:14 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 22:43:17 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 22:43:17 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 22:43:17 [ArgusReach] Checking inbox...
+2026-04-02 22:43:18 Cycle complete. Next check in 10 min.
+
+2026-04-02 22:43:18 [ArgusReach] 1 message(s) in last 24h.
+2026-04-02 22:43:18 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 22:43:18 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 22:43:22 Cycle complete. Next check in 10 min.
+
+2026-04-02 22:53:18 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 22:53:18 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 22:53:18 [ArgusReach] Checking inbox...
+2026-04-02 22:53:19 [ArgusReach] 1 message(s) in last 24h.
+2026-04-02 22:53:19 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 22:53:19 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 22:53:22 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-02 22:53:22 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-02 22:53:22 [ArgusReach] Checking inbox...
+2026-04-02 22:53:22 Cycle complete. Next check in 10 min.
+
+2026-04-02 22:53:23 [ArgusReach] 1 message(s) in last 24h.
+2026-04-02 22:53:23 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-02 22:53:24 [ArgusReach] Skipping duplicate: payments-noreply@google.com
+2026-04-02 22:53:27 Cycle complete. Next check in 10 min.
+
