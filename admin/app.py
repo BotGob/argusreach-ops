@@ -410,8 +410,9 @@ def _notify_telegram(msg: str):
 
 # ── ALL-GATES HELPERS ─────────────────────────────────────────────────────────
 
-_ALL_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "payment_confirmed", "sequence_approved", "calendar_connected")
-_PRE_PAYMENT_GATES = ("icp_reviewed", "dns_verified", "warmup_complete", "sequence_approved", "calendar_connected")
+# icp_reviewed removed — ICP data comes from intake form, no separate check needed
+_ALL_GATES = ("dns_verified", "warmup_complete", "payment_confirmed", "sequence_approved", "calendar_connected")
+_PRE_PAYMENT_GATES = ("dns_verified", "warmup_complete", "sequence_approved", "calendar_connected")
 
 
 def check_all_gates_and_alert(client, save_fn):
@@ -1287,7 +1288,7 @@ def save_checklist(client_id):
         return ("not found", 404)
     f = request.form
     client["checklist"] = {
-        "icp_reviewed":       f.get("icp_reviewed") == "1",
+        # icp_reviewed removed — ICP data comes from intake form
         "dns_verified":       f.get("dns_verified") == "1",
         "warmup_complete":    f.get("warmup_complete") == "1",
         "payment_confirmed":  f.get("payment_confirmed") == "1",
@@ -3402,8 +3403,8 @@ def intake_approve(intake_id):
                 "send_days": ["monday","tuesday","wednesday","thursday","friday"],
             },
             # Pre-launch checklist state (persists between sessions)
+            # icp_reviewed removed — ICP data captured at intake
             "checklist": {
-                "icp_reviewed":       False,
                 "dns_verified":       False,
                 "warmup_complete":    False,
                 "payment_confirmed":  False,

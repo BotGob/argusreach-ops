@@ -12,9 +12,9 @@
 {% set seq_ok       = cl.get('sequence_approved') %}
 {% set payment_ok   = cl.get('payment_confirmed') %}
 {% set cal_ok       = cl.get('calendar_connected') %}
-{% set icp_ok       = cl.get('icp_reviewed') %}
+{# icp_reviewed removed - ICP captured at intake #}
 {% set campaign_ok  = client.get('instantly_campaign_id') %}
-{% set pre_payment_gates = icp_ok and dns_ok and warmup_ok and seq_ok and cal_ok %}
+{% set pre_payment_gates = dns_ok and warmup_ok and seq_ok and cal_ok %}
 {% set all_gates    = pre_payment_gates and payment_ok %}
 
 {# ── HEADER ──────────────────────────────────────────────────────── #}
@@ -348,7 +348,7 @@
   <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
     <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">Pre-Launch Checklist</div>
     {% set checklist_items = [
-      ('icp_reviewed',       '✅ ICP reviewed - titles, locations, and industry look right'),
+      {# icp_reviewed removed - ICP captured at intake #}
       ('dns_verified',       '🔒 DNS verified - SPF, DKIM, DMARC passing'),
       ('warmup_complete',    '🌡️ Warmup complete - sending account score ≥ 85% in Instantly' ~ (' (' ~ warmup_live.score|string ~ '/100)' if warmup_live.score is not none else ' (checking...)')),
       ('payment_confirmed',  '💳 Subscription payment confirmed in Stripe'),

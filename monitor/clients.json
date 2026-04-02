@@ -79,7 +79,6 @@
         ]
       },
       "checklist": {
-        "icp_reviewed": true,
         "dns_verified": true,
         "warmup_complete": true,
         "payment_confirmed": true,
@@ -224,7 +223,6 @@
         ]
       },
       "checklist": {
-        "icp_reviewed": true,
         "dns_verified": true,
         "warmup_complete": true,
         "payment_confirmed": true,
