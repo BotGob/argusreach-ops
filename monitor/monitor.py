@@ -581,31 +581,34 @@ def load_prospect_emails(client):
                     log(f"[ProspectFilter] Error reading CSV {p}: {ex}")
 
         # Source 2: Instantly API — pull live lead list (authoritative)
+        # Uses POST /api/v2/leads/list with cursor pagination (GET endpoint is 404)
         if cid and INSTANTLY_API_KEY:
             try:
                 page_size = 100
                 starting_after = None
                 while True:
-                    params = {"campaign": cid, "limit": page_size}
+                    payload = {"campaign_id": cid, "limit": page_size}
                     if starting_after:
-                        params["starting_after"] = starting_after
-                    resp = requests.get(
-                        "https://api.instantly.ai/api/v2/leads",
-                        headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}"},
-                        params=params,
+                        payload["starting_after"] = starting_after
+                    resp = requests.post(
+                        "https://api.instantly.ai/api/v2/leads/list",
+                        headers={"Authorization": f"Bearer {INSTANTLY_API_KEY}", "Content-Type": "application/json"},
+                        json=payload,
                         timeout=15
                     )
                     if resp.status_code != 200:
                         break
-                    items = resp.json().get("items", [])
+                    data = resp.json()
+                    items = data.get("items", [])
                     for item in items:
                         e = item.get("email", "").strip().lower()
                         if e and not is_warmup_domain(e):
                             all_emails.add(e)
                             email_to_campaign[e] = cid
-                    if len(items) < page_size:
+                    next_cursor = data.get("next_starting_after")
+                    if not next_cursor or len(items) < page_size:
                         break
-                    starting_after = items[-1].get("id")
+                    starting_after = next_cursor
             except Exception as ex:
                 log(f"[ProspectFilter] Instantly API fetch failed for {cid}: {ex}")
 

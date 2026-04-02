@@ -7,7 +7,7 @@ Handles the full month-over-month campaign lifecycle:
   1. Detects when current month's campaign is winding down (>75% sequence_complete)
   2. Pulls all previously contacted emails from DB → exclusion list
   3. Searches Apollo for fresh contacts, auto-refills until target is met
-  4. Verifies emails via NeverBounce
+  4. DNC filter (NeverBounce removed — not used)
   5. Filters DNC
   6. Creates new Instantly campaign with client's sequence template
   7. Loads contacts to new campaign
@@ -745,7 +745,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
             print(f"🚫 DNC filter removed {before - len(contacts)} contacts")
     else:
         # Pull from Apollo with replacement loop:
-        # Apollo → DNC filter → NeverBounce → if still under target, pull more
+        # Apollo → DNC filter → if still under target, pull more
         dnc          = load_dnc(client_id)
         contacts     = []
         excluded     = set(already_contacted)
@@ -777,16 +777,7 @@ def run_cycle(client_id, month_name, dry_run=False, skip_apollo=False, skip_veri
                 excluded.update(c["email"] for c in batch)
                 continue
 
-            # NeverBounce verify
-            if not skip_verify:
-                batch, bad = verify_emails(batch)
-                if bad:
-                    bad_emails = [c["email"] for c in bad]
-                    add_to_dnc(bad_emails, client_id)
-                    dnc.update(bad_emails)  # update local set
-                    print(f"🚫 NeverBounce removed {len(bad)} contacts — added to DNC")
-            else:
-                print("⏭️  Skipping NeverBounce (test mode)")
+            # NeverBounce removed — not used
 
             contacts.extend(batch)
             print(f"   Round {round_num} complete: +{len(batch)} clean contacts ({len(contacts)}/{target} total)")

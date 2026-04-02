@@ -1680,7 +1680,7 @@ def upload_prospects(client_id):
 def campaign_launch(client_id):
     """
     Launch a new campaign for a client.
-    Runs: Apollo → DNC filter → NeverBounce (if key exists) → create Instantly campaign (DRAFT) → load leads → notify Vito.
+    Runs: Apollo → DNC filter → create Instantly campaign (DRAFT) → load leads → notify Vito.
     Runs in background thread so the portal stays responsive. Progress streamed via /clients/<id>/launch/status.
     """
     import threading, io, sys
@@ -1694,7 +1694,7 @@ def campaign_launch(client_id):
 
     month = (request.form.get("month") or request.args.get("month", "")).strip()
     skip_apollo = (request.form.get("use_csv") or request.args.get("use_csv", "0")) == "1"
-    skip_verify = not bool(os.environ.get("NEVERBOUNCE_API_KEY", ""))
+    skip_verify = True  # NeverBounce removed from process
     # Wizard params: custom CSV path and ICP label for multi-campaign support
     _wizard_csv_path = request.args.get("csv_path") or request.form.get("csv_path", "")
     _wizard_icp_label = request.args.get("icp_label") or request.form.get("icp_label", "")
@@ -2519,25 +2519,9 @@ def system_status():
     else:
         services.append({"name": "Apollo", "status": "error", "detail": "APOLLO_API_KEY not configured", "note": None})
 
-    # 3. NeverBounce
-    nb_key = os.environ.get("NEVERBOUNCE_API_KEY", "")
-    if nb_key:
-        try:
-            r = requests.get("https://api.neverbounce.com/v4/account/info",
-                             params={"key": nb_key}, timeout=8)
-            if r.ok and r.json().get("status") == "success":
-                info = r.json().get("credits_info", {})
-                paid = info.get("paid_credits_remaining", 0)
-                free = info.get("free_credits_remaining", 0)
-                services.append({"name": "NeverBounce", "status": "ok", "detail": f"{paid} paid credits · {free} free credits remaining", "note": "Pay-as-you-go · $0.008/email"})
-            else:
-                services.append({"name": "NeverBounce", "status": "warn", "detail": "Key set but API check failed", "note": None})
-        except Exception as e:
-            services.append({"name": "NeverBounce", "status": "error", "detail": str(e)[:80], "note": None})
-    else:
-        services.append({"name": "NeverBounce", "status": "error", "detail": "NEVERBOUNCE_API_KEY not configured", "note": None})
+    # NeverBounce removed from process
 
-    # 4. Stripe
+        # 4. Stripe
     stripe_key = os.environ.get("STRIPE_SECRET_KEY", "")
     if stripe_key:
         try:
