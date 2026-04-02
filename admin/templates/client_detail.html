@@ -535,6 +535,32 @@
         <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#f87171">{{ cm.reply_negative }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Removed</div></div>
         <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#60a5fa">{{ cm.reply_rate }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Reply Rate</div></div>
       </div>
+      {% set f = cm.funnel %}
+      {% if f and f.total > 0 %}
+      <div style="margin-top:12px;border-top:1px solid #1e293b;padding-top:10px">
+        <div style="font-size:10px;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Sequence Funnel</div>
+        <div style="display:flex;gap:0;border-radius:4px;overflow:hidden;height:6px;margin-bottom:6px">
+          {% set pct1 = (f.touch_1_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
+          {% set pct2 = (f.touch_2_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
+          {% set pct3 = (f.touch_3_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
+          {% set pctr = (f.replied / f.total * 100)|round|int if f.total > 0 else 0 %}
+          <div style="width:100%;background:#1e293b;border-radius:4px;overflow:hidden;position:relative">
+            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct1 }}%;background:#475569"></div>
+            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct2 }}%;background:#3b82f6"></div>
+            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct3 }}%;background:#6366f1"></div>
+            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pctr }}%;background:#22c55e"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px">
+          <span style="color:#475569">T1: <b style="color:#94a3b8">{{ f.touch_1_sent }}</b></span>
+          <span style="color:#475569">T2: <b style="color:#60a5fa">{{ f.touch_2_sent }}</b></span>
+          <span style="color:#475569">T3: <b style="color:#818cf8">{{ f.touch_3_sent }}</b></span>
+          <span style="color:#475569">Replied: <b style="color:#4ade80">{{ f.replied }}</b></span>
+          {% if f.sequence_complete > 0 %}<span style="color:#475569">Done: <b style="color:#64748b">{{ f.sequence_complete }}</b></span>{% endif %}
+          <span style="color:#334155">| Total: {{ f.total }}</span>
+        </div>
+      </div>
+      {% endif %}
       <div style="margin-top:8px;font-size:11px;font-family:monospace;color:#334155">{{ cm.campaign_id[:32] }}...</div>
     </div>
     {% endfor %}

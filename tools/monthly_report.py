@@ -183,7 +183,50 @@ def build_timeline_html(history):
   </div>"""
 
 
-def build_report_html(client, month, stats, notes=None, history=None):
+def build_funnel_html(funnel: dict) -> str:
+    """Build the sequence funnel section for the monthly report."""
+    if not funnel or funnel.get('total', 0) == 0:
+        return ''
+    total = funnel['total']
+    t1 = funnel.get('touch_1_sent', 0)
+    t2 = funnel.get('touch_2_sent', 0)
+    t3 = funnel.get('touch_3_sent', 0)
+    replied = funnel.get('replied', 0)
+    complete = funnel.get('sequence_complete', 0)
+
+    def pct(n):
+        return f"{n/total*100:.0f}%" if total > 0 else '0%'
+    def bar(n, color):
+        w = max(4, int(n/total*100))
+        return f'<div style="height:6px;width:{w}%;background:{color};border-radius:3px;display:inline-block"></div>'
+
+    return f"""
+  <!-- Sequence Funnel -->
+  <div style="padding:0 40px 28px;">
+    <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:14px;">Sequence Progress</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px 0;color:#6b7280;">Touch 1 sent</td>
+        <td style="padding:8px 0;text-align:right;font-weight:600;color:#111827;">{t1} <span style="color:#9ca3af;font-weight:400;">({pct(t1)})</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px 0;color:#6b7280;">Touch 2 sent</td>
+        <td style="padding:8px 0;text-align:right;font-weight:600;color:#111827;">{t2} <span style="color:#9ca3af;font-weight:400;">({pct(t2)})</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px 0;color:#6b7280;">Touch 3 sent</td>
+        <td style="padding:8px 0;text-align:right;font-weight:600;color:#111827;">{t3} <span style="color:#9ca3af;font-weight:400;">({pct(t3)})</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f3f4f6;">
+        <td style="padding:8px 0;color:#6b7280;">Replied</td>
+        <td style="padding:8px 0;text-align:right;font-weight:600;color:#15803d;">{replied} <span style="color:#9ca3af;font-weight:400;">({pct(replied)})</span></td>
+      </tr>
+      {'<tr><td style="padding:8px 0;color:#6b7280;">Sequence complete</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#9ca3af;">' + str(complete) + ' (' + pct(complete) + ')</td></tr>' if complete > 0 else ''}
+    </table>
+  </div>"""
+
+
+def build_report_html(client, month, stats, notes=None, history=None, funnel=None):
     firm        = client.get('firm_name', 'Client')
     campaign    = client.get('campaign_name', 'Campaign')
     sender_name = client.get('sender_name', 'Vito Resciniti')
@@ -192,6 +235,7 @@ def build_report_html(client, month, stats, notes=None, history=None):
     prospects  = stats['prospects']
     sent       = stats.get('emails_sent', '—')
     interested = stats['reply_interested']
+    funnel_html = build_funnel_html(funnel or {})
     not_now    = stats['reply_not_now']
     meetings   = stats['meetings']
 
@@ -292,6 +336,9 @@ def build_report_html(client, month, stats, notes=None, history=None):
       {sent_row}
     </table>
   </div>
+
+  <!-- Sequence Funnel -->
+  {funnel_html}
 
   <!-- History timeline -->
   {timeline_html}
@@ -399,7 +446,19 @@ def main():
     save_history(args.client, history)
     print(f"📁 History updated ({len(history)} month{'s' if len(history) != 1 else ''})")
 
-    html      = build_report_html(client, args.month, stats, history=history)
+    # Build funnel from DB
+    try:
+        sys.path.insert(0, str(BASE_DIR))
+        from db.database import get_client_funnel as _gcf
+        _camp_ids = [c.get('instantly_campaign_id','') for c in client.get('campaigns',[]) if c.get('instantly_campaign_id')]
+        if not _camp_ids and client.get('instantly_campaign_id'):
+            _camp_ids = [client['instantly_campaign_id']]
+        report_funnel = _gcf(args.client, _camp_ids)
+    except Exception as _fe:
+        print(f"Warning: could not load funnel for report ({_fe})")
+        report_funnel = {}
+
+    html      = build_report_html(client, args.month, stats, history=history, funnel=report_funnel)
     safe_month = args.month.replace(' ', '-')
     out_path  = REPORTS_DIR / f"{args.client}_{safe_month}.html"
     out_path.write_text(html)

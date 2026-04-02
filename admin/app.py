@@ -52,7 +52,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from db.database import (get_db, init_db, sync_client_from_config,
                          upsert_campaign, get_campaigns_for_client,
-                         get_campaign_metrics, get_client_consolidated_metrics)
+                         get_campaign_metrics, get_client_consolidated_metrics,
+                         get_campaign_funnel, get_client_funnel)
 from db.generate_dashboard import fetch_stats, render as render_stats_html
 
 CLIENTS_FILE  = BASE_DIR / "monitor" / "clients.json"
@@ -910,6 +911,41 @@ def dashboard():
     drafts_rejected = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='draft_rejected'").fetchone()[0]
     conn.close()
 
+    # Stage sync: update prospect stages from Instantly (throttled to once per 10 min per campaign)
+    try:
+        sys.path.insert(0, str(BASE_DIR / "tools"))
+        import stage_sync as _ss
+        import importlib; importlib.reload(_ss)
+        _sync_conn = get_db()
+        for c in clients:
+            if not c.get("active"):
+                continue
+            all_camps = list({cid for cid in
+                [c.get("instantly_campaign_id","")] +
+                [cam.get("instantly_campaign_id","") for cam in c.get("campaigns",[])]
+                if cid})
+            for cid in all_camps:
+                row = _sync_conn.execute(
+                    "SELECT updated_at FROM campaigns WHERE id=?", (cid,)
+                ).fetchone()
+                last = row[0] if row else None
+                if last:
+                    try:
+                        import zoneinfo as _zi
+                        from datetime import timezone as _tz
+                        last_dt = datetime.fromisoformat(last).replace(tzinfo=_tz.utc)
+                        if (datetime.now(_tz.utc) - last_dt).total_seconds() < 600:
+                            continue  # synced within last 10 min
+                    except Exception:
+                        pass
+                try:
+                    _ss.sync_lead_stages(c["id"], cid)
+                except Exception as _se:
+                    app.logger.warning(f"Stage sync failed for {cid}: {_se}")
+        _sync_conn.close()
+    except Exception as _e:
+        app.logger.warning(f"Stage sync skipped: {_e}")
+
     client_stats = []
     for c in clients:
         # Collect all campaign IDs: top-level + any in campaigns array
@@ -929,6 +965,7 @@ def dashboard():
         if not _camp_labels and c.get("campaign_name"):
             _camp_labels = [c["campaign_name"]]
         _camp_display = " + ".join(_camp_labels) if _camp_labels else "-"
+        funnel = get_client_funnel(c["id"], list(all_cids))
         client_stats.append({
             "id":               c["id"],
             "name":             c.get("firm_name", c["id"]),
@@ -937,6 +974,7 @@ def dashboard():
             "active":           c.get("active", False),
             "onboarding_status": c.get("onboarding_status", "email_setup"),
             "campaign_name":    _camp_display,
+            "funnel":           funnel,
             **m,
         })
 
@@ -1135,6 +1173,7 @@ def client_detail(client_id):
             cm["campaign_name"] = camp.get("campaign_name", cid[:16] + "...")
             cm["icp_label"]     = camp.get("icp_label", "")
             cm["active"]        = camp.get("active", True)
+            cm["funnel"]        = get_campaign_funnel(client_id, cid)
             campaigns_metrics.append(cm)
 
     campaign_ids = [c.get("instantly_campaign_id") for c in campaigns_list if c.get("instantly_campaign_id")]

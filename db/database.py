@@ -31,6 +31,8 @@ def init_db():
         "ALTER TABLE events ADD COLUMN campaign_id TEXT",
         "ALTER TABLE campaigns ADD COLUMN icp_label TEXT",
         "ALTER TABLE campaigns ADD COLUMN prospects_csv TEXT",
+        "ALTER TABLE prospects ADD COLUMN subsequence_count INTEGER DEFAULT 0",
+        "ALTER TABLE prospects ADD COLUMN replied_at TEXT",
     ]
     for stmt in _migrations:
         try:
@@ -354,6 +356,54 @@ def mark_follow_up_sent(pid: str):
                  (datetime.utcnow().isoformat(), pid))
     conn.commit()
     conn.close()
+
+
+def get_campaign_funnel(client_id: str, campaign_id: str) -> dict:
+    """Return funnel breakdown for a campaign from DB prospect stages."""
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT stage, COUNT(*) as cnt
+        FROM prospects
+        WHERE client_id = ? AND campaign_id = ?
+        GROUP BY stage
+    """, (client_id, campaign_id)).fetchall()
+    total = conn.execute(
+        "SELECT COUNT(*) FROM prospects WHERE client_id = ? AND campaign_id = ?",
+        (client_id, campaign_id)
+    ).fetchone()[0]
+    replied_events = conn.execute("""
+        SELECT COUNT(DISTINCT p.id) FROM prospects p
+        JOIN events e ON e.prospect_id = p.id
+        WHERE p.client_id = ? AND p.campaign_id = ?
+          AND e.event_type = 'classified'
+    """, (client_id, campaign_id)).fetchone()[0]
+    conn.close()
+
+    stage_counts = {r[0]: r[1] for r in rows if r[0]}
+    t1 = sum(stage_counts.get(s, 0) for s in ["touch_1_sent","touch_2_sent","touch_3_sent","replied","sequence_complete"])
+    t2 = sum(stage_counts.get(s, 0) for s in ["touch_2_sent","touch_3_sent","replied","sequence_complete"])
+    t3 = sum(stage_counts.get(s, 0) for s in ["touch_3_sent","replied","sequence_complete"])
+    replied = max(stage_counts.get("replied", 0) + stage_counts.get("sequence_complete", 0), replied_events)
+    complete = stage_counts.get("sequence_complete", 0)
+    return {
+        "total":             total,
+        "touch_1_sent":      t1,
+        "touch_2_sent":      t2,
+        "touch_3_sent":      t3,
+        "replied":           replied,
+        "sequence_complete": complete,
+    }
+
+
+def get_client_funnel(client_id: str, campaign_ids: list) -> dict:
+    """Sum funnel across all campaigns for a client."""
+    totals = {"total": 0, "touch_1_sent": 0, "touch_2_sent": 0,
+              "touch_3_sent": 0, "replied": 0, "sequence_complete": 0}
+    for cid in campaign_ids:
+        f = get_campaign_funnel(client_id, cid)
+        for k in totals:
+            totals[k] += f.get(k, 0)
+    return totals
 
 
 def sync_client_from_config(c: dict):
