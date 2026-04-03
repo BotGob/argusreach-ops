@@ -611,6 +611,21 @@ def vapi_webhook():
         except Exception as e:
             print(f"[Vapi] DB log error: {e}")
 
+    # Write to DNC if prospect opted out on the call
+    if outcome == "not_interested" and client_id and prospect_email:
+        try:
+            dnc_global = BASE_DIR / "monitor" / "dnc" / "global.txt"
+            dnc_client = BASE_DIR / "monitor" / "dnc" / f"{client_id}.txt"
+            for dnc_file in [dnc_global, dnc_client]:
+                dnc_file.parent.mkdir(parents=True, exist_ok=True)
+                existing = set(dnc_file.read_text().splitlines()) if dnc_file.exists() else set()
+                if prospect_email.lower() not in existing:
+                    with open(dnc_file, "a") as f:
+                        f.write(prospect_email.lower() + "\n")
+            print(f"[Vapi] DNC: {prospect_email} added to global + client DNC")
+        except Exception as e:
+            print(f"[Vapi] DNC write error: {e}")
+
     # Send follow-up email for answered calls (interested or general answer)
     if outcome in ("answered", "interested", "voicemail") and client_id and prospect_email:
         try:

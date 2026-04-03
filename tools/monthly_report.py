@@ -78,6 +78,19 @@ def pull_db_stats(client_id, month_str):
         (client_id, start, end)
     ).fetchone()[0]
 
+    calls_made       = conn.execute(
+        "SELECT COUNT(*) FROM events WHERE event_type LIKE 'call_%' AND client_id=? AND date(created_at) BETWEEN ? AND ?",
+        (client_id, start, end)
+    ).fetchone()[0]
+    calls_answered   = conn.execute(
+        "SELECT COUNT(*) FROM events WHERE event_type='call_answered' AND client_id=? AND date(created_at) BETWEEN ? AND ?",
+        (client_id, start, end)
+    ).fetchone()[0]
+    calls_interested = conn.execute(
+        "SELECT COUNT(*) FROM events WHERE event_type='call_interested' AND client_id=? AND date(created_at) BETWEEN ? AND ?",
+        (client_id, start, end)
+    ).fetchone()[0]
+
     conn.close()
     return {
         'prospects':        prospects,
@@ -86,6 +99,9 @@ def pull_db_stats(client_id, month_str):
         'reply_negative':   breakdown.get('negative', 0),
         'reply_escalated':  breakdown.get('escalated', 0),
         'meetings':         meetings,
+        'calls_made':       calls_made,
+        'calls_answered':   calls_answered,
+        'calls_interested': calls_interested,
     }
 
 
@@ -236,6 +252,20 @@ def build_report_html(client, month, stats, notes=None, history=None, funnel=Non
     sent       = stats.get('emails_sent', '—')
     interested = stats['reply_interested']
     funnel_html = build_funnel_html(funnel or {})
+
+    # Call stats (optional — only shown if voice calling was active)
+    calls_made       = stats.get('calls_made', 0)
+    calls_answered   = stats.get('calls_answered', 0)
+    calls_interested = stats.get('calls_interested', 0)
+    calls_html = f"""
+  <div style="padding:0 40px 28px;">
+    <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9ca3af;margin-bottom:14px;">Voice Follow-up</div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 0;color:#6b7280;">Calls made</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#111827;">{calls_made}</td></tr>
+      <tr style="border-bottom:1px solid #f3f4f6;"><td style="padding:8px 0;color:#6b7280;">Answered</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#111827;">{calls_answered}</td></tr>
+      <tr><td style="padding:8px 0;color:#6b7280;">Expressed interest</td><td style="padding:8px 0;text-align:right;font-weight:600;color:#15803d;">{calls_interested}</td></tr>
+    </table>
+  </div>""" if calls_made > 0 else ''
     not_now    = stats['reply_not_now']
     meetings   = stats['meetings']
 
@@ -339,6 +369,9 @@ def build_report_html(client, month, stats, notes=None, history=None, funnel=Non
 
   <!-- Sequence Funnel -->
   {funnel_html}
+
+  <!-- Voice Calls -->
+  {calls_html}
 
   <!-- History timeline -->
   {timeline_html}

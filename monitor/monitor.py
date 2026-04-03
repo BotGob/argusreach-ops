@@ -1924,6 +1924,18 @@ def run():
                 check_campaign_cycles(clients if clients else [])
                 run._last_sync = datetime.utcnow()
 
+            # Voice call trigger — fires calls for clients with voice_calling_enabled
+            try:
+                voice_clients = [c for c in (clients or []) if c.get('voice_calling_enabled') and c.get('active')]
+                if voice_clients:
+                    sys.path.insert(0, str(BASE_DIR.parent / 'tools'))
+                    import call_trigger as _ct
+                    import importlib as _il; _il.reload(_ct)
+                    for vc in voice_clients:
+                        _ct.run_call_trigger(vc['id'], dry_run=False)
+            except Exception as _ve:
+                log(f"Voice call trigger error (non-fatal): {_ve}")
+
         except Exception as e:
             log(f"Main loop error: {e}")
 

@@ -550,13 +550,14 @@ def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
             "last_name":            c.get("last_name", ""),
             "company_name":         c.get("company") or c.get("company_name", ""),
             "skip_if_in_workspace": False,
-            # Personalization fields — available in sequences as {{city}}, {{title}}, {{state}}
+            # Personalization fields
             "city":                 c.get("city", ""),
             "state":                c.get("state", ""),
             "custom_variables": {
                 "title":        c.get("title", ""),
                 "city":         c.get("city", ""),
                 "state":        c.get("state", ""),
+                "phone":        c.get("phone", ""),
                 "custom_intro": c.get("custom_intro", ""),
             },
         }
@@ -607,6 +608,9 @@ def load_to_instantly(contacts, campaign_id, dry_run=False, client_id=None):
                 last_name   = c.get("last_name",  ""),
                 company     = c.get("company") or c.get("company_name", ""),
                 stage       = "added",
+                phone       = c.get("phone", ""),
+                city        = c.get("city", ""),
+                state       = c.get("state", ""),
             )
             db_loaded += 1
         print(f"💾 {db_loaded} prospects pre-loaded into ArgusReach DB (stage: added)")
@@ -618,7 +622,7 @@ def write_csv(contacts, client_id, month_name):
     slug     = month_name.lower().replace(" ", "_")
     out_path = CAMPAIGNS_DIR / client_id / f"prospects_{slug}.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fields   = ["first_name","last_name","email","company","title","city","state","linkedin_url"]
+    fields   = ["first_name","last_name","email","company","title","city","state","phone","linkedin_url"]
     with open(out_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
@@ -927,6 +931,13 @@ def normalize_apollo_csv(rows):
         "company website":   "organization_website_url",
         "company website url": "organization_website_url",
         "organization_website_url": "organization_website_url",
+        # Phone number fields
+        "phone":             "phone",
+        "phone number":      "phone",
+        "mobile phone":      "phone",
+        "direct phone":      "phone",
+        "work phone":        "phone",
+        "work direct phone": "phone",
         # already-internal passthrough
         "first_name":        "first_name",
         "last_name":         "last_name",
@@ -940,7 +951,7 @@ def normalize_apollo_csv(rows):
             if mapped and mapped not in n:
                 n[mapped] = val.strip() if val else ""
         # Ensure required keys exist
-        for k in ("first_name","last_name","email","company","title","city","state","linkedin_url","organization_website_url"):
+        for k in ("first_name","last_name","email","company","title","city","state","phone","linkedin_url","organization_website_url"):
             n.setdefault(k, "")
         if n.get("email"):
             normalized.append(n)

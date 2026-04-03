@@ -60,7 +60,7 @@
 
 {# ── ACTIVE: KEY METRICS BAR ─────────────────────────────────────── #}
 {% if client.active %}
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:20px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:{% if client.get('voice_calling_enabled') %}10{% else %}20{% endif %}px">
   {% for label, val, color in [
     ('Leads', metrics.leads, '#e2e8f0'),
     ('Sent', metrics.total_sent, '#4ade80'),
@@ -77,6 +77,22 @@
   </div>
   {% endfor %}
 </div>
+
+{% if client.active and client.get('voice_calling_enabled') %}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:20px">
+  {% for label, val, color in [
+    ('Calls Made', metrics.calls_made, '#e2e8f0'),
+    ('Answered', metrics.calls_answered, '#60a5fa'),
+    ('Voicemail', metrics.calls_voicemail, '#facc15'),
+    ('Interested', metrics.calls_interested, '#4ade80'),
+  ] %}
+  <div style="background:#0f172a;border:1px solid #1e3a5f;border-radius:8px;padding:12px 14px;text-align:center">
+    <div style="font-size:20px;font-weight:700;color:{{ color }};line-height:1">{{ val }}</div>
+    <div style="font-size:10px;color:#475569;margin-top:4px;text-transform:uppercase;letter-spacing:.05em">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
 
 {# Monitor status bar #}
 <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid {% if monitor_status.running %}rgba(74,222,128,0.2){% else %}rgba(248,113,113,0.25){% endif %};border-radius:8px;padding:9px 14px;margin-bottom:20px;flex-wrap:wrap;gap:8px">
@@ -503,11 +519,27 @@
               <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused</option>
             </select>
           </div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Voice Calling</label>
+            <select name="voice_calling_enabled" style="font-size:12px">
+              <option value="false" {% if not client.get('voice_calling_enabled') %}selected{% endif %}>⏸ Off</option>
+              <option value="true" {% if client.get('voice_calling_enabled') %}selected{% endif %}>📞 Enabled</option>
+            </select>
+          </div>
           <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Link</label><input name="calendly_link" value="{{ client.get('calendly_link','') }}" placeholder="https://calendly.com/…" style="font-size:12px"></div>
           <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Event Slug</label><input name="calendly_event_slug" value="{{ client.get('calendly_event_slug','') }}" style="font-size:12px"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
       </form>
+      {% if client.get('voice_calling_enabled') %}
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #1e293b">
+        <div style="font-size:11px;color:#64748b;margin-bottom:8px">📞 Test Voice Call</div>
+        <form method="POST" action="{{ url_for('test_call', client_id=client.id) }}" style="display:flex;gap:8px;align-items:center">
+          <input name="phone" placeholder="+15551234567" style="font-size:12px;width:160px;font-family:monospace">
+          <button type="submit" class="btn btn-ghost btn-sm" style="font-size:11px">Fire Test Call</button>
+        </form>
+        <div style="font-size:10px;color:#334155;margin-top:4px">Calls your number so you can hear exactly what prospects hear.</div>
+      </div>
+      {% endif %}
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid #1e293b;font-size:12px;color:#475569">
         <strong style="color:#64748b">Client ID:</strong> {{ client.id }} ·
         <strong style="color:#64748b">Plan:</strong> {{ client.plan }} ·

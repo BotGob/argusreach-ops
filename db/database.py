@@ -33,6 +33,10 @@ def init_db():
         "ALTER TABLE campaigns ADD COLUMN prospects_csv TEXT",
         "ALTER TABLE prospects ADD COLUMN subsequence_count INTEGER DEFAULT 0",
         "ALTER TABLE prospects ADD COLUMN replied_at TEXT",
+        "ALTER TABLE prospects ADD COLUMN phone TEXT DEFAULT ''",
+        "ALTER TABLE prospects ADD COLUMN timezone TEXT DEFAULT ''",
+        "ALTER TABLE prospects ADD COLUMN call_status TEXT DEFAULT ''",
+        "ALTER TABLE prospects ADD COLUMN called_at TEXT DEFAULT ''",
     ]
     for stmt in _migrations:
         try:
@@ -291,23 +295,53 @@ def get_client_consolidated_metrics(client_id: str, campaign_ids: list) -> dict:
 
 def upsert_prospect(client_id: str, campaign_id: str, email: str,
                     first_name: str = "", last_name: str = "",
-                    company: str = "", stage: str = "added"):
+                    company: str = "", stage: str = "added",
+                    phone: str = "", city: str = "", state: str = ""):
     pid = prospect_id(client_id, email)
     now = datetime.utcnow().isoformat()
+    # Derive timezone from state
+    tz = _state_to_timezone(state) if state else ""
     conn = get_db()
     conn.execute("""
-        INSERT INTO prospects (id, client_id, campaign_id, email, first_name, last_name, company, stage, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO prospects (id, client_id, campaign_id, email, first_name, last_name, company, stage, phone, timezone, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
-            stage = excluded.stage,
+            stage      = excluded.stage,
             first_name = COALESCE(NULLIF(excluded.first_name,''), first_name),
             last_name  = COALESCE(NULLIF(excluded.last_name,''),  last_name),
             company    = COALESCE(NULLIF(excluded.company,''),    company),
+            phone      = COALESCE(NULLIF(excluded.phone,''),      phone),
+            timezone   = COALESCE(NULLIF(excluded.timezone,''),   timezone),
             updated_at = excluded.updated_at
-    """, (pid, client_id, campaign_id, email.lower(), first_name, last_name, company, stage, now, now))
+    """, (pid, client_id, campaign_id, email.lower(), first_name, last_name, company, stage, phone, tz, now, now))
     conn.commit()
     conn.close()
     return pid
+
+
+def _state_to_timezone(state: str) -> str:
+    """Map US state abbreviation or name to IANA timezone. Best effort."""
+    ET = "America/New_York"
+    CT = "America/Chicago"
+    MT = "America/Denver"
+    PT = "America/Los_Angeles"
+    STATE_TZ = {
+        # Eastern
+        "CT":"CT","DE":ET,"FL":ET,"GA":ET,"IN":ET,"KY":ET,"MA":ET,"MD":ET,"ME":ET,
+        "MI":ET,"NC":ET,"NH":ET,"NJ":ET,"NY":ET,"OH":ET,"PA":ET,"RI":ET,"SC":ET,
+        "TN":ET,"VA":ET,"VT":ET,"WV":ET,"DC":ET,
+        # Central
+        "AL":CT,"AR":CT,"IA":CT,"IL":CT,"KS":CT,"LA":CT,"MN":CT,"MO":CT,"MS":CT,
+        "ND":CT,"NE":CT,"OK":CT,"SD":CT,"TX":CT,"WI":CT,
+        # Mountain
+        "AZ":"America/Phoenix","CO":MT,"ID":MT,"MT":MT,"NM":MT,"UT":MT,"WY":MT,
+        # Pacific
+        "CA":PT,"NV":PT,"OR":PT,"WA":PT,
+        # Hawaii/Alaska
+        "AK":"America/Anchorage","HI":"Pacific/Honolulu",
+    }
+    s = state.strip().upper()[:2]
+    return STATE_TZ.get(s, ET)  # default Eastern
 
 
 def update_prospect_stage(pid: str, stage: str):

@@ -561,6 +561,10 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     # DISTINCT id within each campaign still prevents double-counting within a single campaign.
     leads_db          = conn.execute("SELECT COUNT(*) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
+    calls_made        = conn.execute("SELECT COUNT(*) FROM events WHERE event_type LIKE 'call_%' AND client_id=?", (client_id,)).fetchone()[0]
+    calls_answered    = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_answered' AND client_id=?", (client_id,)).fetchone()[0]
+    calls_interested  = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_interested' AND client_id=?", (client_id,)).fetchone()[0]
+    calls_voicemail   = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_voicemail' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
 
     breakdown     = {r[0]: r[1] for r in reply_rows if r[0]}
@@ -623,6 +627,10 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
         "open_count":        open_count,
         "open_rate":         "N/A",
         "reply_rate":        f"{(total_replies/leads*100):.1f}%" if leads > 0 else "-",
+        "calls_made":        calls_made,
+        "calls_answered":    calls_answered,
+        "calls_interested":  calls_interested,
+        "calls_voicemail":   calls_voicemail,
     }
 
 def fetch_instantly_analytics(campaign_id=None):
@@ -1342,6 +1350,39 @@ def client_status_update(client_id):
     return redirect(url_for("client_detail", client_id=client_id))
 
 
+@app.route("/clients/<client_id>/test-call", methods=["POST"])
+@login_required
+def test_call(client_id):
+    """Fire a test Vapi call to a specified phone number."""
+    client, _ = get_client_by_id(client_id)
+    if not client:
+        flash("Client not found.", "error")
+        return redirect(url_for("dashboard"))
+    phone = request.form.get("phone", "").strip()
+    if not phone:
+        flash("Phone number required.", "error")
+        return redirect(url_for("client_detail", client_id=client_id))
+    try:
+        sys.path.insert(0, str(BASE_DIR / "tools"))
+        import vapi_caller as _vc
+        import importlib; importlib.reload(_vc)
+        prospect = {
+            "first_name": "Test",
+            "last_name":  "Prospect",
+            "email":      "test@example.com",
+            "company":    "Test Practice",
+            "phone":      phone,
+        }
+        result = _vc.fire_call(client, prospect)
+        if result.get("id"):
+            flash(f"📞 Test call fired to {phone}. Call ID: {result['id'][:16]}...", "success")
+        else:
+            flash("Call failed - check Vapi API key and phone number ID in .env", "error")
+    except Exception as e:
+        flash(f"Test call error: {e}", "error")
+    return redirect(url_for("client_detail", client_id=client_id))
+
+
 @app.route("/clients/<client_id>/offboard", methods=["POST"])
 @login_required
 def client_offboard(client_id):
@@ -1396,6 +1437,8 @@ def client_update(client_id):
         client["launch_date"] = f["launch_date"].strip()
     if "active" in f:
         client["active"] = f["active"] == "true"
+    if "voice_calling_enabled" in f:
+        client["voice_calling_enabled"] = f["voice_calling_enabled"] == "true"
     if "calendly_event_slug" in f:
         client["calendly_event_slug"] = f["calendly_event_slug"].strip()
     if "calendly_link" in f:
