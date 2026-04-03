@@ -114,12 +114,19 @@ RULES:
         "name": f"ArgusReach - {client_name} Follow-up",
         "firstMessage": f"",  # empty - model waits for human to speak first
         "firstMessageMode": "assistant-waits-for-user",
+        "transcriber": {
+            "provider": "deepgram",
+            "model": "nova-2",
+            "language": "en-US",
+            "smartFormat": True,
+            "endpointing": 300,  # ms to wait after silence before processing - lower = more responsive
+        },
         "model": {
-            "provider": "openai",
-            "model": "gpt-4o-mini",
+            "provider": "groq",
+            "model": "llama-3.3-70b-versatile",  # fastest inference available, good reasoning
             "messages": [{"role": "system", "content": system_prompt}],
             "temperature": 0.7,
-            "maxTokens": 500,
+            "maxTokens": 200,  # keep responses short for phone calls
         },
         "voice": {
             "provider": "11labs",
