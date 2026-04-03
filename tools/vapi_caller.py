@@ -161,11 +161,17 @@ def fire_call(client: dict, prospect: dict, dry_run: bool = False) -> dict:
     Fire an outbound call via Vapi for a prospect.
     Returns the Vapi call object or a dry_run stub.
     """
-    if not VAPI_API_KEY:
+    # Re-read env vars at call time (handles reload() in app.py)
+    from dotenv import load_dotenv as _lde
+    _lde(BASE_DIR / "monitor" / ".env", override=True)
+    api_key  = os.environ.get("VAPI_API_KEY", "") or VAPI_API_KEY
+    phone_id = os.environ.get("VAPI_PHONE_NUMBER_ID", "") or VAPI_PHONE_ID
+
+    if not api_key:
         print("No VAPI_API_KEY configured — skipping call")
         return {}
 
-    if not VAPI_PHONE_ID:
+    if not phone_id:
         print("No VAPI_PHONE_NUMBER_ID configured — skipping call")
         return {}
 
@@ -190,7 +196,7 @@ def fire_call(client: dict, prospect: dict, dry_run: bool = False) -> dict:
 
     payload = {
         "assistant":     assistant,
-        "phoneNumberId": VAPI_PHONE_ID,
+        "phoneNumberId": phone_id,
         "customer": {
             "number": phone,
             "name":   f"{prospect.get('first_name','')} {prospect.get('last_name','')}".strip(),
@@ -205,7 +211,7 @@ def fire_call(client: dict, prospect: dict, dry_run: bool = False) -> dict:
     try:
         r = requests.post(
             f"{VAPI_BASE}/call",
-            headers={"Authorization": f"Bearer {VAPI_API_KEY}", "Content-Type": "application/json"},
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json=payload,
             timeout=15,
         )
