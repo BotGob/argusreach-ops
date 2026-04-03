@@ -36,8 +36,15 @@ load_dotenv(BASE_DIR / "monitor" / ".env")
 
 from db.database import get_db, init_db
 
-DAILY_CALL_LIMIT = 30   # max calls per client per day
-CALL_DELAY_SEC   = 30   # seconds between calls to avoid rate limits
+# Daily call limits per plan
+DAILY_CALL_LIMITS = {
+    "starter": 20,
+    "growth":  40,
+    "scale":   80,
+}
+DEFAULT_DAILY_LIMIT = 20
+CALL_DELAY_SEC       = 30   # seconds between calls — sequential, never simultaneous
+MIN_SEND_RATIO       = 1.8  # emails_sent/leads must be >= this before calling starts
 
 
 def is_business_hours(tz_str: str) -> bool:
@@ -109,10 +116,15 @@ def get_eligible_prospects(client_id: str, campaign_ids: list) -> list:
               WHERE event_type LIKE 'call_%'
                 AND client_id = ?
           )
+          AND p.id NOT IN (
+              SELECT DISTINCT prospect_id FROM events
+              WHERE event_type = 'meeting_booked'
+                AND client_id = ?
+          )
           AND p.stage NOT IN ('replied', 'sequence_complete', 'unsubscribed')
-        ORDER BY p.created_at ASC
+        ORDER BY p.created_at ASC  -- oldest first: furthest along in sequence
         LIMIT 50
-    """, [client_id] + campaign_ids + [client_id, client_id]).fetchall()
+    """, [client_id] + campaign_ids + [client_id, client_id, client_id]).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -136,11 +148,15 @@ def run_call_trigger(client_id: str, dry_run: bool = False) -> dict:
     if not client.get("active", False):
         return {"skipped": "client not active"}
 
+    # Plan-based daily limit
+    plan = client.get("plan", "starter").lower()
+    daily_limit = DAILY_CALL_LIMITS.get(plan, DEFAULT_DAILY_LIMIT)
+
     # Check daily limit
     daily_count = get_daily_call_count(client_id)
-    if daily_count >= DAILY_CALL_LIMIT:
-        print(f"  [{client_id}] Daily call limit reached ({daily_count}/{DAILY_CALL_LIMIT}) — skipping")
-        return {"skipped": f"daily limit {daily_count}/{DAILY_CALL_LIMIT}"}
+    if daily_count >= daily_limit:
+        print(f"  [{client_id}] Daily call limit reached ({daily_count}/{daily_limit}) — skipping")
+        return {"skipped": f"daily limit {daily_count}/{daily_limit}"}
 
     # Get all active campaign IDs
     campaign_ids = list({
@@ -150,14 +166,39 @@ def run_call_trigger(client_id: str, dry_run: bool = False) -> dict:
         if cid
     })
 
+    # Gate 1 — confirm T2 has gone out (emails_sent / leads >= 1.8)
+    # Uses Instantly analytics to ensure we're not calling people before T2
+    try:
+        import os as _os, requests as _req
+        _key = _os.environ.get("INSTANTLY_API_KEY", "")
+        if _key and campaign_ids:
+            total_sent = 0
+            total_leads = 0
+            for cid in campaign_ids:
+                _r = _req.get(
+                    "https://api.instantly.ai/api/v2/campaigns/analytics",
+                    headers={"Authorization": f"Bearer {_key}"},
+                    params={"id": cid}, timeout=10
+                )
+                if _r.ok:
+                    for a in (_r.json() if isinstance(_r.json(), list) else [_r.json()]):
+                        total_sent  += a.get("emails_sent_count", 0)
+                        total_leads += a.get("leads_count", 0) or 1
+            ratio = total_sent / total_leads if total_leads > 0 else 0
+            print(f"  [{client_id}] Send ratio: {total_sent}/{total_leads} = {ratio:.2f} (need >= {MIN_SEND_RATIO})")
+            if ratio < MIN_SEND_RATIO:
+                return {"skipped": f"send ratio {ratio:.2f} < {MIN_SEND_RATIO} — T2 not yet sent to enough contacts"}
+    except Exception as _e:
+        print(f"  [{client_id}] Send ratio check failed (non-fatal): {_e}")
+
     prospects = get_eligible_prospects(client_id, campaign_ids)
     if not prospects:
         return {"called": 0, "message": "no eligible prospects"}
 
-    remaining_today = DAILY_CALL_LIMIT - daily_count
+    remaining_today = daily_limit - daily_count
     to_call = prospects[:remaining_today]
 
-    print(f"  [{client_id}] {len(prospects)} eligible, calling {len(to_call)} today (limit: {DAILY_CALL_LIMIT}/day)")
+    print(f"  [{client_id}] {len(prospects)} eligible, calling {len(to_call)} today (limit: {daily_limit}/day)")
 
     # Import caller
     sys.path.insert(0, str(BASE_DIR / "tools"))
@@ -195,7 +236,7 @@ def run_call_trigger(client_id: str, dry_run: bool = False) -> dict:
         "skipped_hours":   skipped_hours,
         "eligible":        len(prospects),
         "daily_count":     daily_count + called,
-        "daily_limit":     DAILY_CALL_LIMIT,
+        "daily_limit":     daily_limit,
     }
     print(f"  [{client_id}] Call trigger done: {summary}")
     return summary
