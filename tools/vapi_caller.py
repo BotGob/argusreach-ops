@@ -41,7 +41,8 @@ def build_assistant(client: dict, prospect: dict) -> dict:
     Build a transient Vapi assistant config for this specific client + prospect.
     Script is personalized to the client's firm and the prospect's name/company.
     """
-    client_name  = client.get("firm_name", "our client")
+    # Ensure compound names are spoken naturally (e.g. "ArgusReach" -> "Argus Reach")
+    client_name  = client.get("firm_name", "our client").replace("ArgusReach", "Argus Reach")
     sender_name  = client.get("sender_name", "our team")
     prospect_first = prospect.get("first_name", "there")
     prospect_company = prospect.get("company", "your practice")
