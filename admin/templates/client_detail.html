@@ -12,85 +12,129 @@
 {% set seq_ok       = cl.get('sequence_approved') %}
 {% set payment_ok   = cl.get('payment_confirmed') %}
 {% set cal_ok       = cl.get('calendar_connected') %}
-{# icp_reviewed removed - ICP captured at intake #}
 {% set campaign_ok  = client.get('instantly_campaign_id') %}
 {% set pre_payment_gates = dns_ok and warmup_ok and seq_ok and cal_ok %}
 {% set all_gates    = pre_payment_gates and payment_ok %}
 
 {# ── HEADER ──────────────────────────────────────────────────────── #}
-<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4ade80;margin-bottom:8px;font-family:'JetBrains Mono',monospace">Client Profile</div>
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
-  <h1 style="margin:0">{{ client.firm_name }}</h1>
-  {% if client.active %}
-    <span class="badge badge-green">● Live</span>
-  {% elif os == 'email_setup' %}
-    <span style="font-size:11px;background:#1e3a5f;color:#60a5fa;padding:3px 10px;border-radius:20px;border:1px solid #2563eb44">📬 Email setup</span>
-  {% elif os == 'warming_up' %}
-    <span style="font-size:11px;background:#14301a;color:#4ade80;padding:3px 10px;border-radius:20px;border:1px solid #4ade8044">🔥 Warming up</span>
-  {% elif os == 'dns_pending' %}
-    <span style="font-size:11px;background:#2d2008;color:#fbbf24;padding:3px 10px;border-radius:20px;border:1px solid #fbbf2444">🔍 DNS pending</span>
-  {% elif os == 'pending_review' %}
-    <span style="font-size:11px;background:#2d2008;color:#facc15;padding:3px 10px;border-radius:20px;border:1px solid #facc1544">👀 Pending review</span>
-  {% elif os == 'ready_to_launch' %}
-    <span style="font-size:11px;background:#2d1200;color:#fb923c;padding:3px 10px;border-radius:20px;border:1px solid #fb923c44">🚀 Ready to launch</span>
-  {% elif os == 'offboarding' %}
-    <span style="font-size:11px;background:#2d0f0f;color:#f87171;padding:3px 10px;border-radius:20px;border:1px solid #f8717144">⛔ Offboarding</span>
-  {% else %}
-    <span class="badge badge-gray">⏸ Paused</span>
-  {% endif %}
-  <span style="font-size:11px;background:#1e293b;color:#64748b;padding:3px 10px;border-radius:20px;border:1px solid #334155">
-    {{ client.plan|upper }} · {{ client.contacts_per_month }} contacts/mo
-  </span>
-</div>
-<p class="subtitle" style="margin-bottom:20px">
-  {{ client.vertical }} · {{ client.outreach_email or '- no outreach email yet' }} · {{ client.get('client_email','') }}
-</p>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+  <div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#475569;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Client Profile</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <h1 style="margin:0;font-size:22px">{{ client.firm_name }}</h1>
+      {% if client.active %}
+        <span class="badge badge-green">● Live</span>
+      {% elif os == 'ready_to_launch' %}
+        <span style="font-size:11px;background:#2d1200;color:#fb923c;padding:3px 10px;border-radius:20px;border:1px solid #fb923c44">🚀 Ready to launch</span>
+      {% elif os == 'warming_up' %}
+        <span style="font-size:11px;background:#14301a;color:#4ade80;padding:3px 10px;border-radius:20px;border:1px solid #4ade8044">🔥 Warming up</span>
+      {% elif os == 'dns_pending' %}
+        <span style="font-size:11px;background:#2d2008;color:#fbbf24;padding:3px 10px;border-radius:20px;border:1px solid #fbbf2444">🔍 DNS pending</span>
+      {% elif os == 'email_setup' %}
+        <span style="font-size:11px;background:#1e3a5f;color:#60a5fa;padding:3px 10px;border-radius:20px;border:1px solid #2563eb44">📬 Email setup</span>
+      {% elif os == 'offboarding' %}
+        <span style="font-size:11px;background:#2d0f0f;color:#f87171;padding:3px 10px;border-radius:20px;border:1px solid #f8717144">⛔ Offboarding</span>
+      {% else %}
+        <span class="badge badge-gray">⏸ Paused</span>
+      {% endif %}
+      <span style="font-size:11px;background:#1e293b;color:#64748b;padding:3px 10px;border-radius:20px;border:1px solid #334155">
+        {{ client.plan|upper }} · {{ client.contacts_per_month }} contacts/mo
+      </span>
+    </div>
+    <div style="font-size:12px;color:#475569;margin-top:5px">
+      {{ client.vertical }}{% if client.outreach_email %} · {{ client.outreach_email }}{% endif %}{% if client.get('client_email') %} · {{ client.client_email }}{% endif %}
+    </div>
+  </div>
 
-{# ── PROGRESS PIPELINE ───────────────────────────────────────────── #}
+  {# Quick actions top-right #}
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    {% if client.active %}
+      <a href="{{ url_for('generate_report', client_id=client.id) }}" class="btn btn-ghost btn-sm">📊 Monthly Report</a>
+      <form method="POST" action="{{ url_for('client_offboard', client_id=client.id) }}"
+            onsubmit="return confirm('Offboard {{ client.firm_name }}? Campaign pauses, data preserved.')">
+        <button class="btn btn-ghost btn-sm" style="color:#ef4444;border-color:#ef444433">⛔ Offboard</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+{# ── ACTIVE: KEY METRICS BAR ─────────────────────────────────────── #}
+{% if client.active %}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:20px">
+  {% for label, val, color in [
+    ('Leads', metrics.leads, '#e2e8f0'),
+    ('Sent', metrics.total_sent, '#4ade80'),
+    ('Interested', metrics.reply_interested, '#4ade80'),
+    ('Not Now', metrics.reply_not_now, '#facc15'),
+    ('Removed', metrics.reply_negative, '#f87171'),
+    ('Escalated', metrics.reply_escalated, '#fb923c'),
+    ('Meetings', metrics.meetings, '#a855f7'),
+    ('Reply Rate', metrics.reply_rate, '#60a5fa'),
+  ] %}
+  <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px 14px;text-align:center">
+    <div style="font-size:20px;font-weight:700;color:{{ color }};line-height:1">{{ val }}</div>
+    <div style="font-size:10px;color:#475569;margin-top:4px;text-transform:uppercase;letter-spacing:.05em">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+{# Monitor status bar #}
+<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid {% if monitor_status.running %}rgba(74,222,128,0.2){% else %}rgba(248,113,113,0.25){% endif %};border-radius:8px;padding:9px 14px;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:7px;height:7px;border-radius:50%;background:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %};{% if monitor_status.running %}box-shadow:0 0 6px #4ade80{% endif %}"></div>
+    <span style="font-size:12px;font-weight:600;color:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %}">
+      Monitor {% if monitor_status.running %}running{% else %}⚠️ offline{% endif %}
+    </span>
+    {% if monitor_status.last_seen %}
+    <span style="font-size:11px;color:var(--muted)">Last cycle: {{ monitor_status.last_seen }}{% if monitor_status.age_minutes is not none %} ({{ monitor_status.age_minutes }}m ago){% endif %}</span>
+    {% endif %}
+  </div>
+  {% if not monitor_status.running %}
+  <span style="font-size:11px;color:#f87171">Monitor hasn't checked in for {{ monitor_status.age_minutes or '?' }} minutes - may need restart</span>
+  {% endif %}
+</div>
+{% endif %}
+
+{# ── PRE-LAUNCH: PIPELINE ─────────────────────────────────────────── #}
 {% if not client.active %}
 <div class="section" style="margin-bottom:20px">
-  <div class="section-title" style="margin-bottom:16px">📍 Onboarding Progress</div>
+  <div class="section-title" style="margin-bottom:14px">📍 Onboarding Progress</div>
 
-  {# Compute current step (first incomplete) #}
   {% set steps = [
-    ('intake',    '✅', 'Intake Approved',     True,      'Auto - on form submit.'),
-    ('creds',     '🔐', 'Email Credentials',   creds_ok,  'Auto - client submits via secure link.'),
-    ('warmup',    '🌡️', 'Warmup Running',      creds_ok,  'Auto - starts when credentials received.'),
-    ('followup',  '📨', 'Follow-up Email Sent',client.get('followup_sent'), 'Manual - Vito sends from portal.'),
-    ('dns',       '🔒', 'DNS Verified',         dns_ok,    'Auto - polled every 4h.'),
-    ('seq',       '✉️', 'Sequence Approved',    seq_ok,    'Manual - Vito checks after client confirms.'),
-    ('calendar',  '📅', 'Calendar Connected',   cal_ok,    'Manual - Vito confirms after client connects.'),
-    ('payment',   '💳', 'Payment Confirmed',    payment_ok,'Auto - Stripe webhook on payment.'),
-    ('launch',    '🚀', 'Campaign Launched',    campaign_ok and client.active, 'Manual - Vito reviews draft in Instantly, then activates.'),
+    ('intake',   '✅', 'Intake Approved',      True,                               'Auto - on form submit.'),
+    ('creds',    '🔐', 'Credentials',           creds_ok,                           'Auto - client submits via secure link.'),
+    ('warmup',   '🌡️', 'Warmup Running',        creds_ok,                           'Auto - starts when credentials received.'),
+    ('followup', '📨', 'Follow-up Sent',        client.get('followup_sent'),        'Manual - Vito sends from portal.'),
+    ('dns',      '🔒', 'DNS Verified',          dns_ok,                             'Auto - polled every 4h.'),
+    ('seq',      '✉️', 'Sequence Approved',     seq_ok,                             'Manual - Vito confirms.'),
+    ('calendar', '📅', 'Calendar Connected',    cal_ok,                             'Manual - Vito confirms.'),
+    ('payment',  '💳', 'Payment Confirmed',     payment_ok,                         'Auto - Stripe webhook.'),
+    ('launch',   '🚀', 'Campaign Launched',     campaign_ok and client.active,      'Manual - activate in Instantly.'),
   ] %}
 
-  {# Find active step index #}
   {% set ns = namespace(active_idx=8) %}
   {% for key, icon, label, done, hint in steps %}
     {% if not done and ns.active_idx == 8 %}{% set ns.active_idx = loop.index0 %}{% endif %}
   {% endfor %}
 
-  {# Render pipeline #}
-  <div style="display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;margin-bottom:16px">
+  <div style="display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;gap:0;margin-bottom:14px">
     {% for key, icon, label, done, hint in steps %}
     {% set is_active = loop.index0 == ns.active_idx %}
     <div style="display:flex;align-items:center;flex:0 0 auto">
-      <div style="display:flex;flex-direction:column;align-items:center;width:88px;text-align:center">
-        <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;
+      <div style="display:flex;flex-direction:column;align-items:center;width:82px;text-align:center">
+        <div style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;
           {% if done %}background:#052e16;border:2px solid #4ade80;color:#4ade80
           {% elif is_active %}background:rgba(251,191,36,0.08);border:2px solid #fbbf24;color:#fbbf24
           {% else %}background:#1e293b;border:2px solid #334155;color:#475569{% endif %}">
           {% if done %}✓{% else %}{{ loop.index }}{% endif %}
         </div>
-        <div style="font-size:10px;margin-top:5px;line-height:1.3;
+        <div style="font-size:9px;margin-top:4px;line-height:1.3;
           {% if done %}color:#4ade80{% elif is_active %}color:#fbbf24;font-weight:700{% else %}color:#475569{% endif %}">
           {{ label }}
         </div>
-        <div style="font-size:9px;margin-top:3px;line-height:1.2;color:#334155;text-align:center">{{ hint }}</div>
       </div>
       {% if not loop.last %}
-      <div style="width:12px;height:2px;flex-shrink:0;margin-bottom:18px;
-        {% if done %}background:#4ade80{% else %}background:#1e293b{% endif %}"></div>
+      <div style="width:10px;height:2px;flex-shrink:0;margin-bottom:14px;{% if done %}background:#4ade80{% else %}background:#1e293b{% endif %}"></div>
       {% endif %}
     </div>
     {% endfor %}
@@ -99,12 +143,11 @@
   {# Next action callout #}
   {% if ns.active_idx < 9 %}
   {% set cur = steps[ns.active_idx] %}
-  <div style="background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.25);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+  <div style="background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.2);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
     <div>
-      <div style="font-size:11px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Next step</div>
-      <div style="font-size:13px;color:#e2e8f0">{{ cur[2] }} - {{ cur[4] }}</div>
+      <div style="font-size:10px;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Next step</div>
+      <div style="font-size:13px;color:#e2e8f0">{{ cur[2] }} — {{ cur[4] }}</div>
     </div>
-    {# Contextual action button #}
     {% if ns.active_idx == 1 %}
       <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
         <button class="btn btn-primary btn-sm">📧 Send Credential Link</button>
@@ -116,571 +159,521 @@
     {% elif ns.active_idx == 4 %}
       <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank" class="btn btn-primary btn-sm">📋 Get DNS Records</a>
     {% elif ns.active_idx == 7 %}
-      <span style="font-size:12px;color:#64748b;padding:6px 12px;border-radius:6px;background:#1e293b;border:1px solid #334155">⏳ Waiting for Stripe payment webhook</span>
+      <span style="font-size:12px;color:#64748b;padding:6px 12px;border-radius:6px;background:#1e293b;border:1px solid #334155">⏳ Waiting for Stripe payment</span>
     {% endif %}
   </div>
   {% endif %}
 </div>
 {% endif %}
 
-{# ── ACTIVE CLIENT ACTIONS ───────────────────────────────────────── #}
-{% if client.active %}
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
-  <a href="{{ url_for('generate_report', client_id=client.id) }}" class="btn btn-ghost btn-sm">📊 Monthly Report</a>
-  <form method="POST" action="{{ url_for('client_offboard', client_id=client.id) }}"
-        onsubmit="return confirm('Offboard {{ client.firm_name }}? Campaign pauses, data preserved.')">
-    <button class="btn btn-ghost btn-sm" style="color:#ef4444;border-color:#ef444433">⛔ Offboard</button>
-  </form>
-</div>
-{% endif %}
+{# ── MAIN CONTENT: 2-COLUMN LAYOUT ───────────────────────────────── #}
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
 
-{# ── PRE-LAUNCH ACTIONS (non-active only) ────────────────────────── #}
-{% if not client.active %}
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
-  {% if not creds_ok %}
-  <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
-    <button class="btn btn-primary btn-sm">🔗 Send Credential Link</button>
-  </form>
-  {% endif %}
-  {% if creds_ok %}
-  <form method="POST" action="{{ url_for('send_followup_email', client_id=client.id) }}">
-    <button class="btn btn-ghost btn-sm" style="{% if not dns_ok %}border-color:#f59e0b;color:#f59e0b{% endif %}">
-      📨 Send Follow-up Email{% if not dns_ok %} ⚠️{% endif %}
-    </button>
-  </form>
-  <button id="auto-verify-btn" onclick="runAutoVerify()" class="btn btn-ghost btn-sm">🔍 Verify DNS &amp; Warmup</button>
-  <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank" class="btn btn-ghost btn-sm">📋 DNS Records</a>
-  {% endif %}
-  {% if not payment_ok %}
-  <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}">
-    <button class="btn btn-ghost btn-sm">💳 {% if client.get('stripe_payment_link') %}View{% else %}Generate{% endif %} Payment Link</button>
-  </form>
-  {% endif %}
-  {% if pre_payment_gates and client.get('stripe_payment_link') %}
-    {% if client.get('launch_email_sent_at') %}
-      <span style="font-size:12px;color:#64748b;padding:6px 12px;border-radius:6px;background:#1e293b;border:1px solid #334155;white-space:nowrap">
-        📧 Launch email sent {{ client.get('launch_email_sent_at') }}
-      </span>
-    {% else %}
-      <form method="POST" action="{{ url_for('send_launch_email', client_id=client.id) }}">
-        <button class="btn btn-sm" style="background:#4ade80;color:#000;font-weight:700;border:none">🚀 Send Ready-to-Launch Email</button>
-      </form>
-    {% endif %}
-  {% endif %}
-</div>
-{% endif %}
+{# ── LEFT COLUMN ─────────────────────────────────────────────────── #}
+<div>
 
-<div id="auto-verify-result" style="display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:14px;font-size:12px;line-height:1.7"></div>
-
-{# ── WARMUP SCORE BAR ────────────────────────────────────────────── #}
-{% if creds_ok and warmup_live.score is not none %}
-{% set ws = warmup_live.score|int %}
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-  <span style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0">Warmup</span>
-  <div style="flex:1;min-width:120px;max-width:180px;background:#1a2030;border-radius:4px;height:6px;overflow:hidden">
-    <div style="height:100%;width:{{ [ws,100]|min }}%;background:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %};border-radius:4px"></div>
-  </div>
-  <span style="font-size:13px;font-weight:700;color:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %}">{{ ws }}/100</span>
-  <span style="font-size:12px;color:var(--muted)">{% if ws >= 85 %}✅ Ready to launch{% elif ws >= 60 %}Getting there{% else %}Still warming{% endif %}</span>
-  {% if warmup_live.status == 0 %}<span style="font-size:11px;color:#f87171">⚠️ Warmup is OFF in Instantly - enable it</span>{% endif %}
-</div>
-{% endif %}
-
-{# ── CREDENTIAL STATUS ───────────────────────────────────────────── #}
-{% if creds_ok %}
-<div style="background:#052e16;border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-  <div style="font-size:12px;color:#4ade80">
-    🔐 Credentials received - {{ client._credentials_received_at }}
-    <span style="color:#475569;margin-left:8px">{{ client.get('outreach_email','') }}</span>
-  </div>
-  {% if conn_status %}
-    {% if conn_status.status == 'ok' %}
-      <span style="font-size:11px;color:#4ade80">📡 IMAP connected · {{ conn_status.checked_at }}</span>
-    {% elif conn_status.status == 'error' %}
-      <span style="font-size:11px;color:#f87171">⚠️ IMAP error · {{ conn_status.checked_at }}</span>
-    {% endif %}
-  {% else %}
-    <span style="font-size:11px;color:#475569">📡 Connection not yet tested</span>
-  {% endif %}
-  <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
-    <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="return confirm('This invalidates the current credentials. Are you sure?')">🔄 Resend Credential Link</button>
-  </form>
-</div>
-{% endif %}
-
-{# ── MONITOR STATUS (active clients only) ───────────────────────── #}
-{% if client.active %}
-<div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid {% if monitor_status.running %}rgba(74,222,128,0.2){% else %}rgba(248,113,113,0.25){% endif %};border-radius:8px;padding:10px 16px;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-  <div style="display:flex;align-items:center;gap:10px">
-    <div style="width:8px;height:8px;border-radius:50%;background:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %};{% if monitor_status.running %}box-shadow:0 0 6px #4ade80{% endif %}"></div>
-    <span style="font-size:12px;font-weight:600;color:{% if monitor_status.running %}#4ade80{% else %}#f87171{% endif %}">
-      Monitor {% if monitor_status.running %}running{% else %}⚠️ offline{% endif %}
-    </span>
-    {% if monitor_status.last_seen %}
-    <span style="font-size:11px;color:var(--muted)">Last cycle: {{ monitor_status.last_seen }}
-      {% if monitor_status.age_minutes is not none %}({{ monitor_status.age_minutes }}m ago){% endif %}
-    </span>
-    {% endif %}
-  </div>
-  {% if not monitor_status.running %}
-  <span style="font-size:11px;color:#f87171">Monitor hasn't checked in for {{ monitor_status.age_minutes or '?' }} minutes - may need restart</span>
-  {% endif %}
-</div>
-{% endif %}
-
-{# ── STATS (shown prominently when active, compact otherwise) ─────── #}
-{% if client.active %}
-<div class="cards" style="margin-bottom:16px">
-  <div class="card"><div class="card-label">Leads Uploaded</div><div class="card-value">{{ metrics.leads }}</div></div>
-  <div class="card"><div class="card-label">Total Sent</div><div class="card-value" style="color:#4ade80">{{ metrics.total_sent }}</div></div>
-  <div class="card"><div class="card-label">🙋 Interested</div><div class="card-value" style="color:#4ade80">{{ metrics.reply_interested }}</div></div>
-  <div class="card"><div class="card-label">🕐 Not Now</div><div class="card-value" style="color:#facc15">{{ metrics.reply_not_now }}</div></div>
-  <div class="card"><div class="card-label">❌ Removed</div><div class="card-value" style="color:#f87171">{{ metrics.reply_negative }}</div></div>
-  <div class="card"><div class="card-label">🚨 Escalated</div><div class="card-value" style="color:#fb923c">{{ metrics.reply_escalated }}</div></div>
-  <div class="card"><div class="card-label">📅 Meetings</div><div class="card-value" style="color:#a855f7">{{ metrics.meetings }}</div></div>
-  <div class="card"><div class="card-label">Open Rate</div><div class="card-value">{{ metrics.open_rate }}</div></div>
-  <div class="card"><div class="card-label">Reply Rate</div><div class="card-value">{{ metrics.reply_rate }}</div></div>
-</div>
-{% else %}
-<details style="margin-bottom:16px">
-  <summary style="font-size:12px;color:#475569;cursor:pointer;padding:4px 0">📊 View campaign stats</summary>
-  <div class="cards" style="margin-top:12px">
-    <div class="card"><div class="card-label">Leads</div><div class="card-value">{{ metrics.leads }}</div></div>
-    <div class="card"><div class="card-label">Sent</div><div class="card-value">{{ metrics.total_sent }}</div></div>
-    <div class="card"><div class="card-label">Interested</div><div class="card-value" style="color:#4ade80">{{ metrics.reply_interested }}</div></div>
-    <div class="card"><div class="card-label">Meetings</div><div class="card-value" style="color:#a855f7">{{ metrics.meetings }}</div></div>
-  </div>
-</details>
-{% endif %}
-
-{# ── SEQUENCE EDITOR ─────────────────────────────────────────────── #}
-<div class="section" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <div class="section-title" style="margin:0">✉️ Outreach Sequence</div>
-    {% if seq_ok %}
-      <span style="font-size:11px;background:#052e16;color:#4ade80;border:1px solid #166534;padding:3px 10px;border-radius:20px">✅ Approved</span>
-    {% else %}
-      <span style="font-size:11px;background:#1e293b;color:#64748b;border:1px solid #334155;padding:3px 10px;border-radius:20px">Awaiting client approval</span>
-    {% endif %}
-  </div>
-  <p style="font-size:12px;color:#64748b;margin-bottom:14px">Written from intake data. Edit here → save → include in follow-up email → client approves → check the box below.</p>
-  <form method="POST" action="{{ url_for('save_sequence', client_id=client.id) }}">
-    {% for i, touch in [(1, seq[0] if seq|length > 0 else {}), (2, seq[1] if seq|length > 1 else {}), (3, seq[2] if seq|length > 2 else {})] %}
-    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:11px;font-weight:700;color:#4ade80;letter-spacing:.08em;text-transform:uppercase">Touch {{ i }}</span>
-        {% if i > 1 %}
-        <span style="font-size:11px;color:#64748b">Sends
-          <input type="number" name="t{{ i }}_delay" value="{{ touch.get('delay_days', 5) }}" min="1" max="30"
-                 style="width:40px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:11px;text-align:center">
-          days after Touch {{ i - 1 }}</span>
-        {% else %}
-        <span style="font-size:11px;color:#64748b">Sends on launch day</span>
-        {% endif %}
+  {# ── CAMPAIGNS ─────────────────────────────────────────────────── #}
+  <div class="section" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="section-title" style="margin:0">📊 Campaigns</div>
+        {% set cc = campaigns_metrics|length if campaigns_metrics else (1 if client.instantly_campaign_id else 0) %}
+        <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
       </div>
-      <input type="text" name="t{{ i }}_subject" value="{{ touch.get('subject','') }}" placeholder="Subject line"
-             style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;margin-bottom:8px">
-      <textarea name="t{{ i }}_body" placeholder="Email body…" rows="5"
-                style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:5px;font-size:12px;line-height:1.5;resize:vertical">{{ touch.get('body','') }}</textarea>
+      <a href="{{ url_for('campaign_wizard', client_id=client.id) }}" class="btn btn-primary btn-sm">➕ New Campaign</a>
     </div>
-    {% endfor %}
-    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em">Send Schedule</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:10px">
-        {% for day in ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
-        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#94a3b8;cursor:pointer">
-          <input type="checkbox" name="send_days" value="{{ day }}"
-                 {% if day in (sched.get('send_days', ['monday','tuesday','wednesday','thursday','friday'])) %}checked{% endif %}
-                 style="accent-color:#4ade80">{{ day[:3]|capitalize }}
-        </label>
+
+    {# Consolidated summary (2+ campaigns) #}
+    {% if campaigns_metrics|length > 1 %}
+    <div style="background:#0d2137;border:1px solid #1e4070;border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#60a5fa;margin-bottom:8px">All Campaigns - Consolidated</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        {% for label, val, color in [
+          ('Leads', consolidated_metrics.leads, '#e2e8f0'),
+          ('Sent', consolidated_metrics.emails_sent, '#4ade80'),
+          ('Interested', consolidated_metrics.reply_interested, '#4ade80'),
+          ('Not Now', consolidated_metrics.reply_not_now, '#facc15'),
+          ('Removed', consolidated_metrics.reply_negative, '#f87171'),
+          ('Meetings', consolidated_metrics.meetings, '#a855f7'),
+          ('Reply Rate', consolidated_metrics.reply_rate, '#60a5fa'),
+        ] %}
+        <div style="text-align:center">
+          <div style="font-size:17px;font-weight:700;color:{{ color }}">{{ val }}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px">{{ label }}</div>
+        </div>
         {% endfor %}
       </div>
-      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:12px;color:#64748b">Send window:</span>
-        <select name="start_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
-          {% for h in range(0,24) %}
-          {% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}
-          <option value="{{ h }}" {% if sched.get('start_hour',8)==h %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-        <span style="font-size:12px;color:#64748b">to</span>
-        <select name="end_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
-          {% for h in range(0,24) %}
-          {% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}
-          <option value="{{ h }}" {% if sched.get('end_hour',17)==h %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-        <span style="font-size:11px;color:#475569">Eastern Time</span>
-      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button type="submit" name="push_instantly" value="0" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save</button>
-      {% if client.instantly_campaign_id %}
-      <button type="submit" name="push_instantly" value="1" class="btn btn-primary btn-sm">💾 Save &amp; Push to Instantly</button>
-      <span style="font-size:11px;color:var(--muted)">Updates the sequence in your Instantly DRAFT campaign. Safe - doesn't affect lead-level personalization.</span>
-      {% endif %}
-    </div>
-  </form>
-
-  {% if client.instantly_campaign_id %}
-  <form method="POST" action="{{ url_for('push_sequence', client_id=client.id) }}" style="margin-top:8px">
-    <button type="submit" class="btn btn-ghost btn-sm">🔄 Push Current Sequence to Instantly (without saving changes)</button>
-  </form>
-  {% endif %}
-</div>
-
-{# ── LAUNCH SECTION (pre-launch only) ───────────────────────────── #}
-{% if not client.active %}
-<div class="section" style="margin-bottom:24px;border:1px solid {% if all_gates %}rgba(74,222,128,0.3){% else %}rgba(74,222,128,0.08){% endif %}">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <div class="section-title" style="margin:0">🚀 Launch Campaign</div>
-    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#f87171;cursor:pointer">
-      <input type="checkbox" id="override-toggle" style="accent-color:#f87171" onchange="toggleOverride()">
-      Test override (bypass gate checks)
-    </label>
-  </div>
-
-  <div id="override-warning" style="display:none;background:#2d0a0a;border:1px solid #ef444433;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#f87171">
-    ⚠️ <strong>Override active</strong> - gate checks bypassed. For testing only. Do not use on real clients.
-  </div>
-
-  {# Checklist #}
-  <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:16px">
-    <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em">Pre-Launch Checklist</div>
-    {% set checklist_items = [
-      {# icp_reviewed removed - ICP captured at intake #}
-      ('dns_verified',       '🔒 DNS verified - SPF, DKIM, DMARC passing'),
-      ('warmup_complete',    '🌡️ Warmup complete - sending account score ≥ 85% in Instantly' ~ (' (' ~ warmup_live.score|string ~ '/100)' if warmup_live.score is not none else ' (checking...)')),
-      ('payment_confirmed',  '💳 Subscription payment confirmed in Stripe'),
-      ('sequence_approved',  '✉️ Sequence approved by client'),
-      ('calendar_connected', '📅 Calendar connected - Calendly event live'),
-    ] %}
-    {% for key, label in checklist_items %}
-    <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer">
-      <input type="checkbox" class="launch-check persist-check" data-key="{{ key }}"
-             {% if cl.get(key) %}checked{% endif %}
-             style="width:16px;height:16px;accent-color:#4ade80;margin-top:1px;flex-shrink:0">
-      <span {% if cl.get(key) %}style="color:#4ade80"{% endif %}>{{ label }}</span>
-    </label>
-    {% endfor %}
-  </div>
-
-  {# If campaign ready to go live #}
-  {% if client.get('instantly_campaign_id') and not client.active %}
-  <div style="background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:3px">Campaign in Instantly - DRAFT</div>
-      <div style="font-size:12px;color:#64748b">Review sequence in Instantly, activate it, then click here.</div>
-    </div>
-    <form method="POST" action="{{ url_for('client_go_live', client_id=client.id) }}">
-      <button class="btn btn-primary" style="background:#4ade80;color:#000;font-weight:800">✅ Mark Campaign Live</button>
-    </form>
-  </div>
-  {% endif %}
-
-  {# ── ICP / Apollo Search Reference ── #}
-  {% set locs = client._target_locations.split('\n') | map('trim') | select | list if client._target_locations else [] %}
-  {% set titles = client._target_titles.split(',') | map('trim') | select | list if client._target_titles else [] %}
-  {% set sizes = client._target_company_size.split(',') | map('trim') | select | list if client._target_company_size else [] %}
-  <details style="margin-bottom:16px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px 16px">
-    <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">📋 Apollo Search Filters (use these each month)</summary>
-    <div style="margin-top:10px;font-size:12px;color:#94a3b8;line-height:1.8">
-      <div><span style="color:#475569">Titles:</span> {{ titles | join(', ') or '-' }}</div>
-      <div><span style="color:#475569">Industry:</span> {{ client._target_industry | replace('_',' ') | title or '-' }}</div>
-      <div><span style="color:#475569">Seniority:</span> {{ client._target_seniority | replace('_',' ') | replace(',',' · ') or '-' }}</div>
-      <div><span style="color:#475569">Company size:</span> {{ sizes | join(', ') or '-' }} employees</div>
-      <div><span style="color:#475569">Locations:</span> {{ locs | join(' · ') or '-' }}</div>
-      <div><span style="color:#475569">Target contacts/mo:</span> {{ client.contacts_per_month or 200 }}</div>
-    </div>
-  </details>
-
-  {# ── CSV Upload (manual Apollo export) ── #}
-  {% set csv_path = 'campaigns/' + client.id + '/prospects.csv' %}
-  {% set csv_exists = prospects_csv_count is defined and prospects_csv_count > 0 %}
-  <details style="margin-bottom:16px;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px 16px">
-    <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">
-      📤 Upload Apollo CSV Export
-      {% if prospects_csv_count %}<span style="color:#4ade80;margin-left:8px">✓ {{ prospects_csv_count }} prospects ready</span>{% endif %}
-    </summary>
-    <div style="margin-top:10px">
-      <p style="font-size:11px;color:#475569;margin:0 0 10px">Export from Apollo using the filters above, then upload here. All columns are auto-mapped - upload the raw Apollo CSV as-is.</p>
-      <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" id="csv-upload-form">
-        <div id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()"
-             style="border:2px dashed #334155;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:8px">
-          <div style="font-size:12px;color:#475569">Drag &amp; drop your CSV here, or <span style="color:#4ade80">click to browse</span></div>
-          <div id="csv-file-name" style="font-size:11px;color:#4ade80;margin-top:6px;display:none"></div>
-        </div>
-        <input type="file" id="csv-file-input" name="prospects_csv" accept=".csv" required style="display:none">
-        <button type="submit" class="btn btn-ghost btn-sm" style="font-size:12px">Upload</button>
-      </form>
-      <script>
-        (function() {
-          var dz = document.getElementById('csv-drop-zone');
-          var inp = document.getElementById('csv-file-input');
-          var lbl = document.getElementById('csv-file-name');
-          inp.addEventListener('change', function() {
-            if (inp.files[0]) { lbl.textContent = inp.files[0].name; lbl.style.display='block'; dz.style.borderColor='#4ade80'; }
-          });
-          dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='#4ade80'; });
-          dz.addEventListener('dragleave', function() { dz.style.borderColor='#334155'; });
-          dz.addEventListener('drop', function(e) {
-            e.preventDefault();
-            var f = e.dataTransfer.files[0];
-            if (f && f.name.endsWith('.csv')) {
-              var dt = new DataTransfer(); dt.items.add(f);
-              inp.files = dt.files;
-              lbl.textContent = f.name; lbl.style.display='block'; dz.style.borderColor='#4ade80';
-            } else { dz.style.borderColor='#ef4444'; setTimeout(function(){dz.style.borderColor='#334155';},1500); }
-          });
-        })();
-      </script>
-    </div>
-  </details>
-
-  {# ── Launch Form ── #}
-  <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form"
-        onsubmit="
-          var src = document.querySelector('[name=use_csv]').value;
-          if (src === '1' && {{ prospects_csv_count }} === 0) {
-            alert('No CSV uploaded yet. Upload an Apollo export first, then launch.');
-            return false;
-          }
-        ">
-    <input type="hidden" name="override" id="override-input" value="0">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
-      <div>
-        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Campaign Month</label>
-        <input type="text" name="month" placeholder="{{ now.strftime('%B %Y') }}" value="{{ now.strftime('%B %Y') }}" required
-               style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:140px">
-      </div>
-      <div>
-        <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Lead Limit</label>
-        <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="1" max="1000"
-               style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 12px;border-radius:6px;font-size:13px;width:90px">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <label style="font-size:12px;color:#64748b">Lead Source</label>
-        <select name="use_csv" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:8px 10px;border-radius:6px;font-size:13px">
-          <option value="0">Apollo API (auto)</option>
-          <option value="1" {% if prospects_csv_count %}selected{% endif %}>Uploaded CSV</option>
-        </select>
-      </div>
-      <button type="submit" id="launch-btn" class="btn btn-primary"
-              style="background:#4ade80;color:#0f172a;font-weight:700{% if not all_gates %};opacity:0.45;cursor:not-allowed{% endif %}"
-              {% if not all_gates %}disabled{% endif %}>
-        🚀 Build &amp; Launch Campaign
-      </button>
-    </div>
-    {% if not all_gates %}
-    <p style="font-size:11px;color:#475569;margin-top:8px" id="gates-hint">All 6 checklist items must be checked to launch - or enable test override above.</p>
     {% endif %}
-  </form>
 
-  <div id="launch-log" style="display:none;margin-top:16px">
-    <div style="font-size:12px;color:#64748b;margin-bottom:6px">Launch Progress</div>
-    <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:11px;color:#94a3b8;max-height:300px;overflow-y:auto;white-space:pre-wrap"></pre>
-  </div>
-</div>
-{% endif %}{# end not client.active #}
-
-{# ── CAMPAIGNS ───────────────────────────────────────────────────── #}
-<div class="section" style="margin-bottom:20px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="section-title" style="margin:0">📊 Campaigns</div>
-      {% set cc = campaigns_metrics|length if campaigns_metrics else (1 if client.instantly_campaign_id else 0) %}
-      <span style="font-size:11px;background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;padding:2px 8px;border-radius:20px">{{ cc }} campaign{{ 's' if cc != 1 }}</span>
-    </div>
-    <a href="{{ url_for('campaign_wizard', client_id=client.id) }}" class="btn btn-primary btn-sm">➕ New Campaign</a>
-  </div>
-
-  {# ── CONSOLIDATED SUMMARY (only shown when 2+ campaigns) #}
-  {% if campaigns_metrics|length > 1 %}
-  <div style="background:#0d2137;border:1px solid #1e4070;border-radius:8px;padding:14px;margin-bottom:16px">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#60a5fa;margin-bottom:10px">All Campaigns - Consolidated</div>
-    <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#fff">{{ consolidated_metrics.leads }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Leads</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">{{ consolidated_metrics.emails_sent }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Sent</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">{{ consolidated_metrics.reply_interested }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Interested</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#facc15">{{ consolidated_metrics.reply_not_now }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Not Now</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#f87171">{{ consolidated_metrics.reply_negative }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Removed</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#a855f7">{{ consolidated_metrics.meetings }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Meetings</div></div>
-      <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#60a5fa">{{ consolidated_metrics.reply_rate }}</div><div style="font-size:10px;color:#64748b;margin-top:2px">Reply Rate</div></div>
-    </div>
-  </div>
-  {% endif %}
-
-  {# ── PER-CAMPAIGN CARDS #}
-  {% if campaigns_metrics %}
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+    {# Per-campaign cards #}
+    {% if campaigns_metrics %}
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
     {% for cm in campaigns_metrics %}
     <div style="background:#0f172a;border:1px solid {% if cm.active %}#1e3a5f{% else %}#1e293b{% endif %};border-radius:8px;padding:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div>
           <div style="font-size:13px;font-weight:600;color:#e2e8f0">{{ cm.campaign_name }}</div>
-          {% if cm.icp_label %}<div style="font-size:11px;color:#64748b;margin-top:2px">{{ cm.icp_label }}</div>{% endif %}
+          {% if cm.icp_label %}<div style="font-size:11px;color:#64748b;margin-top:1px">{{ cm.icp_label }}</div>{% endif %}
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          {% if cm.active %}<span style="font-size:11px;color:#22c55e;background:#052e1622;padding:2px 8px;border-radius:20px;border:1px solid #22c55e44">● Active</span>{% else %}<span style="font-size:11px;color:#64748b;background:#1e293b;padding:2px 8px;border-radius:20px;border:1px solid #33415544">⏸ Paused</span>{% endif %}
+          {% if cm.active %}<span style="font-size:11px;color:#22c55e;background:#052e1622;padding:2px 8px;border-radius:20px;border:1px solid #22c55e44">● Active</span>
+          {% else %}<span style="font-size:11px;color:#64748b;background:#1e293b;padding:2px 8px;border-radius:20px;border:1px solid #33415544">⏸ Paused</span>{% endif %}
           <form method="POST" action="{{ url_for('campaign_toggle', client_id=client.id, campaign_id=cm.campaign_id) }}" style="display:inline">
             <button type="submit" style="font-size:11px;background:none;border:1px solid #334155;color:#94a3b8;padding:2px 8px;border-radius:4px;cursor:pointer">{{ 'Pause' if cm.active else 'Activate' }}</button>
           </form>
         </div>
       </div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap">
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#fff">{{ cm.leads }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Leads</div></div>
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">{{ cm.emails_sent }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Sent</div></div>
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">{{ cm.reply_interested }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Interested</div></div>
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#facc15">{{ cm.reply_not_now }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Not Now</div></div>
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#f87171">{{ cm.reply_negative }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Removed</div></div>
-        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#60a5fa">{{ cm.reply_rate }}</div><div style="font-size:10px;color:#64748b;margin-top:1px">Reply Rate</div></div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+        {% for label, val, color in [
+          ('Leads', cm.leads, '#e2e8f0'),
+          ('Sent', cm.emails_sent, '#4ade80'),
+          ('Interested', cm.reply_interested, '#4ade80'),
+          ('Not Now', cm.reply_not_now, '#facc15'),
+          ('Removed', cm.reply_negative, '#f87171'),
+          ('Reply Rate', cm.reply_rate, '#60a5fa'),
+        ] %}
+        <div style="text-align:center">
+          <div style="font-size:15px;font-weight:700;color:{{ color }}">{{ val }}</div>
+          <div style="font-size:10px;color:#475569;margin-top:1px">{{ label }}</div>
+        </div>
+        {% endfor %}
       </div>
+
+      {# Funnel bar #}
       {% set f = cm.funnel %}
       {% if f and f.total > 0 %}
-      <div style="margin-top:12px;border-top:1px solid #1e293b;padding-top:10px">
-        <div style="font-size:10px;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Sequence Funnel</div>
-        <div style="display:flex;gap:0;border-radius:4px;overflow:hidden;height:6px;margin-bottom:6px">
+      <div style="border-top:1px solid #1e293b;padding-top:10px">
+        <div style="font-size:10px;color:#475569;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Sequence Funnel</div>
+        <div style="width:100%;background:#1e293b;border-radius:4px;overflow:hidden;position:relative;height:5px;margin-bottom:6px">
           {% set pct1 = (f.touch_1_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
           {% set pct2 = (f.touch_2_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
           {% set pct3 = (f.touch_3_sent / f.total * 100)|round|int if f.total > 0 else 0 %}
           {% set pctr = (f.replied / f.total * 100)|round|int if f.total > 0 else 0 %}
-          <div style="width:100%;background:#1e293b;border-radius:4px;overflow:hidden;position:relative">
-            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct1 }}%;background:#475569"></div>
-            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct2 }}%;background:#3b82f6"></div>
-            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct3 }}%;background:#6366f1"></div>
-            <div style="position:absolute;left:0;top:0;height:100%;width:{{ pctr }}%;background:#22c55e"></div>
-          </div>
+          <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct1 }}%;background:#475569"></div>
+          <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct2 }}%;background:#3b82f6"></div>
+          <div style="position:absolute;left:0;top:0;height:100%;width:{{ pct3 }}%;background:#6366f1"></div>
+          <div style="position:absolute;left:0;top:0;height:100%;width:{{ pctr }}%;background:#22c55e"></div>
         </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px">
-          <span style="color:#475569">T1: <b style="color:#94a3b8">{{ f.touch_1_sent }}</b></span>
-          <span style="color:#475569">T2: <b style="color:#60a5fa">{{ f.touch_2_sent }}</b></span>
-          <span style="color:#475569">T3: <b style="color:#818cf8">{{ f.touch_3_sent }}</b></span>
-          <span style="color:#475569">Replied: <b style="color:#4ade80">{{ f.replied }}</b></span>
-          {% if f.sequence_complete > 0 %}<span style="color:#475569">Done: <b style="color:#64748b">{{ f.sequence_complete }}</b></span>{% endif %}
-          <span style="color:#334155">| Total: {{ f.total }}</span>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px">
+          <span style="color:#64748b">T1: <b style="color:#94a3b8">{{ f.touch_1_sent }}</b></span>
+          <span style="color:#64748b">T2: <b style="color:#60a5fa">{{ f.touch_2_sent }}</b></span>
+          <span style="color:#64748b">T3: <b style="color:#818cf8">{{ f.touch_3_sent }}</b></span>
+          <span style="color:#64748b">Replied: <b style="color:#4ade80">{{ f.replied }}</b></span>
+          {% if f.sequence_complete > 0 %}<span style="color:#64748b">Done: <b style="color:#64748b">{{ f.sequence_complete }}</b></span>{% endif %}
+          <span style="color:#1e293b">| {{ f.total }} total</span>
         </div>
       </div>
       {% endif %}
-      <div style="margin-top:8px;font-size:11px;font-family:monospace;color:#334155">{{ cm.campaign_id[:32] }}...</div>
+
+      <div style="margin-top:8px;font-size:10px;font-family:monospace;color:#1e293b">{{ cm.campaign_id[:32] }}...</div>
     </div>
     {% endfor %}
     </div>
-  {% elif client.instantly_campaign_id %}
+    {% elif client.instantly_campaign_id %}
     <div style="background:#0f172a;border-radius:6px;padding:12px;margin-bottom:12px;font-size:12px">
-      <div style="font-weight:600;margin-bottom:4px">{{ client.campaign_name or 'Campaign' }}</div>
+      <div style="font-weight:600;margin-bottom:3px">{{ client.campaign_name or 'Campaign' }}</div>
       <div style="font-family:monospace;color:#64748b;font-size:11px">{{ client.instantly_campaign_id }}</div>
     </div>
+    {% endif %}
+
+    {# Link existing campaign #}
+    <details style="margin-top:4px">
+      <summary style="font-size:11px;color:#334155;cursor:pointer;padding:4px 0">Link an existing Instantly campaign ID manually</summary>
+      <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Campaign Name</label><input name="campaign_name" style="font-size:12px"></div>
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">ICP Label</label><input name="icp_label" placeholder="e.g. RIA Advisors" style="font-size:12px"></div>
+        <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Launch Date</label><input name="launch_date" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
+        <div style="grid-column:1/-1"><button type="submit" class="btn btn-ghost btn-sm">Link Campaign</button></div>
+      </form>
+    </details>
+  </div>
+
+  {# ── SEQUENCE EDITOR ─────────────────────────────────────────────── #}
+  <div class="section" style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="section-title" style="margin:0">✉️ Outreach Sequence</div>
+      {% if seq_ok %}
+        <span style="font-size:11px;background:#052e16;color:#4ade80;border:1px solid #166534;padding:2px 10px;border-radius:20px">✅ Approved</span>
+      {% else %}
+        <span style="font-size:11px;background:#1e293b;color:#64748b;border:1px solid #334155;padding:2px 10px;border-radius:20px">Awaiting approval</span>
+      {% endif %}
+    </div>
+    <p style="font-size:11px;color:#475569;margin-bottom:12px">Written from intake data. Edit here, save, include in follow-up email, get client approval, then check the gate.</p>
+
+    <form method="POST" action="{{ url_for('save_sequence', client_id=client.id) }}">
+      {% for i, touch in [(1, seq[0] if seq|length > 0 else {}), (2, seq[1] if seq|length > 1 else {}), (3, seq[2] if seq|length > 2 else {})] %}
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:13px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <span style="font-size:10px;font-weight:700;color:#4ade80;letter-spacing:.08em;text-transform:uppercase">Touch {{ i }}</span>
+          {% if i > 1 %}
+          <span style="font-size:11px;color:#64748b">Sends
+            <input type="number" name="t{{ i }}_delay" value="{{ touch.get('delay_days', 5) }}" min="1" max="30"
+                   style="width:38px;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:2px 5px;border-radius:4px;font-size:11px;text-align:center">
+            days after Touch {{ i - 1 }}</span>
+          {% else %}
+          <span style="font-size:11px;color:#64748b">Sends on launch day</span>
+          {% endif %}
+        </div>
+        <input type="text" name="t{{ i }}_subject" value="{{ touch.get('subject','') }}" placeholder="Subject line"
+               style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:7px 10px;border-radius:5px;font-size:12px;margin-bottom:7px">
+        <textarea name="t{{ i }}_body" placeholder="Email body…" rows="5"
+                  style="width:100%;background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:7px 10px;border-radius:5px;font-size:12px;line-height:1.5;resize:vertical">{{ touch.get('body','') }}</textarea>
+      </div>
+      {% endfor %}
+
+      {# Send schedule #}
+      <details style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px 14px;margin-bottom:10px">
+        <summary style="font-size:11px;font-weight:600;color:#64748b;cursor:pointer">⏰ Send Schedule</summary>
+        <div style="margin-top:10px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 14px;margin-bottom:10px">
+            {% for day in ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#94a3b8;cursor:pointer">
+              <input type="checkbox" name="send_days" value="{{ day }}"
+                     {% if day in (sched.get('send_days', ['monday','tuesday','wednesday','thursday','friday'])) %}checked{% endif %}
+                     style="accent-color:#4ade80">{{ day[:3]|capitalize }}
+            </label>
+            {% endfor %}
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:12px;color:#64748b">Window:</span>
+            <select name="start_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
+              {% for h in range(0,24) %}{% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}<option value="{{ h }}" {% if sched.get('start_hour',8)==h %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <span style="font-size:12px;color:#64748b">to</span>
+            <select name="end_hour" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px;font-size:12px">
+              {% for h in range(0,24) %}{% set label = (('%d:00 AM' % h) if h < 12 else ('%d:00 PM' % (h-12 if h>12 else h))) if h not in [0,12] else ('12:00 AM' if h==0 else '12:00 PM') %}<option value="{{ h }}" {% if sched.get('end_hour',17)==h %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            <span style="font-size:11px;color:#475569">Eastern Time</span>
+          </div>
+        </div>
+      </details>
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button type="submit" name="push_instantly" value="0" class="btn btn-primary btn-sm" style="background:#334155;color:#e2e8f0">💾 Save</button>
+        {% if client.instantly_campaign_id %}
+        <button type="submit" name="push_instantly" value="1" class="btn btn-primary btn-sm">💾 Save &amp; Push to Instantly</button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  {# ── LAUNCH (pre-active only) ────────────────────────────────────── #}
+  {% if not client.active %}
+  <div class="section" style="margin-bottom:20px;border:1px solid {% if all_gates %}rgba(74,222,128,0.3){% else %}rgba(74,222,128,0.08){% endif %}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="section-title" style="margin:0">🚀 Launch Campaign</div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:#f87171;cursor:pointer">
+        <input type="checkbox" id="override-toggle" style="accent-color:#f87171" onchange="toggleOverride()">
+        Test override (bypass gates)
+      </label>
+    </div>
+
+    <div id="override-warning" style="display:none;background:#2d0a0a;border:1px solid #ef444433;border-radius:6px;padding:9px 12px;margin-bottom:12px;font-size:12px;color:#f87171">
+      ⚠️ Override active - gate checks bypassed. Testing only.
+    </div>
+
+    {# Apollo search reference #}
+    {% set locs = client._target_locations.split('\n') | map('trim') | select | list if client._target_locations else [] %}
+    {% set titles = client._target_titles.split(',') | map('trim') | select | list if client._target_titles else [] %}
+    {% set sizes = client._target_company_size.split(',') | map('trim') | select | list if client._target_company_size else [] %}
+    <details style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:11px 14px;margin-bottom:12px">
+      <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">📋 Apollo Search Filters</summary>
+      <div style="margin-top:9px;font-size:12px;color:#94a3b8;line-height:1.8">
+        <div><span style="color:#475569">Titles:</span> {{ titles | join(', ') or '-' }}</div>
+        <div><span style="color:#475569">Industry:</span> {{ client._target_industry | replace('_',' ') | title or '-' }}</div>
+        <div><span style="color:#475569">Seniority:</span> {{ client._target_seniority | replace('_',' ') | replace(',',' · ') or '-' }}</div>
+        <div><span style="color:#475569">Company size:</span> {{ sizes | join(', ') or '-' }} employees</div>
+        <div><span style="color:#475569">Locations:</span> {{ locs | join(' · ') or '-' }}</div>
+        <div><span style="color:#475569">Target/mo:</span> {{ client.contacts_per_month or 200 }}</div>
+      </div>
+    </details>
+
+    {# CSV upload #}
+    <details style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:11px 14px;margin-bottom:12px">
+      <summary style="font-size:12px;font-weight:600;color:#64748b;cursor:pointer;list-style:none">
+        📤 Upload Apollo CSV
+        {% if prospects_csv_count %}<span style="color:#4ade80;margin-left:8px">✓ {{ prospects_csv_count }} prospects ready</span>{% endif %}
+      </summary>
+      <div style="margin-top:10px">
+        <p style="font-size:11px;color:#475569;margin:0 0 9px">Export from Apollo using the filters above. Upload the raw CSV as-is.</p>
+        <form method="POST" action="{{ url_for('upload_prospects', client_id=client.id) }}" enctype="multipart/form-data" id="csv-upload-form">
+          <div id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()"
+               style="border:2px dashed #334155;border-radius:8px;padding:18px;text-align:center;cursor:pointer;margin-bottom:8px">
+            <div style="font-size:12px;color:#475569">Drag &amp; drop CSV, or <span style="color:#4ade80">click to browse</span></div>
+            <div id="csv-file-name" style="font-size:11px;color:#4ade80;margin-top:5px;display:none"></div>
+          </div>
+          <input type="file" id="csv-file-input" name="prospects_csv" accept=".csv" required style="display:none">
+          <button type="submit" class="btn btn-ghost btn-sm">Upload</button>
+        </form>
+        <script>
+          (function() {
+            var dz = document.getElementById('csv-drop-zone');
+            var inp = document.getElementById('csv-file-input');
+            var lbl = document.getElementById('csv-file-name');
+            inp.addEventListener('change', function() { if (inp.files[0]) { lbl.textContent = inp.files[0].name; lbl.style.display='block'; dz.style.borderColor='#4ade80'; } });
+            dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='#4ade80'; });
+            dz.addEventListener('dragleave', function() { dz.style.borderColor='#334155'; });
+            dz.addEventListener('drop', function(e) { e.preventDefault(); var f = e.dataTransfer.files[0]; if (f && f.name.endsWith('.csv')) { var dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; lbl.textContent = f.name; lbl.style.display='block'; dz.style.borderColor='#4ade80'; } });
+          })();
+        </script>
+      </div>
+    </details>
+
+    {# Campaign ready callout #}
+    {% if client.get('instantly_campaign_id') and not client.active %}
+    <div style="background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.25);border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#4ade80;margin-bottom:2px">Campaign in Instantly - DRAFT</div>
+        <div style="font-size:11px;color:#64748b">Review in Instantly, activate it, then mark live here.</div>
+      </div>
+      <form method="POST" action="{{ url_for('client_go_live', client_id=client.id) }}">
+        <button class="btn btn-primary" style="background:#4ade80;color:#000;font-weight:800">✅ Mark Campaign Live</button>
+      </form>
+    </div>
+    {% endif %}
+
+    {# Launch form #}
+    <form method="POST" action="{{ url_for('campaign_launch', client_id=client.id) }}" id="launch-form"
+          onsubmit="var src=document.querySelector('[name=use_csv]').value;if(src==='1'&&{{ prospects_csv_count }}===0){alert('No CSV uploaded yet.');return false;}">
+      <input type="hidden" name="override" id="override-input" value="0">
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Month</label>
+          <input type="text" name="month" value="{{ now.strftime('%B %Y') }}" required
+                 style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:7px 11px;border-radius:6px;font-size:13px;width:130px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Lead Limit</label>
+          <input type="number" name="limit" value="{{ client.contacts_per_month or 200 }}" min="1" max="1000"
+                 style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:7px 11px;border-radius:6px;font-size:13px;width:85px">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Lead Source</label>
+          <select name="use_csv" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;padding:7px 10px;border-radius:6px;font-size:13px">
+            <option value="0">Apollo API (auto)</option>
+            <option value="1" {% if prospects_csv_count %}selected{% endif %}>Uploaded CSV</option>
+          </select>
+        </div>
+        <button type="submit" id="launch-btn" class="btn btn-primary"
+                style="background:#4ade80;color:#0f172a;font-weight:700{% if not all_gates %};opacity:0.45;cursor:not-allowed{% endif %}"
+                {% if not all_gates %}disabled{% endif %}>
+          🚀 Build &amp; Launch
+        </button>
+      </div>
+      {% if not all_gates %}
+      <p style="font-size:11px;color:#475569;margin-top:7px" id="gates-hint">All checklist items must be checked to launch.</p>
+      {% endif %}
+    </form>
+
+    <div id="launch-log" style="display:none;margin-top:14px">
+      <div style="font-size:11px;color:#64748b;margin-bottom:5px">Launch Progress</div>
+      <pre id="launch-log-text" style="background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:11px;font-size:11px;color:#94a3b8;max-height:280px;overflow-y:auto;white-space:pre-wrap"></pre>
+    </div>
+  </div>
   {% endif %}
 
-  {# ── LINK EXISTING CAMPAIGN (manual fallback) #}
-  <details style="margin-top:4px"><summary style="font-size:11px;color:#334155;cursor:pointer;padding:4px 0">Already have an Instantly campaign ID? Link it manually</summary>
-    <form method="POST" action="{{ url_for('campaign_add', client_id=client.id) }}" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Instantly Campaign ID *</label><input name="instantly_campaign_id" placeholder="UUID" required style="font-family:monospace;font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Campaign Name</label><input name="campaign_name" style="font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">ICP Label</label><input name="icp_label" placeholder="e.g. RIA Advisors" style="font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:3px">Launch Date</label><input name="launch_date" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
-      <div style="grid-column:1/-1"><button type="submit" class="btn btn-ghost btn-sm">Link Campaign</button></div>
+  {# ── SECONDARY (collapsed) ───────────────────────────────────────── #}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <details class="section">
+      <summary style="font-size:13px;color:#94a3b8;cursor:pointer;list-style:none">📵 DNC List <span style="color:#475569;font-size:11px">({{ dnc_count }} entries)</span></summary>
+      <form method="POST" action="{{ url_for('upload_dnc', client_id=client.id) }}" enctype="multipart/form-data" style="margin-top:10px">
+        <input type="file" name="dnc_file" accept=".csv,.txt" style="font-size:12px;margin-bottom:8px">
+        <button type="submit" class="btn btn-primary btn-sm">Import DNC</button>
+      </form>
+    </details>
+    <details class="section">
+      <summary style="font-size:13px;color:#94a3b8;cursor:pointer;list-style:none">📋 Upload Leads{% if lead_count > 0 %} <span style="color:#4ade80;font-size:11px">({{ lead_count }} ready)</span>{% endif %}</summary>
+      <form method="POST" action="{{ url_for('upload_leads', client_id=client.id) }}" enctype="multipart/form-data" style="margin-top:10px">
+        <div id="drop-zone" onclick="document.getElementById('leads_file_input').click()"
+             style="border:2px dashed #1e2535;border-radius:6px;padding:14px;text-align:center;cursor:pointer;margin-bottom:8px">
+          <div id="drop-label" style="color:#64748b;font-size:12px">Drop CSV or click to browse</div>
+          <div id="file-selected" style="color:#4ade80;font-size:12px;display:none"></div>
+        </div>
+        <input type="file" name="leads_file" id="leads_file_input" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
+        <div style="display:flex;gap:8px">
+          <button type="submit" id="upload-btn" class="btn btn-primary btn-sm" disabled>Upload</button>
+          {% if lead_count > 0 %}<a href="{{ url_for('download_leads', client_id=client.id) }}" class="btn btn-ghost btn-sm">⬇ Download</a>{% endif %}
+        </div>
+      </form>
+    </details>
+  </div>
+
+  <details class="section" style="margin-bottom:12px">
+    <summary style="font-size:13px;color:#64748b;cursor:pointer;list-style:none">📅 Log a Meeting Manually</summary>
+    <form method="POST" action="{{ url_for('log_meeting') }}" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-top:11px">
+      <input type="hidden" name="client_id" value="{{ client.id }}">
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospect Email *</label><input name="prospect_email" required placeholder="prospect@firm.com" style="font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Name</label><input name="prospect_name" placeholder="Dr. Jane Smith" style="font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Date</label><input name="meeting_date" type="date" style="font-size:12px"></div>
+      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Notes</label><input name="notes" placeholder="Optional" style="font-size:12px"></div>
+      <button type="submit" class="btn btn-primary btn-sm">Log</button>
     </form>
   </details>
-</div>
 
-{# ── SECONDARY SECTIONS ──────────────────────────────────────────── #}
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
-  <div class="section">
-    <div class="section-title">📵 DNC List</div>
-    <p style="font-size:12px;color:#64748b;margin-bottom:12px">{{ dnc_count }} entries · CSV or plain text.</p>
-    <form method="POST" action="{{ url_for('upload_dnc', client_id=client.id) }}" enctype="multipart/form-data">
-      <input type="file" name="dnc_file" accept=".csv,.txt" style="font-size:12px;margin-bottom:8px">
-      <button type="submit" class="btn btn-primary btn-sm">Import DNC</button>
-    </form>
-  </div>
-  <div class="section">
-    <div class="section-title">📋 Upload Leads</div>
-    <p style="font-size:12px;color:#64748b;margin-bottom:12px">CSV: email, first_name, last_name, company, title.</p>
-    <form method="POST" action="{{ url_for('upload_leads', client_id=client.id) }}" enctype="multipart/form-data">
-      <div id="drop-zone" onclick="document.getElementById('leads_file_input').click()"
-           style="border:2px dashed #1e2535;border-radius:6px;padding:16px;text-align:center;cursor:pointer;margin-bottom:8px">
-        <div id="drop-label" style="color:#64748b;font-size:12px">🗂 Drop CSV or click to browse</div>
-        <div id="file-selected" style="color:#4ade80;font-size:12px;display:none"></div>
+  <details class="section" style="margin-bottom:12px">
+    <summary style="font-size:13px;color:#64748b;cursor:pointer;list-style:none">⚙️ Settings &amp; Config</summary>
+    <div style="margin-top:12px">
+      <form method="POST" action="{{ url_for('client_update', client_id=client.id) }}">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign ID</label><input name="instantly_campaign_id" value="{{ client.instantly_campaign_id or '' }}" placeholder="UUID" style="font-family:monospace;font-size:12px"></div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label><input name="campaign_name" value="{{ client.campaign_name or '' }}" style="font-size:12px"></div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label><input name="launch_date" value="{{ client.launch_date or '' }}" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Monitor Status</label>
+            <select name="active" style="font-size:12px">
+              <option value="true" {% if client.active %}selected{% endif %}>🟢 Active</option>
+              <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused</option>
+            </select>
+          </div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Link</label><input name="calendly_link" value="{{ client.get('calendly_link','') }}" placeholder="https://calendly.com/…" style="font-size:12px"></div>
+          <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Event Slug</label><input name="calendly_event_slug" value="{{ client.get('calendly_event_slug','') }}" style="font-size:12px"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
+      </form>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #1e293b;font-size:12px;color:#475569">
+        <strong style="color:#64748b">Client ID:</strong> {{ client.id }} ·
+        <strong style="color:#64748b">Plan:</strong> {{ client.plan }} ·
+        <strong style="color:#64748b">Contacts/mo:</strong> {{ client.contacts_per_month }} ·
+        <strong style="color:#64748b">Client Email:</strong> {{ client.get('client_email','-') }}
       </div>
-      <input type="file" name="leads_file" id="leads_file_input" accept=".csv" style="display:none" onchange="handleFileSelect(this)">
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <input type="checkbox" name="warm" value="yes" id="warm" style="width:auto">
-        <label for="warm" style="font-size:12px;color:#94a3b8;text-transform:none;letter-spacing:0">Warm leads</label>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button type="submit" id="upload-btn" class="btn btn-primary btn-sm" disabled>Upload</button>
-        {% if lead_count > 0 %}<a href="{{ url_for('download_leads', client_id=client.id) }}" class="btn btn-ghost btn-sm">⬇ {{ lead_count }} leads</a>{% endif %}
-      </div>
-    </form>
-  </div>
-</div>
-
-{# ── LOG MEETING ─────────────────────────────────────────────────── #}
-<details class="section" style="margin-bottom:20px">
-  <summary style="font-size:13px;color:#94a3b8;cursor:pointer;list-style:none">📅 Log a Meeting Manually</summary>
-  <form method="POST" action="{{ url_for('log_meeting') }}" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:12px">
-    <input type="hidden" name="client_id" value="{{ client.id }}">
-    <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Prospect Email *</label><input name="prospect_email" required placeholder="prospect@theirclinic.com" style="font-size:12px"></div>
-    <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Name</label><input name="prospect_name" placeholder="Dr. Jane Smith" style="font-size:12px"></div>
-    <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Date</label><input name="meeting_date" type="date" style="font-size:12px"></div>
-    <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Notes</label><input name="notes" placeholder="Optional" style="font-size:12px"></div>
-    <button type="submit" class="btn btn-primary btn-sm">Log</button>
-  </form>
-</details>
-
-{# ── SETTINGS ────────────────────────────────────────────────────── #}
-<details class="section" style="margin-bottom:20px">
-  <summary style="font-size:13px;color:#64748b;cursor:pointer;list-style:none">⚙️ Settings &amp; Config</summary>
-  <div style="margin-top:14px">
-  <form method="POST" action="{{ url_for('client_update', client_id=client.id) }}">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign ID</label><input name="instantly_campaign_id" value="{{ client.instantly_campaign_id or '' }}" placeholder="UUID" style="font-family:monospace;font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Campaign Name</label><input name="campaign_name" value="{{ client.campaign_name or '' }}" style="font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Launch Date</label><input name="launch_date" value="{{ client.launch_date or '' }}" placeholder="YYYY-MM-DD" style="font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Monitor Status</label>
-        <select name="active" style="font-size:12px">
-          <option value="true" {% if client.active %}selected{% endif %}>🟢 Active</option>
-          <option value="false" {% if not client.active %}selected{% endif %}>⏸ Paused</option>
-        </select>
-      </div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Link</label><input name="calendly_link" value="{{ client.get('calendly_link','') }}" placeholder="https://calendly.com/argusreach/…" style="font-size:12px"></div>
-      <div><label style="font-size:11px;color:#64748b;display:block;margin-bottom:4px">Calendly Event Slug</label><input name="calendly_event_slug" value="{{ client.get('calendly_event_slug','') }}" style="font-size:12px"></div>
     </div>
-    <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
-  </form>
-  <div style="margin-top:14px;padding-top:14px;border-top:1px solid #1e293b;font-size:12px;color:#475569">
-    <strong style="color:#64748b">Client ID:</strong> {{ client.id }} ·
-    <strong style="color:#64748b">Plan:</strong> {{ client.plan }} ·
-    <strong style="color:#64748b">Contacts/mo:</strong> {{ client.contacts_per_month }} ·
-    <strong style="color:#64748b">Client Email:</strong> {{ client.get('client_email','-') }}
-  </div>
-  </div>
-</details>
+  </details>
 
-{# ── RECENT EVENTS ───────────────────────────────────────────────── #}
-{% if events %}
-<details class="section">
-  <summary style="font-size:13px;color:#64748b;cursor:pointer;list-style:none">📋 Recent Events ({{ events|length }})</summary>
-  <table style="margin-top:12px">
-    <thead><tr><th>Time</th><th>Event</th><th>Prospect</th><th>Detail</th></tr></thead>
-    <tbody>
-    {% for ev in events %}
-    <tr>
-      <td style="color:#64748b;font-size:12px">{{ ev.created_at | to_et }}</td>
-      <td>{% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e','draft_rejected':'#ef4444','unsubscribed':'#64748b'} %}{% set labels = {'reply_sent':'Reply Sent','meeting_booked':'Meeting Booked','draft_queued':'Draft Queued','classified':'Reply Received','draft_approved':'Draft Approved','draft_rejected':'Draft Ignored','unsubscribed':'Unsubscribed'} %}{% set c = colors.get(ev.event_type, '#94a3b8') %}<span class="badge" style="background:{{ c }}22;color:{{ c }};border:1px solid {{ c }}44">{{ labels.get(ev.event_type, ev.event_type) }}</span></td>
-      <td style="font-size:12px">{{ ev.email or '-' }}</td>
-      <td style="font-size:12px;color:#64748b">{% if ev.metadata %}{{ ev.metadata|tojson|truncate(80) }}{% endif %}</td>
-    </tr>
+  {% if events %}
+  <details class="section">
+    <summary style="font-size:13px;color:#64748b;cursor:pointer;list-style:none">📋 Recent Events ({{ events|length }})</summary>
+    <table style="margin-top:11px">
+      <thead><tr><th>Time</th><th>Event</th><th>Prospect</th><th>Detail</th></tr></thead>
+      <tbody>
+      {% for ev in events %}
+      <tr>
+        <td style="color:#64748b;font-size:12px">{{ ev.created_at | to_et }}</td>
+        <td>{% set colors = {'reply_sent':'#22c55e','meeting_booked':'#a855f7','draft_queued':'#f59e0b','classified':'#60a5fa','draft_approved':'#22c55e','draft_rejected':'#ef4444','unsubscribed':'#64748b'} %}{% set labels = {'reply_sent':'Reply Sent','meeting_booked':'Meeting Booked','draft_queued':'Draft Queued','classified':'Reply Received','draft_approved':'Draft Approved','draft_rejected':'Draft Ignored','unsubscribed':'Unsubscribed'} %}{% set c = colors.get(ev.event_type, '#94a3b8') %}<span class="badge" style="background:{{ c }}22;color:{{ c }};border:1px solid {{ c }}44">{{ labels.get(ev.event_type, ev.event_type) }}</span></td>
+        <td style="font-size:12px">{{ ev.email or '-' }}</td>
+        <td style="font-size:12px;color:#64748b">{% if ev.metadata %}{{ ev.metadata|tojson|truncate(80) }}{% endif %}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% endif %}
+
+</div>{# end left column #}
+
+{# ── RIGHT COLUMN ────────────────────────────────────────────────── #}
+<div style="position:sticky;top:20px;display:flex;flex-direction:column;gap:14px">
+
+  {# Credentials status #}
+  {% if creds_ok %}
+  <div style="background:#052e16;border:1px solid rgba(74,222,128,0.2);border-radius:8px;padding:11px 14px">
+    <div style="font-size:11px;color:#4ade80;margin-bottom:4px;font-weight:600">🔐 Credentials Received</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:6px">{{ client._credentials_received_at }}</div>
+    <div style="font-size:12px;color:#94a3b8;margin-bottom:8px">{{ client.get('outreach_email','') }}</div>
+    {% if conn_status %}
+      {% if conn_status.status == 'ok' %}
+        <div style="font-size:11px;color:#4ade80">📡 IMAP connected · {{ conn_status.checked_at }}</div>
+      {% else %}
+        <div style="font-size:11px;color:#f87171">⚠️ IMAP error · {{ conn_status.checked_at }}</div>
+      {% endif %}
+    {% else %}
+      <div style="font-size:11px;color:#475569">📡 Connection not yet tested</div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}" style="margin-top:8px">
+      <button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="return confirm('This invalidates the current credentials. Are you sure?')">🔄 Resend Credential Link</button>
+    </form>
+  </div>
+  {% else %}
+  <div style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:11px 14px">
+    <div style="font-size:11px;color:#64748b;margin-bottom:8px">🔐 Credentials not yet received</div>
+    <form method="POST" action="{{ url_for('resend_setup_link', client_id=client.id) }}">
+      <button class="btn btn-primary btn-sm">📧 Send Credential Link</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {# Warmup score #}
+  {% if creds_ok and warmup_live.score is not none %}
+  {% set ws = warmup_live.score|int %}
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:8px">Warmup Score</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="flex:1;background:#1a2030;border-radius:4px;height:7px;overflow:hidden">
+        <div style="height:100%;width:{{ [ws,100]|min }}%;background:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %};border-radius:4px"></div>
+      </div>
+      <span style="font-size:14px;font-weight:700;color:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %}">{{ ws }}/100</span>
+    </div>
+    <div style="font-size:12px;color:{% if ws >= 85 %}#4ade80{% elif ws >= 60 %}#facc15{% else %}#f87171{% endif %}">
+      {% if ws >= 85 %}✅ Ready to launch{% elif ws >= 60 %}Getting there...{% else %}Still warming up{% endif %}
+    </div>
+    {% if warmup_live.status == 0 %}<div style="font-size:11px;color:#f87171;margin-top:6px">⚠️ Warmup is OFF in Instantly - enable it</div>{% endif %}
+  </div>
+  {% endif %}
+
+  {# Pre-launch checklist #}
+  {% if not client.active %}
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 14px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:11px">Pre-Launch Checklist</div>
+    {% set checklist_items = [
+      ('dns_verified',       '🔒 DNS verified'),
+      ('warmup_complete',    '🌡️ Warmup ≥85%' ~ (' (' ~ warmup_live.score|string ~ '/100)' if warmup_live.score is not none else '')),
+      ('sequence_approved',  '✉️ Sequence approved'),
+      ('calendar_connected', '📅 Calendar connected'),
+      ('payment_confirmed',  '💳 Payment confirmed'),
+    ] %}
+    {% for key, label in checklist_items %}
+    <label style="display:flex;align-items:center;gap:9px;margin-bottom:9px;font-size:12px;cursor:pointer">
+      <input type="checkbox" class="launch-check persist-check" data-key="{{ key }}"
+             {% if cl.get(key) %}checked{% endif %}
+             style="width:15px;height:15px;accent-color:#4ade80;flex-shrink:0">
+      <span {% if cl.get(key) %}style="color:#4ade80"{% else %}style="color:#64748b"{% endif %}>{{ label }}</span>
+    </label>
     {% endfor %}
-    </tbody>
-  </table>
-</details>
-{% endif %}
+
+    <div id="auto-verify-result" style="display:none;margin-top:8px;background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px;font-size:11px;line-height:1.7"></div>
+
+    {% if creds_ok %}
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid #1e293b;display:flex;flex-direction:column;gap:6px">
+      <button id="auto-verify-btn" onclick="runAutoVerify()" class="btn btn-ghost btn-sm" style="font-size:11px">🔍 Verify DNS &amp; Warmup</button>
+      <a href="{{ url_for('dns_records', client_id=client.id) }}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:11px">📋 DNS Records</a>
+      {% if not payment_ok %}
+      <form method="POST" action="{{ url_for('generate_payment_link', client_id=client.id) }}">
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;width:100%">💳 {% if client.get('stripe_payment_link') %}View{% else %}Generate{% endif %} Payment Link</button>
+      </form>
+      {% endif %}
+      {% if pre_payment_gates and client.get('stripe_payment_link') %}
+        {% if client.get('launch_email_sent_at') %}
+          <div style="font-size:11px;color:#475569;padding:5px 0">📧 Launch email sent {{ client.get('launch_email_sent_at') }}</div>
+        {% else %}
+          <form method="POST" action="{{ url_for('send_launch_email', client_id=client.id) }}">
+            <button class="btn btn-sm" style="background:#4ade80;color:#000;font-weight:700;border:none;width:100%;font-size:12px">🚀 Send Ready-to-Launch Email</button>
+          </form>
+        {% endif %}
+      {% endif %}
+      <form method="POST" action="{{ url_for('send_followup_email', client_id=client.id) }}">
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;width:100%;{% if not dns_ok %}border-color:#f59e0b;color:#f59e0b{% endif %}">
+          📨 Send Follow-up Email{% if not dns_ok %} ⚠️{% endif %}
+        </button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# Stripe payment link #}
+  {% if client.get('stripe_payment_link') %}
+  <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:11px 14px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:7px">Stripe Payment Link</div>
+    <a href="{{ client.stripe_payment_link }}" target="_blank" style="font-size:11px;color:#4ade80;word-break:break-all">{{ client.stripe_payment_link }}</a>
+  </div>
+  {% endif %}
+
+</div>{# end right column #}
+</div>{# end 2-col grid #}
 
 {# ── JAVASCRIPT ──────────────────────────────────────────────────── #}
 <script>
-// Override toggle
 function toggleOverride() {
   const on = document.getElementById('override-toggle').checked;
   document.getElementById('override-warning').style.display = on ? 'block' : 'none';
@@ -688,27 +681,22 @@ function toggleOverride() {
   const btn = document.getElementById('launch-btn');
   const hint = document.getElementById('gates-hint');
   if (on) {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-    btn.style.background = '#f87171';
-    btn.style.color = '#0f172a';
+    btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+    btn.style.background = '#f87171'; btn.style.color = '#0f172a';
     if (hint) hint.style.display = 'none';
   } else {
     const allDone = [...document.querySelectorAll('.persist-check')].every(c => c.checked);
-    btn.disabled = !allDone;
-    btn.style.opacity = allDone ? '1' : '0.45';
+    btn.disabled = !allDone; btn.style.opacity = allDone ? '1' : '0.45';
     btn.style.cursor = allDone ? 'pointer' : 'not-allowed';
     btn.style.background = '#4ade80';
     if (hint) hint.style.display = allDone ? 'none' : '';
   }
 }
 
-// Checklist auto-save + launch button state
 document.querySelectorAll('.persist-check').forEach(cb => {
   cb.addEventListener('change', () => {
     const label = cb.closest('label').querySelector('span');
-    label.style.color = cb.checked ? '#4ade80' : '';
+    if (label) label.style.color = cb.checked ? '#4ade80' : '#64748b';
     const state = {};
     document.querySelectorAll('.persist-check').forEach(c => { state[c.dataset.key] = c.checked ? '1' : '0'; });
     fetch('{{ url_for("save_checklist", client_id=client.id) }}', {
@@ -717,19 +705,16 @@ document.querySelectorAll('.persist-check').forEach(cb => {
       body: new URLSearchParams(state).toString()
     });
     const allDone = Object.values(state).every(v => v === '1');
-    const override = document.getElementById('override-toggle').checked;
+    const override = document.getElementById('override-toggle') && document.getElementById('override-toggle').checked;
     if (!override) {
       const btn = document.getElementById('launch-btn');
-      btn.disabled = !allDone;
-      btn.style.opacity = allDone ? '1' : '0.45';
-      btn.style.cursor = allDone ? 'pointer' : 'not-allowed';
+      if (btn) { btn.disabled = !allDone; btn.style.opacity = allDone ? '1' : '0.45'; btn.style.cursor = allDone ? 'pointer' : 'not-allowed'; }
       const hint = document.getElementById('gates-hint');
       if (hint) hint.style.display = allDone ? 'none' : '';
     }
   });
 });
 
-// Auto-verify
 function runAutoVerify() {
   const btn = document.getElementById('auto-verify-btn');
   const panel = document.getElementById('auto-verify-result');
@@ -738,31 +723,20 @@ function runAutoVerify() {
   panel.innerHTML = '<span style="color:#94a3b8">Querying DNS and Instantly API…</span>';
   fetch('{{ url_for("auto_check_gates", client_id=client.id) }}')
     .then(r => r.json()).then(data => {
-      btn.disabled = false; btn.textContent = '🔍 Auto-verify DNS & Warmup';
+      btn.disabled = false; btn.textContent = '🔍 Verify DNS & Warmup';
       const dns = data.dns || {}, warm = data.warmup || {};
       const score = warm.score !== null && warm.score !== undefined ? warm.score : '-';
-      let html = `<div style="font-weight:700;color:#e2e8f0;margin-bottom:8px">Results - ${data.checked_at||''}</div>`;
-      html += `<div style="margin-bottom:6px;color:${data.dns_pass?'#4ade80':'#f87171'}"><b>DNS:</b> ${data.dns_pass?'✅ All passing':'❌ Issues found'}<br>`;
-      html += `<span style="color:${dns.spf?'#4ade80':'#f87171'}">SPF: ${dns.spf?'✅':'❌'}</span> &nbsp;`;
-      html += `<span style="color:${dns.dmarc?'#4ade80':'#f87171'}">DMARC: ${dns.dmarc?'✅':'❌'}</span> &nbsp;`;
-      html += `<span style="color:${dns.dkim?'#4ade80':'#f87171'}">DKIM: ${dns.dkim?'✅':'❌'}</span></div>`;
-      html += `<div style="color:${data.warmup_pass?'#4ade80':'#f87171'}"><b>Warmup:</b> ${data.warmup_pass?'✅':'❌'} Score: ${score}${score!=='-'?'/100':''} (need ≥85%)`;
+      let html = `<b style="color:#e2e8f0">Results</b><br>`;
+      html += `<span style="color:${data.dns_pass?'#4ade80':'#f87171'}">DNS: ${data.dns_pass?'✅':'❌'} SPF:${dns.spf?'✅':'❌'} DMARC:${dns.dmarc?'✅':'❌'} DKIM:${dns.dkim?'✅':'❌'}</span><br>`;
+      html += `<span style="color:${data.warmup_pass?'#4ade80':'#f87171'}">Warmup: ${data.warmup_pass?'✅':'❌'} ${score}${score!=='-'?'/100':''} (need ≥85%)</span>`;
       if (warm.error) html += `<br><span style="color:#f87171;font-size:11px">⚠️ ${warm.error}</span>`;
-      html += '</div>';
       if (data.dns_pass || data.warmup_pass) {
-        html += `<div style="margin-top:8px;color:#4ade80;font-size:11px">${data.dns_pass?'✅ DNS Verified auto-checked. ':''}${data.warmup_pass?'✅ Warmup Complete auto-checked. ':{}}Reloading…</div>`;
-        panel.innerHTML = html;
-        setTimeout(() => location.reload(), 1500);
-      } else {
-        panel.innerHTML = html;
-      }
-    }).catch(err => {
-      btn.disabled = false; btn.textContent = '🔍 Auto-verify DNS & Warmup';
-      panel.innerHTML = `<span style="color:#f87171">Error: ${err}</span>`;
-    });
+        html += `<br><span style="color:#4ade80;font-size:11px">Gates updated. Reloading…</span>`;
+        panel.innerHTML = html; setTimeout(() => location.reload(), 1500);
+      } else { panel.innerHTML = html; }
+    }).catch(err => { btn.disabled = false; btn.textContent = '🔍 Verify DNS & Warmup'; panel.innerHTML = `<span style="color:#f87171">Error: ${err}</span>`; });
 }
 
-// Lead file drop zone
 var dropZone = document.getElementById('drop-zone');
 var fileInput = document.getElementById('leads_file_input');
 function handleFileSelect(input) {
@@ -771,7 +745,7 @@ function handleFileSelect(input) {
     document.getElementById('file-selected').style.display = 'block';
     document.getElementById('drop-label').style.display = 'none';
     document.getElementById('upload-btn').disabled = false;
-    dropZone.style.borderColor = '#4ade80';
+    if (dropZone) dropZone.style.borderColor = '#4ade80';
   }
 }
 if (dropZone) {
@@ -779,14 +753,10 @@ if (dropZone) {
   dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = '#1e2535'; });
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
-    if (e.dataTransfer.files[0]) {
-      var dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
-      fileInput.files = dt.files; handleFileSelect(fileInput);
-    }
+    if (e.dataTransfer.files[0]) { var dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]); fileInput.files = dt.files; handleFileSelect(fileInput); }
   });
 }
 
-// Launch log polling
 {% if request.args.get('launch') %}
 (function() {
   document.getElementById('launch-log').style.display = 'block';
