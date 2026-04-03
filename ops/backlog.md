@@ -69,3 +69,12 @@ If client's outreach email is @gmail.com, @outlook.com, @yahoo.com (any free pro
 - dns_poll.py should skip these clients
 - Portal checklist should show bypass state, not pending
 Context: app password + SMTP + Instantly warmup all work fine on free Gmail. Only consequence is DNS gate stuck at pending permanently, blocking launch.
+
+### Voice Calling — AI outbound calls (Scale feature)
+Multi-channel sequence: Email → AI voice call → Email → Meeting booked.
+- Bland.ai or Vapi.ai for outbound AI voice calls (60-90 sec)
+- xAI voice API as alternative to evaluate
+- Call outcome feeds back into system → triggers follow-up email → Calendly booking
+- Flow: Touch 1 email → no reply 3 days → AI call → interested = immediate follow-up email with booking link
+- Growth/Scale tier feature ($1,500-$2,500/mo clients)
+- Trigger: 3+ paying clients
