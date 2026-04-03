@@ -128,14 +128,14 @@ RULES:
             "model": "nova-2",
             "language": "en-US",
             "smartFormat": True,
-            "endpointing": 600,  # ms to wait after silence - higher = less likely to cut in on "uhh" pauses
+            "endpointing": 600,
         },
         "model": {
-            "provider": "groq",
-            "model": "llama-3.3-70b-versatile",  # fastest inference available, good reasoning
+            "provider": "openai",
+            "model": "gpt-4o-mini",
             "messages": [{"role": "system", "content": system_prompt}],
             "temperature": 0.7,
-            "maxTokens": 200,  # keep responses short for phone calls
+            "maxTokens": 200,
         },
         "voice": {
             "provider": "11labs",
