@@ -212,11 +212,22 @@
       <label>Which plan are you starting with? <span class="req">*</span>
         <span class="hint">This determines your monthly prospect volume. You can upgrade at any time.</span>
       </label>
-      <select name="plan" required>
+      <select name="plan" required id="plan-select" onchange="updateVoiceField()">
         <option value="">- Select your plan -</option>
-        <option value="starter">Starter - $750/mo · 200 prospects/month</option>
-        <option value="growth">Growth - $1,500/mo · 500 prospects/month</option>
-        <option value="scale">Scale - $2,500/mo · 1,000 prospects/month</option>
+        <option value="starter">Starter - $750/mo · 200 prospects/month · Email outreach</option>
+        <option value="growth">Growth - $1,500/mo · 500 prospects/month · Email + AI voice follow-up</option>
+        <option value="scale">Scale - $2,500/mo · 1,000 prospects/month · Email + AI voice follow-up + Priority support</option>
+      </select>
+    </div>
+
+    <!-- Voice calling opt-in (Growth/Scale only) -->
+    <div class="field" id="voice-calling-field" style="display:none">
+      <label>AI Voice Follow-up <span class="req">*</span>
+        <span class="hint">After your email sequence, our AI calls prospects who haven't replied to introduce your practice and offer a meeting. Calls are made Mon-Fri 9am-5pm in the prospect's timezone.</span>
+      </label>
+      <select name="voice_calling_enabled">
+        <option value="true">Yes - include AI voice follow-up calls</option>
+        <option value="false">No - email sequence only</option>
       </select>
     </div>
 
@@ -574,6 +585,12 @@ document.querySelectorAll('.upload-zone').forEach(zone => {
     }
   });
 });
+
+function updateVoiceField() {
+  var plan = document.getElementById('plan-select').value;
+  var field = document.getElementById('voice-calling-field');
+  field.style.display = (plan === 'growth' || plan === 'scale') ? 'block' : 'none';
+}
 </script>
 </body>
 </html>

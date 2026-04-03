@@ -3429,6 +3429,7 @@ def intake_approve(intake_id):
             "_current_biz_source":   intake.get("current_biz_source",""),
             "_biggest_challenge":    intake.get("biggest_challenge",""),
             "_has_existing_list":    intake.get("has_existing_list","no"),
+            "voice_calling_enabled": intake.get("voice_calling_enabled","false") == "true",
             "_website":              intake.get("website",""),
             "_email_provider":       intake.get("email_provider","google"),
             "_dns_provider":         intake.get("dns_provider",""),
