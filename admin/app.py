@@ -1367,10 +1367,10 @@ def test_call(client_id):
         import vapi_caller as _vc
         import importlib; importlib.reload(_vc)
         prospect = {
-            "first_name": "Test",
-            "last_name":  "Prospect",
+            "first_name": request.form.get("first_name", "Test").strip() or "Test",
+            "last_name":  "",
             "email":      "test@example.com",
-            "company":    "Test Practice",
+            "company":    request.form.get("company", "Test Practice").strip() or "Test Practice",
             "phone":      phone,
         }
         result = _vc.fire_call(client, prospect)
