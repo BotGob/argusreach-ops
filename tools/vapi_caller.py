@@ -109,9 +109,13 @@ RULES:
             "maxTokens": 500,
         },
         "voice": {
-            "provider": "openai",
-            "voiceId": "nova",  # nova - warm, natural, conversational
+            "provider": "11labs",
+            "voiceId": "EXAVITQu4vr4xnSDxMaL",  # Bella - best so far
+            "stability": 0.5,
+            "similarityBoost": 0.75,
+            "style": 0.35,
             "speed": 0.9,
+            "useSpeakerBoost": True,
         },
         "endCallFunctionEnabled": True,
         "recordingEnabled": True,
