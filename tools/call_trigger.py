@@ -36,13 +36,14 @@ load_dotenv(BASE_DIR / "monitor" / ".env")
 
 from db.database import get_db, init_db
 
-# Daily call limits per plan
+# Daily call limit — flat across all plans for now to protect number reputation
+# Shared Vapi number means reputation is shared; start conservative, raise when proven
 DAILY_CALL_LIMITS = {
-    "starter": 10,
-    "growth":  15,
-    "scale":   25,
+    "starter": 0,   # voice not offered on Starter
+    "growth":  10,
+    "scale":   10,
 }
-DEFAULT_DAILY_LIMIT = 20
+DEFAULT_DAILY_LIMIT = 10
 CALL_DELAY_SEC       = 30   # seconds between calls — sequential, never simultaneous
 MIN_SEND_RATIO       = 1.8  # emails_sent/leads must be >= this before calling starts
 
