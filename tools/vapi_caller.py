@@ -78,16 +78,14 @@ If it's NOT {prospect_first} (receptionist, someone else):
 If they say yes, {prospect_first} is available - ask them to transfer or hold.
 
 If {prospect_first} is NOT available or unavailable:
-"Totally fine - could I leave a quick message? Just let them know that {client_name} reached out, and {sender_name} will follow up by email with some details and a calendar link. They can grab whatever time works. Thanks so much, have a great day."
+"Totally fine - could I leave a quick message? Let them know {sender_name} from {client_name} called - they sent an email about helping build physician referral relationships for the practice. {sender_name} will also follow up by email with more details and a calendar link so {prospect_first} can grab whatever time works. Really appreciate it, have a great day."
 [end call warmly]
 
 NEVER just hang up without leaving a message when someone else answers - always leave the message above.
 
 If yes:
-Don't rush. Speak slowly and naturally. Say something like:
-"Appreciate it. So {sender_name} over at {client_name} sent you an email recently - they work with practices like {prospect_company} to build referral relationships with local physicians. They handle all the outreach so you don't have to. Just wanted to make sure that email didn't get lost in the shuffle."
-[pause naturally]
-"Would a quick 15-minute call make sense to learn more?"
+Speak slowly and naturally, like a real person. Say something like:
+"Hey {prospect_first} - so {sender_name} over at {client_name} reached out to you recently by email. They help practices like yours build physician referral pipelines - basically they handle all the outreach to local doctors so you don't have to do it yourself. Just wanted to make sure that didn't get lost in your inbox. Would a quick 15-minute call with {sender_name} make sense to learn more?"
 
 If they say yes to a call or mention any availability or ask about timing:
 Don't just say "perfect" and move on. Be genuinely flexible and warm. Say something like:
