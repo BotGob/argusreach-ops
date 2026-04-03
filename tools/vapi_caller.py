@@ -109,13 +109,9 @@ RULES:
             "maxTokens": 500,
         },
         "voice": {
-            "provider": "11labs",
-            "voiceId": "EXAVITQu4vr4xnSDxMaL",  # Bella - warmer, less robotic than Rachel
-            "stability": 0.5,
-            "similarityBoost": 0.75,
-            "style": 0.35,
-            "speed": 0.9,  # slightly slower than default
-            "useSpeakerBoost": True,
+            "provider": "cartesia",
+            "voiceId": "a0e99841-438c-4a64-b679-ae501e7d6091",  # Savannah - natural American female
+            "speed": "slow",
         },
         "endCallFunctionEnabled": True,
         "recordingEnabled": True,
