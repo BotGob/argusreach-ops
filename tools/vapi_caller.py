@@ -109,9 +109,9 @@ RULES:
             "maxTokens": 500,
         },
         "voice": {
-            "provider": "cartesia",
-            "voiceId": "a0e99841-438c-4a64-b679-ae501e7d6091",  # Savannah - natural American female
-            "speed": "slow",
+            "provider": "openai",
+            "voiceId": "nova",  # nova - warm, natural, conversational
+            "speed": 0.9,
         },
         "endCallFunctionEnabled": True,
         "recordingEnabled": True,
