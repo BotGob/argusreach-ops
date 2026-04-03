@@ -40277,3 +40277,241 @@
   if hasattr(run, '_last_sync') and (datetime.utcnow() - run._last_sync).seconds < 900:
 2026-04-03 15:45:38 Cycle complete. Next check in 10 min.
 
+2026-04-03 15:51:54 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:51:54 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:51:54 [ArgusReach] Checking inbox...
+2026-04-03 15:51:55 [ArgusReach] No messages in last 24h.
+2026-04-03 15:51:58 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:55:38 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:55:38 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:55:38 [ArgusReach] Checking inbox...
+2026-04-03 15:55:39 [ArgusReach] No messages in last 24h.
+2026-04-03 15:55:42 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:01:58 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:01:58 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:01:58 [ArgusReach] Checking inbox...
+2026-04-03 16:01:59 [ArgusReach] No messages in last 24h.
+2026-04-03 16:02:02 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:05:42 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:05:42 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:05:42 [ArgusReach] Checking inbox...
+2026-04-03 16:05:43 [ArgusReach] No messages in last 24h.
+2026-04-03 16:05:46 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:12:03 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:12:03 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:12:03 [ArgusReach] Checking inbox...
+2026-04-03 16:12:03 [ArgusReach] No messages in last 24h.
+2026-04-03 16:12:07 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:15:46 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:15:46 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:15:46 [ArgusReach] Checking inbox...
+2026-04-03 16:15:47 [ArgusReach] No messages in last 24h.
+2026-04-03 16:15:50 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:22:07 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:22:07 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:22:07 [ArgusReach] Checking inbox...
+2026-04-03 16:22:08 [ArgusReach] No messages in last 24h.
+2026-04-03 16:22:11 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:25:51 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:25:51 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:25:51 [ArgusReach] Checking inbox...
+2026-04-03 16:25:51 [ArgusReach] No messages in last 24h.
+2026-04-03 16:25:54 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:32:11 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:32:11 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:32:11 [ArgusReach] Checking inbox...
+2026-04-03 16:32:12 [ArgusReach] No messages in last 24h.
+2026-04-03 16:32:15 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:35:54 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:35:54 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:35:54 [ArgusReach] Checking inbox...
+2026-04-03 16:35:55 [ArgusReach] No messages in last 24h.
+2026-04-03 16:35:59 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:42:15 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:42:15 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:42:15 [ArgusReach] Checking inbox...
+2026-04-03 16:42:16 [ArgusReach] No messages in last 24h.
+2026-04-03 16:42:19 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:45:59 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:45:59 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:45:59 [ArgusReach] Checking inbox...
+2026-04-03 16:46:00 [ArgusReach] No messages in last 24h.
+2026-04-03 16:46:03 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:52:20 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:52:20 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:52:20 [ArgusReach] Checking inbox...
+2026-04-03 16:52:21 [ArgusReach] No messages in last 24h.
+
+2026-04-03 14:31:07 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 14:31:07 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 14:31:11 Cycle complete. Next check in 10 min.
+
+2026-04-03 14:41:12 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 14:41:12 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 14:41:12 [ArgusReach] Checking inbox...
+2026-04-03 14:41:12 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 14:41:13 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 14:41:13 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 14:41:13 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 14:41:13 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 14:41:17 Cycle complete. Next check in 10 min.
+
+2026-04-03 14:51:17 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 14:51:17 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 14:51:18 [ArgusReach] Checking inbox...
+2026-04-03 14:51:19 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 14:51:19 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 14:51:19 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 14:51:20 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 14:51:20 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 14:51:25 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:01:25 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:01:25 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:01:25 [ArgusReach] Checking inbox...
+2026-04-03 15:01:26 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 15:01:26 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 15:01:26 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 15:01:27 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 15:01:27 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 15:01:31 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:11:31 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:11:31 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:11:31 [ArgusReach] Checking inbox...
+2026-04-03 15:11:32 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 15:11:32 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 15:11:32 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 15:11:32 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 15:11:32 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 15:11:37 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:21:37 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:21:37 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:21:37 [ArgusReach] Checking inbox...
+2026-04-03 15:21:38 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 15:21:39 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 15:21:39 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 15:21:39 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 15:21:39 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 15:21:43 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:31:43 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:31:43 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:31:43 [ArgusReach] Checking inbox...
+2026-04-03 15:31:44 [ArgusReach] 3 message(s) in last 24h.
+2026-04-03 15:31:45 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 15:31:45 [ArgusReach] Skipping duplicate: dealermail@nextwaveaudiencenetwork.click
+2026-04-03 15:31:45 [ArgusReach] Skipping duplicate: milton.nava@titansplanetarium.com
+2026-04-03 15:31:45 [ArgusReach] Skipping duplicate: maricelafisher@institutionalsecuritieshelpdesk.help
+2026-04-03 15:31:50 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:41:50 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:41:50 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:41:50 [ArgusReach] Checking inbox...
+2026-04-03 15:41:51 [ArgusReach] No messages in last 24h.
+2026-04-03 15:41:54 Cycle complete. Next check in 10 min.
+
+2026-04-03 15:51:54 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 15:51:54 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 15:51:54 [ArgusReach] Checking inbox...
+2026-04-03 15:51:55 [ArgusReach] No messages in last 24h.
+2026-04-03 15:51:58 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:01:58 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:01:58 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:01:58 [ArgusReach] Checking inbox...
+2026-04-03 16:01:59 [ArgusReach] No messages in last 24h.
+2026-04-03 16:02:02 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:12:03 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:12:03 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:12:03 [ArgusReach] Checking inbox...
+2026-04-03 16:12:03 [ArgusReach] No messages in last 24h.
+2026-04-03 16:12:07 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:22:07 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:22:07 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:22:07 [ArgusReach] Checking inbox...
+2026-04-03 16:22:08 [ArgusReach] No messages in last 24h.
+2026-04-03 16:22:11 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:32:11 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:32:11 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:32:11 [ArgusReach] Checking inbox...
+2026-04-03 16:32:12 [ArgusReach] No messages in last 24h.
+2026-04-03 16:32:15 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:42:15 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:42:15 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:42:15 [ArgusReach] Checking inbox...
+2026-04-03 16:42:16 [ArgusReach] No messages in last 24h.
+2026-04-03 16:42:19 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:52:20 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:52:20 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:52:20 [ArgusReach] Checking inbox...
+2026-04-03 16:52:21 [ArgusReach] No messages in last 24h.
+2026-04-03 16:52:24 Cycle complete. Next check in 10 min.
+2026-04-03 16:52:24 Cycle complete. Next check in 10 min.
+
+2026-04-03 16:56:03 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 16:56:03 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 16:56:03 [ArgusReach] Checking inbox...
+2026-04-03 16:56:04 [ArgusReach] No messages in last 24h.
+2026-04-03 16:56:07 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:02:25 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:02:25 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:02:25 [ArgusReach] Checking inbox...
+2026-04-03 17:02:25 [ArgusReach] No messages in last 24h.
+2026-04-03 17:02:28 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:06:07 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:06:07 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:06:07 [ArgusReach] Checking inbox...
+2026-04-03 17:06:08 [ArgusReach] No messages in last 24h.
+2026-04-03 17:06:11 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:12:29 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:12:29 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:12:29 [ArgusReach] Checking inbox...
+2026-04-03 17:12:29 [ArgusReach] No messages in last 24h.
+2026-04-03 17:12:33 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:16:11 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:16:11 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:16:11 [ArgusReach] Checking inbox...
+2026-04-03 17:16:13 [ArgusReach] No messages in last 24h.
+2026-04-03 17:16:16 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:22:33 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:22:33 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:22:33 [ArgusReach] Checking inbox...
+2026-04-03 17:22:34 [ArgusReach] No messages in last 24h.
+2026-04-03 17:22:37 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:26:16 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:26:16 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:26:16 [ArgusReach] Checking inbox...
+2026-04-03 17:26:17 [ArgusReach] No messages in last 24h.
+2026-04-03 17:26:20 Cycle complete. Next check in 10 min.
+
+2026-04-03 17:32:37 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 17:32:37 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 17:32:37 [ArgusReach] Checking inbox...
+2026-04-03 17:32:38 [ArgusReach] No messages in last 24h.
+2026-04-03 17:32:41 Cycle complete. Next check in 10 min.
+
