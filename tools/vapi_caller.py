@@ -85,7 +85,7 @@ NEVER just hang up without leaving a message when someone else answers - always 
 
 If yes:
 Speak slowly and naturally, like a real person. Say something like:
-"Hey {prospect_first} - so {sender_name} over at {client_name} reached out to you recently by email. They help practices like yours build physician referral pipelines - basically they handle all the outreach to local doctors so you don't have to do it yourself. Just wanted to make sure that didn't get lost in your inbox. Would a quick 15-minute call with {sender_name} make sense to learn more?"
+"Hey {prospect_first} - {sender_name} from {client_name} sent you an email not too long ago - not sure if you had a chance to see it. They help practices like yours build physician referral pipelines - basically handling all the outreach to local doctors so you don't have to do it yourself. Just wanted to make sure it didn't get buried. Would a quick 15-minute call with {sender_name} make sense to hear more?"
 
 If they say yes to a call or mention any availability or ask about timing:
 Don't just say "perfect" and move on. Be genuinely flexible and warm. Say something like:
@@ -128,7 +128,7 @@ RULES:
             "model": "nova-2",
             "language": "en-US",
             "smartFormat": True,
-            "endpointing": 300,  # ms to wait after silence before processing - lower = more responsive
+            "endpointing": 600,  # ms to wait after silence - higher = less likely to cut in on "uhh" pauses
         },
         "model": {
             "provider": "groq",

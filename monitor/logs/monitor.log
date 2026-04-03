@@ -41908,3 +41908,16 @@
 2026-04-03 23:25:41 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
 2026-04-03 23:25:44 Cycle complete. Next check in 10 min.
 
+2026-04-03 23:29:05 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 23:29:05 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 23:29:05 [ArgusReach] Checking inbox...
+2026-04-03 23:29:05 [ArgusReach] 6 message(s) in last 24h.
+2026-04-03 23:29:06 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-03 23:29:06 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-03 23:29:07 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-04-03 23:29:07 [ArgusReach] Skipping duplicate: updates@email.vapi.ai
+2026-04-03 23:29:07 [ArgusReach] Skipping duplicate: yuvanshi@dripcapital.net
+2026-04-03 23:29:07 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-03 23:29:08 [ArgusReach] Skipping duplicate: mailer-daemon@googlemail.com
+2026-04-03 23:29:11 Cycle complete. Next check in 10 min.
+
