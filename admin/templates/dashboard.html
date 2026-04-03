@@ -31,7 +31,7 @@
   <thead><tr>
     <th>Client</th><th>Vertical</th><th>Plan</th><th>Status</th>
     <th>Campaign</th><th>Leads</th>
-    <th title="Sequence funnel: T1 sent / T2 sent / T3 sent / Replied / Complete">Funnel</th>
+    <th title="Emails sent vs leads loaded">Send Progress</th>
     <th title="Emails sent by Instantly sequence">Sequence Sent</th>
     <th title="Reply emails sent by ArgusReach on client's behalf">Replies Sent</th>
     <th title="Total emails sent (sequence + replies)">Total Sent</th>
@@ -69,19 +69,10 @@
     <td style="font-size:12px;color:#64748b">{{ c.campaign_name }}</td>
     <td>{{ c.leads }}</td>
     <td style="font-size:11px;white-space:nowrap">
-      {% set f = c.funnel %}
-      {% if f and f.total > 0 %}
-        <span title="Touch 1 sent" style="color:#94a3b8">T1:{{ f.touch_1_sent }}</span>
-        <span style="color:#475569"> / </span>
-        <span title="Touch 2 sent" style="color:#60a5fa">T2:{{ f.touch_2_sent }}</span>
-        <span style="color:#475569"> / </span>
-        <span title="Touch 3 sent" style="color:#818cf8">T3:{{ f.touch_3_sent }}</span>
-        <span style="color:#475569"> / </span>
-        <span title="Replied" style="color:#4ade80">&#8617;{{ f.replied }}</span>
-        {% if f.sequence_complete > 0 %}
-        <span style="color:#475569"> / </span>
-        <span title="Sequence complete" style="color:#64748b">&#10003;{{ f.sequence_complete }}</span>
-        {% endif %}
+      {% if c.instantly_sent > 0 and c.leads > 0 %}
+        {% set pct = [((c.instantly_sent / c.leads) * 100)|round|int, 100]|min %}
+        <span style="color:#60a5fa">{{ c.instantly_sent }}</span><span style="color:#334155">/{{ c.leads }}</span>
+        <span style="color:#475569;font-size:10px">({{ pct }}%)</span>
       {% else %}
         <span style="color:#334155">-</span>
       {% endif %}
