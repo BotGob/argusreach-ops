@@ -241,17 +241,7 @@
         {% endfor %}
       </div>
 
-      {# Send progress bar - uses accurate Instantly analytics only #}
-      {% if cm.emails_sent > 0 and cm.leads > 0 %}
-      <div style="border-top:1px solid #1e293b;padding-top:10px">
-        <div style="font-size:10px;color:#475569;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Send Progress</div>
-        <div style="width:100%;background:#1e293b;border-radius:4px;overflow:hidden;height:5px;margin-bottom:6px">
-          {% set sent_pct = [((cm.emails_sent / cm.leads) * 100)|round|int, 100]|min %}
-          <div style="height:100%;width:{{ sent_pct }}%;background:#3b82f6;border-radius:4px"></div>
-        </div>
-        <div style="font-size:11px;color:#64748b">{{ cm.emails_sent }} emails sent to {{ cm.leads }} contacts ({{ sent_pct }}%)</div>
-      </div>
-      {% endif %}
+
 
       <div style="margin-top:8px;font-size:10px;font-family:monospace;color:#1e293b">{{ cm.campaign_id[:32] }}...</div>
     </div>
