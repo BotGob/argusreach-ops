@@ -38,9 +38,9 @@ from db.database import get_db, init_db
 
 # Daily call limits per plan
 DAILY_CALL_LIMITS = {
-    "starter": 20,
-    "growth":  40,
-    "scale":   80,
+    "starter": 10,
+    "growth":  15,
+    "scale":   25,
 }
 DEFAULT_DAILY_LIMIT = 20
 CALL_DELAY_SEC       = 30   # seconds between calls — sequential, never simultaneous
