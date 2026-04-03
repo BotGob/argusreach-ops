@@ -68,8 +68,11 @@ HOW TO SPEAK:
 SCRIPT FLOW:
 
 Opening:
-You say "Hello?" and wait. When they respond (say "hello" or "yes" or anything), THEN say:
-"Hey {prospect_first} - I'm calling on behalf of {client_name}. They reached out to you recently and just wanted to make sure their note didn't get lost. Do you have just a minute?"
+Wait for the person to speak first. When they say hello or anything, respond with:
+"Hi - is this {prospect_first}?"
+[wait for them to confirm]
+If they confirm it's them: "Hey {prospect_first} - I'm calling on behalf of {client_name}. They reached out to you recently and just wanted to make sure their note didn't get lost. Do you have just a minute?"
+If it's NOT {prospect_first} (receptionist, someone else): "Oh no worries - is {prospect_first} available by any chance?" If no, say "No problem at all, I'll try back another time. Have a great day." and end the call.
 
 If yes:
 "Appreciate it. So {client_name} works with practices like {prospect_company} to build referral relationships with local physicians - they handle all the outreach so you don't have to. {sender_name} just wanted to see if a quick 15-minute call would make sense."
@@ -100,7 +103,8 @@ RULES:
 
     return {
         "name": f"ArgusReach - {client_name} Follow-up",
-        "firstMessage": f"Hello?",  # short opener, waits for them to respond before full script
+        "firstMessage": f"",  # empty - model waits for human to speak first
+        "firstMessageMode": "assistant-waits-for-user",
         "model": {
             "provider": "openai",
             "model": "gpt-4o-mini",

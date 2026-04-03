@@ -41703,3 +41703,15 @@
 2026-04-03 22:48:42 [ArgusReach] Skipping duplicate: dmurphy@x.ai
 2026-04-03 22:48:46 Cycle complete. Next check in 10 min.
 
+2026-04-03 22:55:21 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-03 22:55:21 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-03 22:55:21 [ArgusReach] Checking inbox...
+2026-04-03 22:55:22 [ArgusReach] 5 message(s) in last 24h.
+2026-04-03 22:55:22 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-03 22:55:22 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-03 22:55:22 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-04-03 22:55:23 [ArgusReach] Skipping duplicate: updates@email.vapi.ai
+2026-04-03 22:55:23 [ArgusReach] Skipping duplicate: yuvanshi@dripcapital.net
+2026-04-03 22:55:23 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-03 22:55:26 Cycle complete. Next check in 10 min.
+
