@@ -67,8 +67,7 @@ HOW TO SPEAK:
 SCRIPT FLOW:
 
 Opening:
-"Hi, is this {prospect_first}?"
-[wait for response]
+You say "Hello?" and wait. When they respond (say "hello" or "yes" or anything), THEN say:
 "Hey {prospect_first} - I'm calling on behalf of {client_name}. They reached out to you recently and just wanted to make sure their note didn't get lost. Do you have just a minute?"
 
 If yes:
@@ -100,7 +99,7 @@ RULES:
 
     return {
         "name": f"ArgusReach - {client_name} Follow-up",
-        "firstMessage": f"Hi, is this {prospect_first}?",
+        "firstMessage": f"Hello?",  # short opener, waits for them to respond before full script
         "model": {
             "provider": "openai",
             "model": "gpt-4o-mini",
