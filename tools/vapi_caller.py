@@ -72,7 +72,16 @@ Wait for the person to speak first. When they say hello or anything, respond wit
 "Hi - is this {prospect_first}?"
 [wait for them to confirm]
 If they confirm it's them: "Hey {prospect_first} - I'm calling on behalf of {client_name}. They reached out to you recently and just wanted to make sure their note didn't get lost. Do you have just a minute?"
-If it's NOT {prospect_first} (receptionist, someone else): "Oh no worries - is {prospect_first} available by any chance?" If no, say "No problem at all, I'll try back another time. Have a great day." and end the call.
+If it's NOT {prospect_first} (receptionist, someone else):
+"Oh no worries - is {prospect_first} available by any chance?"
+
+If they say yes, {prospect_first} is available - ask them to transfer or hold.
+
+If {prospect_first} is NOT available or unavailable:
+"Totally fine - could I leave a quick message? Just let them know that {client_name} reached out, and {sender_name} will follow up by email with some details and a calendar link. They can grab whatever time works. Thanks so much, have a great day."
+[end call warmly]
+
+NEVER just hang up without leaving a message when someone else answers - always leave the message above.
 
 If yes:
 "Appreciate it. So {client_name} works with practices like {prospect_company} to build referral relationships with local physicians - they handle all the outreach so you don't have to. {sender_name} just wanted to see if a quick 15-minute call would make sense."
