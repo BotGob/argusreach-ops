@@ -521,6 +521,184 @@ def calendly_webhook():
     return jsonify({"status": "ok"})
 
 
+# ── VAPI WEBHOOK ─────────────────────────────────────────────────────────────
+
+@app.route("/webhooks/vapi", methods=["POST"])
+def vapi_webhook():
+    """Handle Vapi call lifecycle events and trigger follow-up emails."""
+    import hmac, hashlib
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    # Optional webhook secret verification
+    vapi_secret = os.environ.get("VAPI_WEBHOOK_SECRET", "")
+    if vapi_secret:
+        sig = request.headers.get("x-vapi-signature", "")
+        expected = hmac.new(vapi_secret.encode(), request.data, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, expected):
+            return jsonify({"error": "Invalid signature"}), 401
+
+    try:
+        data = request.get_json(force=True) or {}
+    except Exception:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    event_type   = data.get("message", {}).get("type") or data.get("type", "")
+    call         = data.get("message", {}).get("call") or data.get("call") or {}
+    call_id      = call.get("id", "")
+    metadata     = call.get("metadata") or {}
+    client_id    = metadata.get("client_id", "")
+    prospect_email = metadata.get("prospect_email", "")
+    duration_sec = int(call.get("endedAt", 0) and call.get("startedAt", 0) and 0) or 0
+
+    # Try to get duration from seconds
+    try:
+        from datetime import datetime as _dt
+        started = call.get("startedAt", "")
+        ended   = call.get("endedAt", "")
+        if started and ended:
+            duration_sec = int((_dt.fromisoformat(ended.replace("Z","+00:00")) -
+                               _dt.fromisoformat(started.replace("Z","+00:00"))).total_seconds())
+    except Exception:
+        pass
+
+    print(f"[Vapi] event={event_type} call={call_id[:8] if call_id else '?'} client={client_id} prospect={prospect_email}")
+
+    # Only process end-of-call events
+    if event_type not in ("end-of-call-report", "call-ended", "end_of_call_report"):
+        return jsonify({"status": "ok"})
+
+    # Determine outcome
+    end_reason  = call.get("endedReason", "").lower()
+    transcript  = data.get("message", {}).get("transcript", "") or ""
+
+    # Classify outcome
+    if "voicemail" in end_reason or "no-answer" in end_reason or "no_answer" in end_reason:
+        outcome = "voicemail"
+    elif any(w in transcript.lower() for w in ["not interested", "remove", "unsubscribe", "stop calling", "take me off"]):
+        outcome = "not_interested"
+    elif any(w in transcript.lower() for w in ["yes", "sure", "sounds good", "book", "calendar", "schedule", "interested", "tell me more"]):
+        outcome = "interested"
+    elif duration_sec > 15:
+        outcome = "answered"
+    else:
+        outcome = "no_answer"
+
+    print(f"[Vapi] outcome={outcome} duration={duration_sec}s")
+
+    # Log to DB
+    if client_id and prospect_email:
+        try:
+            sys.path.insert(0, str(BASE_DIR))
+            conn = get_db()
+            pid_row = conn.execute(
+                "SELECT id FROM prospects WHERE client_id=? AND email=?",
+                (client_id, prospect_email.lower())
+            ).fetchone()
+            if pid_row:
+                conn.execute(
+                    "INSERT OR IGNORE INTO events (id, prospect_id, client_id, event_type, metadata, created_at) VALUES (?,?,?,?,?,?)",
+                    (str(uuid.uuid4()), pid_row[0], client_id, f"call_{outcome}",
+                     json.dumps({"vapi_call_id": call_id, "duration_sec": duration_sec, "outcome": outcome, "end_reason": end_reason}),
+                     datetime.utcnow().isoformat())
+                )
+                conn.commit()
+                # Update stage if interested
+                if outcome == "interested":
+                    update_prospect_stage(pid_row[0], "replied")
+            conn.close()
+        except Exception as e:
+            print(f"[Vapi] DB log error: {e}")
+
+    # Send follow-up email for answered calls (interested or general answer)
+    if outcome in ("answered", "interested", "voicemail") and client_id and prospect_email:
+        try:
+            import json as _json
+            clients_data = _json.loads((BASE_DIR / "monitor" / "clients.json").read_text())
+            client = next((c for c in clients_data["clients"] if c["id"] == client_id), None)
+            if client:
+                _send_vapi_followup_email(client, prospect_email, outcome)
+        except Exception as e:
+            print(f"[Vapi] Follow-up email error: {e}")
+
+    # Telegram alert for interested calls
+    if outcome == "interested":
+        try:
+            import json as _json
+            clients_data = _json.loads((BASE_DIR / "monitor" / "clients.json").read_text())
+            client = next((c for c in clients_data["clients"] if c["id"] == client_id), None)
+            firm = client["firm_name"] if client else client_id
+            telegram_notify(
+                f"📞 <b>Call - Interested!</b>\n"
+                f"👤 {prospect_email}\n"
+                f"🏢 {firm}\n"
+                f"⏱ {duration_sec}s\n"
+                f"Follow-up email sent with Calendly link."
+            )
+        except Exception as e:
+            print(f"[Vapi] Telegram alert error: {e}")
+
+    return jsonify({"status": "ok", "outcome": outcome})
+
+
+def _send_vapi_followup_email(client: dict, prospect_email: str, outcome: str):
+    """Send a follow-up email after a Vapi call."""
+    from_email   = "vito@argusreach.com"
+    app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+    if not app_password:
+        print("[Vapi] No ARGUSREACH_GMAIL_APP_PASS - skipping follow-up email")
+        return
+
+    sender_name  = client.get("sender_name", "Vito Resciniti")
+    firm_name    = client.get("firm_name", "ArgusReach")
+    calendly     = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
+    client_email = client.get("outreach_email") or from_email
+
+    if outcome == "voicemail":
+        subject = f"Quick note from {firm_name}"
+        body = f"""Hi,
+
+I just left you a brief voicemail - wanted to make sure you had my contact info.
+
+I'm reaching out on behalf of {firm_name} regarding a potential referral partnership. They'd love 15 minutes to walk you through how they help practices like yours.
+
+Here's their calendar if you'd like to find a time: {calendly}
+
+No pressure at all - happy to connect whenever works for you.
+
+{sender_name}
+{firm_name}"""
+    else:
+        subject = f"Great connecting - {firm_name}"
+        body = f"""Hi,
+
+Thanks for taking a moment on the phone.
+
+As mentioned, {firm_name} would love to set up a quick 15-minute call to show you exactly how they can help. Here's the calendar link to grab whatever time works best:
+
+{calendly}
+
+Looking forward to connecting.
+
+{sender_name}
+{firm_name}"""
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = f"{sender_name} <{from_email}>"
+        msg["To"]      = prospect_email
+        msg.attach(MIMEText(body, "plain"))
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(from_email, app_password)
+            smtp.sendmail(from_email, prospect_email, msg.as_string())
+        print(f"[Vapi] Follow-up email sent to {prospect_email} (outcome: {outcome})")
+    except Exception as e:
+        print(f"[Vapi] Email send error: {e}")
+
+
 if __name__ == "__main__":
     init_db()
     print("🚀 ArgusReach webhook server starting on port 5055...")
