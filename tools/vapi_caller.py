@@ -128,7 +128,7 @@ RULES:
             "model": "nova-2",
             "language": "en-US",
             "smartFormat": True,
-            "endpointing": 600,
+            "endpointing": 500,  # max allowed by Vapi
         },
         "model": {
             "provider": "openai",
