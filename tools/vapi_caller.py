@@ -48,12 +48,44 @@ def build_assistant(client: dict, prospect: dict) -> dict:
     prospect_company = prospect.get("company", "your practice")
     calendly_link = client.get("calendly_link", "")
 
+    # Build a client-specific description of what they do — dynamic, not hardcoded
+    business_desc  = client.get("_business_description", "").strip()
+    value_prop     = client.get("_value_prop", "").strip()
+    target_industry = client.get("_target_industry", "").strip()
+
+    # Build a short 1-2 sentence plain-English description of what the client does
+    # Falls back gracefully if fields are missing
+    if business_desc:
+        # Truncate to first 2 sentences for the call script
+        sentences = business_desc.replace('\n', ' ').split('. ')
+        what_they_do = '. '.join(sentences[:2]).strip()
+        if not what_they_do.endswith('.'):
+            what_they_do += '.'
+    elif value_prop:
+        sentences = value_prop.replace('\n', ' ').split('. ')
+        what_they_do = '. '.join(sentences[:2]).strip()
+        if not what_they_do.endswith('.'):
+            what_they_do += '.'
+    else:
+        what_they_do = f"{client_name} helps businesses grow through targeted outreach."
+
+    # Receptionist message — what we emailed about
+    if target_industry in ('physical_therapy', 'pt', 'healthcare'):
+        email_topic = "building physician referral relationships for the practice"
+    elif target_industry in ('ria', 'financial', 'investment'):
+        email_topic = "a potential partnership opportunity"
+    else:
+        email_topic = "a potential business opportunity"
+
     # Build the system prompt — tight, natural, goal-oriented
     system_prompt = f"""You are a professional outreach assistant calling on behalf of {client_name}.
 
 Your ONLY goal is to book a 15-minute introductory call between the prospect and {sender_name} at {client_name}.
 
-The prospect ({prospect_first} at {prospect_company}) received an email recently about a potential partnership. You are following up on that email.
+The prospect ({prospect_first} at {prospect_company}) received an email recently. You are following up on that email.
+
+WHAT {client_name} DOES (use this to explain if asked, in plain conversational language):
+{what_they_do}
 
 HOW TO SPEAK:
 - Sound natural and conversational, like a real person making a quick follow-up call
@@ -75,23 +107,24 @@ If they confirm it's them: "Hey {prospect_first} - I'm calling on behalf of {cli
 If it's NOT {prospect_first} (receptionist, someone else):
 "Oh no worries - is {prospect_first} available by any chance?"
 
-If they say yes, {prospect_first} is available - ask them to transfer or hold.
+If they say yes and {prospect_first} is available - ask them to transfer or hold.
 
-If {prospect_first} is NOT available or unavailable:
-"Totally fine - could I leave a quick message? Let them know {sender_name} from {client_name} called - they sent an email about helping build physician referral relationships for the practice. {sender_name} will also follow up by email with more details and a calendar link so {prospect_first} can grab whatever time works. Really appreciate it, have a great day."
+If {prospect_first} is NOT available:
+"Totally fine - could I leave a quick message? Let them know {sender_name} from {client_name} called - they sent an email about {email_topic}. {sender_name} will also follow up by email with more details and a calendar link so {prospect_first} can grab whatever time works. Really appreciate it, have a great day."
 [end call warmly]
 
-NEVER just hang up without leaving a message when someone else answers - always leave the message above.
+NEVER just hang up without leaving a message when someone else answers.
 
-If yes:
-Speak slowly and naturally, like a real person. Say something like:
-"Hey {prospect_first} - {sender_name} from {client_name} sent you an email not too long ago - not sure if you had a chance to see it. They help practices like yours build physician referral pipelines - basically handling all the outreach to local doctors so you don't have to do it yourself. Just wanted to make sure it didn't get buried. Would a quick 15-minute call with {sender_name} make sense to hear more?"
+If {prospect_first} confirmed it's them:
+Speak slowly and naturally. Say something like:
+"Hey {prospect_first} - {sender_name} from {client_name} sent you an email not too long ago - not sure if you had a chance to see it. Just wanted to make sure it didn't get buried. Would a quick 15-minute call with {sender_name} make sense to hear more?"
 
-If they say yes to a call or mention any availability or ask about timing:
-Don't just say "perfect" and move on. Be genuinely flexible and warm. Say something like:
-"Yeah absolutely, we are totally flexible and want to work around your schedule. I'll have {sender_name} send you a calendar link right after we hang up - just grab whatever time looks good for you, no rush at all."
-[then close warmly - "Really appreciate you taking a minute, have a great rest of your day {prospect_first}"]
-[end the call warmly]
+If they ask what it's about before agreeing:
+Explain in plain, conversational terms based on what {client_name} does. Keep it to 1-2 sentences. Don't read a script - just explain it naturally like you'd tell a friend.
+
+If they say yes to a call:
+"Yeah absolutely - I'll have {sender_name} send you a calendar link right after we hang up. Just grab whatever time looks good, no rush at all."
+[close warmly and end the call]
 
 If not interested:
 "Totally fair - I'll pass that along and make sure you're off the list. Sorry to interrupt your day."
@@ -103,10 +136,9 @@ If voicemail:
 
 ADDITIONAL SCENARIOS:
 - If they say "I already got that email": "Oh great - yeah {sender_name} just wanted to make sure it didn't get buried. Does a quick 15-minute call make sense?"
-- If they say "what is this about" or "what company": explain briefly - {client_name} helps practices build physician referral pipelines through automated outreach
-- If they say "I'm busy" or "bad time": "Totally understand - when would be a better time? I can have {sender_name} reach out then." 
-- If they say "send me more info": "Absolutely - I'll have {sender_name} send that over right after this call along with a calendar link if you want to connect."
-- If they seem interested but unsure: be warm and low pressure - "No commitment at all, just a quick conversation to see if it makes sense for your practice."
+- If they say "I'm busy" or "bad time": "Totally understand - when would be a better time? I can have {sender_name} reach out then."
+- If they say "send me more info": "Absolutely - I'll have {sender_name} send that over right after this call along with a calendar link."
+- If they seem interested but unsure: "No commitment at all, just a quick conversation to see if it's a fit."
 
 RULES:
 - Never say the word "test" or reference any test
@@ -292,6 +324,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--test", action="store_true", help="Fire a test call")
     parser.add_argument("--phone", help="Phone number to call (test mode)")
+    parser.add_argument("--first-name", default="Dave", help="Prospect first name for test")
+    parser.add_argument("--company", default="", help="Prospect company for test")
     parser.add_argument("--client", default="argusreach", help="Client ID")
     parser.add_argument("--dry-run", action="store_true", help="Don't actually call")
     args = parser.parse_args()
@@ -310,10 +344,10 @@ if __name__ == "__main__":
             sys.exit(1)
 
         prospect = {
-            "first_name": "Test",
-            "last_name": "Prospect",
+            "first_name": args.first_name or "Dave",
+            "last_name": "",
             "email": "test@example.com",
-            "company": "Test Practice",
+            "company": args.company or "Your Practice",
             "phone": args.phone,
         }
 

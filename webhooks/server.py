@@ -772,27 +772,34 @@ def _pause_instantly_prospect(client: dict, prospect_email: str):
     api_key = os.environ.get("INSTANTLY_API_KEY", "")
     if not api_key:
         return
-    campaign_id = client.get("campaign_id", "")
-    if not campaign_id:
+    # Try all campaign IDs on the client
+    campaign_ids = list({cid for cid in
+        [client.get("instantly_campaign_id", "")] +
+        [c.get("instantly_campaign_id", "") for c in client.get("campaigns", [])]
+        if cid})
+    if not campaign_ids:
+        print(f"[Vapi] No campaign_id on client {client.get('id')} — cannot pause")
         return
-    try:
-        # Mark lead as paused in Instantly
-        resp = _req.post(
-            "https://api.instantly.ai/api/v2/leads/pause",
-            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-            json={"campaign_id": campaign_id, "email": prospect_email},
-            timeout=10
-        )
-        print(f"[Vapi] Instantly pause {prospect_email}: {resp.status_code}")
-    except Exception as e:
-        print(f"[Vapi] Instantly pause error: {e}")
+    for campaign_id in campaign_ids:
+        try:
+            # Instantly v2: PATCH lead to set status=paused
+            resp = _req.patch(
+                f"https://api.instantly.ai/api/v2/leads",
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                json={"campaign_id": campaign_id, "email": prospect_email, "status": "paused"},
+                timeout=10
+            )
+            print(f"[Vapi] Instantly pause {prospect_email} campaign={campaign_id[:8]}: {resp.status_code}")
+        except Exception as e:
+            print(f"[Vapi] Instantly pause error: {e}")
 
 
 def _send_vapi_voicemail_followup(client: dict, prospect_email: str):
     """Send a brief email backing up a voicemail left by AI."""
-    from_email   = "vito@argusreach.com"
-    app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
+    from_email   = client.get("outreach_email") or "vito@argusreach.com"
+    app_password = client.get("app_password") or os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
     if not app_password:
+        print(f"[Vapi] No app_password for {client.get('id')} — skipping voicemail email")
         return
     sender_name = client.get("sender_name", "Vito")
     firm_name   = client.get("firm_name", "ArgusReach")
