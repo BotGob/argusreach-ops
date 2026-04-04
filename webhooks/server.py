@@ -569,135 +569,245 @@ def vapi_webhook():
     if event_type not in ("end-of-call-report", "call-ended", "end_of_call_report"):
         return jsonify({"status": "ok"})
 
-    # Determine outcome
-    end_reason  = call.get("endedReason", "").lower()
-    transcript  = data.get("message", {}).get("transcript", "") or ""
+    # Extract transcript — Vapi sends it at message.artifact.transcript or message.transcript
+    msg        = data.get("message", {})
+    transcript = (msg.get("artifact", {}) or {}).get("transcript") or msg.get("transcript") or ""
+    end_reason = call.get("endedReason", "").lower()
 
-    # Classify outcome
-    if "voicemail" in end_reason or "no-answer" in end_reason or "no_answer" in end_reason:
-        outcome = "voicemail"
-    elif any(w in transcript.lower() for w in ["not interested", "remove", "unsubscribe", "stop calling", "take me off"]):
-        outcome = "not_interested"
-    elif any(w in transcript.lower() for w in ["yes", "sure", "sounds good", "book", "calendar", "schedule", "interested", "tell me more"]):
-        outcome = "interested"
-    elif duration_sec > 15:
-        outcome = "answered"
-    else:
-        outcome = "no_answer"
+    # ── Classify outcome via Claude (reliable) ───────────────────────────
+    def _classify_call(transcript: str, end_reason: str, duration_sec: int) -> str:
+        """Use Claude to classify call outcome from transcript."""
+        # Fast-path: no transcript or very short call = no answer
+        if not transcript.strip() or duration_sec < 8:
+            if "voicemail" in end_reason or "no-answer" in end_reason:
+                return "voicemail"
+            return "no_answer"
 
-    print(f"[Vapi] outcome={outcome} duration={duration_sec}s")
+        # Fast-path: voicemail detected by Vapi
+        if "voicemail" in end_reason:
+            return "voicemail"
 
-    # Log to DB
+        import anthropic as _ant
+        try:
+            ant = _ant.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
+            resp = ant.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=20,
+                messages=[{"role": "user", "content": f"""Read this phone call transcript and classify the prospect's response.
+
+Transcript:
+{transcript[:3000]}
+
+Respond with EXACTLY one word:
+- interested  (they agreed to a meeting, said yes to a call, asked for calendar link)
+- not_now     (politely declined for now, said call back later, said send info)
+- not_interested (said no clearly, asked to be removed, said stop calling)
+- answered    (call connected but outcome unclear or neutral)
+
+One word only:"""}]
+            )
+            result = resp.content[0].text.strip().lower().split()[0]
+            if result in ("interested", "not_now", "not_interested", "answered"):
+                return result
+            return "answered"
+        except Exception as e:
+            print(f"[Vapi] Claude classify error: {e} — falling back to duration")
+            return "answered" if duration_sec > 15 else "no_answer"
+
+    outcome = _classify_call(transcript, end_reason, duration_sec)
+    print(f"[Vapi] outcome={outcome} duration={duration_sec}s end_reason={end_reason}")
+
+    # ── Load client record ───────────────────────────────────────────────
+    client = None
+    try:
+        clients_data = json.loads((BASE_DIR / "monitor" / "clients.json").read_text())
+        client = next((c for c in clients_data["clients"] if c["id"] == client_id), None)
+    except Exception as e:
+        print(f"[Vapi] Could not load client: {e}")
+
+    # ── Log to DB (with transcript) ──────────────────────────────────────
+    prospect_id_val = None
     if client_id and prospect_email:
         try:
-            sys.path.insert(0, str(BASE_DIR))
             conn = get_db()
             pid_row = conn.execute(
                 "SELECT id FROM prospects WHERE client_id=? AND email=?",
                 (client_id, prospect_email.lower())
             ).fetchone()
             if pid_row:
+                prospect_id_val = pid_row[0]
                 conn.execute(
                     "INSERT OR IGNORE INTO events (id, prospect_id, client_id, event_type, metadata, created_at) VALUES (?,?,?,?,?,?)",
                     (str(uuid.uuid4()), pid_row[0], client_id, f"call_{outcome}",
-                     json.dumps({"vapi_call_id": call_id, "duration_sec": duration_sec, "outcome": outcome, "end_reason": end_reason}),
+                     json.dumps({"vapi_call_id": call_id, "duration_sec": duration_sec,
+                                 "outcome": outcome, "end_reason": end_reason,
+                                 "transcript": transcript[:4000]}),  # store transcript
                      datetime.utcnow().isoformat())
                 )
+                # Update call_status on prospect record
+                conn.execute(
+                    "UPDATE prospects SET call_status=?, called_at=? WHERE id=?",
+                    (outcome, datetime.utcnow().isoformat(), pid_row[0])
+                )
                 conn.commit()
-                # Update stage if interested
-                if outcome == "interested":
-                    update_prospect_stage(pid_row[0], "replied")
             conn.close()
         except Exception as e:
             print(f"[Vapi] DB log error: {e}")
 
-    # Write to DNC if prospect opted out on the call
-    if outcome == "not_interested" and client_id and prospect_email:
+    # ── Handle each outcome ──────────────────────────────────────────────
+
+    if outcome == "interested" and client and prospect_email:
+        # Queue for Vito's approval — same pattern as email replies
+        # Do NOT auto-send. Create pending approval entry.
+        try:
+            sender_name = client.get("sender_name", "Vito")
+            firm_name   = client.get("firm_name", "ArgusReach")
+            calendly    = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
+
+            draft_body = (
+                f"Hi,\n\n"
+                f"Great speaking with you - really glad we connected.\n\n"
+                f"As mentioned, {firm_name} would love to set up a quick 15-minute call to show you "
+                f"exactly how they help practices like yours. Here's the calendar link to grab whatever time works best:\n\n"
+                f"{calendly}\n\n"
+                f"Looking forward to it.\n\n"
+                f"{sender_name}\n{firm_name}"
+            )
+
+            approval = {
+                "id":             str(uuid.uuid4()),
+                "client_id":      client_id,
+                "type":           "call_followup",
+                "prospect_email": prospect_email,
+                "subject":        f"Great connecting - {firm_name}",
+                "draft":          draft_body,
+                "transcript":     transcript[:2000],
+                "call_duration":  duration_sec,
+                "created_at":     datetime.utcnow().isoformat(),
+            }
+
+            pending_file = BASE_DIR / "monitor" / "logs" / "pending_approvals.json"
+            pending_file.parent.mkdir(parents=True, exist_ok=True)
+            existing = json.loads(pending_file.read_text()) if pending_file.exists() else []
+            existing.append(approval)
+            pending_file.write_text(json.dumps(existing, indent=2))
+
+            # Update prospect stage
+            if prospect_id_val:
+                try:
+                    conn2 = get_db()
+                    conn2.execute("UPDATE prospects SET stage='replied' WHERE id=?", (prospect_id_val,))
+                    conn2.commit()
+                    conn2.close()
+                except Exception:
+                    pass
+
+            # Pause sequence in Instantly so no more emails go out
+            _pause_instantly_prospect(client, prospect_email)
+
+            firm = client["firm_name"]
+            telegram_notify(
+                f"📞 <b>Call - Interested!</b>\n"
+                f"👤 {prospect_email}\n"
+                f"🏢 {firm}\n"
+                f"⏱ {duration_sec}s\n\n"
+                f"Draft follow-up email queued for your approval in the portal.\n"
+                f"Sequence paused - no more emails until you approve."
+            )
+            print(f"[Vapi] Interested: {prospect_email} - pending approval created, sequence paused")
+        except Exception as e:
+            print(f"[Vapi] Interested handling error: {e}")
+
+    elif outcome == "not_interested" and client_id and prospect_email:
+        # DNC — add to global + client list
         try:
             dnc_global = BASE_DIR / "monitor" / "dnc" / "global.txt"
             dnc_client = BASE_DIR / "monitor" / "dnc" / f"{client_id}.txt"
             for dnc_file in [dnc_global, dnc_client]:
                 dnc_file.parent.mkdir(parents=True, exist_ok=True)
-                existing = set(dnc_file.read_text().splitlines()) if dnc_file.exists() else set()
-                if prospect_email.lower() not in existing:
+                existing_dnc = set(dnc_file.read_text().splitlines()) if dnc_file.exists() else set()
+                if prospect_email.lower() not in existing_dnc:
                     with open(dnc_file, "a") as f:
                         f.write(prospect_email.lower() + "\n")
-            print(f"[Vapi] DNC: {prospect_email} added to global + client DNC")
-        except Exception as e:
-            print(f"[Vapi] DNC write error: {e}")
-
-    # Send follow-up email for answered calls (interested or general answer)
-    if outcome in ("answered", "interested", "voicemail") and client_id and prospect_email:
-        try:
-            import json as _json
-            clients_data = _json.loads((BASE_DIR / "monitor" / "clients.json").read_text())
-            client = next((c for c in clients_data["clients"] if c["id"] == client_id), None)
+            print(f"[Vapi] DNC: {prospect_email} added")
             if client:
-                _send_vapi_followup_email(client, prospect_email, outcome)
+                telegram_notify(
+                    f"📞 Call - Opted Out\n"
+                    f"👤 {prospect_email} asked to be removed. Added to DNC."
+                )
         except Exception as e:
-            print(f"[Vapi] Follow-up email error: {e}")
+            print(f"[Vapi] DNC error: {e}")
 
-    # Telegram alert for interested calls
-    if outcome == "interested":
-        try:
-            import json as _json
-            clients_data = _json.loads((BASE_DIR / "monitor" / "clients.json").read_text())
-            client = next((c for c in clients_data["clients"] if c["id"] == client_id), None)
-            firm = client["firm_name"] if client else client_id
+    elif outcome == "not_now" and client and prospect_email:
+        # Log it, sequence continues normally — no action needed
+        if client:
             telegram_notify(
-                f"📞 <b>Call - Interested!</b>\n"
+                f"📞 Call - Not Now\n"
                 f"👤 {prospect_email}\n"
-                f"🏢 {firm}\n"
-                f"⏱ {duration_sec}s\n"
-                f"Follow-up email sent with Calendly link."
+                f"💬 Politely declined for now. Sequence continues."
+            )
+
+    elif outcome == "voicemail" and client and prospect_email:
+        # Send a brief follow-up email backing up the voicemail
+        try:
+            _send_vapi_voicemail_followup(client, prospect_email)
+            telegram_notify(
+                f"📞 Call - Voicemail\n"
+                f"👤 {prospect_email}\n"
+                f"Voicemail left. Follow-up email sent."
             )
         except Exception as e:
-            print(f"[Vapi] Telegram alert error: {e}")
+            print(f"[Vapi] Voicemail follow-up error: {e}")
+
+    elif outcome == "answered" and client and prospect_email:
+        # Connected but neutral — log only, no action
+        print(f"[Vapi] Answered/neutral: {prospect_email} - logged only")
 
     return jsonify({"status": "ok", "outcome": outcome})
 
 
-def _send_vapi_followup_email(client: dict, prospect_email: str, outcome: str):
-    """Send a follow-up email after a Vapi call."""
+def _pause_instantly_prospect(client: dict, prospect_email: str):
+    """Pause a prospect in their Instantly campaign so no more emails go out."""
+    import requests as _req
+    api_key = os.environ.get("INSTANTLY_API_KEY", "")
+    if not api_key:
+        return
+    campaign_id = client.get("campaign_id", "")
+    if not campaign_id:
+        return
+    try:
+        # Mark lead as paused in Instantly
+        resp = _req.post(
+            "https://api.instantly.ai/api/v2/leads/pause",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"campaign_id": campaign_id, "email": prospect_email},
+            timeout=10
+        )
+        print(f"[Vapi] Instantly pause {prospect_email}: {resp.status_code}")
+    except Exception as e:
+        print(f"[Vapi] Instantly pause error: {e}")
+
+
+def _send_vapi_voicemail_followup(client: dict, prospect_email: str):
+    """Send a brief email backing up a voicemail left by AI."""
     from_email   = "vito@argusreach.com"
     app_password = os.environ.get("ARGUSREACH_GMAIL_APP_PASS", "")
     if not app_password:
-        print("[Vapi] No ARGUSREACH_GMAIL_APP_PASS - skipping follow-up email")
         return
+    sender_name = client.get("sender_name", "Vito")
+    firm_name   = client.get("firm_name", "ArgusReach")
+    calendly    = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
 
-    sender_name  = client.get("sender_name", "Vito Resciniti")
-    firm_name    = client.get("firm_name", "ArgusReach")
-    calendly     = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
-    client_email = client.get("outreach_email") or from_email
-
-    if outcome == "voicemail":
-        subject = f"Quick note from {firm_name}"
-        body = f"""Hi,
-
-I just left you a brief voicemail - wanted to make sure you had my contact info.
-
-I'm reaching out on behalf of {firm_name} regarding a potential referral partnership. They'd love 15 minutes to walk you through how they help practices like yours.
-
-Here's their calendar if you'd like to find a time: {calendly}
-
-No pressure at all - happy to connect whenever works for you.
-
-{sender_name}
-{firm_name}"""
-    else:
-        subject = f"Great connecting - {firm_name}"
-        body = f"""Hi,
-
-Thanks for taking a moment on the phone.
-
-As mentioned, {firm_name} would love to set up a quick 15-minute call to show you exactly how they can help. Here's the calendar link to grab whatever time works best:
-
-{calendly}
-
-Looking forward to connecting.
-
-{sender_name}
-{firm_name}"""
+    subject = f"Tried to reach you - {firm_name}"
+    body = (
+        f"Hi,\n\n"
+        f"I just left you a brief voicemail - wanted to make sure you had my info.\n\n"
+        f"{firm_name} works with practices like yours to build physician referral pipelines. "
+        f"{sender_name} would love 15 minutes to walk you through how it works.\n\n"
+        f"Here's the calendar link if you'd like to find a time: {calendly}\n\n"
+        f"No pressure at all - happy to connect whenever works for you.\n\n"
+        f"{sender_name}\n{firm_name}"
+    )
 
     try:
         msg = MIMEMultipart("alternative")
@@ -705,13 +815,15 @@ Looking forward to connecting.
         msg["From"]    = f"{sender_name} <{from_email}>"
         msg["To"]      = prospect_email
         msg.attach(MIMEText(body, "plain"))
-
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(from_email, app_password)
             smtp.sendmail(from_email, prospect_email, msg.as_string())
-        print(f"[Vapi] Follow-up email sent to {prospect_email} (outcome: {outcome})")
+        print(f"[Vapi] Voicemail follow-up email sent to {prospect_email}")
     except Exception as e:
-        print(f"[Vapi] Email send error: {e}")
+        print(f"[Vapi] Voicemail email error: {e}")
+
+
+
 
 
 if __name__ == "__main__":
