@@ -562,7 +562,7 @@ def get_client_metrics(client_id, instantly_campaign_id=None, prefetched_analyti
     leads_db          = conn.execute("SELECT COUNT(*) FROM prospects WHERE client_id=?", (client_id,)).fetchone()[0]
     prospects_tracked = conn.execute("SELECT COUNT(DISTINCT prospect_id) FROM events WHERE event_type='classified' AND client_id=?", (client_id,)).fetchone()[0]
     calls_made        = conn.execute("SELECT COUNT(*) FROM events WHERE event_type LIKE 'call_%' AND client_id=?", (client_id,)).fetchone()[0]
-    calls_answered    = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_answered' AND client_id=?", (client_id,)).fetchone()[0]
+    calls_answered    = conn.execute("SELECT COUNT(*) FROM events WHERE event_type IN ('call_answered','call_not_now') AND client_id=?", (client_id,)).fetchone()[0]
     calls_interested  = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_interested' AND client_id=?", (client_id,)).fetchone()[0]
     calls_voicemail   = conn.execute("SELECT COUNT(*) FROM events WHERE event_type='call_voicemail' AND client_id=?", (client_id,)).fetchone()[0]
     conn.close()
