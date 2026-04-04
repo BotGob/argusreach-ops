@@ -680,10 +680,10 @@ One word only:"""}]
 
             draft_body = (
                 f"Hey {prospect_first},\n\n"
-                f"Great connecting just now.\n\n"
-                f"Here's {sender_name}'s calendar - just grab whatever time works, no pressure at all:\n\n"
+                f"Thanks for taking a moment with our assistant just now.\n\n"
+                f"Here's my calendar if you'd like to connect - just grab whatever time works:\n\n"
                 f"{calendly}\n\n"
-                f"Talk soon,\n"
+                f"Looking forward to it.\n\n"
                 f"{sender_name}"
             )
 
@@ -818,11 +818,11 @@ def _send_vapi_voicemail_followup(client: dict, prospect_email: str):
     firm_name   = client.get("firm_name", "ArgusReach")
     calendly    = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
 
-    subject = f"Tried to reach you"
+    subject = f"Following up"
     body = (
         f"Hi,\n\n"
-        f"Just tried to reach you - left a quick voicemail.\n\n"
-        f"If you get a chance, here's {sender_name}'s calendar to grab 15 minutes:\n\n"
+        f"Our assistant just tried to reach you and left a quick voicemail.\n\n"
+        f"If you get a chance to connect, here's my calendar to grab 15 minutes:\n\n"
         f"{calendly}\n\n"
         f"No rush at all.\n\n"
         f"{sender_name}"
