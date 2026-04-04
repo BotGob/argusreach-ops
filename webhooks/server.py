@@ -664,14 +664,27 @@ One word only:"""}]
             firm_name   = client.get("firm_name", "ArgusReach")
             calendly    = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
 
+            # Get prospect first name for personalization
+            prospect_first = prospect_email.split("@")[0].split(".")[0].capitalize()
+            try:
+                conn_pn = get_db()
+                pn_row = conn_pn.execute(
+                    "SELECT first_name FROM prospects WHERE client_id=? AND email=?",
+                    (client_id, prospect_email.lower())
+                ).fetchone()
+                if pn_row and pn_row[0]:
+                    prospect_first = pn_row[0]
+                conn_pn.close()
+            except Exception:
+                pass
+
             draft_body = (
-                f"Hi,\n\n"
-                f"Great speaking with you - really glad we connected.\n\n"
-                f"As mentioned, {firm_name} would love to set up a quick 15-minute call to show you "
-                f"exactly how they help practices like yours. Here's the calendar link to grab whatever time works best:\n\n"
+                f"Hey {prospect_first},\n\n"
+                f"Great connecting just now.\n\n"
+                f"Here's {sender_name}'s calendar - just grab whatever time works, no pressure at all:\n\n"
                 f"{calendly}\n\n"
-                f"Looking forward to it.\n\n"
-                f"{sender_name}\n{firm_name}"
+                f"Talk soon,\n"
+                f"{sender_name}"
             )
 
             approval = {
@@ -805,15 +818,14 @@ def _send_vapi_voicemail_followup(client: dict, prospect_email: str):
     firm_name   = client.get("firm_name", "ArgusReach")
     calendly    = client.get("calendly_link", "https://calendly.com/vito-argusreach/30min")
 
-    subject = f"Tried to reach you - {firm_name}"
+    subject = f"Tried to reach you"
     body = (
         f"Hi,\n\n"
-        f"I just left you a brief voicemail - wanted to make sure you had my info.\n\n"
-        f"{firm_name} works with practices like yours to build physician referral pipelines. "
-        f"{sender_name} would love 15 minutes to walk you through how it works.\n\n"
-        f"Here's the calendar link if you'd like to find a time: {calendly}\n\n"
-        f"No pressure at all - happy to connect whenever works for you.\n\n"
-        f"{sender_name}\n{firm_name}"
+        f"Just tried to reach you - left a quick voicemail.\n\n"
+        f"If you get a chance, here's {sender_name}'s calendar to grab 15 minutes:\n\n"
+        f"{calendly}\n\n"
+        f"No rush at all.\n\n"
+        f"{sender_name}"
     )
 
     try:
