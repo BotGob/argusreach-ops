@@ -49016,3 +49016,14 @@
 2026-04-04 21:43:13 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'2026-04-04 21:43:13 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
 2026-04-04 21:43:13 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
 2026-04-04 21:43:13 [ArgusReach] Checking inbox...
+2026-04-04 21:43:14 [ArgusReach] 7 message(s) in last 24h.
+2026-04-04 21:43:15 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-04 21:43:15 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-04 21:43:15 [ArgusReach] Skipping duplicate: support@apollo.io
+2026-04-04 21:43:15 [ArgusReach] Skipping duplicate: updates@email.vapi.ai
+2026-04-04 21:43:15 [ArgusReach] Skipping duplicate: yuvanshi@dripcapital.net
+2026-04-04 21:43:16 [ArgusReach] Skipping duplicate: dmurphy@x.ai
+2026-04-04 21:43:16 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-04 21:43:16 [ArgusReach] Skipping duplicate: meganwhite@themarketpartners.help
+2026-04-04 21:43:20 Cycle complete. Next check in 10 min.
+
