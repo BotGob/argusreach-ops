@@ -43,6 +43,20 @@ DKIM instructions for Microsoft 365 clients are written and in the follow-up ema
 
 ---
 
+## 🟡 High Value — Build When First Client Signs (continued)
+
+### 16. Portal approval UI for reply drafts + call follow-ups
+Right now all draft approvals (email replies + call follow-up emails) are managed via Telegram commands. Works fine at 1 client. At 2-3 clients with concurrent replies, needs a proper web UI in admin.argusreach.com:
+- List of all pending approvals across all clients
+- Shows prospect name, company, what they said (email body or call transcript snippet)
+- Claude-drafted response shown with edit box
+- Approve button → email sends immediately
+- Reject/skip button
+- Call follow-ups show transcript + duration + outcome label
+Trigger: 2+ active clients or when Telegram management becomes unwieldy.
+
+---
+
 ## 🟢 Scale Features (3+ Clients)
 
 ### 10. Client-facing dashboard
