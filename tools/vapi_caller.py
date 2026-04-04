@@ -54,9 +54,7 @@ def build_assistant(client: dict, prospect: dict) -> dict:
     target_industry = client.get("_target_industry", "").strip()
 
     # Build a short 1-2 sentence plain-English description of what the client does
-    # Falls back gracefully if fields are missing
     if business_desc:
-        # Truncate to first 2 sentences for the call script
         sentences = business_desc.replace('\n', ' ').split('. ')
         what_they_do = '. '.join(sentences[:2]).strip()
         if not what_they_do.endswith('.'):
@@ -68,6 +66,32 @@ def build_assistant(client: dict, prospect: dict) -> dict:
             what_they_do += '.'
     else:
         what_they_do = f"{client_name} helps businesses grow through targeted outreach."
+
+    # Build a gist of what the email sequence said — so AI can reference it naturally
+    # Pull Touch 1 + Touch 2 bodies, strip template vars, summarize to 2 sentences
+    sequence = client.get("sequence", [])
+    email_gist = ""
+    if sequence:
+        import re as _re
+        t1_body = sequence[0].get("body", "") if len(sequence) > 0 else ""
+        t2_body = sequence[1].get("body", "") if len(sequence) > 1 else ""
+        # Strip Instantly template variables like {{firstName}}, {{custom_intro}} etc
+        combined = (t1_body + " " + t2_body).replace('\n', ' ')
+        combined = _re.sub(r'\{\{[^}]+\}\}', '', combined).strip()
+        combined = _re.sub(r'  +', ' ', combined)
+        # Take first 300 chars as the gist — enough context without being overwhelming
+        email_gist = combined[:300].rsplit(' ', 1)[0]  # don't cut mid-word
+        if email_gist and not email_gist.endswith('.'):
+            email_gist += '...'
+
+    email_context = (
+        f"WHAT THE EMAIL WAS ABOUT (use this if asked, don't read it back word for word — just know the gist):\n"
+        f"The email introduced {client_name} and explained that they help {prospect_company} with {what_they_do[:120]} "
+        f"{('The email said: ' + email_gist) if email_gist else ''}\n"
+        f"The email asked for a 15-minute call with {sender_name} to explore if it's a fit."
+    ) if email_gist else (
+        f"WHAT THE EMAIL WAS ABOUT: Introduced {client_name}, explained what they do, asked for a 15-minute call with {sender_name}."
+    )
 
     # Receptionist message — what we emailed about
     if target_industry in ('physical_therapy', 'pt', 'healthcare'):
@@ -86,6 +110,8 @@ The prospect ({prospect_first} at {prospect_company}) received an email recently
 
 WHAT {client_name} DOES (use this to explain if asked, in plain conversational language):
 {what_they_do}
+
+{email_context}
 
 HOW TO SPEAK:
 - Sound natural and conversational, like a real person making a quick follow-up call
