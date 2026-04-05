@@ -206,7 +206,8 @@ RULES:
         },
         "voice": {
             "provider": "11labs",
-            "voiceId": "EXAVITQu4vr4xnSDxMaL",  # Bella - best so far
+            "voiceId": "cgSgspJ2msm6clMCkdW9",  # Jessica - newer model, more natural than Bella
+            # Revert: EXAVITQu4vr4xnSDxMaL (Bella) if Jessica is worse
             "stability": 0.5,
             "similarityBoost": 0.75,
             "style": 0.35,
