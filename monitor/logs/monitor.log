@@ -77327,3 +77327,12 @@
 2026-04-07 19:49:01 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
 2026-04-07 19:49:04 Cycle complete. Next check in 10 min.
 
+2026-04-07 19:56:05 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:56:05 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:56:05 [ArgusReach] Checking inbox...
+2026-04-07 19:56:06 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:56:07 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-07 19:56:07 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:56:08 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:56:11 Cycle complete. Next check in 10 min.
+
