@@ -77273,3 +77273,48 @@
 2026-04-07 19:18:46 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
 2026-04-07 19:18:49 Cycle complete. Next check in 10 min.
 
+2026-04-07 19:25:47 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:25:47 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:25:47 [ArgusReach] Checking inbox...
+2026-04-07 19:25:48 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:25:49 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-07 19:25:49 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:25:49 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:25:52 Cycle complete. Next check in 10 min.
+
+2026-04-07 19:28:50 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:28:50 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:28:50 [ArgusReach] Checking inbox...
+2026-04-07 19:28:50 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:28:51 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-07 19:28:51 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:28:51 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:28:54 Cycle complete. Next check in 10 min.
+
+2026-04-07 19:35:52 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:35:52 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:35:52 [ArgusReach] Checking inbox...
+2026-04-07 19:35:53 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:35:54 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-07 19:35:54 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:35:55 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:35:58 Cycle complete. Next check in 10 min.
+
+2026-04-07 19:38:54 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:38:54 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:38:54 [ArgusReach] Checking inbox...
+2026-04-07 19:38:55 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:38:56 [ProspectFilter] ArgusReach — 24 known prospects loaded
+2026-04-07 19:38:56 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:38:56 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:38:59 Cycle complete. Next check in 10 min.
+
+2026-04-07 19:45:58 [CampaignValidation] ✓ ArgusReach / ArgusReach - PT → 'ArgusReach - PT'
+2026-04-07 19:45:58 [CampaignValidation] ✓ ArgusReach / ArgusReach — RIA Advisors — April 2026 → 'ArgusReach — RIA Advisors — April 2026'
+2026-04-07 19:45:58 [ArgusReach] Checking inbox...
+2026-04-07 19:45:59 [ArgusReach] 2 message(s) in last 24h.
+2026-04-07 19:46:01 [ProspectFilter] ArgusReach — 119 known prospects loaded
+2026-04-07 19:46:01 [ArgusReach] Skipping duplicate: team@mail.vapi.ai
+2026-04-07 19:46:02 [ArgusReach] Skipping duplicate: workspace-noreply@google.com
+2026-04-07 19:46:05 Cycle complete. Next check in 10 min.
+
