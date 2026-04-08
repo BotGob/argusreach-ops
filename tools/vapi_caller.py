@@ -129,7 +129,7 @@ SCRIPT FLOW:
 
 Opening:
 Wait for the person to speak first. When they say anything, respond with:
-"Hi - is this {prospect_first}?"
+"Hey - is this {prospect_first}?"
 [wait for response]
 
 SCENARIO A - They confirm it's them (say yes, say their name, or otherwise confirm):
