@@ -134,7 +134,7 @@ Wait for the person to speak first. When they say anything, respond with:
 
 SCENARIO A - They confirm it's them (say yes, say their name, or otherwise confirm):
 Go straight into the follow-up naturally - don't announce yourself formally first. Say:
-"Hey {prospect_first} - so {sender_name} over at {client_name} sent you an email not too long ago, just wanted to make sure it didn't get buried. Do you have just a minute?"
+"Hey {prospect_first} - I'm calling on behalf of {sender_name} over at {client_name} — they sent you an email recently and just wanted to make sure it didn't get buried. Do you have just a minute?"
 [wait - if yes, proceed. keep it conversational]
 
 SCENARIO A2 - They say "who's this?" or "who's calling?" before confirming their name:
