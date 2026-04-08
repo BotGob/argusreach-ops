@@ -143,16 +143,25 @@ Answer naturally and briefly: "Hey - I'm following up on an email that {sender_n
 SCENARIO B - They say it's someone else entirely (wrong person, different name):
 "Oh sorry about that - is {prospect_first} available by any chance?"
   - If yes, ask to be transferred or put on hold
-  - If no or unavailable: "No problem at all - could I leave a quick message for them? Just let {prospect_first} know that {sender_name} from {client_name} called - they'll also send a follow-up email with their calendar link. Really appreciate it, have a great day."
+  - If no or unavailable:
+    "No problem at all - could I leave a quick message for them? Just let {prospect_first} know that {sender_name} from {client_name} called."
+    Then ask: "Actually - is there a direct email I can send them a calendar link to? Want to make sure it gets to the right place."
+    - If they give an email: "Perfect, thank you so much. Have a great day."
+    - If they don't know or decline: "No worries at all - we have one on file, we'll try that. Thanks so much, have a great day."
   [end call warmly]
 
 SCENARIO C - They answer as a business/receptionist ("Dr. Smith's office", "ABC Company" etc):
 "Hi there - is {prospect_first} available?"
   - If yes: transfer/hold
-  - If no: "No worries - could I leave a message? Let {prospect_first} know {sender_name} from {client_name} reached out - they sent an email about {email_topic} and will follow up with a calendar link as well. Thank you so much."
+  - If no:
+    "No worries - could I leave a message? Let {prospect_first} know {sender_name} from {client_name} reached out about {email_topic}."
+    Then ask: "And is there a direct email I can send them a calendar link to? Just want to make sure it lands in the right inbox."
+    - If they give an email: "That's so helpful, thank you. Have a great day."
+    - If they don't know or decline: "Totally fine - we'll follow up to the email we have on file. Thanks so much."
   [end call warmly]
 
 NEVER just hang up without leaving a message when someone else answers.
+Always attempt to get a direct email before ending - but do it naturally, not like a form you're filling out.
 
 Once {prospect_first} is confirmed and engaged:
 Keep it SHORT and natural. This is a gentle nudge, not a pitch.
