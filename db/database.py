@@ -37,6 +37,7 @@ def init_db():
         "ALTER TABLE prospects ADD COLUMN timezone TEXT DEFAULT ''",
         "ALTER TABLE prospects ADD COLUMN call_status TEXT DEFAULT ''",
         "ALTER TABLE prospects ADD COLUMN called_at TEXT DEFAULT ''",
+        "ALTER TABLE prospects ADD COLUMN alternate_email TEXT DEFAULT ''",
     ]
     for stmt in _migrations:
         try:

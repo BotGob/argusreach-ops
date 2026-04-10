@@ -13,6 +13,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
+import re
 
 BASE_DIR = Path(__file__).parent.parent
 load_dotenv(BASE_DIR / "monitor" / ".env")
@@ -39,6 +40,17 @@ def telegram_notify(msg: str):
         )
     except Exception as e:
         print(f"Telegram notify failed: {e}")
+
+
+def _extract_email_from_text(text: str) -> str:
+    if not text:
+        return ""
+    matches = re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
+    for m in matches:
+        candidate = m.strip().lower().strip('.,;:!?)]}\"\'')
+        if candidate and "@" in candidate:
+            return candidate
+    return ""
 
 
 @app.route("/health")
@@ -572,6 +584,7 @@ def vapi_webhook():
     # Extract transcript — Vapi sends it at message.artifact.transcript or message.transcript
     msg        = data.get("message", {})
     transcript = (msg.get("artifact", {}) or {}).get("transcript") or msg.get("transcript") or ""
+    alternate_email = _extract_email_from_text(transcript)
     end_reason = call.get("endedReason", "").lower()
 
     # ── Classify outcome via Claude (reliable) ───────────────────────────
@@ -645,10 +658,16 @@ One word only:"""}]
                      datetime.utcnow().isoformat())
                 )
                 # Update call_status on prospect record
-                conn.execute(
-                    "UPDATE prospects SET call_status=?, called_at=? WHERE id=?",
-                    (outcome, datetime.utcnow().isoformat(), pid_row[0])
-                )
+                if alternate_email and alternate_email != prospect_email.lower():
+                    conn.execute(
+                        "UPDATE prospects SET call_status=?, called_at=?, alternate_email=? WHERE id=?",
+                        (outcome, datetime.utcnow().isoformat(), alternate_email, pid_row[0])
+                    )
+                else:
+                    conn.execute(
+                        "UPDATE prospects SET call_status=?, called_at=? WHERE id=?",
+                        (outcome, datetime.utcnow().isoformat(), pid_row[0])
+                    )
                 conn.commit()
             conn.close()
         except Exception as e:
@@ -678,6 +697,8 @@ One word only:"""}]
             except Exception:
                 pass
 
+            send_to_email = alternate_email or prospect_email
+
             draft_body = (
                 f"Hey {prospect_first},\n\n"
                 f"Thanks for taking a moment with our assistant just now.\n\n"
@@ -691,11 +712,12 @@ One word only:"""}]
                 "id":             str(uuid.uuid4()),
                 "client_id":      client_id,
                 "type":           "call_followup",
-                "prospect_email": prospect_email,
+                "prospect_email": send_to_email,
                 "subject":        f"Great connecting - {firm_name}",
                 "draft":          draft_body,
                 "transcript":     transcript[:2000],
                 "call_duration":  duration_sec,
+                "alternate_email": alternate_email,
                 "created_at":     datetime.utcnow().isoformat(),
             }
 
@@ -721,13 +743,13 @@ One word only:"""}]
             firm = client["firm_name"]
             telegram_notify(
                 f"📞 <b>Call - Interested!</b>\n"
-                f"👤 {prospect_email}\n"
+                f"👤 {send_to_email}\n"
                 f"🏢 {firm}\n"
                 f"⏱ {duration_sec}s\n\n"
                 f"Draft follow-up email queued for your approval in the portal.\n"
                 f"Sequence paused - no more emails until you approve."
             )
-            print(f"[Vapi] Interested: {prospect_email} - pending approval created, sequence paused")
+            print(f"[Vapi] Interested: {send_to_email} - pending approval created, sequence paused")
         except Exception as e:
             print(f"[Vapi] Interested handling error: {e}")
 

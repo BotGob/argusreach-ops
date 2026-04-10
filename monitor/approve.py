@@ -242,18 +242,19 @@ def do_approve(entry):
         return False
 
     try:
+        send_to = entry.get('alternate_email') or entry['from_email']
         send_email(
             outreach_email=entry['outreach_email'],
             app_password=_get_app_password(entry),
             sender_name=entry['sender_name'],
-            to_email=entry['from_email'],
+            to_email=send_to,
             subject=entry['subject'],
             body=draft,
             in_reply_to=entry.get('in_reply_to'),
             references=entry.get('references'),
         )
-        log(f"✅ Sent to {entry['from_email']} | client: {entry['firm_name']} ({entry['client_id']}) | class: {entry.get('classification','?')}")
-        log_reply(entry['client_id'], entry['from_email'],
+        log(f"✅ Sent to {send_to} | client: {entry['firm_name']} ({entry['client_id']}) | class: {entry.get('classification','?')}")
+        log_reply(entry['client_id'], send_to,
                   entry.get('classification', 'unknown'), draft, True, 'approved by Vito')
 
         # Write outcome to DB (logs draft_approved + reply_sent + updates stage)
