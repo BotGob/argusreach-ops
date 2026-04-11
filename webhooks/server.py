@@ -13,6 +13,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
+from ai.provider import generate_text as ai_generate_text
 import re
 
 BASE_DIR = Path(__file__).parent.parent
@@ -600,13 +601,8 @@ def vapi_webhook():
         if "voicemail" in end_reason:
             return "voicemail"
 
-        import anthropic as _ant
         try:
-            ant = _ant.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
-            resp = ant.messages.create(
-                model="claude-haiku-4-5",
-                max_tokens=20,
-                messages=[{"role": "user", "content": f"""Read this phone call transcript and classify the prospect's response.
+            resp = ai_generate_text("call_classify", f"""Read this phone call transcript and classify the prospect's response.
 
 Transcript:
 {transcript[:3000]}
@@ -617,9 +613,8 @@ Respond with EXACTLY one word:
 - not_interested (said no clearly, asked to be removed, said stop calling)
 - answered    (call connected but outcome unclear or neutral)
 
-One word only:"""}]
-            )
-            result = resp.content[0].text.strip().lower().split()[0]
+One word only:""", max_tokens=20)
+            result = resp.strip().lower().split()[0]
             if result in ("interested", "not_now", "not_interested", "answered"):
                 return result
             return "answered"

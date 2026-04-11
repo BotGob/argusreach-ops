@@ -13,6 +13,7 @@ import re
 import time
 
 import requests
+from ai.provider import generate_text as ai_generate_text
 
 
 # ── Domain normalization ───────────────────────────────────────────────────────
@@ -112,7 +113,7 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
     Validates: domain confidence check → company name presence → generic-phrase rejection.
     Returns the sentence string, or "" on any failure (always non-fatal).
     """
-    api_key = anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY", "")
+    api_key = anthropic_api_key or os.environ.get("ANTHROPIC_API_KEY", "") or os.environ.get("OPENAI_API_KEY", "")
     if not api_key:
         return ""
 
@@ -171,8 +172,6 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
 
     # Step 4: Claude Haiku — generate opener
     try:
-        import anthropic as _anthropic
-        aclient = _anthropic.Anthropic(api_key=api_key)
         # Pull Touch 1 body from client sequence (strips {{custom_intro}} placeholder)
         touch1_body = ""
         if client:
@@ -230,12 +229,7 @@ def enrich_contact(contact: dict, anthropic_api_key: str = "", client: dict = No
             f"Plain text only. End with a period. 15-25 words maximum. "
             f"Output the sentence and nothing else."
         )
-        msg = aclient.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=150,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        result = msg.content[0].text.strip().rstrip("!?")
+        result = ai_generate_text("enrich", prompt, max_tokens=150).strip().rstrip("!?")
         if not result.endswith("."):
             result += "."
     except Exception:

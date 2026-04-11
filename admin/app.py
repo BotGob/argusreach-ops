@@ -50,6 +50,7 @@ sys.path.insert(0, str(BASE_DIR))
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from ai.provider import generate_json as ai_generate_json
 from db.database import (get_db, init_db, sync_client_from_config,
                          upsert_campaign, get_campaigns_for_client,
                          get_campaign_metrics, get_client_consolidated_metrics,
@@ -179,7 +180,6 @@ def _generate_sequence_from_intake(client: dict) -> list:
     Falls back to template-based generation if API call fails.
     """
     import os, json as _json
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
     sender     = client.get("sender_name", "Vito")
     title_role = client.get("title", "Founder")
@@ -189,11 +189,7 @@ def _generate_sequence_from_intake(client: dict) -> list:
     if calendly:
         sig += f"\n{calendly}"
 
-    if api_key:
-        try:
-            import anthropic as _anthropic
-            aclient = _anthropic.Anthropic(api_key=api_key)
-
+    try:
             intake_context = f"""
 Firm name: {firm}
 Sender name / signer: {sender}
@@ -249,12 +245,8 @@ Respond with ONLY valid JSON in this exact format, no other text:
   ]
 }}"""
 
-            resp = aclient.messages.create(
-                model="claude-haiku-4-5",
-                max_tokens=1200,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            raw = resp.content[0].text.strip()
+            data = ai_generate_json("sequence", prompt, max_tokens=1200)
+            raw = _json.dumps(data)
             # Strip markdown code fences if present
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
@@ -264,10 +256,10 @@ Respond with ONLY valid JSON in this exact format, no other text:
             data = _json.loads(raw)
             touches = data.get("touches", [])
             if len(touches) == 3:
-                app.logger.info(f"✅ Claude-generated sequence for {firm}")
+                app.logger.info(f"✅ AI-generated sequence for {firm}")
                 return touches
-        except Exception as e:
-            app.logger.warning(f"⚠️  Claude sequence generation failed ({e}), falling back to template")
+    except Exception as e:
+        app.logger.warning(f"⚠️  AI sequence generation failed ({e}), falling back to template")
 
     # Fallback: template-based generation
     app.logger.info(f"Using template sequence for {firm}")

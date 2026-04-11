@@ -29,6 +29,7 @@ from pathlib import Path
 import requests
 from anthropic import Anthropic
 from dotenv import load_dotenv
+from ai.provider import generate_json as ai_generate_json, generate_text as ai_generate_text
 
 try:
     from cryptography.fernet import Fernet as _Fernet
@@ -739,8 +740,6 @@ def log_reply(client_id, prospect_email, classification, draft, sent, notes=''):
 
 # ── AI CLASSIFICATION ─────────────────────────────────────────────────────────
 def classify_and_draft(reply_body, from_name, from_email, subject, client):
-    if not ai:
-        return _fallback_result('No ANTHROPIC_API_KEY configured')
     if not client.get('calendly_link', '').strip():
         log(f"[Draft] calendly_link not set for {client.get('id')} — escalating instead of generating broken draft")
         return {
@@ -842,12 +841,8 @@ confidence: integer 0-100. How certain are you this classification is correct?
 
     try:
         ai_tick()
-        response = ai.messages.create(
-            model=AI_MODEL,
-            max_tokens=600,
-            messages=[{'role': 'user', 'content': prompt}]
-        )
-        raw = response.content[0].text.strip()
+        result = ai_generate_json('reply', prompt, max_tokens=600)
+        raw = json.dumps(result)
         if raw.startswith('```'):
             raw = '\n'.join(raw.split('\n')[1:])
             if raw.endswith('```'):
@@ -1369,8 +1364,6 @@ def check_stale_pending():
 
 def _draft_reengagement(client, prospect_email, prospect_first_name):
     """Use Claude to draft a brief re-engagement email for a not-now/OOO prospect."""
-    if not ai:
-        return None
     try:
         fname = prospect_first_name or prospect_email
         prompt = f"""You are drafting a brief, warm re-engagement email for {client['sender_name']} at {client['firm_name']}.
@@ -1391,12 +1384,7 @@ FORMATTING RULES:
 
 Return ONLY the email body text, no subject line, no commentary."""
 
-        resp = ai.messages.create(
-            model='claude-haiku-4-5',
-            max_tokens=300,
-            messages=[{'role': 'user', 'content': prompt}]
-        )
-        return resp.content[0].text.strip()
+        return ai_generate_text('reengagement', prompt, max_tokens=300).strip()
     except Exception as e:
         log(f"[Follow-up] Draft generation failed: {e}")
         return None
