@@ -546,6 +546,44 @@ def get_client_campaigns(client):
     }]
 
 
+
+
+def _normalize_text(value: str) -> str:
+    import re as _re
+    return _re.sub(r'[^a-z0-9]+', ' ', (value or '').lower()).strip()
+
+
+def _best_fallback_prospect_match(client: dict, from_name: str, from_email: str):
+    """Conservative fallback match by name/company when sender email differs."""
+    try:
+        conn = get_db()
+        rows = conn.execute(
+            "SELECT email, first_name, last_name, company, stage FROM prospects WHERE client_id=?",
+            (client['id'],)
+        ).fetchall()
+        conn.close()
+    except Exception:
+        return None
+
+    sender_tokens = set(_normalize_text(from_name).split())
+    email_local = (from_email or '').split('@', 1)[0].replace('.', ' ').replace('_', ' ')
+    sender_tokens |= set(_normalize_text(email_local).split())
+
+    for email, first, last, company, stage in rows:
+        hay = ' '.join([first or '', last or '', company or ''])
+        hay_tokens = set(_normalize_text(hay).split())
+        overlap = sender_tokens & hay_tokens
+        if len(overlap) >= 2:
+            return {
+                'email': email,
+                'first_name': first,
+                'last_name': last,
+                'company': company,
+                'stage': stage,
+                'overlap': sorted(overlap),
+            }
+    return None
+
 def load_prospect_emails(client):
     """
     Return a combined set of lowercase email addresses from ALL active campaigns for this client.
@@ -984,18 +1022,27 @@ def process_client(client, processed_ids):
                 decoded_subject = subject.strip()
                 is_reply_subject = decoded_subject.lower().startswith('re:')
                 if is_reply_subject and not is_warmup(msg, from_email):
-                    # Genuine-looking reply from unknown sender — flag for manual review
+                    fallback = _best_fallback_prospect_match(client, from_name or '', from_email)
+                    thread_preview = (body_text or '')[:800].strip()
+                    context_lines = [
+                        f"👤 {from_name or from_email} `<{from_email}>`",
+                        f"📋 Subject: _{subject}_",
+                        f"🧵 Thread preview: {thread_preview or '(no body text extracted)'}",
+                    ]
+                    if fallback:
+                        context_lines.append(
+                            f"🔎 Possible prospect match: {fallback['first_name'] or ''} {fallback['last_name'] or ''} <{fallback['email']}> / {fallback['company'] or ''}".strip()
+                        )
+                        context_lines.append(f"🧠 Match evidence: {', '.join(fallback.get('overlap', [])) or 'name/company overlap'}")
                     log(f"{label} Unknown sender replied (not in prospect list): {from_email} — flagging")
                     notify(
                         f"⚠️ *{client['firm_name']}* — Unknown sender replied\n"
-                        f"👤 {from_name or from_email} `<{from_email}>`\n"
-                        f"📋 Subject: _{subject}_\n"
-                        f"Not in our prospect list. May be replying from a different address. "
-                        f"Check manually."
+                        + '\n'.join(context_lines) + '\n'
+                        f"Not in our prospect list. May be replying from a different address. Check manually."
                     )
                 else:
                     log(f"{label} Skipping — not a known prospect: {from_email} | {subject[:60]}")
-                mail.store(msg_id, '+FLAGS', '\\Seen')
+                mail.store(msg_id, '+FLAGS', '\Seen')
                 new_processed.add(fingerprint)
                 continue
 
